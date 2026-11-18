@@ -36,25 +36,6 @@
   var pendingSeekMs = null;
   var cachedStoryTimings = {"schema_version":"1.0.0","generator":"Fiezel-ForcedAligner-Qwen3-Compatible","generated_at":"2026-11-02T08:46:11.310Z","stories":{"mizuki-maiko":{"title":"舞妓の一日","scenes":[{"scene_idx":0,"is_quiz":false,"audio_src":"./assets/stories/mizuki-1.mp3","audio_duration_ms":6920,"char_count":26,"char_timings":[{"char":"ミ","start_ms":25,"end_ms":220},{"char":"ズ","start_ms":220,"end_ms":416},{"char":"キ","start_ms":416,"end_ms":611},{"char":"は","start_ms":944,"end_ms":1132},{"char":"1","start_ms":1132,"end_ms":1320},{"char":"7","start_ms":1320,"end_ms":1508},{"char":"歳","start_ms":1508,"end_ms":1696},{"char":"の","start_ms":1696,"end_ms":1883},{"char":"舞","start_ms":1883,"end_ms":2071},{"char":"妓","start_ms":2071,"end_ms":2259},{"char":"で","start_ms":2259,"end_ms":2447},{"char":"す","start_ms":3318,"end_ms":3501},{"char":"毎","start_ms":3501,"end_ms":3684},{"char":"朝","start_ms":3684,"end_ms":3867},{"char":"部","start_ms":4222,"end_ms":4374},{"char":"屋","start_ms":4374,"end_ms":4527},{"char":"で","start_ms":4527,"end_ms":4679},{"char":"美","start_ms":4947,"end_ms":5123},{"char":"し","start_ms":5123,"end_ms":5299},{"char":"い","start_ms":5299,"end_ms":5475},{"char":"着","start_ms":5475,"end_ms":5651},{"char":"物","start_ms":5651,"end_ms":5828},{"char":"を","start_ms":5828,"end_ms":6004},{"char":"着","start_ms":6004,"end_ms":6180},{"char":"ま","start_ms":6180,"end_ms":6356},{"char":"す","start_ms":6356,"end_ms":6532}]},{"scene_idx":1,"is_quiz":false,"audio_src":"./assets/stories/mizuki-2.mp3","audio_duration_ms":5201,"char_count":21,"char_timings":[{"char":"赤","start_ms":25,"end_ms":216},{"char":"い","start_ms":216,"end_ms":406},{"char":"傘","start_ms":406,"end_ms":597},{"char":"を","start_ms":597,"end_ms":787},{"char":"持","start_ms":787,"end_ms":978},{"char":"っ","start_ms":1166,"end_ms":1246},{"char":"て","start_ms":1658,"end_ms":1835},{"char":"京","start_ms":1835,"end_ms":2011},{"char":"都","start_ms":2011,"end_ms":2188},{"char":"の","start_ms":2188,"end_ms":2364},{"char":"古","start_ms":2364,"end_ms":2541},{"char":"い","start_ms":2541,"end_ms":2717},{"char":"道","start_ms":2717,"end_ms":2894},{"char":"を","start_ms":3198,"end_ms":3399},{"char":"静","start_ms":3399,"end_ms":3599},{"char":"か","start_ms":3599,"end_ms":3800},{"char":"に","start_ms":3800,"end_ms":4000},{"char":"歩","start_ms":4000,"end_ms":4201},{"char":"き","start_ms":4201,"end_ms":4401},{"char":"ま","start_ms":4401,"end_ms":4602},{"char":"す","start_ms":4602,"end_ms":4802}]},{"scene_idx":2,"is_quiz":false,"audio_src":"./assets/stories/mizuki-3.mp3","audio_duration_ms":7384,"char_count":28,"char_timings":[{"char":"お","start_ms":25,"end_ms":202},{"char":"は","start_ms":202,"end_ms":379},{"char":"よ","start_ms":379,"end_ms":556},{"char":"う","start_ms":556,"end_ms":734},{"char":"ご","start_ms":734,"end_ms":911},{"char":"ざ","start_ms":911,"end_ms":1088},{"char":"い","start_ms":1088,"end_ms":1265},{"char":"ま","start_ms":1265,"end_ms":1442},{"char":"す","start_ms":1895,"end_ms":2089},{"char":"ミ","start_ms":2089,"end_ms":2283},{"char":"ズ","start_ms":2283,"end_ms":2478},{"char":"キ","start_ms":2478,"end_ms":2672},{"char":"さ","start_ms":2672,"end_ms":2866},{"char":"ん","start_ms":3484,"end_ms":3673},{"char":"今","start_ms":3673,"end_ms":3862},{"char":"日","start_ms":3862,"end_ms":4051},{"char":"も","start_ms":4051,"end_ms":4240},{"char":"元","start_ms":4240,"end_ms":4428},{"char":"気","start_ms":4428,"end_ms":4617},{"char":"で","start_ms":4617,"end_ms":4806},{"char":"す","start_ms":4806,"end_ms":4995},{"char":"ね","start_ms":4995,"end_ms":5184},{"char":"お","start_ms":5767,"end_ms":5966},{"char":"茶","start_ms":5966,"end_ms":6166},{"char":"を","start_ms":6166,"end_ms":6365},{"char":"ど","start_ms":6365,"end_ms":6564},{"char":"う","start_ms":6564,"end_ms":6764},{"char":"ぞ","start_ms":6764,"end_ms":6963}]},{"scene_idx":3,"is_quiz":false,"audio_src":"./assets/stories/mizuki-4.mp3","audio_duration_ms":6687,"char_count":23,"char_timings":[{"char":"夕","start_ms":25,"end_ms":222},{"char":"方","start_ms":222,"end_ms":419},{"char":"先","start_ms":419,"end_ms":616},{"char":"生","start_ms":897,"end_ms":1130},{"char":"と","start_ms":1130,"end_ms":1362},{"char":"一","start_ms":1362,"end_ms":1595},{"char":"緒","start_ms":1595,"end_ms":1827},{"char":"に","start_ms":1827,"end_ms":2060},{"char":"伝","start_ms":2060,"end_ms":2292},{"char":"統","start_ms":2788,"end_ms":3020},{"char":"的","start_ms":3020,"end_ms":3252},{"char":"な","start_ms":3252,"end_ms":3484},{"char":"踊","start_ms":3484,"end_ms":3716},{"char":"り","start_ms":3716,"end_ms":3948},{"char":"と","start_ms":4158,"end_ms":4399},{"char":"音","start_ms":4399,"end_ms":4639},{"char":"楽","start_ms":4639,"end_ms":4880},{"char":"を","start_ms":4880,"end_ms":5120},{"char":"練","start_ms":5120,"end_ms":5361},{"char":"習","start_ms":5361,"end_ms":5601},{"char":"し","start_ms":5601,"end_ms":5842},{"char":"ま","start_ms":5842,"end_ms":6082},{"char":"す","start_ms":6082,"end_ms":6323}]},{"scene_idx":4,"is_quiz":true,"audio_src":"./assets/stories/mizuki-5.mp3","audio_duration_ms":5851,"char_count":19,"char_timings":[{"char":"ミ","start_ms":25,"end_ms":259},{"char":"ズ","start_ms":259,"end_ms":492},{"char":"キ","start_ms":492,"end_ms":726},{"char":"さ","start_ms":1795,"end_ms":2013},{"char":"ん","start_ms":2013,"end_ms":2231},{"char":"は","start_ms":2231,"end_ms":2449},{"char":"夕","start_ms":2449,"end_ms":2667},{"char":"方","start_ms":2837,"end_ms":3038},{"char":"だ","start_ms":3038,"end_ms":3238},{"char":"れ","start_ms":3238,"end_ms":3439},{"char":"と","start_ms":3703,"end_ms":3894},{"char":"何","start_ms":3894,"end_ms":4085},{"char":"を","start_ms":4085,"end_ms":4276},{"char":"練","start_ms":4276,"end_ms":4467},{"char":"習","start_ms":4467,"end_ms":4659},{"char":"し","start_ms":4659,"end_ms":4850},{"char":"ま","start_ms":4850,"end_ms":5041},{"char":"す","start_ms":5041,"end_ms":5232},{"char":"か","start_ms":5232,"end_ms":5423}]}]},"asakusa-neko":{"title":"浅草の猫","scenes":[{"scene_idx":0,"is_quiz":false,"audio_src":"./assets/stories/asakusa-1.mp3","audio_duration_ms":9706,"char_count":35,"char_timings":[{"char":"ケ","start_ms":25,"end_ms":177},{"char":"ン","start_ms":177,"end_ms":329},{"char":"ジ","start_ms":329,"end_ms":480},{"char":"は","start_ms":480,"end_ms":632},{"char":"朝","start_ms":1319,"end_ms":1491},{"char":"早","start_ms":1491,"end_ms":1663},{"char":"く","start_ms":1663,"end_ms":1835},{"char":"有","start_ms":1835,"end_ms":2007},{"char":"名","start_ms":3059,"end_ms":3213},{"char":"な","start_ms":3213,"end_ms":3368},{"char":"浅","start_ms":3368,"end_ms":3522},{"char":"草","start_ms":3522,"end_ms":3677},{"char":"の","start_ms":3677,"end_ms":3831},{"char":"お","start_ms":3831,"end_ms":3985},{"char":"寺","start_ms":3985,"end_ms":4140},{"char":"に","start_ms":4140,"end_ms":4294},{"char":"来","start_ms":4967,"end_ms":5126},{"char":"ま","start_ms":5126,"end_ms":5285},{"char":"し","start_ms":5285,"end_ms":5444},{"char":"た","start_ms":5444,"end_ms":5603},{"char":"大","start_ms":5603,"end_ms":5762},{"char":"き","start_ms":5762,"end_ms":5921},{"char":"な","start_ms":7441,"end_ms":7590},{"char":"赤","start_ms":7590,"end_ms":7739},{"char":"い","start_ms":7739,"end_ms":7888},{"char":"ち","start_ms":7888,"end_ms":8036},{"char":"ょ","start_ms":8036,"end_ms":8185},{"char":"う","start_ms":8185,"end_ms":8334},{"char":"ち","start_ms":8334,"end_ms":8483},{"char":"ん","start_ms":8483,"end_ms":8632},{"char":"が","start_ms":8632,"end_ms":8781},{"char":"あ","start_ms":8781,"end_ms":8929},{"char":"り","start_ms":8929,"end_ms":9078},{"char":"ま","start_ms":9078,"end_ms":9227},{"char":"す","start_ms":9227,"end_ms":9376}]},{"scene_idx":1,"is_quiz":false,"audio_src":"./assets/stories/asakusa-2.mp3","audio_duration_ms":8684,"char_count":32,"char_timings":[{"char":"門","start_ms":25,"end_ms":183},{"char":"の","start_ms":183,"end_ms":341},{"char":"そ","start_ms":341,"end_ms":500},{"char":"ば","start_ms":500,"end_ms":658},{"char":"に","start_ms":658,"end_ms":816},{"char":"茶","start_ms":816,"end_ms":974},{"char":"色","start_ms":1749,"end_ms":1907},{"char":"の","start_ms":1907,"end_ms":2066},{"char":"猫","start_ms":2066,"end_ms":2224},{"char":"が","start_ms":2224,"end_ms":2382},{"char":"座","start_ms":2382,"end_ms":2541},{"char":"っ","start_ms":2541,"end_ms":2699},{"char":"て","start_ms":2699,"end_ms":2857},{"char":"い","start_ms":2857,"end_ms":3015},{"char":"ま","start_ms":3015,"end_ms":3174},{"char":"す","start_ms":3174,"end_ms":3332},{"char":"み","start_ms":4145,"end_ms":4291},{"char":"ん","start_ms":4291,"end_ms":4437},{"char":"な","start_ms":4437,"end_ms":4582},{"char":"は","start_ms":4582,"end_ms":4728},{"char":"そ","start_ms":5204,"end_ms":5377},{"char":"の","start_ms":5377,"end_ms":5549},{"char":"猫","start_ms":5549,"end_ms":5722},{"char":"を","start_ms":5722,"end_ms":5894},{"char":"ミ","start_ms":5894,"end_ms":6067},{"char":"カ","start_ms":7116,"end_ms":7292},{"char":"ン","start_ms":7292,"end_ms":7469},{"char":"と","start_ms":7469,"end_ms":7645},{"char":"呼","start_ms":7645,"end_ms":7821},{"char":"び","start_ms":7821,"end_ms":7997},{"char":"ま","start_ms":7997,"end_ms":8174},{"char":"す","start_ms":8174,"end_ms":8350}]},{"scene_idx":2,"is_quiz":false,"audio_src":"./assets/stories/asakusa-3.mp3","audio_duration_ms":8684,"char_count":34,"char_timings":[{"char":"ケ","start_ms":25,"end_ms":168},{"char":"ン","start_ms":168,"end_ms":311},{"char":"ジ","start_ms":311,"end_ms":453},{"char":"は","start_ms":453,"end_ms":596},{"char":"手","start_ms":596,"end_ms":739},{"char":"を","start_ms":1479,"end_ms":1629},{"char":"洗","start_ms":1629,"end_ms":1779},{"char":"っ","start_ms":1779,"end_ms":1929},{"char":"て","start_ms":1929,"end_ms":2080},{"char":"か","start_ms":2080,"end_ms":2230},{"char":"ら","start_ms":2230,"end_ms":2380},{"char":"お","start_ms":2380,"end_ms":2530},{"char":"祈","start_ms":3290,"end_ms":3440},{"char":"り","start_ms":3440,"end_ms":3591},{"char":"を","start_ms":3591,"end_ms":3741},{"char":"し","start_ms":3741,"end_ms":3891},{"char":"ま","start_ms":3891,"end_ms":4041},{"char":"し","start_ms":4041,"end_ms":4192},{"char":"た","start_ms":4192,"end_ms":4342},{"char":"お","start_ms":5327,"end_ms":5470},{"char":"み","start_ms":5470,"end_ms":5613},{"char":"く","start_ms":5613,"end_ms":5756},{"char":"じ","start_ms":5756,"end_ms":5900},{"char":"を","start_ms":5900,"end_ms":6043},{"char":"引","start_ms":6043,"end_ms":6186},{"char":"く","start_ms":6186,"end_ms":6329},{"char":"と","start_ms":7090,"end_ms":7238},{"char":"大","start_ms":7238,"end_ms":7386},{"char":"吉","start_ms":7386,"end_ms":7533},{"char":"が","start_ms":7533,"end_ms":7681},{"char":"出","start_ms":7681,"end_ms":7829},{"char":"ま","start_ms":7829,"end_ms":7977},{"char":"し","start_ms":7977,"end_ms":8124},{"char":"た","start_ms":8124,"end_ms":8272}]},{"scene_idx":3,"is_quiz":false,"audio_src":"./assets/stories/asakusa-4.mp3","audio_duration_ms":7384,"char_count":35,"char_timings":[{"char":"お","start_ms":25,"end_ms":161},{"char":"寺","start_ms":161,"end_ms":297},{"char":"の","start_ms":297,"end_ms":433},{"char":"前","start_ms":433,"end_ms":569},{"char":"の","start_ms":569,"end_ms":704},{"char":"店","start_ms":704,"end_ms":840},{"char":"で","start_ms":840,"end_ms":976},{"char":"温","start_ms":976,"end_ms":1112},{"char":"か","start_ms":1112,"end_ms":1248},{"char":"い","start_ms":1987,"end_ms":2113},{"char":"せ","start_ms":2113,"end_ms":2238},{"char":"ん","start_ms":2238,"end_ms":2364},{"char":"べ","start_ms":2364,"end_ms":2490},{"char":"い","start_ms":2490,"end_ms":2615},{"char":"を","start_ms":2615,"end_ms":2741},{"char":"買","start_ms":2741,"end_ms":2867},{"char":"い","start_ms":2867,"end_ms":2992},{"char":"ま","start_ms":2992,"end_ms":3118},{"char":"し","start_ms":3118,"end_ms":3244},{"char":"た","start_ms":3244,"end_ms":3369},{"char":"ミ","start_ms":3369,"end_ms":3495},{"char":"カ","start_ms":4270,"end_ms":4399},{"char":"ン","start_ms":4399,"end_ms":4528},{"char":"に","start_ms":4528,"end_ms":4656},{"char":"も","start_ms":4656,"end_ms":4785},{"char":"少","start_ms":5684,"end_ms":5817},{"char":"し","start_ms":5817,"end_ms":5949},{"char":"見","start_ms":5949,"end_ms":6082},{"char":"せ","start_ms":6082,"end_ms":6215},{"char":"て","start_ms":6215,"end_ms":6348},{"char":"あ","start_ms":6348,"end_ms":6480},{"char":"げ","start_ms":6480,"end_ms":6613},{"char":"ま","start_ms":6613,"end_ms":6746},{"char":"し","start_ms":6746,"end_ms":6878},{"char":"た","start_ms":6878,"end_ms":7011}]},{"scene_idx":4,"is_quiz":true,"audio_src":"./assets/stories/asakusa-5.mp3","audio_duration_ms":4876,"char_count":19,"char_timings":[{"char":"お","start_ms":25,"end_ms":215},{"char":"寺","start_ms":215,"end_ms":404},{"char":"の","start_ms":404,"end_ms":594},{"char":"門","start_ms":594,"end_ms":783},{"char":"の","start_ms":1351,"end_ms":1540},{"char":"そ","start_ms":1540,"end_ms":1730},{"char":"ば","start_ms":1730,"end_ms":1919},{"char":"に","start_ms":1919,"end_ms":2109},{"char":"い","start_ms":2109,"end_ms":2298},{"char":"る","start_ms":2298,"end_ms":2488},{"char":"猫","start_ms":2488,"end_ms":2677},{"char":"の","start_ms":2677,"end_ms":2866},{"char":"名","start_ms":2866,"end_ms":3056},{"char":"前","start_ms":3056,"end_ms":3245},{"char":"は","start_ms":3245,"end_ms":3435},{"char":"何","start_ms":3435,"end_ms":3624},{"char":"で","start_ms":3914,"end_ms":4105},{"char":"す","start_ms":4105,"end_ms":4296},{"char":"か","start_ms":4296,"end_ms":4487}]}]},"shinkansen-trip":{"title":"はじめての新幹線","scenes":[{"scene_idx":0,"is_quiz":false,"audio_src":"./assets/stories/shinkansen-1.mp3","audio_duration_ms":9149,"char_count":33,"char_timings":[{"char":"タ","start_ms":25,"end_ms":214},{"char":"ロ","start_ms":214,"end_ms":404},{"char":"ウ","start_ms":404,"end_ms":593},{"char":"は","start_ms":1409,"end_ms":1596},{"char":"朝","start_ms":1596,"end_ms":1782},{"char":"7","start_ms":1782,"end_ms":1969},{"char":"時","start_ms":1969,"end_ms":2155},{"char":"に","start_ms":2155,"end_ms":2342},{"char":"東","start_ms":2889,"end_ms":3056},{"char":"京","start_ms":3056,"end_ms":3223},{"char":"駅","start_ms":3223,"end_ms":3390},{"char":"に","start_ms":3390,"end_ms":3557},{"char":"着","start_ms":3557,"end_ms":3724},{"char":"き","start_ms":3724,"end_ms":3891},{"char":"ま","start_ms":3891,"end_ms":4058},{"char":"し","start_ms":4058,"end_ms":4225},{"char":"た","start_ms":4225,"end_ms":4392},{"char":"ホ","start_ms":5300,"end_ms":5472},{"char":"ー","start_ms":5472,"end_ms":5644},{"char":"ム","start_ms":5644,"end_ms":5815},{"char":"に","start_ms":5815,"end_ms":5987},{"char":"白","start_ms":6867,"end_ms":7033},{"char":"い","start_ms":7033,"end_ms":7199},{"char":"新","start_ms":7199,"end_ms":7365},{"char":"幹","start_ms":7365,"end_ms":7531},{"char":"線","start_ms":7531,"end_ms":7697},{"char":"が","start_ms":7697,"end_ms":7863},{"char":"待","start_ms":7863,"end_ms":8028},{"char":"っ","start_ms":8028,"end_ms":8194},{"char":"て","start_ms":8194,"end_ms":8360},{"char":"い","start_ms":8360,"end_ms":8526},{"char":"ま","start_ms":8526,"end_ms":8692},{"char":"す","start_ms":8692,"end_ms":8858}]},{"scene_idx":1,"is_quiz":false,"audio_src":"./assets/stories/shinkansen-2.mp3","audio_duration_ms":8545,"char_count":38,"char_timings":[{"char":"こ","start_ms":25,"end_ms":181},{"char":"の","start_ms":181,"end_ms":338},{"char":"新","start_ms":338,"end_ms":494},{"char":"幹","start_ms":494,"end_ms":651},{"char":"線","start_ms":651,"end_ms":807},{"char":"は","start_ms":807,"end_ms":963},{"char":"最","start_ms":963,"end_ms":1120},{"char":"新","start_ms":1120,"end_ms":1276},{"char":"の","start_ms":1696,"end_ms":1857},{"char":"自","start_ms":1857,"end_ms":2019},{"char":"動","start_ms":2019,"end_ms":2180},{"char":"運","start_ms":2180,"end_ms":2341},{"char":"転","start_ms":2556,"end_ms":2712},{"char":"シ","start_ms":2712,"end_ms":2867},{"char":"ス","start_ms":2867,"end_ms":3023},{"char":"テ","start_ms":3023,"end_ms":3179},{"char":"ム","start_ms":3179,"end_ms":3334},{"char":"で","start_ms":3334,"end_ms":3490},{"char":"安","start_ms":3490,"end_ms":3646},{"char":"全","start_ms":3646,"end_ms":3801},{"char":"に","start_ms":3801,"end_ms":3957},{"char":"走","start_ms":4477,"end_ms":4642},{"char":"り","start_ms":4642,"end_ms":4806},{"char":"ま","start_ms":4806,"end_ms":4971},{"char":"す","start_ms":4971,"end_ms":5135},{"char":"ご","start_ms":5135,"end_ms":5300},{"char":"ゆ","start_ms":5300,"end_ms":5464},{"char":"っ","start_ms":6431,"end_ms":6586},{"char":"く","start_ms":6586,"end_ms":6742},{"char":"り","start_ms":6742,"end_ms":6897},{"char":"お","start_ms":6897,"end_ms":7052},{"char":"過","start_ms":7279,"end_ms":7404},{"char":"ご","start_ms":7404,"end_ms":7529},{"char":"し","start_ms":7529,"end_ms":7654},{"char":"く","start_ms":7654,"end_ms":7778},{"char":"だ","start_ms":7778,"end_ms":7903},{"char":"さ","start_ms":7903,"end_ms":8028},{"char":"い","start_ms":8028,"end_ms":8153}]},{"scene_idx":2,"is_quiz":false,"audio_src":"./assets/stories/shinkansen-3.mp3","audio_duration_ms":9892,"char_count":39,"char_timings":[{"char":"電","start_ms":25,"end_ms":176},{"char":"車","start_ms":176,"end_ms":327},{"char":"が","start_ms":327,"end_ms":479},{"char":"ス","start_ms":479,"end_ms":630},{"char":"ピ","start_ms":630,"end_ms":781},{"char":"ー","start_ms":781,"end_ms":932},{"char":"ド","start_ms":932,"end_ms":1083},{"char":"を","start_ms":1083,"end_ms":1234},{"char":"上","start_ms":1234,"end_ms":1386},{"char":"げ","start_ms":1386,"end_ms":1537},{"char":"ま","start_ms":1537,"end_ms":1688},{"char":"す","start_ms":3157,"end_ms":3307},{"char":"窓","start_ms":3307,"end_ms":3458},{"char":"の","start_ms":3458,"end_ms":3608},{"char":"外","start_ms":3608,"end_ms":3758},{"char":"を","start_ms":3758,"end_ms":3909},{"char":"見","start_ms":3909,"end_ms":4059},{"char":"る","start_ms":4059,"end_ms":4209},{"char":"と","start_ms":4209,"end_ms":4360},{"char":"青","start_ms":4360,"end_ms":4510},{"char":"い","start_ms":5543,"end_ms":5697},{"char":"空","start_ms":5697,"end_ms":5852},{"char":"の","start_ms":5852,"end_ms":6006},{"char":"下","start_ms":6006,"end_ms":6160},{"char":"に","start_ms":6160,"end_ms":6314},{"char":"富","start_ms":6314,"end_ms":6469},{"char":"士","start_ms":6469,"end_ms":6623},{"char":"山","start_ms":6623,"end_ms":6777},{"char":"が","start_ms":7711,"end_ms":7869},{"char":"は","start_ms":7869,"end_ms":8028},{"char":"っ","start_ms":8028,"end_ms":8186},{"char":"き","start_ms":8186,"end_ms":8344},{"char":"り","start_ms":8344,"end_ms":8503},{"char":"と","start_ms":8503,"end_ms":8661},{"char":"見","start_ms":8661,"end_ms":8820},{"char":"え","start_ms":8820,"end_ms":8978},{"char":"ま","start_ms":8978,"end_ms":9136},{"char":"し","start_ms":9136,"end_ms":9295},{"char":"た","start_ms":9295,"end_ms":9453}]},{"scene_idx":3,"is_quiz":false,"audio_src":"./assets/stories/shinkansen-4.mp3","audio_duration_ms":8731,"char_count":31,"char_timings":[{"char":"た","start_ms":25,"end_ms":204},{"char":"っ","start_ms":204,"end_ms":382},{"char":"た","start_ms":382,"end_ms":561},{"char":"の","start_ms":561,"end_ms":740},{"char":"2","start_ms":740,"end_ms":918},{"char":"時","start_ms":918,"end_ms":1097},{"char":"間","start_ms":1097,"end_ms":1275},{"char":"半","start_ms":1275,"end_ms":1454},{"char":"で","start_ms":2352,"end_ms":2519},{"char":"新","start_ms":2519,"end_ms":2686},{"char":"大","start_ms":2686,"end_ms":2853},{"char":"阪","start_ms":2853,"end_ms":3019},{"char":"駅","start_ms":3019,"end_ms":3186},{"char":"に","start_ms":3186,"end_ms":3353},{"char":"到","start_ms":3353,"end_ms":3520},{"char":"着","start_ms":3520,"end_ms":3687},{"char":"し","start_ms":3687,"end_ms":3854},{"char":"ま","start_ms":3854,"end_ms":4020},{"char":"し","start_ms":4020,"end_ms":4187},{"char":"た","start_ms":4187,"end_ms":4354},{"char":"と","start_ms":5535,"end_ms":5696},{"char":"て","start_ms":5696,"end_ms":5856},{"char":"も","start_ms":5856,"end_ms":6017},{"char":"速","start_ms":6017,"end_ms":6177},{"char":"く","start_ms":6177,"end_ms":6338},{"char":"て","start_ms":6338,"end_ms":6498},{"char":"快","start_ms":7491,"end_ms":7659},{"char":"適","start_ms":7659,"end_ms":7827},{"char":"で","start_ms":7827,"end_ms":7996},{"char":"し","start_ms":7996,"end_ms":8164},{"char":"た","start_ms":8164,"end_ms":8332}]},{"scene_idx":4,"is_quiz":true,"audio_src":"./assets/stories/shinkansen-5.mp3","audio_duration_ms":4830,"char_count":19,"char_timings":[{"char":"タ","start_ms":25,"end_ms":189},{"char":"ロ","start_ms":189,"end_ms":353},{"char":"ウ","start_ms":353,"end_ms":516},{"char":"さ","start_ms":516,"end_ms":680},{"char":"ん","start_ms":1391,"end_ms":1555},{"char":"は","start_ms":1555,"end_ms":1718},{"char":"電","start_ms":1718,"end_ms":1882},{"char":"車","start_ms":1882,"end_ms":2045},{"char":"の","start_ms":2356,"end_ms":2543},{"char":"窓","start_ms":2543,"end_ms":2729},{"char":"か","start_ms":2729,"end_ms":2916},{"char":"ら","start_ms":2916,"end_ms":3103},{"char":"何","start_ms":3103,"end_ms":3290},{"char":"を","start_ms":3290,"end_ms":3476},{"char":"見","start_ms":3476,"end_ms":3663},{"char":"ま","start_ms":3663,"end_ms":3850},{"char":"し","start_ms":3850,"end_ms":4037},{"char":"た","start_ms":4037,"end_ms":4223},{"char":"か","start_ms":4223,"end_ms":4410}]}]}}};
 
-  var STORY_COPY_ID = {
-    'story.btn_next': 'Lanjut ke Adegan Berikutnya →',
-    'story.btn_prev': '← Sebelumnya',
-    'story.btn_quiz': 'Mulai Kuis Akhir →',
-    'story.btn_library': 'Kembali ke Perpustakaan ✓',
-    'story.btn_reread': '↺ Baca Ulang',
-    'story.hint_tap': '👆 Ketuk kanji bergaris untuk melihat arti',
-    'story.btn_start': 'Mulai Membaca →',
-    'story.mizuki_title': '舞妓の一日',
-    'story.mizuki_subtitle': 'Keseharian Mizuki di Kyoto',
-    'story.asakusa_title': '浅草の猫',
-    'story.asakusa_subtitle': 'Kucing Penjaga Kuil Asakusa',
-    'story.shinkansen_title': 'はじめての新幹線',
-    'story.shinkansen_subtitle': 'Perjalanan Shinkansen Pertama',
-    'story.quiz_speaker_name': 'Instruktur Ujian',
-    'story.quiz_audio_role': 'Audio Pertanyaan Soal (Bahasa Jepang)',
-    'story.autoplay_label': 'Putar Otomatis'
-  };
-
   var STORY_COPY_TH = {
     'story.btn_next': 'ไปยังฉากถัดไป →',
     'story.btn_prev': '← ก่อนหน้า',
@@ -97,11 +78,11 @@
     var rootObj = typeof globalThis !== 'undefined' ? globalThis : {};
     if (rootObj.FiezelI18n) {
       if (typeof rootObj.FiezelI18n.overrideCopy === 'function') {
-        rootObj.FiezelI18n.overrideCopy('id', STORY_COPY_ID);
         rootObj.FiezelI18n.overrideCopy('th', STORY_COPY_TH);
+        rootObj.FiezelI18n.overrideCopy('en', STORY_COPY_EN);
       } else if (typeof rootObj.FiezelI18n.registerCopy === 'function') {
-        rootObj.FiezelI18n.registerCopy('id', STORY_COPY_ID);
         rootObj.FiezelI18n.registerCopy('th', STORY_COPY_TH);
+        rootObj.FiezelI18n.registerCopy('en', STORY_COPY_EN);
       }
     }
   } catch (_) {}
@@ -147,7 +128,366 @@
       return story.subtitles[loc];
     }
 
+    if (loc !== 'id' && loc !== 'th') {
+      if (story.subtitles && story.subtitles.en) return story.subtitles.en;
+      if (story.subtitleKey && STORY_COPY_EN && STORY_COPY_EN[story.subtitleKey]) {
+        return STORY_COPY_EN[story.subtitleKey];
+      }
+    }
+
     return story.subtitle || (story.subtitles && story.subtitles.id) || '';
+  }
+
+  function getStoryCategory(category) {
+    if (category === 'Budaya & Tradisi') return t('story.cat-budaya', 'Culture & Tradition');
+    if (category === 'Wisata & Budaya') return t('story.cat-wisata', 'Travel & Culture');
+    if (category === 'Kehidupan Sehari-hari') return t('story.cat-kehidupan', 'Everyday Life');
+    if (category === 'Teknologi & Perjalanan') return t('story.cat-teknologi', 'Technology & Travel');
+    return category || '';
+  }
+
+  function getStoryDescription(story) {
+    if (!story) return '';
+    var rootObj = typeof globalThis !== 'undefined' ? globalThis : {};
+    var loc = 'id';
+    try {
+      if (rootObj.FiezelI18n && typeof rootObj.FiezelI18n.getLocale === 'function') {
+        loc = rootObj.FiezelI18n.getLocale() || 'id';
+      }
+    } catch (_) {}
+    if (story.descriptions) {
+      if (loc === 'id' && story.descriptions.id) return story.descriptions.id;
+      if (loc === 'th' && story.descriptions.th) return story.descriptions.th;
+      if (loc !== 'id' && loc !== 'th' && story.descriptions.en) return story.descriptions.en;
+    }
+    return story.description || '';
+  }
+
+  function storyLocale() {
+    var rootObj = typeof globalThis !== 'undefined' ? globalThis : {};
+    try {
+      if (rootObj.FiezelI18n && typeof rootObj.FiezelI18n.getLocale === 'function') {
+        return rootObj.FiezelI18n.getLocale() || 'id';
+      }
+    } catch (_) {}
+    return 'id';
+  }
+
+  var STORY_SCENE_I18N = {
+    'mizuki-maiko:0': {
+      en: {
+        title: 'Morning in the Kimono Dressing Room',
+        tag: 'Scene 1 of 5 · Traditional Dressing Room',
+        speaker: 'Mizuki',
+        role: 'Apprentice Geiko / Maiko (17)',
+        translation: 'Mizuki is a 17-year-old apprentice geiko. Every morning in her room, she puts on a beautiful silk kimono.'
+      },
+      th: {
+        title: 'ยามเช้าในห้องแต่งตัวกิโมโน',
+        tag: 'ฉากที่ 1 จาก 5 · ห้องแต่งตัวแบบดั้งเดิม',
+        speaker: 'มิซึกิ',
+        role: 'ไมโกะฝึกหัด (อายุ 17 ปี)',
+        translation: 'มิซึกิเป็นไมโกะวัย 17 ปี ทุกเช้าในห้องของเธอ เธอจะสวมชุดกิโมโนที่งดงาม'
+      }
+    },
+    'mizuki-maiko:1': {
+      en: {
+        title: 'Walking the Cobblestone Streets of Gion',
+        tag: 'Scene 2 of 5 · Gion Alleyways, Kyoto',
+        speaker: 'Narrator',
+        role: 'N5 Kyoto Story (Comprehensible Input)',
+        translation: 'Carrying a red umbrella, she walks quietly along the historic stone lanes of Kyoto.'
+      },
+      th: {
+        title: 'เดินไปตามถนนหินเก่าแก่แห่งย่านกิออน',
+        tag: 'ฉากที่ 2 จาก 5 · ตรอกย่านกิออน เกียวโต',
+        speaker: 'ผู้บรรยาย',
+        role: 'เรื่องสั้นเกียวโต ระดับ N5',
+        translation: 'ถือร่มสีแดง เธอเดินอย่างเงียบสงบไปตามถนนหินโบราณของเมืองเกียวโต'
+      }
+    },
+    'mizuki-maiko:2': {
+      en: {
+        title: 'Greeting the Traditional Tea House Owner',
+        tag: 'Scene 3 of 5 · Ochaya Tea House',
+        speaker: 'Tea House Owner',
+        role: 'Ochaya Host',
+        translation: '"Good morning, Mizuki-san. You look bright and well today too. Please enjoy some warm green tea."'
+      },
+      th: {
+        title: 'ทักทายเจ้าของโรงน้ำชาดั้งเดิม',
+        tag: 'ฉากที่ 3 จาก 5 · โรงน้ำชาโอชายะ',
+        speaker: 'เจ้าของโรงน้ำชา',
+        role: 'เจ้าบ้านโรงน้ำชา (Ochaya)',
+        translation: '"สวัสดีตอนเช้า มิซึกิซัง วันนี้ก็ดูสดใสแข็งแรงเช่นเคยนะ เชิญดื่มชาเขียวอุ่น ๆ ได้เลย"'
+      }
+    },
+    'mizuki-maiko:3': {
+      en: {
+        title: 'Traditional Dance and Music Practice',
+        tag: 'Scene 4 of 5 · Traditional Practice Stage',
+        speaker: 'Dance Instructor',
+        role: 'Traditional Arts Mentor',
+        translation: 'In the evening, together with her teacher, she practices traditional dance and music diligently.'
+      },
+      th: {
+        title: 'ฝึกซ้อมร่ายรำและดนตรีดั้งเดิม',
+        tag: 'ฉากที่ 4 จาก 5 · เวทีฝึกซ้อมศิลปะดั้งเดิม',
+        speaker: 'ครูสอนเต้น',
+        role: 'ผู้ฝึกสอนศิลปะวัฒนธรรมดั้งเดิม',
+        translation: 'ในตอนเย็น เธอฝึกซ้อมร่ายรำและดนตรีแบบดั้งเดิมร่วมกับคุณครู'
+      }
+    },
+    'mizuki-maiko:4': {
+      en: {
+        title: 'Story Comprehension Quiz & Reflection',
+        tag: 'Scene 5 of 5 · Story Comprehension Quiz',
+        stem: 'In the evening, with whom and what does Mizuki practice?',
+        explain: 'Scene 4 states: "夕方、先生と一緒に伝統的な踊りと音楽を練習します" (with her teacher, traditional dance and music).',
+        failWhys: {
+          wrong_activity_clothes: 'Wrong activity: Putting on a kimono happens in the morning in the dressing room.',
+          wrong_activity_running: 'Wrong context: Mizuki does not go running alone along the street.'
+        }
+      },
+      th: {
+        title: 'แบบทดสอบความเข้าใจและทบทวนเนื้อเรื่อง',
+        tag: 'ฉากที่ 5 จาก 5 · แบบทดสอบความเข้าใจ',
+        stem: 'ในตอนเย็น มิซึกิฝึกซ้อมอะไร และซ้อมร่วมกับใคร?',
+        explain: 'ในฉากที่ 4 ระบุว่า "夕方、先生と一緒に伝統的な踊りと音楽を練習します" (ฝึกเต้นรำและดนตรีดั้งเดิมกับคุณครู)',
+        failWhys: {
+          wrong_activity_clothes: 'กิจกรรมผิด: การใส่ชุดกิโมโนทำในตอนเช้าที่ห้องแต่งตัว',
+          wrong_activity_running: 'บริบทผิด: มิซึกิไม่ได้ออกไปวิ่งคนเดียวบนถนน'
+        }
+      }
+    },
+    'asakusa-neko:0': {
+      en: {
+        title: 'Morning at Kaminarimon Gate',
+        tag: 'Scene 1 of 5 · Kaminarimon Gate, Asakusa',
+        speaker: 'Kenji',
+        role: 'Tokyo University Student',
+        translation: 'Early in the morning, Kenji came to the famous temple in Asakusa. There hangs a huge red lantern.'
+      },
+      th: {
+        title: 'ยามเช้าที่ประตูคามินาริมอน',
+        tag: 'ฉากที่ 1 จาก 5 · ประตูคามินาริมอน อาซากุสะ',
+        speaker: 'เคนจิ',
+        role: 'นักศึกษาในโตเกียว',
+        translation: 'เช้าตรู่ เคนจิเดินทางมาถึงวัดชื่อดังในย่านอาซากุสะ ที่นั่นมีโคมแดงขนาดใหญ่มาก'
+      }
+    },
+    'asakusa-neko:1': {
+      en: {
+        title: 'The Striped Tabby Guardian Cat',
+        tag: 'Scene 2 of 5 · Meeting Mikan',
+        speaker: 'Narrator',
+        role: 'N5 Everyday Life Story',
+        translation: 'Beside the temple gate, a brown cat sits quietly. Everyone calls the cat "Mikan".'
+      },
+      th: {
+        title: 'แมวลายเสือผู้พิทักษ์หน้าวัด',
+        tag: 'ฉากที่ 2 จาก 5 · พบกับเจ้ามิคัง',
+        speaker: 'ผู้บรรยาย',
+        role: 'เรื่องสั้นชีวิตประจำวัน ระดับ N5',
+        translation: 'ข้างประตูวัด มีแมวสีน้ำตาลตัวหนึ่งนั่งอยู่ ทุกคนเรียกแมวตัวนั้นว่า "มิคัง"'
+      }
+    },
+    'asakusa-neko:2': {
+      en: {
+        title: 'Prayers and Omikuji Fortune',
+        tag: 'Scene 3 of 5 · Fortune Slip Reading',
+        speaker: 'Kenji',
+        role: 'Tokyo University Student',
+        translation: 'After washing his hands, Kenji offered a prayer. When he drew an omikuji fortune, it read "Daikichi" (great blessing).'
+      },
+      th: {
+        title: 'อธิษฐานและเสี่ยงเซียมซีโอมิคุจิ',
+        tag: 'ฉากที่ 3 จาก 5 · ใบทำนายโชคลาภ',
+        speaker: 'เคนจิ',
+        role: 'นักศึกษาในโตเกียว',
+        translation: 'หลังจากล้างมือแล้ว เคนจิก็อธิษฐาน เมื่อจับใบเซียมซีก็ออกผล "ไดคิจิ" (โชคดีอย่างยิ่ง)'
+      }
+    },
+    'asakusa-neko:3': {
+      en: {
+        title: 'The Traditional Senbei Rice Cracker Stall',
+        tag: 'Scene 4 of 5 · Traditional Shop Front',
+        speaker: 'Kenji',
+        role: 'Tokyo University Student',
+        translation: 'At a shop in front of the temple, he bought warm senbei rice crackers and showed a bite to Mikan too.'
+      },
+      th: {
+        title: 'ร้านขนมเซ็มเบ้ข้าวกรอบหน้าวัด',
+        tag: 'ฉากที่ 4 จาก 5 · ร้านค้าแบบดั้งเดิมหน้าวัด',
+        speaker: 'เคนจิ',
+        role: 'นักศึกษาในโตเกียว',
+        translation: 'ที่ร้านหน้าวัด เขาซื้อขนมเซ็มเบ้อุ่น ๆ และนำมาแบ่งให้เจ้ามิคังดูด้วย'
+      }
+    },
+    'asakusa-neko:4': {
+      en: {
+        title: 'Asakusa Temple Comprehension Quiz',
+        tag: 'Scene 5 of 5 · Story Comprehension Quiz',
+        stem: 'What is the name of the cat sitting beside the temple gate?',
+        explain: 'Scene 2 clearly says: "みんなはその猫を「ミカン」と呼びます" (Everyone calls that cat Mikan).',
+        optTextMap: {
+          '(Apel)': '(Apple)',
+          '(Jeruk Mikan)': '(Mikan Tangerine)',
+          '(Bunga Sakura)': '(Sakura Blossom)'
+        },
+        failWhys: {
+          wrong_fruit_name: 'Wrong name: The story says the cat is named Mikan (tangerine), not Ringo (apple).',
+          wrong_flower_name: 'Wrong name: Sakura is a flower name, not the temple cat\'s name.'
+        }
+      },
+      th: {
+        title: 'แบบทดสอบความเข้าใจเรื่องวัดอาซากุสะ',
+        tag: 'ฉากที่ 5 จาก 5 · แบบทดสอบความเข้าใจ',
+        stem: 'แมวที่อยู่ข้างประตูวัดมีชื่อว่าอะไร?',
+        explain: 'ฉากที่ 2 ระบุชัดเจนว่า "みんなはその猫を「ミカン」と呼びます" (ทุกคนเรียกแมวตัวนั้นว่า มิคัง)',
+        optTextMap: {
+          '(Apel)': '(แอปเปิล)',
+          '(Jeruk Mikan)': '(ส้มมิคัง)',
+          '(Bunga Sakura)': '(ดอกซากุระ)'
+        },
+        failWhys: {
+          wrong_fruit_name: 'ชื่อผิด: ในเนื้อเรื่องบอกว่าแมวชื่อมิคัง ไม่ใช่ริงโกะ',
+          wrong_flower_name: 'ชื่อผิด: ซากุระเป็นชื่อดอกไม้ ไม่ใช่ชื่อแมวหน้าวัด'
+        }
+      }
+    },
+    'shinkansen-trip:0': {
+      en: {
+        title: 'Morning on the Tokyo Station Platform',
+        tag: 'Scene 1 of 5 · Tokyo Station Platform',
+        speaker: 'Taro',
+        role: 'Student',
+        translation: 'Taro arrived at Tokyo Station at 7 a.m. On the platform, a sleek white Shinkansen train was waiting.'
+      },
+      th: {
+        title: 'ยามเช้าที่ชานชาลาสถานีโตเกียว',
+        tag: 'ฉากที่ 1 จาก 5 · ชานชาลาสถานีโตเกียว',
+        speaker: 'ทาโร่',
+        role: 'นักเรียน',
+        translation: 'ทาโร่มาถึงสถานีโตเกียวตอน 7 โมงเช้า ที่ชานชาลามีรถไฟชินคันเซ็นสีขาวจอดรออยู่'
+      }
+    },
+    'shinkansen-trip:1': {
+      en: {
+        title: 'Modern Automated Shinkansen Cabin',
+        tag: 'Scene 2 of 5 · Modern Automated Cabin',
+        speaker: 'Train Conductor',
+        role: 'Shinkansen Announcer',
+        translation: '"This Shinkansen travels safely using the latest automated driving system. Please sit back and enjoy your journey."'
+      },
+      th: {
+        title: 'ห้องโดยสารชินคันเซ็นอัตโนมัติทันสมัย',
+        tag: 'ฉากที่ 2 จาก 5 · ตู้โดยสารอัตโนมัติ',
+        speaker: 'เจ้าหน้าที่รถไฟ',
+        role: 'ผู้ประกาศบนรถไฟชินคันเซ็น',
+        translation: '"รถไฟชินคันเซ็นขบวนนี้วิ่งอย่างปลอดภัยด้วยระบบขับเคลื่อนอัตโนมัติรุ่นล่าสุด ขอให้เพลิดเพลินกับการเดินทาง"'
+      }
+    },
+    'shinkansen-trip:2': {
+      en: {
+        title: 'Majestic Mount Fuji Outside the Window',
+        tag: 'Scene 3 of 5 · Scenic Horizon View',
+        speaker: 'Taro',
+        role: 'Student',
+        translation: 'The train picks up speed. Looking out the window, Mount Fuji rises clearly beneath the blue sky.'
+      },
+      th: {
+        title: 'ทิวทัศน์ภูเขาไฟฟูจิจากหน้าต่างรถไฟ',
+        tag: 'ฉากที่ 3 จาก 5 · ทิวทัศน์ธรรมชาติอันงดงาม',
+        speaker: 'ทาโร่',
+        role: 'นักเรียน',
+        translation: 'รถไฟเพิ่มความเร็วขึ้น เมื่อมองออกไปนอกหน้าต่าง ก็เห็นภูเขาไฟฟูจิชัดเจนใต้ท้องฟ้าสีคราม'
+      }
+    },
+    'shinkansen-trip:3': {
+      en: {
+        title: 'Arriving at Shin-Osaka Station',
+        tag: 'Scene 4 of 5 · Arrival in Osaka',
+        speaker: 'Taro',
+        role: 'Student',
+        translation: 'In just 2.5 hours, they arrived at Shin-Osaka Station. The ride was remarkably fast and comfortable.'
+      },
+      th: {
+        title: 'เดินทางถึงสถานีชินโอซาก้า',
+        tag: 'ฉากที่ 4 จาก 5 · เดินทางถึงโอซาก้า',
+        speaker: 'ทาโร่',
+        role: 'นักเรียน',
+        translation: 'ใช้เวลาเพียง 2 ชั่วโมงครึ่ง ก็มาถึงสถานีชินโอซาก้า เป็นการเดินทางที่รวดเร็วและสะดวกสบายมาก'
+      }
+    },
+    'shinkansen-trip:4': {
+      en: {
+        title: 'Shinkansen Journey Comprehension Quiz',
+        tag: 'Scene 5 of 5 · Story Comprehension Quiz',
+        stem: 'What did Taro see outside the train window?',
+        explain: 'Scene 3 states: "青い空の下に富士山がはっきりと見えました" (Mount Fuji beneath the blue sky).',
+        failWhys: {
+          wrong_sight_sea: 'Wrong view: The Tokaido Shinkansen line crosses inland past Mount Fuji, not open ocean ships.',
+          wrong_sight_tower: 'Wrong landmark: Tokyo Tower is in central Tokyo prior to departure.'
+        }
+      },
+      th: {
+        title: 'แบบทดสอบความเข้าใจเรื่องรถไฟชินคันเซ็น',
+        tag: 'ฉากที่ 5 จาก 5 · แบบทดสอบความเข้าใจ',
+        stem: 'ทาโร่มองเห็นอะไรผ่านหน้าต่างรถไฟ?',
+        explain: 'ฉากที่ 3 ระบุว่า "青い空の下に富士山がはっきりと見えました" (ภูเขาไฟฟูจิใต้ท้องฟ้าสีคราม)',
+        failWhys: {
+          wrong_sight_sea: 'ทิวทัศน์ผิด: เส้นทางรถไฟนี้ผ่านภูเขาไฟฟูจิ ไม่ใช่ทะเลเปิดและเรือ',
+          wrong_sight_tower: 'สถานที่ผิด: โตเกียวทาวเวอร์อยู่ในตัวเมืองโตเกียวก่อนออกเดินทาง'
+        }
+      }
+    }
+  };
+
+  var WORD_GLOSS_I18N = {
+    '舞妓': { en: 'apprentice geiko / maiko', th: 'ไมโกะ (เกอิชาฝึกหัด)' },
+    '部屋': { en: 'room', th: 'ห้อง' },
+    '美しい': { en: 'beautiful', th: 'สวยงาม' },
+    '着物': { en: 'traditional kimono', th: 'ชุดกิโมโนแบบดั้งเดิม' },
+    '傘': { en: 'umbrella', th: 'ร่ม' },
+    '京都': { en: 'Kyoto city', th: 'เมืองเกียวโต' },
+    '古い': { en: 'old / historic', th: 'เก่าแก่ / โบราณ' },
+    '静かに': { en: 'quietly / peacefully', th: 'อย่างเงียบสงบ' },
+    '歩きます': { en: 'walk', th: 'เดิน' },
+    '今日': { en: 'today', th: 'วันนี้' },
+    '元気': { en: 'energetic / well', th: 'แข็งแรง / สดใส' },
+    'お茶': { en: 'Japanese green tea', th: 'ชาเขียวญี่ปุ่น' },
+    '踊り': { en: 'traditional dance', th: 'การร่ายรำดั้งเดิม' },
+    '音楽': { en: 'music', th: 'ดนตรี' },
+    '練習します': { en: 'practice', th: 'ฝึกซ้อม' },
+    '朝': { en: 'morning', th: 'ตอนเช้า' },
+    '有名': { en: 'famous', th: 'มีชื่อเสียง' },
+    'お寺': { en: 'Buddhist temple', th: 'วัด' },
+    '猫': { en: 'cat', th: 'แมว' },
+    '呼びます': { en: 'call / name', th: 'เรียกว่า' },
+    'おみくじ': { en: 'fortune slip', th: 'ใบเซียมซี' },
+    '大吉': { en: 'great fortune / blessing', th: 'โชคดีมาก (ไดคิจิ)' },
+    '店': { en: 'shop / stall', th: 'ร้านค้า' },
+    'せんべい': { en: 'Japanese rice crackers', th: 'ขนมเซ็มเบ้ (ข้าวอบกรอบ)' },
+    '買いました': { en: 'bought', th: 'ซื้อแล้ว' },
+    '東京駅': { en: 'Tokyo Station', th: 'สถานีโตเกียว' },
+    '新幹線': { en: 'Shinkansen bullet train', th: 'รถไฟความเร็วสูงชินคันเซ็น' },
+    '最新': { en: 'latest / state-of-the-art', th: 'ล่าสุด / ทันสมัย' },
+    '自動運転': { en: 'automated driving', th: 'ระบบขับเคลื่อนอัตโนมัติ' },
+    '安全に': { en: 'safely', th: 'อย่างปลอดภัย' },
+    '窓': { en: 'window', th: 'หน้าต่าง' },
+    '富士山': { en: 'Mount Fuji', th: 'ภูเขาไฟฟูจิ' },
+    '到着': { en: 'arrive / arrival', th: 'เดินทางถึง' },
+    '速くて': { en: 'fast and...', th: 'รวดเร็วและ...' },
+    '快適': { en: 'comfortable / pleasant', th: 'สะดวกสบาย' }
+  };
+
+  function sceneMeta(storyId, idx) {
+    var loc = storyLocale();
+    if (loc === 'id') return null;
+    var bucket = STORY_SCENE_I18N[storyId + ':' + idx];
+    if (!bucket) return null;
+    return loc === 'th' ? (bucket.th || bucket.en) : (bucket.en || null);
   }
 
   // Visual Scene Vector Generators (Studio Ghibli & Kyoto Travertine Palette)
@@ -321,6 +661,10 @@
       category: 'Budaya & Tradisi',
       coverSvg: makeSceneSvg('mizuki-2', 'Mizuki Cover'),
       description: 'Menelusuri keseharian Mizuki, calon geisha 17 tahun di Kyoto, dari merias kimono sutra hingga latihan menari dan shamisen di Ochaya.',
+      descriptions: {
+        en: 'Follow 17-year-old apprentice geiko Mizuki through her day in Kyoto, from dressing in silk kimono to dance and shamisen practice at the Ochaya.',
+        th: 'ติดตามชีวิตประจำวันของมิซึกิ ไมโกะฝึกหัดวัย 17 ปีในเกียวโต ตั้งแต่แต่งชุดกิโมโนผ้าไหมจนถึงฝึกเต้นรำและชามิเซ็นที่โรงน้ำชา'
+      },
       scenes: [
         {
           index: 0,
@@ -403,6 +747,10 @@
       category: 'Kehidupan Sehari-hari',
       coverSvg: makeSceneSvg('asakusa', 'Asakusa Neko Cover'),
       description: 'Kenji mengunjungi Kuil Senso-ji di Asakusa saat pagi hari dan bertemu kucing belang ramah bernama Mikan penjaga gerbang kuil.',
+      descriptions: {
+        en: 'Kenji visits Senso-ji Temple in Asakusa in the morning and meets Mikan, a friendly tabby cat keeping watch by the temple gate.',
+        th: 'เคนจิไปเยือนวัดเซ็นโซจิในอาซากุสะยามเช้า และได้พบกับเจ้ามิคัง แมวลายเสือใจดีที่เฝ้าอยู่หน้าประตูวัด'
+      },
       scenes: [
         {
           index: 0,
@@ -485,6 +833,10 @@
       category: 'Teknologi & Perjalanan',
       coverSvg: makeSceneSvg('shinkansen', 'Shinkansen Cover'),
       description: 'Pengalaman mendebarkan Taro menaiki Shinkansen otomatis dari Stasiun Tokyo menuju Shin-Osaka melewati panorama Gunung Fuji yang megah.',
+      descriptions: {
+        en: 'Join Taro on a thrilling ride aboard the Shinkansen bullet train from Tokyo Station to Shin-Osaka past majestic views of Mount Fuji.',
+        th: 'ร่วมเดินทางไปกับทาโร่บนรถไฟชินคันเซ็นจากสถานีโตเกียวสู่ชินโอซาก้า ผ่านทิวทัศน์อันงดงามของภูเขาไฟฟูจิ'
+      },
       scenes: [
         {
           index: 0,
@@ -887,15 +1239,15 @@
         '<div class="fz-story-card-item" onclick="window.FiezelStoryReader.openStory(\'' + s.id + '\')">' +
           '<div class="fz-story-thumb-wrap">' +
             sceneArtHtml(s.coverSvg, s.coverSrc, s.title) +
-            '<span class="fz-story-level-badge">' + s.level + ' • 5 Adegan</span>' +
+            '<span class="fz-story-level-badge">' + s.level + ' • ' + t('story.scenes-count', '{count} Scenes', { count: 5 }) + '</span>' +
           '</div>' +
           '<div class="fz-story-card-body">' +
-            '<span class="fz-story-cat-tag">' + s.category + '</span>' +
+            '<span class="fz-story-cat-tag">' + getStoryCategory(s.category) + '</span>' +
             '<h3 class="fz-story-card-title">' + titleHtml + '</h3>' +
             (subtitle ? '<div class="fz-story-card-subtitle">' + subtitle + '</div>' : '') +
-            '<p class="fz-story-card-desc">' + s.description + '</p>' +
+            '<p class="fz-story-card-desc">' + getStoryDescription(s) + '</p>' +
             '<div class="fz-story-card-foot">' +
-              '<span class="fz-story-cta-btn">' + t('story.btn_start', 'Mulai Membaca →') + '</span>' +
+              '<span class="fz-story-cta-btn">' + t('story.btn_start', 'Start Reading →') + '</span>' +
             '</div>' +
           '</div>' +
         '</div>';
@@ -922,12 +1274,18 @@
     var stepperHtml = story.scenes.map(function (sc, idx) {
       var isAct = idx === activeSceneIndex;
       var isPast = idx < activeSceneIndex;
-      var label = sc.isQuiz ? 'Kuis' : String(idx + 1);
+      var label = sc.isQuiz ? t('story.badge-quiz', 'Quiz') : String(idx + 1);
       var cls = 'fz-scene-step-pill ' + (isAct ? 'active' : isPast ? 'passed' : '');
       return '<button type="button" class="' + cls + '" onclick="window.FiezelStoryReader.gotoScene(' + idx + ')">' + label + '</button>';
     }).join('');
 
     var contentHtml = '';
+    var sm = sceneMeta(activeStoryId, activeSceneIndex) || {};
+    var dispTitle = sm.title || scene.title;
+    var dispTag = sm.tag || scene.tag;
+    var dispSpeaker = sm.speaker || scene.speaker;
+    var dispRole = sm.role || scene.role;
+    var dispTranslation = sm.translation || scene.id;
 
     if (!isQuiz) {
       // Adegan Cerita Biasa
@@ -936,24 +1294,24 @@
           '<!-- Left Column: Scene Theater -->' +
           '<div class="fz-theater-card">' +
             '<div class="fz-scene-viewport">' +
-              sceneArtHtml(scene.svgArt, scene.imageSrc, scene.title) +
+              sceneArtHtml(scene.svgArt, scene.imageSrc, dispTitle) +
               '<div class="fz-scene-overlay"></div>' +
-              '<span class="fz-scene-tag">' + scene.tag + '</span>' +
+              '<span class="fz-scene-tag">' + dispTag + '</span>' +
             '</div>' +
             '<div class="fz-audio-console">' +
               '<div class="fz-speaker-row">' +
                 '<div id="fzSpeakerAvatar" class="fz-speaker-avatar' + (isPlaying ? ' speaking' : '') + '">' + scene.avatar + '</div>' +
                 '<div class="fz-speaker-meta">' +
-                  '<div class="fz-speaker-name">' + scene.speaker + '</div>' +
-                  '<div class="fz-speaker-role">' + scene.role + '</div>' +
+                  '<div class="fz-speaker-name">' + dispSpeaker + '</div>' +
+                  '<div class="fz-speaker-role">' + dispRole + '</div>' +
                 '</div>' +
-                '<div class="fz-autoplay-badge" title="' + t('story.autoplay_label', 'Putar Otomatis') + '">' +
-                  '<span class="fz-autoplay-dot"></span> ' + t('story.autoplay_label', 'Putar Otomatis') +
+                '<div class="fz-autoplay-badge" title="' + t('story.autoplay_label', 'Auto-play') + '">' +
+                  '<span class="fz-autoplay-dot"></span> ' + t('story.autoplay_label', 'Auto-play') +
                 '</div>' +
               '</div>' +
               '<div class="fz-play-controls">' +
-                '<button type="button" id="fzBtnPlay" class="fz-btn-play' + (isPlaying ? ' playing' : '') + '" onclick="window.FiezelStoryReader.toggleAudio()" aria-label="' + (isPlaying ? 'Jeda Audio' : 'Putar Dialog') + '">' + (isPlaying ? '⏸' : '▶') + '</button>' +
-                '<div class="fz-progress-bar-wrap" onclick="window.FiezelStoryReader.seekAudio(event)" title="Geser durasi audio">' +
+                '<button type="button" id="fzBtnPlay" class="fz-btn-play' + (isPlaying ? ' playing' : '') + '" onclick="window.FiezelStoryReader.toggleAudio()" aria-label="' + (isPlaying ? 'Pause' : 'Play') + '">' + (isPlaying ? '⏸' : '▶') + '</button>' +
+                '<div class="fz-progress-bar-wrap" onclick="window.FiezelStoryReader.seekAudio(event)" title="' + t('story.audio-scrub-aria', 'Seek audio timeline') + '">' +
                   '<div id="fzAudioProgress" class="fz-progress-bar-fill"></div>' +
                 '</div>' +
               '</div>' +
@@ -963,21 +1321,21 @@
           '<!-- Right Column: Reader & Sentences Flow -->' +
           '<div class="fz-reader-card">' +
             '<div class="fz-reader-header">' +
-              '<h3 class="fz-reader-title">' + scene.title + '</h3>' +
-              (exam ? '' : '<span class="fz-reader-hint">' + t('story.hint_tap', '👆 Ketuk kanji bergaris untuk arti & BKT') + '</span>') +
+              '<h3 class="fz-reader-title">' + dispTitle + '</h3>' +
+              (exam ? '' : '<span class="fz-reader-hint">' + t('story.hint_tap', '👆 Tap underlined kanji for meaning & BKT') + '</span>') +
             '</div>' +
             '<div class="fz-script-flow">' +
               '<div class="fz-sentence-block active">' +
                 '<div class="fz-sentence-jp">' + renderKaraokeSentenceMarkup(scene.jp, exam, activeStoryId, activeSceneIndex) + '</div>' +
-                '<div class="fz-sentence-id">' + scene.id + '</div>' +
+                '<div class="fz-sentence-id">' + dispTranslation + '</div>' +
               '</div>' +
             '</div>' +
             '<div class="fz-story-nav-actions">' +
               (activeSceneIndex > 0 ?
-                '<button type="button" class="fz-btn-nav-prev" onclick="window.FiezelStoryReader.gotoScene(' + (activeSceneIndex - 1) + ')">' + t('story.btn_prev', '← Sebelumnya') + '</button>' :
+                '<button type="button" class="fz-btn-nav-prev" onclick="window.FiezelStoryReader.gotoScene(' + (activeSceneIndex - 1) + ')">' + t('story.btn_prev', '← Previous') + '</button>' :
                 '<div></div>') +
               '<button type="button" class="fz-btn-nav-next primary" onclick="window.FiezelStoryReader.gotoScene(' + (activeSceneIndex + 1) + ')">' +
-                (activeSceneIndex === story.scenes.length - 2 ? t('story.btn_quiz', 'Mulai Kuis Akhir →') : t('story.btn_next', 'Lanjut ke Adegan Berikutnya →')) +
+                (activeSceneIndex === story.scenes.length - 2 ? t('story.btn_quiz', 'Start Final Quiz →') : t('story.btn_next', 'Next Scene →')) +
               '</button>' +
             '</div>' +
           '</div>' +
@@ -986,9 +1344,17 @@
       // Adegan 5: Kuis Pemahaman Akhir
       var q = scene.quiz;
       var optionsHtml = q.options.map(function (opt, idx) {
+        var optTxt = opt.text;
+        if (sm.optTextMap) {
+          for (var okKey in sm.optTextMap) {
+            if (Object.prototype.hasOwnProperty.call(sm.optTextMap, okKey) && optTxt.indexOf(okKey) >= 0) {
+              optTxt = optTxt.replace(okKey, sm.optTextMap[okKey]);
+            }
+          }
+        }
         return '' +
           '<button type="button" class="fz-option-btn" onclick="window.FiezelStoryReader.evaluateQuiz(' + idx + ', this)">' +
-            '<span class="fz-quiz-opt-text">' + normalizeStoryRubyMarkup(opt.text, exam) + '</span>' +
+            '<span class="fz-quiz-opt-text">' + normalizeStoryRubyMarkup(optTxt, exam) + '</span>' +
             '<span class="fz-opt-arrow">→</span>' +
           '</button>';
       }).join('');
@@ -997,21 +1363,21 @@
         '<div class="fz-story-bento">' +
           '<div class="fz-theater-card">' +
             '<div class="fz-scene-viewport">' +
-              sceneArtHtml(scene.svgArt, scene.imageSrc, scene.title) +
+              sceneArtHtml(scene.svgArt, scene.imageSrc, dispTitle) +
               '<div class="fz-scene-overlay"></div>' +
-              '<span class="fz-scene-tag">' + scene.tag + '</span>' +
+              '<span class="fz-scene-tag">' + dispTag + '</span>' +
             '</div>' +
             '<div class="fz-audio-console">' +
               '<div class="fz-speaker-row">' +
                 '<div id="fzSpeakerAvatar" class="fz-speaker-avatar' + (isPlaying ? ' speaking' : '') + '">🎓</div>' +
                 '<div class="fz-speaker-meta">' +
-                  '<div class="fz-speaker-name">' + t('story.quiz_speaker_name', 'Instruktur Ujian') + '</div>' +
-                  '<div class="fz-speaker-role">' + t('story.quiz_audio_role', 'Audio Pertanyaan Soal (Bahasa Jepang)') + '</div>' +
+                  '<div class="fz-speaker-name">' + t('story.quiz_speaker_name', 'Exam Instructor') + '</div>' +
+                  '<div class="fz-speaker-role">' + t('story.quiz_audio_role', 'Quiz Question Audio (Japanese)') + '</div>' +
                 '</div>' +
               '</div>' +
               '<div class="fz-play-controls">' +
-                '<button type="button" id="fzBtnPlay" class="fz-btn-play' + (isPlaying ? ' playing' : '') + '" onclick="window.FiezelStoryReader.toggleAudio()" aria-label="' + (isPlaying ? 'Jeda Audio' : 'Dengarkan Pertanyaan') + '">' + (isPlaying ? '⏸' : '▶') + '</button>' +
-                '<div class="fz-progress-bar-wrap" onclick="window.FiezelStoryReader.seekAudio(event)" title="Geser durasi audio">' +
+                '<button type="button" id="fzBtnPlay" class="fz-btn-play' + (isPlaying ? ' playing' : '') + '" onclick="window.FiezelStoryReader.toggleAudio()" aria-label="' + (isPlaying ? 'Pause' : 'Play') + '">' + (isPlaying ? '⏸' : '▶') + '</button>' +
+                '<div class="fz-progress-bar-wrap" onclick="window.FiezelStoryReader.seekAudio(event)" title="' + t('story.audio-scrub-aria', 'Seek audio timeline') + '">' +
                   '<div id="fzAudioProgress" class="fz-progress-bar-fill"></div>' +
                 '</div>' +
               '</div>' +
@@ -1020,17 +1386,17 @@
           '<div class="fz-reader-card">' +
             '<div class="fz-story-quiz-card-inner">' +
               '<div class="fz-quiz-badge-row">' +
-                '<span class="fz-quiz-badge">Kuis Pemahaman Akhir</span>' +
+                '<span class="fz-quiz-badge">' + t('story.quiz-kicker', 'Final Comprehension Quiz') + '</span>' +
               '</div>' +
               '<div class="fz-quiz-q-jp">' + renderKaraokeSentenceMarkup(q.questionJapanese, exam, activeStoryId, 4) + '</div>' +
-              '<div class="fz-quiz-q-id">' + q.stem + '</div>' +
+              '<div class="fz-quiz-q-id">' + (sm.stem || q.stem) + '</div>' +
               '<div class="fz-quiz-options-grid">' +
                 optionsHtml +
               '</div>' +
               '<div id="fzFeedbackBanner" class="fz-feedback-banner"></div>' +
               '<div class="fz-story-nav-actions" style="margin-top:16px;">' +
-                '<button type="button" class="fz-btn-nav-prev" onclick="window.FiezelStoryReader.gotoScene(0)">' + t('story.btn_reread', '↺ Baca Ulang') + '</button>' +
-                '<button type="button" class="fz-btn-nav-next primary" onclick="window.FiezelStoryReader.openLibrary()">' + t('story.btn_library', 'Kembali ke Perpustakaan ✓') + '</button>' +
+                '<button type="button" class="fz-btn-nav-prev" onclick="window.FiezelStoryReader.gotoScene(0)">' + t('story.btn_reread', '↺ Re-read') + '</button>' +
+                '<button type="button" class="fz-btn-nav-next primary" onclick="window.FiezelStoryReader.openLibrary()">' + t('story.btn_library', 'Back to Library ✓') + '</button>' +
               '</div>' +
             '</div>' +
           '</div>' +
@@ -1043,7 +1409,7 @@
         '<div class="fz-story-top-ctrls">' +
           '<div class="fz-story-top-row1">' +
             '<button type="button" class="fz-story-tab-btn" onclick="window.FiezelStoryReader.openLibrary()">' +
-              '<span>←</span> Perpustakaan' +
+              t('story.back-library-short', '← Library') +
             '</button>' +
             (exam ? '' :
               '<div class="fz-story-aux-ctrls">' +
@@ -1080,8 +1446,8 @@
               '<span id="fzBktPercent" class="fz-bkt-ring-text">25%</span>' +
             '</div>' +
             '<div class="fz-bkt-info">' +
-              '<div class="fz-bkt-label">PENGUASAAN KATA</div>' +
-              '<div id="fzBktStatusMsg" class="fz-bkt-status">Menyimpan progres kata...</div>' +
+              '<div class="fz-bkt-label">' + t('story.vocab-bar-label', 'VOCAB MASTERY') + '</div>' +
+              '<div id="fzBktStatusMsg" class="fz-bkt-status">' + t('story.vocab_saving', 'Saving word progress...') + '</div>' +
             '</div>' +
           '</div>' +
         '</div>' +
@@ -1140,6 +1506,11 @@
 
   function inspectWord(kanji, reading, meaning) {
     if (isStoryExamMode()) return;
+    var loc = storyLocale();
+    var dispMeaning = meaning;
+    if (loc !== 'id' && WORD_GLOSS_I18N[kanji]) {
+      dispMeaning = loc === 'th' ? (WORD_GLOSS_I18N[kanji].th || WORD_GLOSS_I18N[kanji].en) : WORD_GLOSS_I18N[kanji].en;
+    }
     var kEl = document.getElementById('fzPopKanji');
     var rEl = document.getElementById('fzPopReading');
     var mEl = document.getElementById('fzPopMeaning');
@@ -1150,7 +1521,7 @@
 
     if (kEl) kEl.innerText = kanji;
     if (rEl) rEl.innerText = reading;
-    if (mEl) mEl.innerText = meaning;
+    if (mEl) mEl.innerText = dispMeaning;
     if (pop) pop.classList.add('open');
 
     // Alirkan ke Bridge jika ada
@@ -1159,13 +1530,13 @@
     var record = null;
     if (bridge && typeof bridge.recordWordInteraction === 'function') {
       try {
-        record = bridge.recordWordInteraction({ ja: kanji, reading: reading, meaning: meaning }, { isLookup: true });
+        record = bridge.recordWordInteraction({ ja: kanji, reading: reading, meaning: dispMeaning }, { isLookup: true });
       } catch (_) {}
     }
 
     if (ring) ring.style.strokeDashoffset = '75';
     if (percent) percent.innerText = '25%';
-    if (statusMsg) statusMsg.innerText = t('story.vocab_saving', 'Menyimpan progres kata...');
+    if (statusMsg) statusMsg.innerText = t('story.vocab_saving', 'Saving word progress...');
 
     setTimeout(function () {
       var pLt = (record && record.pLt) || 0.72;
@@ -1241,17 +1612,20 @@
     }
 
     if (isCorrect) {
+      var smQ = sceneMeta(story.id, activeSceneIndex);
+      var expText = (smQ && smQ.explain) || quiz.explain;
       if (btnEl) btnEl.classList.add('correct');
       if (banner) {
         banner.className = 'fz-feedback-banner show ok';
-        banner.innerHTML = '<b>✓ Tepat Sekali!</b> ' + quiz.explain;
+        banner.innerHTML = t('story.quiz-correct-feedback', '✓ Spot on! {explain}', { explain: expText });
       }
     } else {
+      var smQf = sceneMeta(story.id, activeSceneIndex);
       if (btnEl) btnEl.classList.add('wrong');
       if (banner) {
         banner.className = 'fz-feedback-banner show fail';
-        var failText = (opt && opt.failWhy) || (evalRes && evalRes.failWhy) || 'Perhatikan kembali alur cerita pada adegan sebelumnya.';
-        banner.innerHTML = '<b>✕ Masih Kurang Tepat:</b> ' + failText;
+        var failText = (smQf && smQf.failWhys && opt && opt.misconceptionId && smQf.failWhys[opt.misconceptionId]) || (opt && opt.failWhy) || (evalRes && evalRes.failWhy) || '';
+        banner.innerHTML = t('story.quiz-wrong-feedback', '✕ Not quite right: {explain}', { explain: failText });
       }
     }
   }

@@ -184,7 +184,8 @@ const ALLOWLIST = Object.freeze({
      Konten belajar Mandarin dengan bahasa pengantar Indonesia (bilingual ZH-ID), bukan kebocoran UI. */
   'features/mandarin/mandarin-curriculum.js': 142,
   'features/mandarin/mandarin-vocab-bank.js': 147,
-  'features/mandarin/mandarin-ui.js': 16
+  /* m025-805: Seluruh UI Chrome Mandarin Studio & Lesson Player 5-langkah diselaraskan penuh ke FiezelI18n (0 kebocoran sisa). */
+  'features/mandarin/mandarin-ui.js': 0
 });
 
 /* DAFTAR INI ADALAH HEURISTIK, DAN ANGKA ANGGARAN DI ATAS HARUS DIBACA BEGITU.

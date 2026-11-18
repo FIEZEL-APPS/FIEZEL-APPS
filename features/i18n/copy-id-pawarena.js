@@ -15,7 +15,7 @@
 
   I18N.registerCopy('id', {
     // --- cangkang arena ---
-    'pawarena.title': 'PAW ARENA',
+    'pawarena.title': 'FIEZEL ARENA',
     'pawarena.subtitle': 'Ruang main FIEZEL — belajar sambil bertanding.',
     'pawarena.pick-game': 'Pilih permainan',
     'pawarena.solo-vs-bot': 'Main sendiri lawan bot',

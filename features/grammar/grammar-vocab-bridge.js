@@ -749,7 +749,7 @@
       <div class="modal-intensity-sheet first-time-intensity" style="position:relative;padding:10px 4px 6px;">
         <div style="display:flex;align-items:center;justify-content:space-between;width:100%;margin-bottom:6px;">
           <div class="modal-mark" style="margin:0;font-size:0.8rem;letter-spacing:0.12em;color:#FFDE43;font-weight:800;">FIEZEL</div>
-          <button type="button" class="modal-close-icon" onclick="closeModal()" aria-label="Tutup" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);border-radius:999px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#E2E8F0;flex-shrink:0;"><i data-lucide="x" style="width:16px;height:16px;"></i></button>
+          <button type="button" class="modal-close-icon" onclick="closeModal()" aria-label="${t('common.tutup', 'Close')}" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);border-radius:999px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#E2E8F0;flex-shrink:0;"><i data-lucide="x" style="width:16px;height:16px;"></i></button>
         </div>
         <h2 style="padding:0 4px;margin:0 0 6px;line-height:1.25;font-size:1.55rem;text-align:center;">${t('scaffold.onboarding-title', 'Pilih Ritme Belajarmu')}</h2>
         <p class="muted" style="padding:0 8px;margin:0 0 12px;text-align:center;font-size:0.88rem;">${t('scaffold.onboarding-desc', 'Tentukan berapa banyak kosakata kunci yang ingin kamu kuasai per materi grammar.')}</p>

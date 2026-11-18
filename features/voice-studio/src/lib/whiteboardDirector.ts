@@ -272,7 +272,19 @@ export async function requestRealtimeWhiteboardAction(params: {
   const localGeminiKey = readLocalGeminiApiKey();
   if (localGeminiKey.length > 10) {
     try {
-      const targetLocaleName = locale === 'th' ? 'Thai' : locale === 'en' ? 'English' : 'Indonesian';
+      const LOCALE_LABELS: Record<string, string> = {
+    en: 'English',
+    id: 'Indonesian',
+    th: 'Thai',
+    ja: 'Japanese',
+    vi: 'Vietnamese',
+    ms: 'Malay',
+    fil: 'Filipino',
+    km: 'Khmer',
+    ru: 'Russian',
+    zh: 'Chinese',
+  };
+  const targetLocaleName = LOCALE_LABELS[locale] || 'English';
       const wantsVisualSwitch = isVisualSwitchRequestText(cleanQuestion);
       const activeVisualDesc = boardContext?.currentVisualKinds?.length
         ? `${boardContext.currentVisualKinds.join(', ')}${boardContext.currentVisualSummary ? ` (${boardContext.currentVisualSummary})` : ''}`

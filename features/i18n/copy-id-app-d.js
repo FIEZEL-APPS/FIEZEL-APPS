@@ -216,7 +216,7 @@
     'progress.mulai-lelah': 'Mulai lelah',
     'progress.mulai-review-btn': 'Mulai Review ({jumlah})',
     'progress.mulai-sesi': 'Mulai sesi',
-    'progress.next-session-dipilih-paw': 'NEXT SESSION · DIPILIH PAW',
+    'progress.next-session-dipilih-paw': 'NEXT SESSION · DIPILIH MOCHI',
     'progress.outcome-menjadi-evidence-policy-upcoming': 'Hasil ini dipakai untuk menyusun rencana sesi berikutnya. Isi jawabanmu tidak dikirim ke mana pun.',
     'progress.penguasaan-keyakinan': '{skillName} · penguasaan {L}% · keyakinan {confidence}%',
     'progress.penguasaan-terkuat': 'Penguasaan terkuat:',

@@ -67,7 +67,7 @@
     'mochi-sos.conn-error': 'การเชื่อมต่อ AI ขัดข้อง — แตะเพื่อลองใหม่',
     'mochi-sos.conn-retry': 'ลองใหม่',
     'mochi-sos.silence-prompt': 'พูดคุยได้เลยนะถ้าต้องการให้โมจิช่วย',
-    'mochi-sos.toggle-label': 'ความช่วยเหลือโมจิ',
+    'mochi-sos.toggle-label': 'ผู้ช่วยโมจิ',
     'mochi-sos.toggle-on-title': 'ผู้ช่วยเสียงโมจิเปิดอยู่ (แตะเพื่อปิด)',
     'mochi-sos.toggle-off-title': 'ผู้ช่วยเสียงโมจิปิดอยู่ (แตะเพื่อเปิด)',
     'mochi-sos.toggle-on-badge': 'Mochi ON',

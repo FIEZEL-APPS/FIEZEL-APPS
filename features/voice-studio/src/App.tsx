@@ -70,7 +70,7 @@ import {
   type WhiteboardFollowUpContext,
 } from './lib/whiteboardDirector';
 import { CALL_SCENARIOS, VOICE_PERSONAS } from './data/callScenarios';
-import { t, tMasteryState } from './lib/i18n';
+import { t, tMasteryState, scenarioMetaForLocale, vocabMeaningForLocale } from './lib/i18n';
 import { playFiezelSfx, registerSfxHostAudioContext } from './lib/sfx';
 import { BraincoreTrendChart } from './components/BraincoreTrendChart';
 import { HomeRedesignView } from './components/HomeRedesignView';
@@ -6159,13 +6159,17 @@ export default function App() {
                       ? 'Japanese (日本語)'
                       : locCode === 'zh'
                         ? 'Mandarin Chinese (中文)'
-                        : locCode === 'en'
-                          ? 'English'
-                          : locCode === 'ko'
-                            ? 'Korean (한국어)'
-                            : locCode === 'ms'
-                              ? 'Malay (Bahasa Melayu)'
-                              : 'Bahasa Indonesia';
+                        : locCode === 'fil'
+                          ? 'Filipino / Tagalog'
+                          : locCode === 'km'
+                            ? 'Khmer (ភាសាខ្មែរ)'
+                            : locCode === 'ko'
+                              ? 'Korean (한국어)'
+                              : locCode === 'ms'
+                                ? 'Malay (Bahasa Melayu)'
+                                : locCode === 'id'
+                                  ? 'Indonesian (Bahasa Indonesia)'
+                                  : 'English';
 
             const allowedAsrLangs = Array.from(
               new Set(
@@ -8481,6 +8485,10 @@ ${
     activePersona.openingGreetingTranslationId || activeScenario.openingTranslationId;
   const defaultOpeningTransTh =
     activePersona.openingGreetingTranslationTh || activeScenario.openingTranslationTh;
+  const defaultOpeningTransEn =
+    activePersona.openingGreetingTranslationEn ||
+    scenarioMetaForLocale(locale, activeScenario).openingTranslation ||
+    '';
   const isStreamingAiLive = Boolean(liveAiDraft.trim());
   const activeAiLiveText = liveAiDraft.trim() || lastAiTurn?.text || defaultOpeningText;
   const hasRealLettersForMeaning = (str?: string): boolean => {
@@ -8493,7 +8501,11 @@ ${
     ? liveAiTranslationDraft
     : lastAiTurn
     ? lastAiTurn.translationId || ''
-    : defaultOpeningTransId;
+    : locale === 'id'
+    ? defaultOpeningTransId
+    : locale === 'th'
+    ? ''
+    : defaultOpeningTransEn;
   const rawSubtitleSourceId = hasRealLettersForMeaning(rawCandidateId) ? rawCandidateId : '';
   const rawCandidateTh = isStreamingAiLive
     ? (locale === 'th' ? liveAiTranslationDraft : '')
@@ -8509,12 +8521,13 @@ ${
     undefined,
     { locale, forceFetch: !isStreamingAiLive }
   );
+  const openingFallbackNonTh = locale === 'id' ? defaultOpeningTransId : defaultOpeningTransEn;
   const activeAiSubtitle = {
     ...computedAiSubtitle,
     translationId:
       rawSubtitleSourceId ||
-      computedAiSubtitle.translationId ||
-      (!isStreamingAiLive && !lastAiTurn ? defaultOpeningTransId : '') ||
+      (locale === 'id' ? computedAiSubtitle.translationId : '') ||
+      (!isStreamingAiLive && !lastAiTurn ? openingFallbackNonTh : '') ||
       '',
     translationTh:
       rawSubtitleSourceTh ||
@@ -8525,28 +8538,25 @@ ${
 
   const resolvedActiveAiMeaning = (() => {
     try {
-      const loadingTranslationText =
-        locale === 'th'
-          ? 'กำลังแปล...'
-          : locale === 'ja'
-          ? '翻訳中...'
-          : locale === 'zh'
-          ? '正在翻译...'
-          : 'Sedang memuat terjemahan...';
+      const loadingTranslationText = t(locale, 'ui.loadingTranslation');
 
       let rawMeaning = '';
       if (locale === 'th') {
-        rawMeaning = activeAiSubtitle.translationTh || activeAiSubtitle.translationId || '';
+        rawMeaning = activeAiSubtitle.translationTh || defaultOpeningTransTh || '';
+      } else if (locale === 'id') {
+        rawMeaning = activeAiSubtitle.translationId || defaultOpeningTransId || '';
       } else if (locale === 'ja') {
         rawMeaning =
           activeAiSubtitle.translationJa ||
-          (activeScenario.targetLang === 'ja' ? '' : activeAiSubtitle.translationId || '');
+          (activeScenario.targetLang === 'ja' ? '' : activeAiSubtitle.translationId || defaultOpeningTransEn);
       } else if (locale === 'zh') {
         rawMeaning =
           activeAiSubtitle.translationZh ||
-          (activeScenario.targetLang === 'zh' ? '' : activeAiSubtitle.translationId || '');
+          (activeScenario.targetLang === 'zh' ? '' : activeAiSubtitle.translationId || defaultOpeningTransEn);
       } else {
-        rawMeaning = activeAiSubtitle.translationId || activeAiSubtitle.translationTh || '';
+        rawMeaning =
+          activeAiSubtitle.translationId ||
+          (!isStreamingAiLive && !lastAiTurn ? defaultOpeningTransEn : '');
       }
 
       // 1. Jika terjemahan valid sudah tersedia (dari skenario/turn/memori terjemahan),
@@ -8580,6 +8590,7 @@ ${
   })();
 
   const isAiHudDuplicateMeaning = (() => {
+    if (locale === 'en' && activeScenario.targetLang === 'en') return true;
     const normMeaning = (resolvedActiveAiMeaning || '').replace(/[^\p{L}\p{N}]+/gu, '').toLowerCase();
     const normSpeech = (activeAiLiveText || '').replace(/[^\p{L}\p{N}]+/gu, '').toLowerCase();
     if (normMeaning && normMeaning === normSpeech) return true;
@@ -8614,12 +8625,14 @@ ${
     if (!activeUserSubtitle) return '';
     const candidate =
       locale === 'th'
-        ? activeUserSubtitle.translationTh || activeUserSubtitle.translationId
+        ? activeUserSubtitle.translationTh || ''
         : locale === 'ja'
-        ? activeUserSubtitle.translationJa || activeUserSubtitle.translationId
+        ? activeUserSubtitle.translationJa || (activeScenario.targetLang === 'ja' ? '' : activeUserSubtitle.translationId || '')
         : locale === 'zh'
-        ? activeUserSubtitle.translationZh || activeUserSubtitle.translationId
-        : activeUserSubtitle.translationId || activeUserSubtitle.translationTh;
+        ? activeUserSubtitle.translationZh || (activeScenario.targetLang === 'zh' ? '' : activeUserSubtitle.translationId || '')
+        : locale === 'id'
+        ? activeUserSubtitle.translationId || activeUserSubtitle.translationTh
+        : activeUserSubtitle.translationId || '';
     if (!candidate || isGenericPlaceholderTranslation(candidate)) return '';
     if (locale !== 'ja' && locale !== 'zh' && /[\u4E00-\u9FFF\u3040-\u30FF]/.test(candidate)) {
       return candidate
@@ -8663,17 +8676,17 @@ ${
               onClick={handleBackToPwa}
               data-testid="mitra-kaiwa-back-btn"
               className="px-2 sm:px-2.5 py-1 rounded-full bg-white/90 hover:bg-white shadow-[0_1px_2px_rgba(28,22,17,0.05)] font-semibold text-[#1C1611] cursor-pointer flex items-center gap-1 transition-all text-xs shrink-0"
-              title="Kembali"
+              title={t(locale, 'ui.back')}
             >
               <ArrowLeft className="w-3.5 h-3.5 shrink-0" />
-              <span className="hidden sm:inline">{locale === 'th' ? 'กลับ' : 'Kembali'}</span>
+              <span className="hidden sm:inline">{t(locale, 'ui.back')}</span>
             </a>
 
             <span
               data-testid="mitra-kaiwa-header-title"
               className="sr-only"
             >
-              {targetLang === 'ja' ? 'Mitra Kaiwa' : 'Kawan Bicara'}
+              {targetLang === 'ja' ? t(locale, 'ui.speakPartnerBrandJA') : t(locale, 'ui.speakPartnerBrand')}
             </span>
 
             {targetLang === 'ja' && (
@@ -8701,7 +8714,7 @@ ${
                 setShowPersonaModal(true);
               }}
               className="inline-flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 rounded-full bg-[#FAF5EB] hover:bg-[#F3ECE0] border border-[#E8DEC8] text-[#5C4E3C] text-[11px] font-bold shadow-2xs transition-all cursor-pointer active:scale-95 min-w-0 shrink"
-              title={locale === 'th' ? 'เปลี่ยนติวเตอร์และสไตล์เสียง' : 'Ganti Karakter & Gaya Bicara Partner'}
+              title={t(locale, 'ui.switchPersona')}
             >
               <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse shrink-0"></span>
               <span className="max-w-[76px] xs:max-w-[105px] sm:max-w-[160px] truncate">
@@ -8750,7 +8763,7 @@ ${
                   }`}
                 >
                   <MessageSquare className="w-3 h-3 text-[#5C4E3C]" />
-                  <span>{locale === 'th' ? 'แชท' : locale === 'ja' ? '履歴' : locale === 'zh' ? '记录' : 'Riwayat'}</span>
+                  <span>{t(locale, 'ui.history')}</span>
                   {turns.filter((tr) => tr.speaker === 'user').length > 0 && (
                     <span className="w-3.5 h-3.5 rounded-full bg-[#8C2233] text-white text-[9px] flex items-center justify-center font-bold">
                       {turns.filter((tr) => tr.speaker === 'user').length}
@@ -8887,13 +8900,15 @@ ${
                 }
                 title={
                   isSswPill
-                    ? 'Buka Papan Taktis SSW Sensei (Trik Wakai Papa+, Kotoba & Kuis Prometric)'
-                    : 'Buka Papan Tulis Interaktif (Bank Materi Braincore + Bedah Kilat Fiezel)'
+                    ? locale === 'id'
+                      ? 'Buka Papan Taktis SSW Sensei (Trik Wakai Papa+, Kotoba & Kuis Prometric)'
+                      : 'Open SSW Tactical Board'
+                    : t(locale, 'ui.whiteboard')
                 }
               >
                 <BookOpen className={`w-3.5 h-3.5 shrink-0 ${isSswPill ? 'text-[#8C2233]' : 'text-[#8C6D1F]'}`} />
                 <span className="hidden sm:inline">
-                  {isSswPill ? 'Papan Taktis' : locale === 'th' ? 'กระดานติวเตอร์' : 'Papan Tulis'}
+                  {isSswPill ? t(locale, 'ui.tacticalBoard') : t(locale, 'ui.whiteboard')}
                 </span>
               </button>
               );
@@ -8987,11 +9002,7 @@ ${
               const nextState = recordVocabPrereqMastery(brainState, scen.prereqCompetencyId);
               setBrainState(nextState);
               playFiezelSfx('lesson_start');
-              setStatusBanner(
-                locale === 'th'
-                  ? 'ปลดล็อกคำศัพท์พื้นฐานเรียบร้อยแล้ว!'
-                  : 'Kosakata prasyarat berhasil dikuasai!'
-              );
+              setStatusBanner(t(locale, 'ui.prereqUnlockedToast'));
               void brainSyncFlush(nextState).then(({ nextState: synced }) => setBrainState(synced));
             }}
             onSpeakSample={(sampleText) => {
@@ -9025,7 +9036,7 @@ ${
                         rubyClassName="font-bold text-[#1C1611]"
                       />
                       <div className="text-[#6E5E47]">
-                        {locale === 'th' ? v.meaningTh : v.meaningId}
+                        {vocabMeaningForLocale(locale, v)}
                       </div>
                     </div>
                   ))}
@@ -9061,7 +9072,7 @@ ${
                             setShowPersonaModal(true);
                           }}
                           className="inline-flex items-center gap-1 font-bold text-[#1C1611] hover:text-[#5C4E3C] bg-white/90 hover:bg-white px-2 py-0.5 rounded-full border border-black/5 transition-all cursor-pointer active:scale-95 text-[11px]"
-                          title={locale === 'th' ? 'เปลี่ยนติวเตอร์และสไตล์เสียง' : 'Ganti Karakter & Gaya Bicara Partner'}
+                          title={t(locale, 'ui.switchPersona')}
                         >
                           <span>{formatPersonaShortName(activePersona.name)}</span>
                           <span className="text-[10px] text-[#8C7A65]">▾</span>
@@ -9076,17 +9087,11 @@ ${
                               setShowCefrPicker((v) => !v);
                             }}
                             className="inline-flex items-center gap-1 font-bold text-[#1C1611] hover:text-[#5C4E3C] bg-white/90 hover:bg-white px-2 py-0.5 rounded-full border border-black/5 transition-all cursor-pointer active:scale-95 text-[11px]"
-                            title="Pilih Target Level CEFR (A1 - C2)"
+                            title={t(locale, 'ui.cefrBtnTitle')}
                           >
                             <span className="text-[#B45309]">🎯</span>
                             <span>
-                              {locale === 'th'
-                                ? `ระดับ ${userCefrLevel}`
-                                : locale === 'ja'
-                                ? `レベル ${userCefrLevel}`
-                                : locale === 'zh'
-                                ? `等级 ${userCefrLevel}`
-                                : `Level ${userCefrLevel}`}
+                              {`${t(locale, 'ui.levelWord')} ${userCefrLevel}`}
                             </span>
                             <span className="text-[10px] text-[#8C7A65]">▾</span>
                           </button>
@@ -9157,20 +9162,8 @@ ${
                           }`}
                         >
                           {isMeasureMode
-                            ? locale === 'th'
-                              ? 'โหมดสอบ'
-                              : locale === 'ja'
-                              ? 'テスト'
-                              : locale === 'zh'
-                              ? '考试'
-                              : 'Mode Ujian'
-                            : locale === 'th'
-                            ? 'ฝึกพูด'
-                            : locale === 'ja'
-                            ? '練習'
-                            : locale === 'zh'
-                            ? '练习'
-                            : 'Latihan'}
+                            ? t(locale, 'ui.examMode')
+                            : t(locale, 'ui.practiceMode')}
                         </button>
 
                         {!isMeasureMode && (
@@ -9192,20 +9185,8 @@ ${
                           >
                             <span>
                               {callMode === 'casual_chat'
-                                ? locale === 'th'
-                                  ? '☕ คุยเล่น'
-                                  : locale === 'ja'
-                                  ? '☕ 会話'
-                                  : locale === 'zh'
-                                  ? '☕ 闲聊'
-                                  : '☕ Kasual'
-                                : locale === 'th'
-                                ? '🎓 เมนเทอร์'
-                                : locale === 'ja'
-                                ? '🎓 メンター'
-                                : locale === 'zh'
-                                ? '🎓 导师'
-                                : '🎓 Mentor'}
+                                ? t(locale, 'ui.casualMode')
+                                : t(locale, 'ui.mentorMode')}
                             </span>
                           </button>
                         )}
@@ -9229,7 +9210,7 @@ ${
                             } catch {}
                           }
                         }}
-                        title={isPlayingAiAudio ? 'Ketuk untuk menyela Mochi' : 'Mochi (Mitra Kaiwa 3D)'}
+                        title={isPlayingAiAudio ? t(locale, 'ui.tapInterrupt') : 'Mochi (3D)'}
                         className="relative w-[155px] sm:w-[280px] lg:w-[300px] h-[88px] sm:h-[200px] lg:h-[225px] flex items-center justify-center cursor-pointer select-none"
                       >
                         <div
@@ -9289,44 +9270,24 @@ ${
                             />
                             <span data-testid="ai-call-status-text">
                               {isAiThinking && !isPlayingAiAudio
-                                ? locale === 'th'
-                                  ? 'Mochi กำลังคิด…'
-                                  : locale === 'ja'
-                                  ? 'Mochiが考えています…'
-                                  : locale === 'zh'
-                                  ? 'Mochi 正在思考…'
-                                  : 'Mochi sedang berpikir…'
+                                ? t(locale, 'ui.thinking')
                                 : isPlayingAiAudio
                                 ? isLiveConnected
-                                  ? `Mochi berbicara... (${formatTimer(callDurationSec)})`
-                                  : locale === 'th'
-                                  ? 'กำลังพูด...'
-                                  : locale === 'ja'
-                                  ? '話し中...'
-                                  : locale === 'zh'
-                                  ? '正在说话...'
-                                  : 'Sedang berbicara...'
+                                  ? locale === 'id'
+                                    ? `Mochi berbicara... (${formatTimer(callDurationSec)})`
+                                    : `${t(locale, 'ui.mochiSpeakingStatus')} (${formatTimer(callDurationSec)})`
+                                  : t(locale, 'ui.speakingNow')
                                 : isWaitingAfterSpeech
-                                ? locale === 'th'
-                                  ? `Mochi กำลังฟัง… (ช่วงคิด) (${formatTimer(callDurationSec)})`
-                                  : locale === 'ja'
-                                  ? `Mochiが聴いています… (${formatTimer(callDurationSec)})`
-                                  : locale === 'zh'
-                                  ? `Mochi 正在聆听… (${formatTimer(callDurationSec)})`
-                                  : `Mochi mendengarkan... (jeda berpikir) (${formatTimer(callDurationSec)})`
+                                ? `${t(locale, 'ui.listening')} (${formatTimer(callDurationSec)})`
                                 : isRecordingPtt
-                                  ? `Merekam suara... (${formatTimer(pttRecordingSec)})`
+                                  ? locale === 'id'
+                                    ? `Merekam suara... (${formatTimer(pttRecordingSec)})`
+                                    : `${t(locale, 'ui.recordingStatus')} (${formatTimer(pttRecordingSec)})`
                                   : isLiveConnected
                                     ? isMicMuted
-                                      ? `${locale === 'th' ? 'ปิดไมค์อยู่' : locale === 'ja' ? 'マイク消音' : locale === 'zh' ? '麦克风已静音' : 'Mic dibisukan'} · ${formatTimer(callDurationSec)}`
+                                      ? `${t(locale, 'ui.micMutedShort')} · ${formatTimer(callDurationSec)}`
                                       : `LIVE · ${formatTimer(callDurationSec)}`
-                                    : locale === 'th'
-                                    ? 'พร้อมพูดคุย'
-                                    : locale === 'ja'
-                                    ? '話す準備完了'
-                                    : locale === 'zh'
-                                    ? '准备就绪'
-                                    : 'Siap bicara'}
+                                    : t(locale, 'ui.readyToTalk')}
                             </span>
                           </div>
 
@@ -9336,9 +9297,9 @@ ${
                               className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#FEFCE8] border border-[#FDE68A] text-[11px] font-bold text-[#78350F] shadow-2xs"
                             >
                               {isLocalTestEnvironment() ? (
-                                <span>🧪 Bebas Gem</span>
+                                <span>{t(locale, 'ui.freeGem')}</span>
                               ) : liveBillingUi.isDailyFree && liveBillingUi.gemsSpent === 0 ? (
-                                <span>🎁 Gratis ({liveBillingUi.turns}/{DAILY_FREE_CALL_MAX_TURNS})</span>
+                                <span>{t(locale, 'ui.freeDaily')} ({liveBillingUi.turns}/{DAILY_FREE_CALL_MAX_TURNS})</span>
                               ) : (
                                 <span>💎 {liveBillingUi.gemsSpent} Gem ({liveBillingUi.turns})</span>
                               )}
@@ -9355,11 +9316,7 @@ ${
                               disabled={isLiveConnecting}
                               onClick={() => requestStartLiveCall()}
                               className="w-full xs:w-auto inline-flex items-center justify-center gap-2 sm:gap-2.5 px-4 sm:px-6 py-2 sm:py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm shadow-[0_4px_16px_rgba(16,185,129,0.35)] transition-all cursor-pointer active:scale-95 disabled:opacity-60 group"
-                              title={
-                                locale === 'th'
-                                  ? 'เริ่มโทรเสียง FaceTime แบบแฮนด์ฟรี'
-                                  : 'Nyalakan panggilan suara FaceTime (Hands-free, mic aktif otomatis)'
-                              }
+                              title={t(locale, 'ui.startFaceTimeTitle')}
                             >
                               <span className="relative flex h-2.5 w-2.5">
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-300 opacity-75"></span>
@@ -9368,32 +9325,14 @@ ${
                               <Phone className="w-4 h-4 text-white group-hover:rotate-12 transition-transform shrink-0" />
                               <span>
                                 {isLiveConnecting
-                                  ? locale === 'th'
-                                    ? 'กำลังเชื่อมต่อ...'
-                                    : locale === 'ja'
-                                    ? '接続中...'
-                                    : locale === 'zh'
-                                    ? '连接中...'
-                                    : 'Menyambungkan FaceTime...'
-                                  : locale === 'th'
-                                  ? 'เริ่มโทร FaceTime'
-                                  : locale === 'ja'
-                                  ? 'FaceTime通話を開始'
-                                  : locale === 'zh'
-                                  ? '开始 FaceTime 通话'
-                                  : 'Mulai Telepon FaceTime'}
+                                  ? t(locale, 'call.connecting')
+                                  : t(locale, 'call.startLive')}
                               </span>
                             </button>
                             <span className="hidden sm:flex text-[11px] text-[#8C7A65] font-medium items-center gap-1.5">
                               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                               <span>
-                                {locale === 'th'
-                                  ? 'แฮนด์ฟรี · ไมค์สนทนาสองทางพร้อมใช้งาน'
-                                  : locale === 'ja'
-                                  ? 'ハンズフリー · 双方向マイクでそのまま会話'
-                                  : locale === 'zh'
-                                  ? '免提 · 双向麦克风实时对话'
-                                  : 'Hands-Free · Mikrofon aktif dua arah untuk ngobrol langsung'}
+                                {t(locale, 'ui.handsFreeSub')}
                               </span>
                             </span>
                           </div>
@@ -9415,16 +9354,16 @@ ${
                                 <Mic className={`w-3.5 h-3.5 shrink-0 ${isMicMuted ? 'text-[#8C2233]' : 'text-emerald-700 animate-pulse'}`} />
                                 <span className="truncate">
                                   {isMicMuted
-                                    ? 'Mic Mati'
+                                    ? t(locale, 'ui.micOff')
                                     : isUserSpeakingLive
-                                    ? 'Kamu Bicara...'
+                                    ? t(locale, 'ui.youSpeak')
                                     : isPlayingAiAudio
                                     ? liveTransportMode === 'ws-duplex' && isMicHardwareReady
-                                      ? 'Mochi Bicara · Mic Aktif'
-                                      : 'Mochi Bicara'
+                                      ? t(locale, 'ui.mochiSpeakMic')
+                                      : t(locale, 'ui.mochiSpeak')
                                     : !isMicHardwareReady
-                                    ? 'Ketuk untuk Aktifkan Mic'
-                                    : 'Mic Aktif'}
+                                    ? t(locale, 'ui.tapEnableMic')
+                                    : t(locale, 'ui.micOn')}
                                 </span>
                                 <span className="font-mono text-emerald-700 text-[11px] font-semibold shrink-0">
                                   ({formatTimer(callDurationSec)})
@@ -9439,7 +9378,7 @@ ${
                                 className={`p-1.5 rounded-full transition-colors cursor-pointer ${
                                   isMicMuted ? 'bg-[#8C2233] text-white' : 'bg-white hover:bg-emerald-100 text-emerald-800 border border-emerald-200'
                                 }`}
-                                title={isMicMuted ? 'Aktifkan Mic' : 'Bisukan Mic'}
+                                title={isMicMuted ? t(locale, 'ui.enableMicTitle') : t(locale, 'ui.muteMicTitle')}
                               >
                                 {isMicMuted ? <MicOff className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5" />}
                               </button>
@@ -9453,10 +9392,10 @@ ${
                               setLiveAiDraft('');
                             }}
                                 className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-[#B8432D] hover:bg-[#9E3622] text-white text-xs font-bold shadow-xs cursor-pointer transition-all active:scale-95"
-                                title="Akhiri Telepon FaceTime"
+                                title={t(locale, 'ui.endCallTitle')}
                               >
                                 <PhoneOff className="w-3.5 h-3.5" />
-                                <span>Tutup</span>
+                                <span>{t(locale, 'ui.endCallBtn')}</span>
                               </button>
                             </div>
                           </div>
@@ -9482,7 +9421,7 @@ ${
                           <span className="w-2 h-2 rounded-full bg-[#8C2233] animate-pulse [animation-delay:-0.15s]" />
                           <span className="w-2 h-2 rounded-full bg-[#8C2233] animate-pulse" />
                           <span className="text-xs font-medium text-[#6E5E47]">
-                            {locale === 'th' ? 'กำลังตอบกลับ...' : locale === 'ja' ? '返信を準備中...' : locale === 'zh' ? '正在思考回复...' : 'Menyiapkan balasan...'}
+                            {t(locale, 'ui.preparingReply')}
                           </span>
                         </div>
                       ) : (
@@ -9517,13 +9456,7 @@ ${
                               <div className="min-w-0 flex-1 space-y-0.5">
                                 <div className="flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold text-[#9C6119] tracking-wider uppercase">
                                   <span>
-                                    {locale === 'th'
-                                      ? '🇹🇭 คำแปล:'
-                                      : locale === 'ja'
-                                      ? '🇯🇵 意味:'
-                                      : locale === 'zh'
-                                      ? '🇨🇳 翻译:'
-                                      : '🇮🇩 Arti / Terjemahan:'}
+                                    {t(locale, 'ui.translationLabel')}
                                   </span>
                                 </div>
                                 <p
@@ -9537,9 +9470,9 @@ ${
                                 type="button"
                                 onClick={() => setShowTranslations(false)}
                                 className="text-[11px] text-[#8C6D1F] hover:text-[#1C1611] shrink-0 font-medium cursor-pointer pt-0.5"
-                                title={locale === 'th' ? 'ซ่อนคำแปล' : 'Sembunyikan terjemahan'}
+                                title={t(locale, 'ui.hideTitle')}
                               >
-                                {locale === 'th' ? '👁️ ซ่อน' : '👁️ Sembunyikan'}
+                                {t(locale, 'ui.hide')}
                               </button>
                             </div>
                           )}
@@ -9549,9 +9482,9 @@ ${
                                 type="button"
                                 onClick={() => setShowTranslations(true)}
                                 className="text-[11px] text-[#8C6D1F] hover:text-[#1C1611] font-medium cursor-pointer"
-                                title={locale === 'th' ? 'แสดงคำแปล' : 'Tampilkan terjemahan'}
+                                title={t(locale, 'ui.showTitle')}
                               >
-                                {locale === 'th' ? '👁️ แสดงคำแปล' : '👁️ Tampilkan Arti'}
+                                {t(locale, 'ui.showTranslation')}
                               </button>
                             </div>
                           )}
@@ -9568,25 +9501,13 @@ ${
                             if (lastAi) void speakAiText(lastAi.text, lastAi.audioBase64, speechRate, { isManualReplay: true });
                           }}
                           className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FAF5EB] hover:bg-[#F3ECE0] border border-[#E8DEC8] text-xs font-semibold text-[#1C1611] transition-all cursor-pointer active:scale-95"
-                          title={locale === 'th' ? 'ฟังเสียงด้วยความเร็วปัจจุบัน' : locale === 'ja' ? '現在の速度で再生' : locale === 'zh' ? '按当前语速播放' : 'Putar suara dengan kecepatan saat ini'}
+                          title={t(locale, 'ui.playAtRate')}
                         >
                           <Volume2 className="w-3.5 h-3.5 text-[#5C4E3C] shrink-0" />
                           <span>
                             {callStateKey === 'speaking'
-                              ? locale === 'th'
-                                ? 'กำลังเล่น...'
-                                : locale === 'ja'
-                                ? '再生中...'
-                                : locale === 'zh'
-                                ? '播放中...'
-                                : 'Diputar...'
-                              : locale === 'th'
-                              ? 'เล่นเสียง'
-                              : locale === 'ja'
-                              ? '音声を再生'
-                              : locale === 'zh'
-                              ? '播放语音'
-                              : 'Putar Suara'}
+                              ? t(locale, 'ui.playing')
+                              : t(locale, 'call.replayAi')}
                           </span>
                         </button>
 
@@ -9606,7 +9527,7 @@ ${
                                 ? 'bg-white text-[#1C1611] shadow-2xs font-bold'
                                 : 'text-[#8C7A65] hover:text-[#1C1611]'
                             }`}
-                            title="0.85x - Santai & Jelas"
+                            title={t(locale, 'ui.rateSlow')}
                           >
                             🐢 0.85x
                           </button>
@@ -9621,7 +9542,7 @@ ${
                                 ? 'bg-white text-[#1C1611] shadow-2xs font-bold'
                                 : 'text-[#8C7A65] hover:text-[#1C1611]'
                             }`}
-                            title="0.92x - Alami & Pas"
+                            title={t(locale, 'ui.rateNatural')}
                           >
                             ✨ 0.92x
                           </button>
@@ -9636,7 +9557,7 @@ ${
                                 ? 'bg-white text-[#1C1611] shadow-2xs font-bold'
                                 : 'text-[#8C7A65] hover:text-[#1C1611]'
                             }`}
-                            title="1.0x - Normal Native"
+                            title={t(locale, 'ui.rateNormal')}
                           >
                             ⚡ 1.0x
                           </button>
@@ -9650,7 +9571,7 @@ ${
                         >
                           <div className="flex items-start gap-1.5 text-xs text-[#5C4E3C]">
                             <strong className="font-semibold text-[#1C1611] shrink-0 pt-0.5">
-                              {locale === 'th' ? 'คุณ:' : locale === 'ja' ? 'あなた:' : locale === 'zh' ? '你:' : 'Kamu:'}
+                              {t(locale, 'ui.youLabel')}
                             </strong>
                             <div className="min-w-0 flex-1">
                               <JapaneseRubyDisplay
@@ -9753,7 +9674,7 @@ ${
                     <div className="flex items-center justify-between gap-2 px-1 text-xs text-[#6E5E47] pb-1">
                       <span className="inline-flex items-center gap-1.5 text-xs font-bold text-[#1C1611] uppercase tracking-wider">
                         <MessageSquare className="w-3.5 h-3.5 text-[#8C2233]" />
-                        <span>{locale === 'th' ? 'บันทึกการสนทนา' : 'Transkrip Percakapan'}</span>
+                        <span>{t(locale, 'ui.transcriptHeading')}</span>
                       </span>
 
                       <div className="flex items-center gap-2 shrink-0">
@@ -9767,13 +9688,7 @@ ${
                         >
                           <Video className="w-3 h-3" />
                           <span>
-                            {locale === 'th'
-                              ? 'กลับสู่หน้าต่างคุยสด'
-                              : locale === 'ja'
-                              ? '通話画面に戻る'
-                              : locale === 'zh'
-                              ? '返回实时通话'
-                              : 'Kembali ke FaceTime'}
+                            {locale === 'zh' ? '返回实时通话' : t(locale, 'ui.backToFaceTime')}
                           </span>
                         </button>
                         {!isMeasureMode && (
@@ -9783,20 +9698,16 @@ ${
                             className="font-medium text-[#6E5E47] hover:text-[#1C1611] cursor-pointer"
                           >
                             {showTranslations
-                              ? locale === 'th'
-                                ? 'ซ่อนคำแปล'
-                                : locale === 'ja'
+                              ? locale === 'ja'
                                 ? '訳を隠す'
                                 : locale === 'zh'
                                 ? '隐藏翻译'
-                                : 'Sembunyikan Arti'
-                              : locale === 'th'
-                                ? 'แสดงคำแปล'
-                                : locale === 'ja'
+                                : t(locale, 'ui.hideTitle')
+                              : locale === 'ja'
                                 ? '訳を表示'
                                 : locale === 'zh'
                                 ? '显示翻译'
-                                : 'Tampilkan Arti'}
+                                : t(locale, 'ui.showTitle')}
                           </button>
                         )}
                         <button
@@ -9805,7 +9716,7 @@ ${
                           className="font-medium text-[#6E5E47] hover:text-[#1C1611] flex items-center gap-1 cursor-pointer"
                         >
                           <RefreshCw className="w-3 h-3" />
-                          <span>{locale === 'th' ? 'เริ่มใหม่' : locale === 'ja' ? 'やり直し' : locale === 'zh' ? '重来' : 'Ulangi'}</span>
+                          <span>{locale === 'zh' ? '重来' : t(locale, 'ui.resetBtn')}</span>
                         </button>
                       </div>
                     </div>
@@ -9820,14 +9731,10 @@ ${
                         className="rounded-2xl border border-dashed border-[#DFD4BF] bg-white/60 px-4 py-4 text-xs text-[#6E5E47] leading-relaxed"
                       >
                         <p className="font-semibold text-[#1C1611] mb-1">
-                          {locale === 'th'
-                            ? 'พร้อมเริ่มบทสนทนาแล้ว'
-                            : 'Siap memulai percakapan'}
+                          {t(locale, 'ui.emptyChatTitle')}
                         </p>
                         <p>
-                          {locale === 'th'
-                            ? 'พูดผ่านไมโครโฟน เลือกประโยคแนะนำด้านบน หรือพิมพ์ข้อความด้านล่าง บันทึกบทสนทนาและคำแนะนำไวยากรณ์จะแสดงที่นี่'
-                            : 'Bicara lewat mikrofon, pilih salah satu saran kalimat di atas, atau ketik balasan di bawah. Riwayat obrolan dan umpan balik tata bahasa akan tampil di sini.'}
+                          {t(locale, 'ui.emptyChatDesc')}
                         </p>
                       </div>
                     )}
@@ -9840,19 +9747,23 @@ ${
                         const aiHistorySubtitle = translateAndPhoneticizeLiveText(
                           turn.text,
                           activeScenario.targetLang,
-                          turn.translationId,
-                          turn.translationTh,
+                          locale === 'id' ? turn.translationId : undefined,
+                          locale === 'th' ? turn.translationTh : undefined,
                           undefined,
                           { locale, forceFetch: true }
                         );
                         const aiMeaningText =
                           locale === 'th'
-                            ? aiHistorySubtitle.translationTh || turn.translationTh || aiHistorySubtitle.translationId || turn.translationId
+                            ? aiHistorySubtitle.translationTh || turn.translationTh
+                            : locale === 'id'
+                            ? aiHistorySubtitle.translationId || turn.translationId
                             : locale === 'ja'
-                            ? aiHistorySubtitle.translationJa || turn.translationJa || aiHistorySubtitle.translationId || turn.translationId
+                            ? aiHistorySubtitle.translationJa || turn.translationJa || (activeScenario.targetLang !== 'ja' ? aiHistorySubtitle.translationId : '')
                             : locale === 'zh'
-                            ? aiHistorySubtitle.translationZh || turn.translationZh || aiHistorySubtitle.translationId || turn.translationId
-                            : aiHistorySubtitle.translationId || turn.translationId || aiHistorySubtitle.translationTh || turn.translationTh;
+                            ? aiHistorySubtitle.translationZh || turn.translationZh || (activeScenario.targetLang !== 'zh' ? aiHistorySubtitle.translationId : '')
+                            : activeScenario.targetLang !== locale
+                            ? aiHistorySubtitle.translationId || ''
+                            : '';
 
                         return (
                           <div
@@ -9878,7 +9789,7 @@ ${
                                 type="button"
                                 onClick={() => void speakAiText(turn.text, turn.audioBase64, 1.0, { isManualReplay: true })}
                                 className="w-6 h-6 rounded-full bg-[#F5F1E8] hover:bg-[#EAE3D5] flex items-center justify-center text-[#5C4E3C] shrink-0 cursor-pointer mt-0.5"
-                                title={locale === 'th' ? 'เล่นเสียง' : 'Putar suara'}
+                                title={t(locale, 'call.replayAi')}
                               >
                                 <Volume2 className="w-3 h-3" />
                               </button>
@@ -9901,19 +9812,23 @@ ${
                       const userHistorySubtitle = translateAndPhoneticizeLiveText(
                         turn.text,
                         activeScenario.targetLang,
-                        turn.translationId,
-                        turn.translationTh,
+                        locale === 'id' ? turn.translationId : undefined,
+                        locale === 'th' ? turn.translationTh : undefined,
                         undefined,
                         { locale, forceFetch: true }
                       );
                       const userMeaningText =
                         locale === 'th'
-                          ? userHistorySubtitle.translationTh || turn.translationTh || userHistorySubtitle.translationId || turn.translationId
+                          ? userHistorySubtitle.translationTh || turn.translationTh
+                          : locale === 'id'
+                          ? userHistorySubtitle.translationId || turn.translationId
                           : locale === 'ja'
-                          ? userHistorySubtitle.translationJa || turn.translationJa || userHistorySubtitle.translationId || turn.translationId
+                          ? userHistorySubtitle.translationJa || turn.translationJa || (activeScenario.targetLang !== 'ja' ? userHistorySubtitle.translationId : '')
                           : locale === 'zh'
-                          ? userHistorySubtitle.translationZh || turn.translationZh || userHistorySubtitle.translationId || turn.translationId
-                          : userHistorySubtitle.translationId || turn.translationId || userHistorySubtitle.translationTh || turn.translationTh;
+                          ? userHistorySubtitle.translationZh || turn.translationZh || (activeScenario.targetLang !== 'zh' ? userHistorySubtitle.translationId : '')
+                          : activeScenario.targetLang !== locale
+                          ? userHistorySubtitle.translationId || ''
+                          : '';
 
                       return (
                         <div key={turn.id} className="flex flex-col items-end space-y-1">
@@ -9964,20 +9879,16 @@ ${
                                   )}
                                   <span className={diag.ok ? 'text-[#2E8B69]' : 'text-[#B8432D]'}>
                                     {diag.ok
-                                      ? locale === 'th'
-                                        ? 'ประโยคถูกต้อง'
-                                        : locale === 'ja'
+                                      ? locale === 'ja'
                                         ? '自然な文です'
                                         : locale === 'zh'
                                         ? '表达准确'
-                                        : 'Kalimat Tepat'
-                                      : locale === 'th'
-                                        ? 'คำแนะนำการแก้ไขประโยค'
-                                        : locale === 'ja'
+                                        : t(locale, 'diag.correctHeader')
+                                      : locale === 'ja'
                                         ? '表現のアドバイス'
                                         : locale === 'zh'
                                         ? '表达优化建议'
-                                        : 'Perbaikan Kalimat'}
+                                        : t(locale, 'diag.wrongHeader')}
                                   </span>
                                 </div>
                                 <span className="font-mono tabular-nums text-[11px] text-[#6E5E47]">
@@ -9999,13 +9910,11 @@ ${
                                   <div className="bg-white/95 rounded-xl px-3 py-2 flex items-start justify-between gap-2 text-[#1C1611] border border-[#EADBCE]/60">
                                     <div className="min-w-0 flex-1 space-y-0.5">
                                       <span className="block font-semibold text-[11px] text-[#8C2233]">
-                                        {locale === 'th'
-                                          ? 'ประโยคที่เป็นธรรมชาติ:'
-                                          : locale === 'ja'
+                                        {locale === 'ja'
                                           ? '自然な言い方:'
                                           : locale === 'zh'
                                           ? '更地道的说法:'
-                                          : 'Naturalnya begini:'}
+                                          : t(locale, 'diag.naturalLabel')}
                                       </span>
                                       <div data-testid="history-correction-display">
                                         <JapaneseRubyDisplay
@@ -10028,13 +9937,13 @@ ${
                                       }}
                                       className="shrink-0 px-2.5 py-1 rounded-full bg-[#F5F1E8] hover:bg-[#EAE3D5] text-[11px] font-semibold cursor-pointer mt-0.5"
                                     >
-                                      {locale === 'th' ? 'นำไปใช้' : locale === 'ja' ? '使う' : locale === 'zh' ? '使用' : 'Gunakan'}
+                                      {locale === 'ja' ? '使う' : locale === 'zh' ? '使用' : t(locale, 'ui.useAnswerBtn')}
                                     </button>
                                   </div>
                                 );
                               })()}
 
-                              {!diag.ok && (
+                              {!diag.ok && (locale === 'th' ? (diag.whyFailsTh || diag.pedagogicalFeedbackTh) : locale === 'id' ? (diag.whyFailsId || diag.pedagogicalFeedbackId) : '') && (
                                 <p className="text-[#5C4E3C] break-words leading-snug">
                                   {locale === 'th'
                                     ? diag.whyFailsTh || diag.pedagogicalFeedbackTh
@@ -10050,7 +9959,7 @@ ${
                     {isAnalyzingTurn && (
                       <div className="bg-white/85 rounded-2xl px-3.5 py-2 max-w-[70%] text-xs font-medium text-[#6E5E47] inline-flex items-center gap-2">
                         <span className="w-2 h-2 rounded-full bg-[#1C1611] animate-ping" />
-                        <span>{locale === 'th' ? 'กำลังเตรียมคำตอบ...' : 'Menyiapkan balasan...'}</span>
+                        <span>{t(locale, 'ui.preparingReply')}</span>
                       </div>
                     )}
                   </div>
@@ -10079,7 +9988,7 @@ ${
                   onClick={() => handleTabChange('call')}
                   className="px-3.5 py-2.5 rounded-xl bg-[#FFF3DC] hover:bg-[#FFF3C4] border border-[#F0E4CF] text-[#241A11] font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer"
                 >
-                  <span>← Kembali ke Panggilan</span>
+                  <span>{t(locale, 'ui.backToCall')}</span>
                 </button>
                 <button
                   type="button"
@@ -10102,12 +10011,12 @@ ${
 
             <div className="fz-studio-card rounded-3xl p-6 overflow-x-auto">
               <h2 className="text-sm font-bold text-[#241A11] mb-3 fz-solar-ribbon pl-3">
-                Matriks Kompetensi Kurikulum Aktif
+                {t(locale, 'ui.matrixTitle')}
               </h2>
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
                   <tr className="border-b border-[#F0E4CF] text-[#6E5E47]">
-                    <th className="py-2.5 pr-3">Kompetensi</th>
+                    <th className="py-2.5 pr-3">{t(locale, 'ui.competencyCol')}</th>
                     <th className="py-2.5 px-3">Status</th>
                     <th className="py-2.5 px-3">BKT P(L)</th>
                     <th className="py-2.5 pl-3">IRT θ</th>
@@ -10152,7 +10061,7 @@ ${
                     >
                       <div className="flex justify-between font-bold text-[#8C2233]">
                         <code className="font-mono">{item.misconceptionId}</code>
-                        <span>{item.frequency}x terdeteksi</span>
+                        <span>{item.frequency}{t(locale, 'ui.detectedSuffix')}</span>
                       </div>
                       <p className="text-[#241A11] font-semibold">"{item.lastUtterance}"</p>
                       <p className="text-[#6E5E47]">{item.correctionPattern}</p>
@@ -10246,38 +10155,30 @@ ${
                   <span className="font-medium truncate">
                     {liveUserDraft.trim()
                       ? isWaitingAfterSpeech
-                        ? `"${liveUserDraft.trim()}" (jeda berpikir...)`
+                        ? `"${liveUserDraft.trim()}" ${t(locale, 'ui.thinkingPauseTag')}`
                         : `"${liveUserDraft.trim()}"`
                       : isPlayingAiAudio
-                        ? locale === 'th'
-                          ? 'ติวเตอร์กำลังพูด (พูดแทรกเพื่อขัดจังหวะได้)'
-                          : (
-                            <>
-                              Coach sedang bicara
-                              <span className="inline"> · mic aktif, bicara saja untuk menyela</span>
-                            </>
-                          )
+                        ? (
+                          <>
+                            {t(locale, 'ui.coachSpeakingInterrupt')}
+                            <span className="inline"> {t(locale, 'ui.coachInterruptHint')}</span>
+                          </>
+                        )
                         : isLiveConnected
                           ? isMicMuted
-                            ? locale === 'th'
-                              ? 'ไมโครโฟนปิดอยู่: แตะไอคอนไมค์เพื่อเปิด'
-                              : (
-                                <>
-                                  Mic nonaktif
-                                  <span className="hidden sm:inline">: klik tombol mic untuk aktifkan</span>
-                                </>
-                              )
-                            : locale === 'th'
-                              ? 'ไมโครโฟนแฮนด์ฟรีเปิดอยู่: พูดได้เลยไม่ต้องกดปุ่ม'
-                              : (
-                                <>
-                                  Mic handsfree aktif
-                                  <span className="hidden sm:inline">: bicara langsung tanpa tekan tombol</span>
-                                </>
-                              )
-                          : locale === 'th'
-                            ? 'กำลังฟังเสียงของคุณ...'
-                            : 'Mendengarkan... Silakan bicara'}
+                            ? (
+                              <>
+                                {t(locale, 'ui.micOffBanner')}
+                                <span className="hidden sm:inline">{t(locale, 'ui.micOffHint')}</span>
+                              </>
+                            )
+                            : (
+                              <>
+                                {t(locale, 'ui.micHandsFreeBanner')}
+                                <span className="hidden sm:inline">{t(locale, 'ui.micHandsFreeHint')}</span>
+                              </>
+                            )
+                          : t(locale, 'ui.listeningPleaseSpeak')}
                   </span>
                 </div>
                 {liveUserDraft.trim() && (
@@ -10305,7 +10206,7 @@ ${
                     }}
                     className="px-3 py-0.5 rounded-full bg-[#1C1611] text-white font-semibold text-[11px] shrink-0 cursor-pointer"
                   >
-                    Kirim
+                    {t(locale, 'ui.sendShortBtn')}
                   </button>
                 )}
               </div>
@@ -10329,14 +10230,14 @@ ${
                   }`}
                   title={
                     isMicMuted
-                      ? 'Mikrofon dibisukan. Klik untuk aktifkan suara.'
-                      : 'Hands-free aktif. Klik untuk bisukan suara.'
+                      ? t(locale, 'ui.micMutedTitle')
+                      : t(locale, 'ui.micActiveTitle')
                   }
                 >
                   {isMicMuted ? (
                     <>
                       <MicOff className="w-3.5 h-3.5 shrink-0 text-white" />
-                      <span>{locale === 'th' ? 'ปิดไมค์' : 'Mic Mati'}</span>
+                      <span>{t(locale, 'ui.micOff')}</span>
                     </>
                   ) : (
                     <>
@@ -10345,7 +10246,7 @@ ${
                         <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                       </span>
                       <Mic className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
-                      <span>{locale === 'th' ? 'แฮนด์ฟรี' : 'Hands-Free'}</span>
+                      <span>{t(locale, 'ui.handsFreeBtn')}</span>
                     </>
                   )}
                 </button>
@@ -10378,7 +10279,7 @@ ${
                       ? 'bg-[#8C2233] text-white'
                       : 'bg-[#F5F1E8] hover:bg-[#EAE3D5] text-[#1C1611]'
                   }`}
-                  title={isPlayingAiAudio ? 'Sela ucapan Partner & bicara' : t(locale, 'call.pushToTalk')}
+                  title={isPlayingAiAudio ? t(locale, 'ui.interruptAndSpeak') : t(locale, 'call.pushToTalk')}
                 >
                   {isRecordingPtt ? (
                     <MicOff className="w-3.5 h-3.5 shrink-0" />
@@ -10388,9 +10289,7 @@ ${
                   <span>
                     {isRecordingPtt
                       ? `Stop (${pttRecordingSec}s)`
-                      : locale === 'th'
-                        ? 'พูด'
-                        : 'Bicara'}
+                      : t(locale, 'ui.speakShortBtn')}
                   </span>
                 </button>
               )}
@@ -10415,9 +10314,7 @@ ${
                     }
                   }
                 }}
-                placeholder={
-                  locale === 'th' ? 'พิมพ์ข้อความ...' : 'Ketik pesan...'
-                }
+                placeholder={t(locale, 'ui.typeMsgPlaceholder')}
                 className="min-w-0 flex-1 bg-transparent border-0 px-2.5 py-1.5 text-sm text-[#1C1611] placeholder:text-[#8C7E6A] focus:outline-none"
               />
 
@@ -10441,7 +10338,7 @@ ${
                 className="px-4 py-2 rounded-full bg-[#1C1611] hover:bg-[#332920] text-white font-semibold text-xs flex items-center justify-center gap-1.5 shrink-0 cursor-pointer transition-all disabled:opacity-30"
               >
                 <Send className="w-3.5 h-3.5 shrink-0" />
-                <span>{isAnalyzingTurn ? '...' : locale === 'th' ? 'ส่ง' : 'Kirim'}</span>
+                <span>{isAnalyzingTurn ? '...' : t(locale, 'ui.sendShortBtn')}</span>
               </button>
             </div>
           </div>
@@ -10450,7 +10347,7 @@ ${
 
       {/* NAVIGASI BAWAH MOBILE KHAS FIEZEL (Nonaktif pada mode tunggal Mitra Kaiwa) */}
       <nav
-        aria-label="Navigasi utama"
+        aria-label="Primary navigation"
         aria-hidden="true"
         style={{ display: 'none' }}
         className="hidden fixed bottom-0 left-0 right-0 z-40 bg-[#FFF9EE]/95 backdrop-blur-xl border-t border-[#F0E4CF] px-4 py-2 sm:hidden"
@@ -10466,7 +10363,7 @@ ${
             }`}
           >
             <Home className="w-5 h-5" />
-            <span>{locale === 'th' ? 'หน้าแรก' : 'Beranda'}</span>
+            <span>{t(locale, 'ui.homeTab')}</span>
           </button>
           <button
             type="button"
@@ -10478,7 +10375,7 @@ ${
             }`}
           >
             <Phone className="w-5 h-5" />
-            <span>{locale === 'th' ? 'โทรด้วยเสียง' : 'Panggilan Suara'}</span>
+            <span>{t(locale, 'ui.voiceTab')}</span>
           </button>
           <button
             type="button"
@@ -10512,15 +10409,13 @@ ${
             <div className="flex items-center justify-between pb-3 border-b border-[#EAE0CE]">
               <div>
                 <h3 className="text-base sm:text-lg font-bold text-[#1C1611] flex items-center gap-2">
-                  <span>{locale === 'th' ? 'เลือกคู่สนทนาและสไตล์เสียง' : 'Pilih Karakter & Gaya Bicara'}</span>
+                  <span>{t(locale, 'ui.choosePersonaTitle')}</span>
                   <span className="text-xs px-2 py-0.5 rounded-full bg-[#1C1611] text-white font-bold">
                     {targetLang.toUpperCase()}
                   </span>
                 </h3>
                 <p className="text-xs text-[#6E5E47] mt-0.5">
-                  {locale === 'th'
-                    ? 'เลือกติวเตอร์ที่มีเอกลักษณ์ บุคลิก และระดับการเคี่ยวเข็ญที่คุณชอบ'
-                    : 'Pilih mentor dengan gaya mengajar, aksen, dan tingkat roasting yang kamu sukai'}
+                  {t(locale, 'ui.choosePersonaSub')}
                 </p>
               </div>
               <button
@@ -10528,7 +10423,7 @@ ${
                 data-testid="close-persona-modal-btn"
                 onClick={() => setShowPersonaModal(false)}
                 className="w-8 h-8 rounded-full bg-[#EAE0CE] hover:bg-[#DDD0BC] text-[#5C4E3C] flex items-center justify-center font-bold text-sm cursor-pointer transition-colors"
-                aria-label="Tutup"
+                aria-label={t(locale, 'ui.close')}
               >
                 ✕
               </button>
@@ -10537,9 +10432,9 @@ ${
             {/* Bagian 1: Karakter & Persona (Grid 2 Kolom) */}
             <div className="space-y-2">
               <div className="flex items-center justify-between text-xs font-bold text-[#5C4E3C] uppercase tracking-wider">
-                <span>{locale === 'th' ? 'ติวเตอร์ที่เลือกได้' : 'Karakter Mentor Fiezel'}</span>
+                <span>{t(locale, 'ui.availableMentors')}</span>
                 <span className="text-[11px] font-normal normal-case text-[#8C7A65]">
-                  {locale === 'th' ? 'แตะเพื่อเปลี่ยนทันที' : 'Klik untuk ganti mentor'}
+                  {t(locale, 'ui.tapToSwitch')}
                 </span>
               </div>
 
@@ -10561,19 +10456,23 @@ ${
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-black text-xs sm:text-sm text-[#1C1611]">
-                          SSW SENSEI - Mentor Pengolahan Makanan (Wakai Papa Pro)
+                          {locale === 'id'
+                            ? 'SSW SENSEI - Mentor Pengolahan Makanan (Wakai Papa Pro)'
+                            : 'SSW SENSEI - Food Processing Exam Mentor (Prometric)'}
                         </span>
                         <span className="px-2 py-0.5 rounded-full bg-[#8C2233] text-white text-[10px] font-black">
                           OTAFF Ver 5.1 (Apr 2026)
                         </span>
                       </div>
                       <p className="text-[11px] text-[#5C4E3C] truncate mt-0.5">
-                        91 Hal PDF + 266 Kotoba + 58 Soal CBT + 86 Video Wakai Papa Pro (Bilingual ID + JP)
+                        {locale === 'id'
+                          ? '91 Hal PDF + 266 Kotoba + 58 Soal CBT + 86 Video Wakai Papa Pro (Bilingual ID + JP)'
+                          : '91-Page OTAFF Official Guide + 266 Kotoba + 58 CBT Drills (EN / ID / JP)'}
                       </p>
                     </div>
                   </div>
                   <span className="px-2.5 py-1 rounded-full bg-[#1C1611] text-white text-[11px] font-bold shrink-0">
-                    {activePersona.id === 'ssw_sensei' ? 'Aktif ✓' : 'Pilih'}
+                    {activePersona.id === 'ssw_sensei' ? `${t(locale, 'ui.activeTag')} ✓` : t(locale, 'ui.chooseBtn')}
                   </span>
                 </button>
               )}
@@ -10628,10 +10527,18 @@ ${
 
                         <div className="space-y-1 mt-1">
                           <div className="inline-block text-[10px] px-2 py-0.5 rounded-full font-bold bg-[#FAF2E4] text-[#7A5A29]">
-                            {locale === 'th' ? persona.personalityTagTh || persona.roleTh : persona.personalityTagId || persona.roleId}
+                            {locale === 'th'
+                              ? persona.personalityTagTh || persona.roleTh
+                              : locale === 'id'
+                              ? persona.personalityTagId || persona.roleId
+                              : persona.accentLabel || persona.name}
                           </div>
                           <div className="text-[11px] text-[#5C4E3C] line-clamp-2 leading-snug">
-                            {locale === 'th' ? persona.roastStyleTh || persona.speakingStyle : persona.roastStyleId || persona.speakingStyle}
+                            {locale === 'th'
+                              ? persona.roastStyleTh || persona.speakingStyle
+                              : locale === 'id'
+                              ? persona.roastStyleId || persona.speakingStyle
+                              : persona.speakingStyle}
                           </div>
                         </div>
                       </button>
@@ -10643,9 +10550,9 @@ ${
             {/* Bagian 2: Topik & Skenario Percakapan */}
             <div className="space-y-2 pt-2 border-t border-[#EAE0CE]">
               <div className="flex items-center justify-between text-xs font-bold text-[#5C4E3C] uppercase tracking-wider">
-                <span>{locale === 'th' ? 'หัวข้อบทสนทนา' : 'Pilihan Skenario & Topik'}</span>
+                <span>{t(locale, 'ui.scenarioTrackLabel')}</span>
                 <span className="text-[11px] font-normal normal-case text-[#8C7A65]">
-                  {scenariosForLang.length} {locale === 'th' ? 'สถานการณ์' : 'skenario'}
+                  {scenariosForLang.length} {t(locale, 'ui.scenariosShort')}
                 </span>
               </div>
 
@@ -10653,6 +10560,7 @@ ${
                 {scenariosForLang.map((scen) => {
                   const isScenActive = activeScenario.id === scen.id;
                   const scenPersona = VOICE_PERSONAS[scen.personaId] || activePersona;
+                  const scenMeta = scenarioMetaForLocale(locale, scen);
                   return (
                     <button
                       key={scen.id}
@@ -10667,14 +10575,14 @@ ${
                     >
                       <div className="min-w-0 flex-1">
                         <div className="text-xs text-[#1C1611] truncate font-medium">
-                          {locale === 'th' ? scen.titleTh : scen.titleId}
+                          {scenMeta.title}
                         </div>
                         <div className="text-[10px] text-[#8C7A65] truncate">
                           {formatPersonaShortName(scenPersona.name)} · {formatCleanLevel(scen.level)}
                         </div>
                       </div>
                       {isScenActive && (
-                        <span className="text-xs text-[#10B981] font-bold shrink-0">✓ Aktif</span>
+                        <span className="text-xs text-[#10B981] font-bold shrink-0">✓ {t(locale, 'ui.activeTag')}</span>
                       )}
                     </button>
                   );
@@ -10689,9 +10597,7 @@ ${
                 onClick={() => setShowPersonaModal(false)}
                 className="w-full py-2.5 px-4 rounded-xl bg-[#1C1611] hover:bg-[#332A22] text-white font-bold text-xs cursor-pointer transition-all active:scale-[0.98] shadow-md"
               >
-                {locale === 'th'
-                  ? `เริ่มคุยกับ ${formatPersonaShortName(activePersona.name)}`
-                  : `Mulai Bicara dengan ${formatPersonaShortName(activePersona.name)}`}
+                {`${t(locale, 'ui.startTalkWith')} ${formatPersonaShortName(activePersona.name)}`}
               </button>
             </div>
           </div>
@@ -11005,12 +10911,10 @@ ${
             </div>
             <div>
               <h3 className="text-base font-extrabold text-[#1C1611]">
-                {locale === 'th' ? 'Kawan Bicara' : 'Kawan Bicara'}
+                {targetLang === 'ja' ? t(locale, 'ui.speakPartnerBrandJA') : t(locale, 'ui.speakPartnerBrand')}
               </h3>
               <p className="mt-1.5 text-xs leading-relaxed text-[#5C4E3C]">
-                {locale === 'th'
-                  ? 'ฟีเจอร์นี้ใช้ Gem และสามารถรับ Gem ฟรีได้จากการฝึกประจำวัน'
-                  : 'Fitur ini memakai Gem, dan Gem bisa diakses gratis dari latihan harian.'}
+                {t(locale, 'ui.gemModalFeatureDesc')}
               </p>
             </div>
             <div className="flex items-center gap-2 pt-1">
@@ -11019,14 +10923,14 @@ ${
                 onClick={() => setCallConfirmModal(null)}
                 className="flex-1 py-3 px-4 rounded-xl bg-[#F1F5F9] hover:bg-[#E2E8F0] text-[#475569] font-bold text-xs cursor-pointer transition-colors"
               >
-                {locale === 'th' ? 'ยกเลิก' : 'Batal'}
+                {t(locale, 'ui.cancelBtn')}
               </button>
               <button
                 type="button"
                 onClick={handleConfirmStartCall}
                 className="flex-1 py-3 px-4 rounded-xl bg-[#F59E0B] hover:bg-[#D97706] text-white font-bold text-xs shadow-md shadow-amber-500/25 cursor-pointer transition-all active:scale-[0.98]"
               >
-                {locale === 'th' ? 'เชื่อมต่อ' : 'Sambungkan'}
+                {t(locale, 'ui.connectBtn')}
               </button>
             </div>
           </div>
@@ -11042,20 +10946,26 @@ ${
             </div>
             <div>
               <h3 className="text-base font-extrabold text-[#1C1611]">
-                {locale === 'th' ? 'Gem ยังไม่พอ' : 'Gem Belum Cukup'}
+                {t(locale, 'ui.notEnoughGemsTitle')}
               </h3>
               <div className="mt-2 text-xs leading-relaxed text-[#5C4E3C]">
                 {locale === 'th' ? (
                   <>
-                    คุณต้องมีอย่างน้อย <strong>{KAWAN_BICARA_MIN_START_GEMS} Gem</strong> สำหรับเสียงตอบแรกของ Kawan Bicara (ยอดปัจจุบัน: {insufficientGemModal.balance} 💎)
+                    คุณต้องมีอย่างน้อย <strong>{KAWAN_BICARA_MIN_START_GEMS} Gem</strong> สำหรับเสียงตอบแรกของ {t(locale, 'ui.speakPartnerBrand')} (ยอดปัจจุบัน: {insufficientGemModal.balance} 💎)
                     <br /><br />
                     ทำแบบฝึกหัดในควิซเพื่อสะสม Gem หรือรอรีเซ็ตสิทธิ์ฟรีรายวันในวันพรุ่งนี้!
                   </>
-                ) : (
+                ) : locale === 'id' ? (
                   <>
                     Kamu membutuhkan minimal <strong>{KAWAN_BICARA_MIN_START_GEMS} Gem</strong> untuk respon suara pertama Kawan Bicara (Saldo saat ini: {insufficientGemModal.balance} 💎).
                     <br /><br />
                     Selesaikan latihan soal di kuis untuk mengumpulkan Gem gratis atau tunggu kuota gratis harian besok!
+                  </>
+                ) : (
+                  <>
+                    You need at least <strong>{KAWAN_BICARA_MIN_START_GEMS} Gems</strong> for the first {t(locale, 'ui.speakPartnerBrand')} voice reply (Current balance: {insufficientGemModal.balance} 💎).
+                    <br /><br />
+                    Complete quiz exercises to collect free Gems or wait for tomorrow&apos;s daily free allowance!
                   </>
                 )}
               </div>
@@ -11066,7 +10976,7 @@ ${
                 onClick={() => setInsufficientGemModal(null)}
                 className="w-full py-3 px-4 rounded-xl bg-[#0F172A] hover:bg-[#1E293B] text-white font-bold text-xs shadow-md cursor-pointer transition-colors"
               >
-                {locale === 'th' ? 'เข้าใจแล้ว' : 'Mengerti'}
+                {t(locale, 'ui.understoodBtn')}
               </button>
             </div>
           </div>
@@ -11085,7 +10995,7 @@ ${
             className="px-5 py-3 rounded-2xl bg-[#1C1611] text-white font-bold text-sm shadow-xl flex items-center gap-2.5 animate-bounce border border-[#FF9800]/40 cursor-pointer"
           >
             <Phone className="w-4 h-4 text-[#FF9800]" />
-            <span>Sambungkan Telepon Live Sekarang</span>
+            <span>{t(locale, 'ui.connectLiveNow')}</span>
           </button>
         </div>
       )}

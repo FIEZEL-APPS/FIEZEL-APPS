@@ -200,7 +200,6 @@
     'mochi-sos.conn-error': 'Koneksi AI bermasalah — Ketuk untuk coba lagi',
     'mochi-sos.conn-retry': 'Coba lagi',
     'mochi-sos.toggle-on-title': 'Nonaktifkan bantuan suara Mochi',
-    'mochi-sos.toggle-off-title': 'Aktifkan bantuan suara Mochi',
     'mochi-sos.toggle-label': 'Bantuan Mochi',
     'mochi-sos.toggle-on-badge': 'ON',
     'mochi-sos.toggle-off-badge': 'OFF',
@@ -4846,9 +4845,9 @@
     _syncCardToggleUi: function (btn, isOn) {
       if (!btn) return;
       var titleText = isOn
-        ? t('mochi-sos.toggle-on-title', 'Nonaktifkan bantuan suara Mochi')
-        : t('mochi-sos.toggle-off-title', 'Aktifkan bantuan suara Mochi');
-      var labelText = 'Bantuan mochi';
+        ? t('mochi-sos.toggle-on-title', 'Turn off Mochi voice help')
+        : t('mochi-sos.toggle-off-title', 'Turn on Mochi voice help');
+      var labelText = t('mochi-sos.toggle-label', 'Mochi Help');
       var stateText = isOn ? 'ON' : 'OFF';
       var stateSig = (isOn ? '1:' : '0:') + stateText + ':' + titleText;
       if (btn.getAttribute('data-mochi-sig') === stateSig) return;

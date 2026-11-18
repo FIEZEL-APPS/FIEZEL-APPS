@@ -290,7 +290,7 @@
     'level.toast-cooldown': '{judul} {level} ลองใหม่ได้ {jeda}',
     'level.toast-demosi': 'เราถอยกลับไปที่ {level} ก่อนนะ — ความคืบหน้าทั้งหมดของคุณยังอยู่ครบ',
     'level.toast-mulai-ujian': '{judul} {level} · {jumlah} ข้อ ไม่มีคำใบ้',
-    'level.toast-warn': 'พลาด {miss} จาก {batas} ที่ {level} PAW อยู่เป็นเพื่อนนะ',
+    'level.toast-warn': 'พลาด {miss} จาก {batas} ที่ {level} Mochi อยู่เป็นเพื่อนนะ',
     'level.tombol-cooldown': 'ลองใหม่ได้ {jeda}',
     'masukan.batal': 'ยกเลิก',
     'masukan.judul': 'ส่งความคิดเห็น',
@@ -338,6 +338,9 @@
     'vocab.n-kata': '{jumlah} คำ',
     'vocab.review-due': ' Review Due ({jumlah})</button>',
     'vocab.subjudul': '{jumlah} คำของระดับ {level} แบบฝึกหัดทั้งหมดตามระดับการเรียนที่ใช้อยู่',
-    'vocab.uji': ' ทดสอบ Vocabulary {level}</button>'
+    'vocab.uji': ' ทดสอบ Vocabulary {level}</button>',
+    'tour.listen-miss-body': 'ผิดตอนฝึกเป็นเรื่องธรรมดา ไม่มีปัญหาเลย Mochi คอยอยู่เป็นเพื่อนในทุกข้อนะ',
+    'tour.menu-ask-body': 'ปุ่มด้านขวานี้คือประตูสู่ Mochi ผู้ช่วยสอน สงสัยตรงไหนถามได้ที่นี่เลย (ต้องใช้อินเทอร์เน็ต)',
+    'tour.menu-home-body': 'นี่คือหน้าวันนี้: ความคืบหน้าประจำวัน สถิติต่อเนื่อง และคำแนะนำการฝึกจาก Mochi การเดินทางทั้งหมดของคุณเริ่มจากตรงนี้'
   });
 }());

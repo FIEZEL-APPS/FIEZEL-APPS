@@ -225,12 +225,18 @@
   };
 
   /* -------------------------------------------------------------- i18n / boot -------- */
+  var VALID_LOCALES = { en: 1, id: 1, th: 1, vi: 1, ms: 1, fil: 1, ja: 1, km: 1, ru: 1 };
+  function normLoc(raw) {
+    var s = String(raw || '').trim().toLowerCase().split('-')[0];
+    if (s === 'tl') s = 'fil';
+    return VALID_LOCALES[s] ? s : '';
+  }
   function resolveLocale() {
-    var q = params.get('lang');
-    if (q === 'th' || q === 'id') return q;
-    var h = lsGet(KEYS.locale);
-    if (h === 'th' || h === 'id') return h;
-    try { return /^th\b/i.test(String(root.navigator.language || '')) ? 'th' : 'id'; } catch (_) { return 'id'; }
+    var q = normLoc(params.get('locale') || params.get('lang'));
+    if (q) return q;
+    var h = normLoc(lsGet(KEYS.locale));
+    if (h) return h;
+    try { return normLoc(root.navigator.language) || 'en'; } catch (_) { return 'en'; }
   }
   function loadScript(src) {
     return new Promise(function (resolve, reject) {
@@ -1582,7 +1588,14 @@
 
   var loc = resolveLocale();
   if (loc === 'th') {
-    loadScript('./features/i18n/copy-th-undercover.js')
-      .then(function () { I.setLocale('th'); start(); }, function () { start(); });
+    Promise.all([
+      loadScript('./features/i18n/copy-th-undercover.js'),
+      I && I.loadLocale ? I.loadLocale('th') : Promise.resolve()
+    ]).then(function () { if (I && I.setLocale) I.setLocale('th'); start(); }, function () { if (I && I.setLocale) I.setLocale('th'); start(); });
+  } else if (loc && loc !== 'id') {
+    Promise.all([
+      I && I.loadLocale ? I.loadLocale('en') : Promise.resolve(),
+      (loc !== 'en' && I && I.loadLocale) ? I.loadLocale(loc) : Promise.resolve()
+    ]).then(function () { if (I && I.setLocale) I.setLocale(loc); start(); }, function () { if (I && I.setLocale) I.setLocale(loc); start(); });
   } else start();
 }());

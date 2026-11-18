@@ -124,7 +124,7 @@
     // app.js:1007 — levelExamCooldownLabel()
     'level.cooldown-sejam': 'kurang dari sejam lagi',
     // app.js:122 — LEVEL_GUARD_COPY.demotionBody
-    'level.demosi-isi': 'Sepuluh jawaban meleset di level ini \u2014 bukan karena kamu nggak mampu, tapi karena fondasinya belum kebentuk penuh, dan maksa lanjut cuma bikin capek. Makanya PAW ajak kamu balik ke A1 dulu, nguatin dasarnya bareng-bareng; fitur level atas dikunci sementara biar fokusmu nggak pecah. Kalau kamu merasa udah siap lebih cepat, jalannya ada: lulus Ujian Skip Level, dan pintunya kebuka lagi.',
+    'level.demosi-isi': 'Sepuluh jawaban meleset di level ini — bukan karena kamu nggak mampu, tapi karena fondasinya belum kebentuk penuh, dan maksa lanjut cuma bikin capek. Makanya Mochi ajak kamu balik ke A1 dulu, nguatin dasarnya bareng-bareng; fitur level atas dikunci sementara biar fokusmu nggak pecah. Kalau kamu merasa udah siap lebih cepat, jalannya ada: lulus Ujian Skip Level, dan pintunya kebuka lagi.',
     // app.js:121 — LEVEL_GUARD_COPY.demotionTitle
     'level.demosi-judul': 'Kita mundur selangkah dulu, ya',
     // app.js:123 — LEVEL_GUARD_COPY.demotionStart
@@ -154,11 +154,11 @@
     // app.js:124 — LEVEL_GUARD_COPY.lockedFeature
     'level.fitur-terkunci': 'Fitur ini dikunci sementara kamu nguatin fondasi di A1. Selesaikan materinya pelan-pelan, atau buka lebih cepat lewat Ujian Skip Level.',
     // app.js:119 — LEVEL_GUARD_COPY.warn5
-    'level.peringatan-5': 'Udah 5 yang meleset, dan itu nggak apa-apa \u2014 salah itu bagian dari belajar. Coba pelan-pelan: baca soalnya dua kali, atau pakai petunjuk kalau butuh. PAW nungguin, nggak ke mana-mana.',
+    'level.peringatan-5': 'Udah 5 yang meleset, dan itu nggak apa-apa — salah itu bagian dari belajar. Coba pelan-pelan: baca soalnya dua kali, atau pakai petunjuk kalau butuh. Mochi nungguin, nggak ke mana-mana.',
     // app.js:120 — LEVEL_GUARD_COPY.warn8
-    'level.peringatan-8': 'Level ini kayaknya masih lumayan berat buat sekarang, dan itu wajar banget. Saran PAW: mampir sebentar ke materi dasarnya, biar pas balik ke sini rasanya lebih enteng. Kalau meleset 2 kali lagi, kita turun bareng dulu buat nguatin fondasi, ya.',
+    'level.peringatan-8': 'Level ini kayaknya masih lumayan berat buat sekarang, dan itu wajar banget. Saran Mochi: mampir sebentar ke materi dasarnya, biar pas balik ke sini rasanya lebih enteng. Kalau meleset 2 kali lagi, kita turun bareng dulu buat nguatin fondasi, ya.',
     // app.js:115 — LEVEL_GUARD_COPY.probationBody
-    'level.probation-isi': 'Lulusin Ujian Skip Level dulu, PAW temenin dari A1.',
+    'level.probation-isi': 'Lulusin Ujian Skip Level dulu, Mochi temenin dari A1.',
     // app.js:114 — LEVEL_GUARD_COPY.probationTitle
     'level.probation-judul': 'Level ini belum terverifikasi',
     // app.js:808 — activeLevelLabel()
@@ -177,7 +177,7 @@
     // app.js:125 — LEVEL_GUARD_COPY.examTitle
     'level.ujian-judul': 'Ujian Skip Level',
     // app.js:128 — LEVEL_GUARD_COPY.examPass
-    'level.ujian-lulus': 'Lulus! Level ini sekarang terverifikasi buat kamu \u2014 PAW sampai lompat-lompat. Grammar, kosakata, dan bacaanmu di level ini terbukti kuat; semua fitur di level ini kebuka. Speaking dan listening belum ikut diuji \u2014 itu medan seru berikutnya, lanjut!',
+    'level.ujian-lulus': 'Lulus! Level ini sekarang terverifikasi buat kamu — Mochi sampai lompat-lompat. Grammar, kosakata, dan bacaanmu di level ini terbukti kuat; semua fitur di level ini kebuka. Speaking dan listening belum ikut diuji — itu medan seru berikutnya, lanjut!',
     // app.js:127 — LEVEL_GUARD_COPY.examStart
     'level.ujian-mulai': 'Mulai ujian',
     // app.js:160 — LOGIN_MESSAGES[] (top-level const)
