@@ -105,30 +105,31 @@ export const SOCIAL_DDL = Object.freeze([
     ' ) WITHOUT ROWID'
 ]);
 
-/** Cache penerapan per handle DB. WeakMap: entri hilang bersama handle-nya. */
-const ENSURED = new WeakMap();
+/** Penanda selesai per handle DB (WeakSet boolean, bukan Promise lintas request). */
+const ENSURED = new WeakSet();
 
 /**
  * Terapkan DDL sosial secara idempoten. FAIL-CLOSED bagi pemanggil: tanpa DB
  * fungsi ini melempar, dan rute sosial menjawab 503 — bukan diam-diam jalan
- * tanpa penyimpanan. Kegagalan TIDAK di-cache (retry pada permintaan berikut).
+ * tanpa penyimpanan. Kegagalan TIDAK ditandai (retry pada permintaan berikut).
  */
-export function ensureSocialSchema(db) {
+export async function ensureSocialSchema(db) {
   if (!db || typeof db.prepare !== 'function') {
-    return Promise.reject(new Error('social_store_missing'));
+    throw new Error('social_store_missing');
   }
-  let pending = ENSURED.get(db);
-  if (!pending) {
-    pending = (async () => {
-      for (const statement of SOCIAL_DDL) {
-        /* eslint-disable no-await-in-loop */
-        await db.prepare(statement).run();
-      }
-      await db.prepare('CREATE INDEX IF NOT EXISTS idx_social_friend_b ON social_friend (b, a, since_day)').run();
-      return true;
-    })();
-    ENSURED.set(db, pending);
-    pending.catch(() => ENSURED.delete(db));
+  if (ENSURED.has(db)) return true;
+  const statements = [
+    ...SOCIAL_DDL,
+    'CREATE INDEX IF NOT EXISTS idx_social_friend_b ON social_friend (b, a, since_day)'
+  ];
+  if (typeof db.batch === 'function') {
+    await db.batch(statements.map((statement) => db.prepare(statement)));
+  } else {
+    for (const statement of statements) {
+      /* eslint-disable no-await-in-loop */
+      await db.prepare(statement).run();
+    }
   }
-  return pending;
+  ENSURED.add(db);
+  return true;
 }

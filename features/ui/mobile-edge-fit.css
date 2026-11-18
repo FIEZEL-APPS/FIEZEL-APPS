@@ -1469,6 +1469,9 @@ html.fz-booting header.topbar {
   justify-content: center !important;
   margin-top: 4px !important;
 }
+.fz-auth-google[hidden] {
+  display: none !important;
+}
 
 /* Or Divider */
 .fz-auth-or {
