@@ -60,6 +60,14 @@ export interface FlexibleTurnEvaluationResult {
   replySource?: 'ai' | 'ai-gemini-key';
   uiAction?: VoiceUiAction;
   readAloudAlignment?: SpeechAlignmentResult;
+  serverDiagnosis?: {
+    ok: boolean;
+    misconceptionCode: string | null;
+    canonicalCode?: string | null;
+    whyFailsId?: string;
+    correction?: string;
+    source?: string;
+  } | null;
 }
 
 declare global {
@@ -5044,6 +5052,101 @@ export async function requestAiPartnerReply(params: {
 }
 
 /**
+ * Queries pre-trained neural classifier (/api/ai/task conversation_correct for en/ja)
+ * on free-form learner utterances so arbitrary syntax/grammar mistakes map onto canonical
+ * misconception-taxonomy-v1 codes inside Braincore Misconception Ledger.
+ */
+export async function requestNeuralUtteranceDiagnosis(params: {
+  text: string;
+  scenario: CallScenario;
+  targetLang: TargetLang;
+  locale: LearnerLocale;
+  history: Array<{ speaker: 'ai' | 'user'; text: string }>;
+}): Promise<{
+  ok: boolean;
+  misconceptionCode: string | null;
+  canonicalCode: string | null;
+  whyFailsId: string;
+  correction: string;
+  source: string;
+} | null> {
+  const message = String(params.text || '').trim().slice(0, 400);
+  if (!message || message.length < 6) return null;
+  // Closed schema in Worker ai-tasks allows course 'en' | 'ja'
+  if (params.targetLang !== 'en' && params.targetLang !== 'ja') return null;
+  const base = resolveCfApiBase();
+  if (!base || Date.now() < _aiPartnerCooldownUntil) return null;
+
+  if (!_identityReady) {
+    await Promise.race([
+      ensureLearnerIdentity(),
+      new Promise<boolean>((r) => setTimeout(() => r(false), 350)),
+    ]);
+  }
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 5500);
+  try {
+    const history = (params.history || [])
+      .filter((h) => h && h.text && h.text.trim())
+      .map((h) => `${h.speaker === 'ai' ? 'a' : 'u'}: ${h.text.trim()}`.slice(0, 320))
+      .slice(-6);
+    const res = await fetch(`${base}/api/ai/task`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        schema: AI_TASK_REQUEST_SCHEMA,
+        task: 'conversation_correct',
+        input: {
+          message,
+          course: params.targetLang,
+          level: mapScenarioLevel((params.scenario as { level?: string }).level),
+          scenarioId: mapScenarioToWorkerRole(params.scenario.id),
+          mode: 'call',
+          ...(history.length ? { history } : {}),
+        },
+        locale: params.locale === 'th' ? 'th' : 'id',
+      }),
+      credentials: 'include',
+      mode: 'cors',
+      cache: 'no-store',
+      signal: controller.signal,
+    });
+    clearTimeout(timer);
+    if (!res.ok) return null;
+    const data = await res.json();
+    const turn = data?.turn || data?.result?.turn || null;
+    if (!turn || data?.degraded) return null;
+    const hasFix = Boolean(turn.correction && turn.correction.corrected);
+    if (hasFix) {
+      const code = String(turn.correction.canonicalCode || turn.canonicalCode || 'lexical.form_confusion');
+      return {
+        ok: false,
+        misconceptionCode: code,
+        canonicalCode: code,
+        whyFailsId: String(turn.correction.note || ''),
+        correction: String(turn.correction.corrected || ''),
+        source: 'workers_ai_neural_corrector',
+      };
+    }
+    if (turn.correctionChecked === true && turn.mistakeSignal === false) {
+      return {
+        ok: true,
+        misconceptionCode: null,
+        canonicalCode: null,
+        whyFailsId: '',
+        correction: '',
+        source: 'workers_ai_neural_corrector',
+      };
+    }
+    return null;
+  } catch {
+    clearTimeout(timer);
+    return null;
+  }
+}
+
+/**
  * Wakes the neural TTS backend (Render free tier cold-starts in ~7s) and issues the learner
  * identity cookie as soon as Voice Studio opens, so the first spoken line is not silent.
  */
@@ -5438,6 +5541,22 @@ export async function resolveAiReply(
             uiAction
           );
 
+          const serverDiag =
+            data?.diagnosis && typeof data.diagnosis === 'object' && typeof data.diagnosis.ok === 'boolean'
+              ? {
+                  ok: Boolean(data.diagnosis.ok),
+                  misconceptionCode: data.diagnosis.misconceptionCode
+                    ? String(data.diagnosis.misconceptionCode)
+                    : null,
+                  canonicalCode: data.diagnosis.canonicalCode
+                    ? String(data.diagnosis.canonicalCode)
+                    : null,
+                  whyFailsId: String(data.diagnosis.whyFailsId || ''),
+                  correction: String(data.diagnosis.correction || ''),
+                  source: String(data.diagnosis.source || 'gemini_neural_partner'),
+                }
+              : null;
+
           // When opening a learning popup, InCallLearningWorkbenchModal owns the single unified explanation
           // speech in the learner's locale (`id` / `th`), so NEVER fire a second competing English TTS here!
           if (uiAction && uiAction.actionType === 'open_learning_popup') {
@@ -5452,6 +5571,7 @@ export async function resolveAiReply(
               ttsEngine: 'workbench-unified-tts',
               replySource: 'ai',
               uiAction,
+              serverDiagnosis: serverDiag,
             };
           }
 
@@ -5471,6 +5591,7 @@ export async function resolveAiReply(
             ttsEngine: ttsRes?.engine || 'gemini-3.8-flash-lite-tts',
             replySource: 'ai',
             uiAction,
+            serverDiagnosis: serverDiag,
           };
         }
         }

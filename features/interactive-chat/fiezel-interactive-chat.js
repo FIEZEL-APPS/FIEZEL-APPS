@@ -2704,8 +2704,10 @@
       type: 'speaking'
     };
 
+    var canon = hint && (hint.canonical || hint.canonicalCode) ? String(hint.canonical || hint.canonicalCode) : '';
     var diagnosis = {
       misconception: hint && hint.id ? String(hint.id) : '',
+      ...(canon ? { canonical: canon } : {}),
       timing: 'normal'
     };
 
@@ -2728,6 +2730,7 @@
           concept: cid,
           family: 'speaking',
           misconception: diagnosis.misconception,
+          ...(canon ? { canonical: canon } : {}),
           correct: isOk,
           timing: 'normal',
           sessionId: 'chat_' + Date.now()
@@ -3081,7 +3084,8 @@
       var cleanTrans = String(turn.translation || '').replace(/-{2,}\s*(?:END\s+(?:OF\s+)?)?DATA\s*-{2,}/gi, '').trim();
       var corr = turn.correction && turn.correction.corrected ? {
         corrected: String(turn.correction.corrected).replace(/-{2,}\s*(?:END\s+(?:OF\s+)?)?DATA\s*-{2,}/gi, '').trim(),
-        note: String(turn.correction.note || '').replace(/-{2,}\s*(?:END\s+(?:OF\s+)?)?DATA\s*-{2,}/gi, '').trim()
+        note: String(turn.correction.note || '').replace(/-{2,}\s*(?:END\s+(?:OF\s+)?)?DATA\s*-{2,}/gi, '').trim(),
+        canonicalCode: turn.correction.canonicalCode ? String(turn.correction.canonicalCode).trim() : (turn.canonicalCode ? String(turn.canonicalCode).trim() : null)
       } : null;
       return {
         text: cleanReply,
@@ -3091,6 +3095,7 @@
         grammarNote: null,
         suggestions: [],
         correction: corr,
+        canonicalCode: corr ? corr.canonicalCode : (turn.canonicalCode || null),
         correctionChecked: turn.correctionChecked === true,
         mistakeSignal: typeof turn.mistakeSignal === 'boolean' ? turn.mistakeSignal : null,
         source: 'ai'
@@ -3415,6 +3420,33 @@
       userMsg.correction = r.correction || null;
       userMsg.correctionChecked = r.correctionChecked === true;
       userMsg.mistakeSignal = typeof r.mistakeSignal === 'boolean' ? r.mistakeSignal : null;
+      // Neural diagnosis Braincore telemetry: jika detektor lokal tidak memicu kesalahan,
+      // namun model neural Worker (/api/ai/task conversation_correct) memvonis salah + canonical code
+      // (atau memverifikasi kalimat bebas benar), catat langsung ke Braincore BKT & Misconception Ledger.
+      try {
+        var normC = (course === 'ja' || course === 'zh') ? course : 'en';
+        var cid = normC + '_kaiwa_' + (sid || 'free');
+        var fCid = normC + '_speaking_fluency';
+        var hasNeuralFix = !!(r.correction && r.correction.corrected);
+        var hasNeuralSignal = typeof r.mistakeSignal === 'boolean';
+        if (!userMsg.hint && (hasNeuralFix || hasNeuralSignal)) {
+          var diagOk = !hasNeuralFix && r.mistakeSignal !== true;
+          var neuralCode = !diagOk
+            ? String((r.correction && r.correction.canonicalCode) || r.canonicalCode || 'lexical.form_confusion')
+            : '';
+          if (typeof Pedagogy !== 'undefined' && Pedagogy && typeof Pedagogy.mapToCanonicalTaxonomyCode === 'function' && !diagOk) {
+            neuralCode = Pedagogy.mapToCanonicalTaxonomyCode(neuralCode, (r.correction && r.correction.note) || userMsg.text, normC);
+          }
+          callUpdateMastery('speaking', cid, diagOk, 4200, null, Date.now());
+          callBktRecord(cid, diagOk, computeSpeakingKappa(diagOk, 4200, 0), 1.2);
+          callBktRecord(fCid, diagOk, computeSpeakingKappa(diagOk, 4200, 0), 1.1);
+          callMisconceptionRecord(
+            cid,
+            !diagOk && neuralCode ? { id: neuralCode, canonical: neuralCode } : null,
+            diagOk
+          );
+        }
+      } catch (_) {}
     }
     targetMsgs.push(assistantMsg);
 

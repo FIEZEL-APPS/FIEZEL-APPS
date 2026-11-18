@@ -3355,6 +3355,118 @@ function forgettingProbability(b){
   const stability=Math.max(.25,b.stability||1);
   return Math.min(.99,1-Math.exp(-ageDays/stability))
 }
+const FSRS6_SHADOW_KEY='fiezel-fsrs6-shadow-v1';
+const FSRS6_SHADOW_MAX_SAMPLES=400;
+function fsrsShadowAllowed(){
+  try{
+    const oracle=self.FiezelFsrsOracle;
+    if(!oracle||typeof oracle.createFSRS6!=='function')return{allowed:false,reason:'oracle_unavailable'};
+    if(self.FIEZEL_FSRS6_SHADOW===false)return{allowed:false,reason:'client_flag_off'};
+    if(self.FiezelBrainManifest?.authorityMap?.fsrsOracle==='off')return{allowed:false,reason:'manifest_off'};
+    const st=typeof loadSelfTuneState==='function'?loadSelfTuneState():null;
+    if(st&&st.halt===true)return{allowed:false,reason:'self_tune_halt'};
+    if(cfRemoteState&&cfRemoteState.status==='ok'){
+      if(cfRemoteState.flags?.cfApiEnabled===false)return{allowed:false,reason:'server_api_disabled'};
+      if(cfRemoteState.enabled?.coach===false)return{allowed:false,reason:'server_coach_killed'};
+    }
+    return{allowed:true,reason:'ok'};
+  }catch{return{allowed:false,reason:'guard_error'}}
+}
+function fsrsShadowRead(){
+  try{const raw=localStorage.getItem(sideStateKey(FSRS6_SHADOW_KEY));const arr=raw?JSON.parse(raw):null;return Array.isArray(arr)?arr:[]}catch{return[]}
+}
+function fsrsShadowWrite(entries){
+  if(!Array.isArray(entries))return;
+  try{localStorage.setItem(sideStateKey(FSRS6_SHADOW_KEY),JSON.stringify(entries.slice(-FSRS6_SHADOW_MAX_SAMPLES)))}catch{}
+}
+function fsrsShadowStep(ctx){
+  const gate=fsrsShadowAllowed();
+  if(!gate.allowed||!ctx||!ctx.b)return null;
+  try{
+    const oracle=self.FiezelFsrsOracle;
+    const clampP=v=>Math.min(1-1e-6,Math.max(1e-6,Number(v)||0.5));
+    const weights=Array.isArray(ctx.weights)?ctx.weights:oracle.FSRS6_DEFAULT_WEIGHTS;
+    const fsrs6=oracle.createFSRS6(weights);
+    const prevSeen=Math.max(0,Number(ctx.prevSeen)||0);
+    const now=Math.max(0,Number(ctx.now)||Date.now());
+    const elapsedDays=prevSeen>0&&now>=prevSeen?(now-prevSeen)/86400000:0;
+    const priorFsrs6=ctx.priorFsrs6&&Number(ctx.priorFsrs6.stability)>0?ctx.priorFsrs6:null;
+    const timing=!ctx.ok?'wrong':(ctx.ms>12000||ctx.confidence===1)?'struggled':(ctx.ms<5000&&ctx.confidence!==1)?'fluent':'ok';
+    const rating=typeof oracle.fiezelAttemptToFsrsRating==='function'
+      ? oracle.fiezelAttemptToFsrsRating({ok:!!ctx.ok,timing,streak:Math.max(0,Number(ctx.streak)||0)})
+      : (ctx.ok?3:1);
+    const hasRepeat=prevSeen>0&&now>prevSeen&&priorFsrs6!==null;
+    const fsrs6Pred=hasRepeat?clampP(fsrs6.forgettingCurve(elapsedDays,priorFsrs6.stability)):null;
+    const nextState=fsrs6.step(priorFsrs6,elapsedDays,rating);
+    ctx.b.fsrs6={
+      stability:Math.round(Number(nextState.stability||0.2)*10000)/10000,
+      difficulty:Math.round(Number(nextState.difficulty||5)*10000)/10000,
+      halfLife:Math.round(Number(nextState.halfLife||0.2)*10000)/10000,
+      lastAt:now
+    };
+    if(!hasRepeat||fsrs6Pred===null)return{recorded:false,rating,nextState:ctx.b.fsrs6};
+    const itemId=ctx.itemKey?`${ctx.bucket||'item'}:${ctx.itemKey}`:`direct:${String(ctx.b.id||ctx.b.key||'anon')}`;
+    const entry={
+      item:itemId,
+      at:now,
+      ok:ctx.ok?1:0,
+      ageDays:Math.round(elapsedDays*1000)/1000,
+      rating,
+      legacyPred:Number(clampP(ctx.legacyPred).toFixed(6)),
+      fsrs6Pred:Number(fsrs6Pred.toFixed(6)),
+      fsrs6Stability:ctx.b.fsrs6.stability
+    };
+    const list=fsrsShadowRead();
+    const dupIdx=list.findIndex(r=>r&&r.item===itemId&&r.at===now);
+    if(dupIdx>=0)list[dupIdx]=entry;else list.push(entry);
+    fsrsShadowWrite(list);
+    return{recorded:true,entry,nextState:ctx.b.fsrs6};
+  }catch{return null}
+}
+function fsrsShadowCompareSnapshot(){
+  const gate=fsrsShadowAllowed();
+  const sg=self.FiezelStatGate;
+  const sgOk=!!(sg&&typeof sg.pairedBootstrap==='function'&&typeof sg.twoProportionTest==='function'&&typeof sg.verdict==='function');
+  const rows=fsrsShadowRead();
+  const llPairs=[],brPairs=[];
+  let sumLlL=0,sumLlF=0,sumBrL=0,sumBrF=0,calOkL=0,calOkF=0,crossDayN=0;
+  for(const r of rows){
+    if(!r||!Number.isFinite(r.legacyPred)||!Number.isFinite(r.fsrs6Pred))continue;
+    const y=r.ok?1:0;
+    const pL=Math.min(1-1e-6,Math.max(1e-6,Number(r.legacyPred)));
+    const pF=Math.min(1-1e-6,Math.max(1e-6,Number(r.fsrs6Pred)));
+    const llL=-(y*Math.log(pL)+(1-y)*Math.log(1-pL));
+    const llF=-(y*Math.log(pF)+(1-y)*Math.log(1-pF));
+    const brL=(pL-y)*(pL-y);
+    const brF=(pF-y)*(pF-y);
+    llPairs.push([llL,llF]);
+    brPairs.push([brL,brF]);
+    sumLlL+=llL;sumLlF+=llF;sumBrL+=brL;sumBrF+=brF;
+    if(Math.abs(pL-y)<0.35)calOkL++;
+    if(Math.abs(pF-y)<0.35)calOkF++;
+    if(Number(r.ageDays)>=1)crossDayN++;
+  }
+  const n=llPairs.length;
+  const bootstrapLogLoss=sgOk&&n>=2?sg.pairedBootstrap(llPairs,1000,42):{insufficient:true,n};
+  const bootstrapBrier=sgOk&&n>=2?sg.pairedBootstrap(brPairs,1000,42):{insufficient:true,n};
+  const proportionTest=sgOk&&n>=1?sg.twoProportionTest({successes:calOkL,n},{successes:calOkF,n}):null;
+  const verdict=sgOk&&n>=1?sg.verdict({control:{successes:calOkL,n},candidate:{successes:calOkF,n}}):{decision:'hold',rationale:'stat_gate_unavailable'};
+  return{
+    schema:'fiezel-fsrs6-shadow-compare-v1',
+    mode:'shadow',
+    allowed:gate.allowed,
+    haltReason:gate.reason,
+    statGateAvailable:sgOk,
+    n,
+    crossDayN,
+    legacy:{meanLogLoss:n?Number((sumLlL/n).toFixed(6)):null,meanBrier:n?Number((sumBrL/n).toFixed(6)):null,wellCalibrated:calOkL},
+    fsrs6:{meanLogLoss:n?Number((sumLlF/n).toFixed(6)):null,meanBrier:n?Number((sumBrF/n).toFixed(6)):null,wellCalibrated:calOkF},
+    bootstrapLogLoss,
+    bootstrapBrier,
+    proportionTest,
+    verdict
+  };
+}
 /**
  * Jadwal ulangan berikutnya.
  *
@@ -3369,6 +3481,9 @@ function scheduleNext(b,ok,ms,confidence,options={}){
   const now=Math.max(0,Number(options.now)||Date.now()),speed=Math.max(.5,Math.min(2,12000/Math.max(1500,ms||6000))),confFactor=confidence===3?(ok?1.12:.82):confidence===1?(ok?0.9:1.12):1;
   const stability=Math.max(.25,Number(options.baseStability??b.stability)||1),baseLapses=Math.max(0,Number(options.baseLapses??b.lapses)||0),baseBurden=Math.max(0,Number(options.baseLapseBurden??b.lapseBurden??b.lapses)||0);
   const prevSeen=Math.max(0,Number(options.baseLastSeen??b.lastSeen)||0);
+  const shadowPriorFsrs6=options.baseFsrs6??(b.fsrs6&&typeof b.fsrs6==='object'?{...b.fsrs6}:null);
+  const shadowElapsedDays=prevSeen>0&&now>=prevSeen?(now-prevSeen)/86400000:0;
+  let shadowLegacyPred=Math.exp(-shadowElapsedDays/Math.max(.25,stability));
   if(ok)b.stability=Math.min(365,stability*(1.25+0.15*speed)*confFactor);else b.stability=Math.max(.25,stability*.42);
   b.lapses=baseLapses+(ok?0:1);b.lapseBurden=ok?Math.max(0,baseBurden*.65):Math.min(12,baseBurden*.7+1);
   const interval=ok?Math.max(b.mastery>=MASTERY_THRESHOLD?30:.5,b.stability):Math.min(1,Math.max(.25,b.stability));
@@ -3398,6 +3513,7 @@ function scheduleNext(b,ok,ms,confidence,options={}){
       // Retrievability SAAT review: peluang materi masih teringat ketika soalnya muncul.
       const ageDays=prevSeen>0?Math.max(0,(now-prevSeen)/86400000):0;
       const retr=typeof brain.retrievability==='function'?Number(brain.retrievability(prior,ageDays)):Math.exp(-ageDays/Math.max(.05,prior));
+      if(Number.isFinite(retr))shadowLegacyPred=retr;
       const updated=brain.updateMemory({stability:prior,retrievability:Math.max(0,Math.min(1,Number(retr)||0)),difficulty,ok:!!ok});
       const nextDays=Number(updated?.stability);
       if(Number.isFinite(nextDays)&&nextDays>0){
@@ -3413,6 +3529,13 @@ function scheduleNext(b,ok,ms,confidence,options={}){
     }
   }catch{}
   if(!fsrsScheduled)b.nextReview=now+interval*86400000;
+  try{
+    fsrsShadowStep({
+      b,ok:!!ok,ms:Math.max(0,Number(ms)||6000),confidence,now,prevSeen,
+      streak:b.streak,priorFsrs6:shadowPriorFsrs6,legacyPred:shadowLegacyPred,
+      bucket:options.bucket,itemKey:options.itemKey,weights:options.fsrs6Weights
+    });
+  }catch{}
   return b;
 }
 function ensureStateBucket(bucket){if(!bucket||typeof bucket!=='string')return null;if(!state[bucket]||typeof state[bucket]!=='object'||Array.isArray(state[bucket]))state[bucket]={};return state[bucket]}
@@ -3420,7 +3543,7 @@ function updateMastery(bucket,key,ok,ms=6000,confidence=null,attemptAt=Date.now(
   // m025-35: a teacher notices a run of misses. Tracked here because every answer in
   // the app passes through updateMastery, so no call site can forget to report.
   state.consecutiveWrong=ok?0:Number(state.consecutiveWrong||0)+1;
-  if(!ok)state.lastWrongAt=Date.now();const accuracy=b.correct/Math.max(1,b.total);b.mastery=Math.min(100,Math.round(accuracy*100*Math.min(1,b.total/5)));scheduleNext(b,ok,ms,confidence,{now:attemptAt,baseStability,baseLapses,baseLapseBurden,baseStabilityDays,baseLastSeen,difficulty:itemDifficulty});b.lastSchedule={at:attemptAt,baseStability,baseLapses,baseLapseBurden,baseStabilityDays,baseLastSeen,difficulty:itemDifficulty,ok:!!ok,ms:Math.max(0,Number(ms)||0)};store[key]=b;save()}
+  if(!ok)state.lastWrongAt=Date.now();const baseFsrs6=b.fsrs6&&typeof b.fsrs6==='object'?{...b.fsrs6}:null,accuracy=b.correct/Math.max(1,b.total);b.mastery=Math.min(100,Math.round(accuracy*100*Math.min(1,b.total/5)));scheduleNext(b,ok,ms,confidence,{now:attemptAt,baseStability,baseLapses,baseLapseBurden,baseStabilityDays,baseLastSeen,baseFsrs6,difficulty:itemDifficulty,bucket,itemKey:key});b.lastSchedule={at:attemptAt,baseStability,baseLapses,baseLapseBurden,baseStabilityDays,baseLastSeen,difficulty:itemDifficulty,ok:!!ok,ms:Math.max(0,Number(ms)||0)};store[key]=b;save()}
 function markMastered(bucket,key){if(!key||!bucket)return;const store=ensureStateBucket(bucket);if(!store)return;const b=store[key]||{correct:0,total:0,streak:0,mastery:0};b.mastery=100;b.streak=Math.max(1,b.streak);b.stability=Math.max(30,b.stability||1);b.nextReview=Date.now()+Math.max(30,b.stability)*86400000;b.lastSeen=Date.now();b.lapseBurden=Math.max(0,Number(b.lapseBurden)||0)*.5;store[key]=b;save()}
 /* Audit V-E 2026-10-04: "Masih belajar" di flashcard adalah PENILAIAN DIRI, bukan jawaban salah.
    Dulu tombol itu memanggil updateMastery(...,false): total naik, lapses naik, dan
@@ -3593,7 +3716,7 @@ const SELF_TUNE_KEY='fiezel-self-tune-v1';
 const DECISION_TRACE_KEY='fiezel-decision-trace-v2',LIVE_PARAMS_KEY='fiezel-live-params-v1';
 function selfTuneAvailable(){return !!(self.FiezelSelfTune&&typeof self.FiezelSelfTune.propose==='function')}
 function paramLedgerAvailable(){return !!(self.FiezelParamLedger&&typeof self.FiezelParamLedger.append==='function')}
-function brainConfigAvailable(){return !!(self.FiezelBrainConfig&&typeof self.FiezelBrainConfig.resolve==='function')}
+function brainConfigAvailable(){return !!(self.FiezelBrainConfig&&(typeof self.FiezelBrainConfig.sanitize==='function'||typeof self.FiezelBrainConfig.resolve==='function'))}
 /* m025-376 (A3): state penyetel kini MENGUBAH pemilihan soal, jadi ia milik SATU murid dan
    SATU bahasa - disimpan lewat sideStateKey seperti BKT dan ledger miskonsepsi. Kunci datar
    lama hanya berisi jalur propose() yang tidak pernah bergerak, dan ikut dihapus reset. */
@@ -3958,7 +4081,7 @@ const SIDE_STATE_OWNER_KEY='fiezel-side-state-owner-v1';
  *  berkas ini, dan daftar yang dievaluasi saat top-level masih berjalan akan kena TDZ. */
 function sideStateBaseKeys(){
   return [BKT_KEY,MISCONCEPTION_LEDGER_KEY,CONFUSION_MATRIX_KEY,RETENTION_PROBE_KEY,
-          ITEM_CALIBRATION_KEY,OLM_NEGOTIATION_KEY,SRL_KEY,SOCIAL_MASTERED_KEY,SL_STATE_KEY];
+          ITEM_CALIBRATION_KEY,OLM_NEGOTIATION_KEY,SRL_KEY,SOCIAL_MASTERED_KEY,SL_STATE_KEY,FSRS6_SHADOW_KEY];
 }
 /* S1b: sidecar bukti Speaking/Listening. Ia ditunda di S1 bukan karena kurang penting,
    tetapi karena SATU-SATUNYA penulisnya ada di luar app.js (StateStore di addon), dan
@@ -4036,11 +4159,12 @@ function quizFamily(q){
 function misconceptionLedgerRecord(session,q,diagnosis,ok){
   if(!misconceptionLedgerAvailable())return;
   try{
-    const L=self.FiezelMisconceptionLedger,now=Date.now();
+    const L=self.FiezelMisconceptionLedger,now=Date.now(),canonicalCode=String(diagnosis?.canonical||diagnosis?.canonicalCode||'').trim();
     const ledger=L.update(misconceptionLedgerRead(),{
       concept:quizConcept(q),
       family:quizFamily(q),
       misconception:String(diagnosis?.misconception||''),
+      ...(canonicalCode?{canonical:canonicalCode}:{}),
       correct:!!ok,
       timing:String(diagnosis?.timing||''),
       sessionId:String(session?.startedAt||state.activeSession?.startedAt||'')
@@ -21456,7 +21580,7 @@ function resetProgress(){openModal(`<div class="modal-mark">FIEZEL</div><h2>${Fi
      Komentar ini sengaja DI LUAR literal array: tests/reset-side-state-test.js mengurai
      daftar itu dengan split(','), jadi satu koma di dalam komentar membuat gerbangnya
      membaca kunci yang salah. */
-  for(const k of [BKT_KEY,MISCONCEPTION_LEDGER_KEY,ITEM_CALIBRATION_KEY,CONFUSION_MATRIX_KEY,OLM_NEGOTIATION_KEY,SRL_KEY,EVIDENCE_COHORT_KEY,EVIDENCE_LAST_KEY,EVIDENCE_ATTEMPT_KEY,RETENTION_PROBE_KEY,SL_STATE_KEY,IDENTITY_EVIDENCE_ATTEMPT_KEY,LEARNER_NAME_SYNC_KEY,ACCOUNT_NUDGE_KEY,SELF_TUNE_KEY,DECISION_TRACE_KEY,LIVE_PARAMS_KEY,ITEM_POOL_KEY,UNDERCOVER_RECEIPT_KEY,SAFETY_SNAPSHOT_KEY]){
+  for(const k of [BKT_KEY,MISCONCEPTION_LEDGER_KEY,ITEM_CALIBRATION_KEY,CONFUSION_MATRIX_KEY,OLM_NEGOTIATION_KEY,SRL_KEY,EVIDENCE_COHORT_KEY,EVIDENCE_LAST_KEY,EVIDENCE_ATTEMPT_KEY,RETENTION_PROBE_KEY,SL_STATE_KEY,IDENTITY_EVIDENCE_ATTEMPT_KEY,LEARNER_NAME_SYNC_KEY,ACCOUNT_NUDGE_KEY,SELF_TUNE_KEY,DECISION_TRACE_KEY,LIVE_PARAMS_KEY,ITEM_POOL_KEY,UNDERCOVER_RECEIPT_KEY,SAFETY_SNAPSHOT_KEY,FSRS6_SHADOW_KEY]){
     try{localStorage.removeItem(sideStateKey(k))}catch{}
     try{localStorage.removeItem(k)}catch{}
   }
@@ -24505,6 +24629,7 @@ if(typeof document!=='undefined'&&document.addEventListener){
 }
 /* ============================== akhir blok SOSIAL (SLOT 7) ========================== */
 window.istilahMurid=istilahMurid;/* dipapar untuk gerbang QA: penerjemah enum harus bisa disapu penuh */window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={showBrandSplash,showOnboarding,prefersReducedMotion,readInstallHealth,installHealthReportMarkup,buildBackupFile,previewRestoreForState,applyRestore,continuitySettingsMarkup,academicReadinessMarkup,unifiedSkillsMarkup,buildPersonalJourney,journeyMarkup,setGoalProfile,loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,startLevelPlacement,/* m025-246: dipapar untuk regression-test - gerbang itu harus bisa MENANYAKAN ukuran rencana penempatan, bukan memaku 25 dan merah setiap kali ukurannya berubah dengan sengaja. */placementSize,placementBlueprint,/* cetak biru PENUH dipapar terpisah: gerbang harus tetap bisa menjaga invarian 'penempatan penuh memuat ketiga jenis konten' walau jalur murid memakai cetak biru lite */PLACEMENT_BLUEPRINT_FULL:PLACEMENT_BLUEPRINT,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,/* m025-201: dipapar untuk tests/core-policy-parity-test.js - gerbang paritas tidak bisa membandingkan apa yang tidak bisa ia panggil */capRationaleCodes,policyEffectiveness,sanitizePolicyEffectiveness,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,coreBrainMemory,tutorSession,tutorObserve,misconceptionLedgerRead,misconceptionLedgerActive,coreBrainAttempts,quizPredictedSuccess,evidenceKappa,bktRead,bktRecord,bktShadowMarkup,brainManifestMarkup,learningTelemetryMode,learningTelemetryEmitAnswer,learningTelemetryStudyDay,braincoreEvidenceMode,braincoreEvidenceCohort,braincoreEvidenceCohortForBuild,braincoreEvidenceDay,braincoreEvidenceEmitSnapshot,activeLevelOverallMastery,braincoreEvidenceEmitDecision,braincoreEvidenceFlush,braincoreEvidenceObserveSession,braincoreDecisionReason,braincoreEvidenceAnyLaneActive,identityEvidenceMode,learnerNameSyncToServer,maybeSyncLearnerName,identityEvidenceActive,identityEvidenceMirror,identityEvidenceFlush,forgetLearnerEvidence,confusionMatrixRead,confusionMatrixRecord,affectObserve,affectSessionSync,affectTargetSuccess,listeningAdaptivePolicy,olmPanelMarkup,coreBrainPanelMarkup,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession,/* Fase 3 (C5): kalibrasi item, cloze, OLM negotiated, SRL, speaking adaptif, step tutor */itemCalibrationRead,itemCalibrationObserve,itemCalibrationEffective,calibrationItemId,ensureClozeBank,makeClozeQuestion,clozeAdaptivePicks,clozeSkillReady,clozeProductionRecord,olmSummarizeInput,olmDispute,olmProbeNextSkill,olmProbeConsume,olmNegotiationRead,srlSessionPlan,srlPredictPrompt,srlCaptureConfidence,srlReflect,srlSessionSync,speakingCoverageRows,speakingAdaptiveEvidence,speakingAdaptivePolicy,stepTutorGuidance,stepTutorGuidanceMarkup,isLearnerOverwhelmed,record,quizLoop,startAdaptive,/* m025-308: dipapar untuk tests/th-content-overlay-test.js. Gerbang itu harus bisa memanggil overlay yang SUNGGUHAN lalu membacanya lewat jalur baca yang dipakai penyaji - kalau ia hanya boleh memeriksa isi sidecar, ia mengulang kebutaan yang justru membiarkan 45 petunjuk writing dan 96 umpan balik reading-exam menganggur. */applyContentLocale,writingPromptPool,writingExamTask,readingExamSets,makeExamReadingQuestion,/* m025-314: dipapar untuk tests/target-lang-surface-guard-test.js. Gerbang itu harus bisa MEMANGGIL daftar kartu yang sungguhan lalu membacanya, bukan menebak dari pola teks di app.js - penjaga yang hanya diuji lewat grep akan tetap hijau saat kartunya dipindah ke fungsi lain. */latihanCards,skillHubModel,skillHubMarkup,continueLearningCard,aiBoosterCard,targetLangSurfaceBlocked,targetLangVoiceBlocked,courseLanguageLabel,/* `state` adalah binding modul, jadi ia TIDAK muncul sebagai properti global di vm - gerbang yang perlu menggeser bahasa target atau membaca layar aktif tidak punya jalan lain. Diekspor sebagai FUNGSI, bukan nilai: salinan yang diambil saat berkas dimuat akan basi begitu state ditugaskan ulang (loadState dipanggil lagi saat akun berpindah). */liveState:()=>state,/* B1 (m025-317): dipapar untuk tests/target-lang-progress-isolation-test.js. Gerbang itu harus MENJALANKAN jalur simpan/muat yang sungguhan di kedua bahasa - sumbu yang hanya diuji lewat modulnya adalah persis cara cacat ini bertahan berbulan-bulan. */saveFlushWrite,switchTargetLangStorage,progressStorageKey,pickProgress,sideStateKey,PROGRESS_STATE_FIELDS,PROGRESS_PREF_FIELDS,/* Migrasi sekali-jalan saat murid masuk akun. Dipapar karena inilah satu-satunya jalur yang bisa MENELANTARKAN progres bahasa: ia lahir sebelum ruang nama @lang ada. Gerbang harus menjalankannya, bukan membaca namanya. */activateAccountStateFromPuter,migrateSideStateToAccount,FIEZEL_TARGET_COURSE_KEY,decisionTrace:()=>self.FiezelDecisionTrace,presenceEngine:()=>self.FiezelPresenceEngine,/* m025-375: dipapar untuk tests/policy-evidence-window-test.js - gerbang harus bisa memanggil jendela bukti dan panel Home yang sungguhan. */policyEvidenceArms,policyEvidenceMin,policyEvidenceProgress,evidenceProgressPanelMarkup,todayHomeMarkup,/* m025-376: dipapar untuk tests/self-tune-retention-test.js. */selfTuneAfterOutcome,selfTuneTargetFor,selfTuneRetentionArms,loadSelfTuneState,retentionProbeResults,RETENTION_PROBE_KEY,SELF_TUNE_KEY,/* Audit UI/UX Home 2026-09-27: dipapar untuk tests/home-honesty-test.js. */homeWeekStats,homeVocabStats,HOME_WEEK_MIN,/* Braincore langkah 2: dipapar untuk tests/item-pool-test.js - gerbang harus menjalankan jalur catat/kirim/baca yang sungguhan. */itemPoolObserve,itemPoolFlush,itemPoolRefreshTable,itemPoolEffective,itemPoolCanonicalPrior,itemPoolPriorPrediction,itemPoolTable,ITEM_POOL_KEY,ITEM_POOL_TABLE_KEY,/* langkah 3 */itemPoolProbePrediction,itemPoolObserveProbe};
+Object.assign(window.__fiezelAudit,{brainConfigAvailable,FSRS6_SHADOW_KEY,fsrsShadowAllowed,fsrsShadowRead,fsrsShadowStep,fsrsShadowCompareSnapshot});
 window.FIEZEL_TARGET_COURSE_KEY=FIEZEL_TARGET_COURSE_KEY;
 window.startVocabQuiz=startVocabQuiz;window.buildAdaptivePool=buildAdaptivePool;window.buildGrammarLessonQuestions=buildGrammarLessonQuestions;window.getScenePalette=getScenePalette;window.getCelestialState=getCelestialState;window.playFeedbackSound=playFeedbackSound;window.updateMastery=updateMastery;window.bktRecord=bktRecord;window.record=record;window.undercoverEvidenceDrain=undercoverEvidenceDrain;window.misconceptionLedgerRecord=misconceptionLedgerRecord;window.markMastered=markMastered;window.__getFiezelState=()=>state;window.__fiezelValidViews=()=>[...VALID_VIEWS];window.__fiezelDueReviews=()=>dueItems().length;window.buildAdaptivePolicy=buildAdaptivePolicy;window.studyDayKey=studyDayKey;window.startAdaptive=startAdaptive;window.showToast=showToast;window.answerFeedbackSignal=answerFeedbackSignal;window.practiceSkill=practiceSkill;window.openReadingLevel=openReadingLevel;window.startReadingRandom=startReadingRandom;window.startReadingAdaptive=startReadingAdaptive;window.startPlacement=startPlacement;window.startLevelPlacement=startLevelPlacement;window.startLevelPractice=startLevelPractice;window.startAdaptive=startAdaptive;window.resetProgress=resetProgress;window.closeModal=closeModal;window.openSettings=openSettings;window.openReportPreview=openReportPreview;window.sendCreatorReport=sendCreatorReport;window.askCoachAI=askCoachAI;window.dismissWelcome=dismissWelcome;window.requestStudyNotificationPermission=requestStudyNotificationPermission;window.declineStudyNotifications=declineStudyNotifications;window.skipPuterSignIn=skipPuterSignIn;window.attemptGoogleSignIn=attemptGoogleSignIn;window.shouldPresentPuterPopup=shouldPresentPuterPopup;window.notifyAppUpdateIfNew=notifyAppUpdateIfNew;window.setConfidence=setConfidence;window.explainWithAI=explainWithAI;window.explainWordWithAI=explainWordWithAI;window.olmDispute=olmDispute;/* Fase 3 (C5 butir 3): handler tombol sanggah di panel OLM */
 // m025-84: dipasang di ujung berkas, saat go()/state/VALID_VIEWS sudah ada, dan SEBELUM

@@ -19,19 +19,114 @@
 }(typeof globalThis !== 'undefined' ? globalThis : window, function (root) {
   'use strict';
 
+  /**
+   * Canonical client Braincore defaults ("Satu Otak, Satu Penggaris"):
+   * Exact match with features/brain/fiezel-brain-config.js & fiezel-mastery-bkt.js.
+   */
   var BRAINCORE_PARAMS = {
-    P_INIT: 0.25,
-    P_LEARN: 0.18,
+    P_INIT: 0.20,
+    P_LEARN: 0.15,
     P_SLIP: 0.10,
-    P_GUESS: 0.20,
-    MASTERY_T: 0.80,
-    DEVELOPING_T: 0.60,
-    MIN_CORRECT_FOR_MASTERY: 3,
+    P_GUESS: 0.25,
+    MASTERY_T: 0.95,
+    DEVELOPING_T: 0.55,
+    MIN_CORRECT_FOR_MASTERY: 5,
     DISCRIMINATION: 1.5,
     GUESS_FLOOR: 0.25,
     TARGET_SUCCESS: 0.80,
     HALF_LIFE_DAYS: 30.0
   };
+
+  function resolveCanonicalBktParams() {
+    var cfg = null;
+    var bkt = null;
+    try {
+      cfg = root.FiezelBrainConfig || (root.parent && root.parent !== root ? root.parent.FiezelBrainConfig : null);
+      bkt = root.FiezelMasteryBKT || (root.parent && root.parent !== root ? root.parent.FiezelMasteryBKT : null);
+    } catch (_) {}
+    var b = (bkt && bkt.PARAMS) || (cfg && cfg.bkt) || null;
+    var g = (bkt && bkt.GATE) || null;
+    var z = (bkt && bkt.ZPD) || null;
+    var d = (cfg && cfg.difficulty) || null;
+    var m = (cfg && cfg.memory) || null;
+    function n(v, fb) { return typeof v === 'number' && isFinite(v) ? v : fb; }
+    return {
+      P_INIT: n(b && b.L0, BRAINCORE_PARAMS.P_INIT),
+      P_LEARN: n(b && b.T, BRAINCORE_PARAMS.P_LEARN),
+      P_SLIP: n(b && b.slip, BRAINCORE_PARAMS.P_SLIP),
+      P_GUESS: n(b && b.guess, BRAINCORE_PARAMS.P_GUESS),
+      MASTERY_T: n(g && g.L, BRAINCORE_PARAMS.MASTERY_T),
+      DEVELOPING_T: n(z && z.lo, BRAINCORE_PARAMS.DEVELOPING_T),
+      MIN_CORRECT_FOR_MASTERY: Math.max(1, Math.round(n(g && g.minN, BRAINCORE_PARAMS.MIN_CORRECT_FOR_MASTERY))),
+      DISCRIMINATION: n(d && d.discrimination, BRAINCORE_PARAMS.DISCRIMINATION),
+      GUESS_FLOOR: n(d && d.guessFloor, BRAINCORE_PARAMS.GUESS_FLOOR),
+      TARGET_SUCCESS: n(d && d.targetSuccess, BRAINCORE_PARAMS.TARGET_SUCCESS),
+      HALF_LIFE_DAYS: n(m && m.baseHalfLifeDays, BRAINCORE_PARAMS.HALF_LIFE_DAYS)
+    };
+  }
+
+  var CANONICAL_TAXONOMY_CODES = [
+    'tense_aspect.aspect_for_completed', 'tense_aspect.habitual_overgeneralized',
+    'tense_aspect.progressive_overuse', 'tense_aspect.perfect_misuse',
+    'tense_aspect.timeline_mismatch', 'tense_aspect.future_form_confusion',
+    'agreement.bare_form', 'agreement.number_mismatch', 'agreement.missing_auxiliary',
+    'structure.double_marking', 'structure.word_order', 'structure.inversion_error',
+    'structure.malformed_blend', 'structure.omitted_element',
+    'modality.function_confusion', 'modality.strength_miscalibrated',
+    'modality.negation_scope', 'modality.past_reference_error',
+    'conditionals.type_mismatch', 'conditionals.clause_form_swap',
+    'passive.active_for_passive', 'passive.participle_form',
+    'passive.causative_confusion', 'passive.impersonal_pattern',
+    'reported.backshift_error', 'reported.deixis_shift',
+    'articles.definiteness_mismatch', 'articles.countability_quantifier',
+    'articles.sound_rule', 'articles.zero_article',
+    'comparison.degree_scope', 'comparison.form_intensifier',
+    'prepositions.semantic_category', 'prepositions.collocation',
+    'lexical.form_confusion', 'lexical.register_mismatch',
+    'complementation.gerund_infinitive_swap', 'complementation.meaning_pair_shift',
+    'complementation.bare_form_error', 'complementation.verb_pattern',
+    'relative.pronoun_choice', 'relative.restrictiveness', 'relative.reduction_error',
+    'question.auxiliary_error', 'question.polarity_negation', 'question.wh_choice',
+    'pronouns.case_form', 'linking.connector_choice', 'transfer.id_l1_pattern'
+  ];
+
+  var CANONICAL_SET = {};
+  for (var ci = 0; ci < CANONICAL_TAXONOMY_CODES.length; ci++) {
+    CANONICAL_SET[CANONICAL_TAXONOMY_CODES[ci]] = true;
+  }
+
+  function mapToCanonicalTaxonomyCode(rawCode, detailText, targetLang) {
+    var raw = String(rawCode || '').trim();
+    if (CANONICAL_SET[raw]) return raw;
+    var probe = (raw + ' ' + String(detailText || '')).toLowerCase();
+    if (/overregulariz|past_tense_irregular|tense|timeline|lampau|yesterday|last\s+week/.test(probe)) {
+      return 'tense_aspect.timeline_mismatch';
+    }
+    if (/stative|progressive|-ing\b/.test(probe)) return 'tense_aspect.progressive_overuse';
+    if (/perfect|already|since|for\s+\d/.test(probe)) return 'tense_aspect.perfect_misuse';
+    if (/future|will\s|going\s+to/.test(probe)) return 'tense_aspect.future_form_confusion';
+    if (/agree\b|be_plus_base_verb|l1_transfer|indonesian|terjemah|kopula/.test(probe)) {
+      return 'transfer.id_l1_pattern';
+    }
+    if (/auxiliary|do\/does|missing_aux|tanya|question/.test(probe)) return 'agreement.missing_auxiliary';
+    if (/plural|singular|number|jamak|tunggal|subject.?verb/.test(probe)) return 'agreement.number_mismatch';
+    if (/bare_form|infleksi|third\s*person|goed|buyed|eated|seed/.test(probe)) return 'agreement.bare_form';
+    if (/double_mark|although.*but|negasi\s+ganda|would.*if/.test(probe)) return 'structure.double_marking';
+    if (/word_order|urutan|svo|time.?place|incomplete_clause/.test(probe)) return 'structure.word_order';
+    if (/omitted|missing|hilang|bolong/.test(probe)) return 'structure.omitted_element';
+    if (/tara|conditional|andaian|if\s+clause/.test(probe)) return 'conditionals.clause_form_swap';
+    if (/particle|partikel|preposit|in\/on\/at|は|が|を|に|で/.test(probe)) return 'prepositions.semantic_category';
+    if (/desu_verb|blend|malformed|konjugasi|conjugat/.test(probe)) return 'structure.malformed_blend';
+    if (/measure_word|satuan|量词|article|a\/an\/the|countable/.test(probe)) return 'articles.countability_quantifier';
+    if (/modal|must|should|might|can|could/.test(probe)) return 'modality.function_confusion';
+    if (/passive|pasif|v3|participle/.test(probe)) return 'passive.participle_form';
+    if (/gerund|infinitive|to\s*\+\s*-ing/.test(probe)) return 'complementation.gerund_infinitive_swap';
+    if (/pronoun|kata\s+ganti/.test(probe)) return 'pronouns.case_form';
+    if (/tone|pitch|pronunci|phonem|nada|aksen|intonasi|mora/.test(probe)) return 'lexical.form_confusion';
+    if (/register|formal|sopan|keigo|casual/.test(probe)) return 'lexical.register_mismatch';
+    if (targetLang === 'ja' || targetLang === 'zh') return 'structure.malformed_blend';
+    return 'lexical.form_confusion';
+  }
 
   // Bug #1 & #2: Hasil "tidak dinilai". Analyzer deterministik hanya berwenang menyatakan SALAH
   // untuk pola yang ia kenali secara eksplisit. Selain itu ia DIAM (ok: null) — penilaian final
@@ -41,6 +136,7 @@
       ok: null,
       userExactTranscript: text,
       misconceptionId: null,
+      canonicalCode: null,
       whyFailsId: null,
       whyFailsTh: null,
       missingTokens: [],
@@ -51,6 +147,56 @@
       aiReply: null,
       aiReplyTranslationId: null,
       aiReplyTranslationTh: null
+    };
+  }
+
+  /**
+   * Normalizes and validates output from a pre-trained neural classifier
+   * (Workers AI JSON-mode / Gemini Live / Turn-by-Turn evaluator) for ANY free-form
+   * utterance — enforces Zero-Dumbing + canonical misconception-taxonomy-v1 mapping.
+   */
+  function normalizeNeuralDiagnosis(neuralPayload, rawTranscript, targetLang) {
+    var text = String(rawTranscript || '').trim();
+    var p = neuralPayload && typeof neuralPayload === 'object' ? neuralPayload : null;
+    if (!text || !p || typeof p.ok !== 'boolean') return undecided(text);
+
+    var ok = p.ok;
+    var rawCode = !ok ? String(p.misconceptionId || p.misconceptionCode || p.errorType || 'freeform_grammar_error').trim() : null;
+    var whyId = !ok ? String(p.whyFailsId || p.explanationId || p.reason || '').trim() : null;
+    var corr = String(p.syntacticCorrection || p.correction || p.naturalReformulation || '').trim() || null;
+    if (!ok && (!whyId || whyId.length < 6)) {
+      whyId = 'Sistem mendeteksi ketidaksesuaian tata bahasa pada "' + text + '"' + (corr ? '; bentuk yang lebih tepat: "' + corr + '".' : '.');
+    }
+    var canonicalCode = !ok ? mapToCanonicalTaxonomyCode(p.canonicalCode || rawCode, whyId + ' ' + text, targetLang) : null;
+    var specificMiscId = !ok ? (rawCode || canonicalCode) : null;
+
+    var acc = typeof p.accuracyScore === 'number' && isFinite(p.accuracyScore)
+      ? Math.max(0, Math.min(100, Math.round(p.accuracyScore)))
+      : (ok ? 90 : 52);
+    var gram = typeof p.grammarScore === 'number' && isFinite(p.grammarScore)
+      ? Math.max(0, Math.min(100, Math.round(p.grammarScore)))
+      : (ok ? 92 : 46);
+
+    return {
+      ok: ok,
+      accuracyScore: ok ? acc : Math.min(acc, 72),
+      grammarScore: ok ? gram : Math.min(gram, 68),
+      fluencyScore: typeof p.fluencyScore === 'number' && isFinite(p.fluencyScore) ? Math.round(p.fluencyScore) : (ok ? 88 : 68),
+      vocabUsageScore: typeof p.vocabUsageScore === 'number' && isFinite(p.vocabUsageScore) ? Math.round(p.vocabUsageScore) : (ok ? 90 : 66),
+      userExactTranscript: text,
+      misconceptionId: specificMiscId,
+      canonicalCode: canonicalCode,
+      whyFailsId: whyId,
+      whyFailsTh: !ok ? String(p.whyFailsTh || p.explanationTh || whyId || '').trim() || null : null,
+      missingTokens: Array.isArray(p.missingTokens) ? p.missingTokens.slice(0, 8).map(String) : [],
+      syntacticCorrection: corr,
+      naturalReformulation: String(p.naturalReformulation || corr || text).trim(),
+      pedagogicalFeedbackId: String(p.pedagogicalFeedbackId || whyId || (ok ? 'Struktur dan tata bahasa sudah natural.' : '')).trim() || null,
+      pedagogicalFeedbackTh: String(p.pedagogicalFeedbackTh || '').trim() || null,
+      aiReply: p.aiReply ? String(p.aiReply) : null,
+      aiReplyTranslationId: p.aiReplyTranslationId ? String(p.aiReplyTranslationId) : null,
+      aiReplyTranslationTh: p.aiReplyTranslationTh ? String(p.aiReplyTranslationTh) : null,
+      source: 'neural_classifier'
     };
   }
 
@@ -323,24 +469,26 @@
    * IRT 3PL Success Probability calculation
    */
   function calculateIRTProbability(abilityTheta, difficultyB, discriminationA) {
-    var a = Math.max(0.01, Number(discriminationA || BRAINCORE_PARAMS.DISCRIMINATION));
+    var cfg = resolveCanonicalBktParams();
+    var a = Math.max(0.01, Number(discriminationA || cfg.DISCRIMINATION));
     var diff = Number(abilityTheta || 0) - Number(difficultyB || 0);
     var z = -a * diff;
     var latent;
     if (z > 40.0) latent = 0.0;
     else if (z < -40.0) latent = 1.0;
     else latent = 1.0 / (1.0 + Math.exp(z));
-    return BRAINCORE_PARAMS.GUESS_FLOOR + (1.0 - BRAINCORE_PARAMS.GUESS_FLOOR) * latent;
+    return cfg.GUESS_FLOOR + (1.0 - cfg.GUESS_FLOOR) * latent;
   }
 
   /**
-   * BKT Update computation
+   * BKT Update computation (unified with canonical FiezelMasteryBKT)
    */
   function computeBktUpdate(pCurrent, isCorrect, hintsUsed, confidence) {
-    var p = Math.max(0.001, Math.min(0.999, Number(pCurrent || BRAINCORE_PARAMS.P_INIT)));
-    var s = BRAINCORE_PARAMS.P_SLIP;
-    var g = BRAINCORE_PARAMS.P_GUESS;
-    var l = BRAINCORE_PARAMS.P_LEARN;
+    var cfg = resolveCanonicalBktParams();
+    var p = Math.max(0.001, Math.min(0.999, Number(pCurrent == null ? cfg.P_INIT : pCurrent)));
+    var s = cfg.P_SLIP;
+    var g = cfg.P_GUESS;
+    var l = cfg.P_LEARN;
     var h = Math.max(0, Math.floor(hintsUsed || 0));
 
     if (h > 0 && isCorrect) {
@@ -378,6 +526,7 @@
     // Bug #1 & #15: Tolak verdict non-boolean (termasuk ok: null dari undecided)
     if (!cid || typeof p.ok !== 'boolean') return null;
 
+    var cfg = resolveCanonicalBktParams();
     var ok = p.ok;
     var now = Date.now();
     var hasHostBkt = typeof root.bktRecord === 'function';
@@ -388,16 +537,22 @@
     // 1. Baca estimasi BKT awal sebelum pembaruan (canonical BKT atau standalone fallback)
     var bktModule = root.FiezelMasteryBKT || null;
     var bktKey = resolveSideKey('fiezel-mastery-bkt-v1');
-    var bktBefore = BRAINCORE_PARAMS.P_INIT;
-    var bktAfter = BRAINCORE_PARAMS.P_INIT;
+    var bktBefore = cfg.P_INIT;
+    var bktAfter = cfg.P_INIT;
+    var obsCount = 1;
     if (hasHostBkt && bktModule && typeof bktModule.mastery === 'function') {
       try {
         var rawHostBkt = localStorage.getItem(bktKey);
         var hostBktData = rawHostBkt ? JSON.parse(rawHostBkt) : null;
         var pre = bktModule.mastery(hostBktData, cid, now);
         if (pre && typeof pre.L === 'number') bktBefore = pre.L;
+        if (pre && typeof pre.n === 'number') obsCount = pre.n + 1;
       } catch (_) {}
     }
+
+    var resolvedCanonical = (!ok && p.misconceptionId)
+      ? mapToCanonicalTaxonomyCode(p.canonicalCode || p.misconceptionId, p.userExactTranscript, p.targetLang)
+      : null;
 
     // Rute ke Host Braincore Gateway bila berjalan di aplikasi web Fiezel
     if (typeof root.updateMastery === 'function') {
@@ -413,6 +568,7 @@
           var postData = postRaw ? JSON.parse(postRaw) : null;
           var post = bktModule.mastery(postData, cid, now);
           if (post && typeof post.L === 'number') bktAfter = post.L;
+          if (post && typeof post.n === 'number') obsCount = post.n;
         } else {
           bktAfter = computeBktUpdate(bktBefore, ok, p.hintsUsed, p.confidence || 0.85);
         }
@@ -421,7 +577,9 @@
     if (hasHostLedger) {
       try {
         var qPayload = { id: 'kaiwa:' + cid, lessonSkill: cid, skill: cid, conceptId: cid, target: cid, type: 'speaking' };
-        var diagPayload = (!ok && p.misconceptionId) ? { misconception: String(p.misconceptionId), timing: 'normal' } : null;
+        var diagPayload = (!ok && p.misconceptionId)
+          ? { misconception: String(p.misconceptionId), canonical: resolvedCanonical, timing: 'normal' }
+          : null;
         root.misconceptionLedgerRecord({ startedAt: now }, qPayload, diagPayload, ok);
       } catch (_) {}
     }
@@ -434,12 +592,13 @@
         var bktData = rawBkt ? JSON.parse(rawBkt) : { skills: {} };
         if (!bktData || typeof bktData !== 'object') bktData = { skills: {} };
         if (!bktData.skills) bktData.skills = {};
-        var curSkill = bktData.skills[cid] || { p: BRAINCORE_PARAMS.P_INIT, attempts: 0, correct: 0 };
-        bktBefore = curSkill.p || BRAINCORE_PARAMS.P_INIT;
+        var curSkill = bktData.skills[cid] || { p: cfg.P_INIT, attempts: 0, correct: 0 };
+        bktBefore = typeof curSkill.p === 'number' ? curSkill.p : cfg.P_INIT;
         bktAfter = computeBktUpdate(bktBefore, ok, p.hintsUsed, p.confidence || 0.85);
+        obsCount = (curSkill.attempts || 0) + 1;
         bktData.skills[cid] = {
           p: bktAfter,
-          attempts: (curSkill.attempts || 0) + 1,
+          attempts: obsCount,
           correct: (curSkill.correct || 0) + (ok ? 1 : 0),
           updatedAt: now
         };
@@ -461,6 +620,7 @@
         mObj.count = (mObj.count || 0) + 1;
         mObj.lastAt = now;
         mObj.resolved = false;
+        mObj.canonical = resolvedCanonical;
         mObj.lastUtterance = p.userExactTranscript;
         entry.misconceptions[mKey] = mObj;
         ledger.concepts[cid] = entry;
@@ -469,19 +629,26 @@
     }
 
     var thetaAfter = Number((1.0 + 4.0 * bktAfter).toFixed(2));
-    var masteryState = bktAfter >= 0.8 ? 'MASTERED' : (bktAfter >= 0.6 ? 'DEVELOPING' : 'PRACTICING');
+    var masteryState = (bktAfter >= cfg.MASTERY_T && obsCount >= cfg.MIN_CORRECT_FOR_MASTERY)
+      ? 'MASTERED'
+      : (bktAfter >= cfg.DEVELOPING_T ? 'DEVELOPING' : 'PRACTICING');
 
     return {
       competencyId: cid,
       bktBefore: bktBefore,
       bktAfter: bktAfter,
       thetaAfter: thetaAfter,
-      masteryStateAfter: masteryState
+      masteryStateAfter: masteryState,
+      canonicalCode: resolvedCanonical
     };
   }
 
   return {
     BRAINCORE_PARAMS: BRAINCORE_PARAMS,
+    CANONICAL_TAXONOMY_CODES: CANONICAL_TAXONOMY_CODES,
+    resolveCanonicalBktParams: resolveCanonicalBktParams,
+    mapToCanonicalTaxonomyCode: mapToCanonicalTaxonomyCode,
+    normalizeNeuralDiagnosis: normalizeNeuralDiagnosis,
     analyzeUtterancePedagogy: analyzeUtterancePedagogy,
     calculateIRTProbability: calculateIRTProbability,
     computeBktUpdate: computeBktUpdate,

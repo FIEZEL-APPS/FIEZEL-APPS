@@ -47,12 +47,17 @@ import {
   diagnosePteCandidateSpeech,
   type PteDiagnosticSpeechResult,
   readHostPwaCognitiveSnapshot,
+  reconcileNeuralDiagnosis,
   recordSpeakingAttempt,
   recordVocabPrereqMastery,
   saveBraincoreState,
   STORAGE_KEY,
   type TurnAcousticTelemetry,
 } from './lib/braincore';
+import {
+  createAcousticProsodyTracker,
+  type AcousticProsodyAnalysis,
+} from './lib/acousticProsodyAnalyzer';
 import { type SpeechAlignmentResult } from './lib/speechAlignment';
 import {
   InCallLearningWorkbenchModal,
@@ -124,6 +129,7 @@ import {
   pcm16Base64ToAudioBuffer,
   reportGeminiLiveSessionDrop,
   requestGeminiLiveSessionToken,
+  requestNeuralUtteranceDiagnosis,
   requestRealtimeCopilotAssist,
   resolveAiReply,
   resolveLiveCallWebSocketUrls,
@@ -700,6 +706,7 @@ export default function App() {
   const [isWaitingAfterSpeech, setIsWaitingAfterSpeech] = useState<boolean>(false);
   const pttStartedAtRef = useRef<number | null>(null);
   const turnAcousticTrackerRef = useRef(createTurnAcousticTracker());
+  const acousticProsodyRef = useRef(createAcousticProsodyTracker(16000));
   const [latestPteDiagnostic, setLatestPteDiagnostic] = useState<PteDiagnosticSpeechResult | null>(null);
   const [latestReadAloudAlignment, setLatestReadAloudAlignment] = useState<SpeechAlignmentResult | null>(null);
   const lastSyncedWorkbenchKeyRef = useRef<string>('');
@@ -2880,6 +2887,44 @@ export default function App() {
     void brainSyncFlush(updated).then(({ nextState }) => setBrainState(nextState));
   };
 
+  const consumeTurnAcousticProsody = (transcriptText?: string): AcousticProsodyAnalysis => {
+    const analysis = acousticProsodyRef.current.analyzeTurn({
+      targetLang: activeScenario.targetLang,
+      expectedText: activeWorkbenchTargetRef.current.isOpen
+        ? activeWorkbenchTargetRef.current.activeTargetText
+        : undefined,
+      transcript: transcriptText,
+    });
+    acousticProsodyRef.current.reset();
+    return analysis;
+  };
+
+  const scheduleAsyncNeuralDiagnosis = (opts: {
+    turnId: string;
+    uText: string;
+    priorBktBefore: number;
+    hintsUsed: number;
+  }) => {
+    if (opts.uText.trim().length < 6) return;
+    void requestNeuralUtteranceDiagnosis({
+      text: opts.uText,
+      scenario: activeScenario,
+      targetLang: activeScenario.targetLang,
+      locale,
+      history: turnsRef.current.slice(-6).map((tr) => ({ speaker: tr.speaker, text: tr.text })),
+    }).then((neuralDiag) => {
+      if (neuralDiag && !neuralDiag.ok && neuralDiag.misconceptionCode) {
+        applyNeuralDiagnosisReconciliation({
+          turnId: opts.turnId,
+          uText: opts.uText,
+          priorBktBefore: opts.priorBktBefore,
+          hintsUsed: opts.hintsUsed,
+          diag: neuralDiag,
+        });
+      }
+    });
+  };
+
   const commitLiveUserTurn = (
     textToCommit: string,
     opts?: { inputMode?: 'voice' | 'typed' | 'quick_chip' }
@@ -2894,6 +2939,8 @@ export default function App() {
     const effectiveInputMode = opts?.inputMode || 'voice';
     const liveTelemetry =
       effectiveInputMode === 'voice' ? turnAcousticTrackerRef.current.finalize() : null;
+    const acousticAnalysis =
+      effectiveInputMode === 'voice' ? consumeTurnAcousticProsody(uText) : null;
     if (effectiveInputMode === 'voice') {
       turnAcousticTrackerRef.current.reset();
     }
@@ -3027,42 +3074,49 @@ export default function App() {
       setLatestReadAloudAlignment(ev.readAloudAlignment || pteDiagResult?.readAloudAlignment || null);
     }
     const effectiveHints = isMeasureMode ? 0 : showHint ? 1 : 0;
+    const acMisc = acousticAnalysis?.hasSufficientAudio ? acousticAnalysis.acousticMisconceptionId : null;
+    const acCanon = acousticAnalysis?.hasSufficientAudio ? acousticAnalysis.canonicalTaxonomyCode : null;
+    const acReason = acousticAnalysis?.hasSufficientAudio ? acousticAnalysis.whyFailsId : null;
+    const resolvedMiscId = pteDiagResult?.misconceptionsFound[0]?.id || ev.misconceptionId || acMisc || null;
+    const resolvedOk = pteDiagResult ? pteDiagResult.scores.passedTarget : Boolean(ev.ok && !acMisc);
     const outcome = recordSpeakingAttempt(brainStateRef.current, {
       competencyId: activeScenario.competencyId,
       scenarioId: activeScenario.id,
       targetLang: activeScenario.targetLang,
       userExactTranscript: uText,
-      ok: pteDiagResult ? pteDiagResult.scores.passedTarget : Boolean(ev.ok),
+      ok: resolvedOk,
       grammarScore: pteDiagResult ? Math.round(pteDiagResult.scores.pronunciation * 20) : ev.grammarScore,
       fluencyScore: pteDiagResult ? Math.round(pteDiagResult.scores.fluency * 20) : ev.fluencyScore,
       vocabUsageScore: pteDiagResult ? Math.round(pteDiagResult.templateAdherence.contentScore * 33) : ev.vocabUsageScore,
       accuracyScore: pteDiagResult ? pteDiagResult.scores.pearsonEstimate : ev.accuracyScore,
       speakingDurationSec: liveTelemetry?.spanDurationSec || undefined,
-      misconceptionId: pteDiagResult?.misconceptionsFound[0]?.id || ev.misconceptionId || null,
+      misconceptionId: resolvedMiscId,
+      canonicalCode: acCanon || resolvedMiscId,
       correctionPattern: ev.syntacticCorrection || ev.naturalReformulation || null,
       hintsUsed: effectiveHints,
       confidence: 0.85,
       measureMode: isMeasureMode,
+      acousticMetrics: acousticAnalysis,
     });
     brainStateRef.current = outcome.nextState;
     setBrainState(outcome.nextState);
     if (isMeasureMode) {
-      playFiezelSfx(ev.ok ? 'answer_correct' : 'answer_wrong');
+      playFiezelSfx(resolvedOk ? 'answer_correct' : 'answer_wrong');
     }
     const turnDiag: TurnDiagnosis = {
-      ok: pteDiagResult ? pteDiagResult.scores.passedTarget : Boolean(ev.ok),
+      ok: resolvedOk,
       accuracyScore: pteDiagResult ? pteDiagResult.scores.pearsonEstimate : ev.accuracyScore,
       grammarScore: pteDiagResult ? Math.round(pteDiagResult.scores.pronunciation * 20) : ev.grammarScore,
       fluencyScore: pteDiagResult ? Math.round(pteDiagResult.scores.fluency * 20) : ev.fluencyScore,
       vocabUsageScore: pteDiagResult ? Math.round(pteDiagResult.templateAdherence.contentScore * 33) : ev.vocabUsageScore,
       userExactTranscript: uText,
-      misconceptionId: pteDiagResult?.misconceptionsFound[0]?.id || ev.misconceptionId || null,
-      whyFailsId: pteDiagResult?.misconceptionsFound[0]?.detail || ev.whyFailsId || null,
+      misconceptionId: resolvedMiscId,
+      whyFailsId: pteDiagResult?.misconceptionsFound[0]?.detail || ev.whyFailsId || acReason || null,
       whyFailsTh: ev.whyFailsTh || null,
       missingTokens: ev.missingTokens || [],
       syntacticCorrection: ev.syntacticCorrection || null,
       naturalReformulation: ev.naturalReformulation || uText,
-      pedagogicalFeedbackId: pteDiagResult?.clinicalDossierText || ev.pedagogicalFeedbackId,
+      pedagogicalFeedbackId: pteDiagResult?.clinicalDossierText || acReason || ev.pedagogicalFeedbackId,
       pedagogicalFeedbackTh: ev.pedagogicalFeedbackTh,
       bktBefore: outcome.bktBefore,
       bktAfter: outcome.bktAfter,
@@ -3070,16 +3124,25 @@ export default function App() {
       masteryStateAfter: outcome.masteryStateAfter,
     };
 
+    const committedTurnId = `live_u_${Date.now()}`;
     setTurns((prev) => [
       ...prev,
       {
-        id: `live_u_${Date.now()}`,
+        id: committedTurnId,
         speaker: 'user',
         text: uText,
         timestamp: Date.now(),
         diagnosis: turnDiag,
       },
     ]);
+    if (!pteDiagResult && !resolvedMiscId && uText.length >= 6) {
+      scheduleAsyncNeuralDiagnosis({
+        turnId: committedTurnId,
+        uText,
+        priorBktBefore: outcome.bktBefore,
+        hintsUsed: effectiveHints,
+      });
+    }
   };
 
   const submitLiveUserUtterance = (
@@ -3707,6 +3770,58 @@ export default function App() {
     };
   };
 
+  const applyNeuralDiagnosisReconciliation = (opts: {
+    turnId: string;
+    uText: string;
+    priorBktBefore: number;
+    hintsUsed: number;
+    diag: {
+      ok: boolean;
+      misconceptionCode: string | null;
+      whyFailsId?: string;
+      correction?: string;
+    };
+  }) => {
+    if (opts.diag.ok || !opts.diag.misconceptionCode) return;
+    const fresh = loadBraincoreState();
+    const recRes = reconcileNeuralDiagnosis(fresh, {
+      competencyId: activeScenario.competencyId,
+      scenarioId: activeScenario.id,
+      targetLang: activeScenario.targetLang,
+      userExactTranscript: opts.uText,
+      priorBktBefore: opts.priorBktBefore,
+      neuralOk: false,
+      misconceptionCode: opts.diag.misconceptionCode,
+      whyFailsId: opts.diag.whyFailsId || null,
+      correctionPattern: opts.diag.correction || null,
+      hintsUsed: opts.hintsUsed,
+    });
+    brainStateRef.current = recRes.nextState;
+    setBrainState(recRes.nextState);
+    void brainSyncFlush(recRes.nextState).then(({ nextState }) => setBrainState(nextState));
+    setTurns((prev) =>
+      prev.map((tr) =>
+        tr.id === opts.turnId && tr.diagnosis
+          ? {
+              ...tr,
+              diagnosis: {
+                ...tr.diagnosis,
+                ok: false,
+                misconceptionId: opts.diag.misconceptionCode,
+                whyFailsId: opts.diag.whyFailsId || tr.diagnosis.whyFailsId,
+                syntacticCorrection: opts.diag.correction || tr.diagnosis.syntacticCorrection,
+                naturalReformulation: opts.diag.correction || tr.diagnosis.naturalReformulation,
+                pedagogicalFeedbackId: opts.diag.whyFailsId || tr.diagnosis.pedagogicalFeedbackId,
+                bktAfter: recRes.bktAfter,
+                thetaAfter: recRes.thetaAfter,
+                masteryStateAfter: recRes.masteryStateAfter,
+              },
+            }
+          : tr
+      )
+    );
+  };
+
   const submitStudentTurn = async (params: {
     text?: string;
     audioBase64?: string;
@@ -3714,6 +3829,7 @@ export default function App() {
     speakingDurationSec?: number;
     inputMode?: 'voice' | 'typed' | 'quick_chip';
     fluencyTelemetry?: Partial<TurnAcousticTelemetry> | null;
+    acousticAnalysis?: AcousticProsodyAnalysis | null;
   }) => {
     const trimmed = (params.text || '').trim();
     if (!trimmed && !params.audioBase64) return;
@@ -3881,44 +3997,50 @@ export default function App() {
 
       const effectiveHints = isMeasureMode ? 0 : showHint ? 1 : 0;
       const freshBrain = loadBraincoreState();
+      const acMetrics = params.acousticAnalysis?.hasSufficientAudio ? params.acousticAnalysis : null;
+      const acMiscSub = acMetrics?.acousticMisconceptionId || null;
+      const resolvedSubMisc = pteDiagResult?.misconceptionsFound[0]?.id || ev.misconceptionId || acMiscSub || null;
+      const resolvedSubOk = pteDiagResult ? pteDiagResult.scores.passedTarget : Boolean(ev.ok && !acMiscSub);
       const attemptOutcome = recordSpeakingAttempt(freshBrain, {
         competencyId: activeScenario.competencyId,
         scenarioId: activeScenario.id,
         targetLang: activeScenario.targetLang,
         userExactTranscript: exactTranscript,
-        ok: pteDiagResult ? pteDiagResult.scores.passedTarget : Boolean(ev.ok),
+        ok: resolvedSubOk,
         grammarScore: pteDiagResult ? Math.round(pteDiagResult.scores.pronunciation * 20) : ev.grammarScore,
         fluencyScore: pteDiagResult ? Math.round(pteDiagResult.scores.fluency * 20) : ev.fluencyScore,
         vocabUsageScore: pteDiagResult ? Math.round(pteDiagResult.templateAdherence.contentScore * 33) : ev.vocabUsageScore,
         accuracyScore: pteDiagResult ? pteDiagResult.scores.pearsonEstimate : ev.accuracyScore,
         speakingDurationSec: measuredDurationSec,
-        misconceptionId: pteDiagResult?.misconceptionsFound[0]?.id || ev.misconceptionId || null,
+        misconceptionId: resolvedSubMisc,
+        canonicalCode: acMetrics?.canonicalTaxonomyCode || resolvedSubMisc,
         correctionPattern: ev.syntacticCorrection || ev.naturalReformulation || null,
         hintsUsed: effectiveHints,
         confidence: 0.85,
         measureMode: isMeasureMode,
+        acousticMetrics: acMetrics,
       });
 
       brainStateRef.current = attemptOutcome.nextState;
       setBrainState(attemptOutcome.nextState);
       if (isMeasureMode) {
-        playFiezelSfx(ev.ok ? 'answer_correct' : 'answer_wrong');
+        playFiezelSfx(resolvedSubOk ? 'answer_correct' : 'answer_wrong');
       }
 
       const diagnosis: TurnDiagnosis = {
-        ok: pteDiagResult ? pteDiagResult.scores.passedTarget : Boolean(ev.ok),
+        ok: resolvedSubOk,
         accuracyScore: pteDiagResult ? pteDiagResult.scores.pearsonEstimate : ev.accuracyScore,
         grammarScore: pteDiagResult ? Math.round(pteDiagResult.scores.pronunciation * 20) : ev.grammarScore,
         fluencyScore: pteDiagResult ? Math.round(pteDiagResult.scores.fluency * 20) : ev.fluencyScore,
         vocabUsageScore: pteDiagResult ? Math.round(pteDiagResult.templateAdherence.contentScore * 33) : ev.vocabUsageScore,
         userExactTranscript: exactTranscript,
-        misconceptionId: pteDiagResult?.misconceptionsFound[0]?.id || ev.misconceptionId || null,
-        whyFailsId: pteDiagResult?.misconceptionsFound[0]?.detail || ev.whyFailsId || null,
+        misconceptionId: resolvedSubMisc,
+        whyFailsId: pteDiagResult?.misconceptionsFound[0]?.detail || ev.whyFailsId || acMetrics?.whyFailsId || null,
         whyFailsTh: ev.whyFailsTh || null,
         missingTokens: ev.missingTokens || [],
         syntacticCorrection: ev.syntacticCorrection || null,
         naturalReformulation: ev.naturalReformulation || exactTranscript,
-        pedagogicalFeedbackId: pteDiagResult?.clinicalDossierText || ev.pedagogicalFeedbackId,
+        pedagogicalFeedbackId: pteDiagResult?.clinicalDossierText || acMetrics?.whyFailsId || ev.pedagogicalFeedbackId,
         pedagogicalFeedbackTh: ev.pedagogicalFeedbackTh,
         bktBefore: attemptOutcome.bktBefore,
         bktAfter: attemptOutcome.bktAfter,
@@ -4106,6 +4228,35 @@ export default function App() {
       ) {
         const aiAudioBase64 = replyEv.audioBase64 || null;
         void speakAiText(replyEv.aiReply, aiAudioBase64);
+      }
+      if (!pteDiagResult && !resolvedSubMisc) {
+        if (replyEv.serverDiagnosis && !replyEv.serverDiagnosis.ok && replyEv.serverDiagnosis.misconceptionCode) {
+          applyNeuralDiagnosisReconciliation({
+            turnId: userTurn.id,
+            uText: exactTranscript,
+            priorBktBefore: attemptOutcome.bktBefore,
+            hintsUsed: effectiveHints,
+            diag: replyEv.serverDiagnosis,
+          });
+        } else if (!replyEv.serverDiagnosis && exactTranscript.length >= 6) {
+          void requestNeuralUtteranceDiagnosis({
+            text: exactTranscript,
+            scenario: activeScenario,
+            targetLang: activeScenario.targetLang,
+            locale,
+            history: historyAfterUser,
+          }).then((neuralDiag) => {
+            if (neuralDiag && !neuralDiag.ok && neuralDiag.misconceptionCode) {
+              applyNeuralDiagnosisReconciliation({
+                turnId: userTurn.id,
+                uText: exactTranscript,
+                priorBktBefore: attemptOutcome.bktBefore,
+                hintsUsed: effectiveHints,
+                diag: neuralDiag,
+              });
+            }
+          });
+        }
       }
     } catch (err) {
       setIsGeneratingCopilot(false);
@@ -4339,11 +4490,13 @@ export default function App() {
               } else {
                 const liveTel = turnAcousticTrackerRef.current.finalize();
                 turnAcousticTrackerRef.current.reset();
+                const liveProsody = consumeTurnAcousticProsody(toSend);
                 void submitStudentTurnRef.current({
                   text: toSend,
                   speakingDurationSec: liveTel.spanDurationSec > 0 ? liveTel.spanDurationSec : undefined,
                   inputMode: 'voice',
                   fluencyTelemetry: liveTel,
+                  acousticAnalysis: liveProsody,
                 });
               }
             }
@@ -4410,11 +4563,13 @@ export default function App() {
                   } else {
                     const liveTel = turnAcousticTrackerRef.current.finalize();
                     turnAcousticTrackerRef.current.reset();
+                    const liveProsody = consumeTurnAcousticProsody(toSend);
                     void submitStudentTurnRef.current({
                       text: toSend,
                       speakingDurationSec: liveTel.spanDurationSec > 0 ? liveTel.spanDurationSec : undefined,
                       inputMode: 'voice',
                       fluencyTelemetry: liveTel,
+                      acousticAnalysis: liveProsody,
                     });
                   }
                 }
@@ -4612,15 +4767,18 @@ export default function App() {
           liveDictatedTextRef.current = '';
           const pttTelemetry = turnAcousticTrackerRef.current.finalize(elapsedSec);
           turnAcousticTrackerRef.current.reset();
+          const pttProsody = consumeTurnAcousticProsody(dictated);
           void submitStudentTurnRef.current({
             text: dictated,
             speakingDurationSec:
               pttTelemetry.spanDurationSec > 0 ? pttTelemetry.spanDurationSec : elapsedSec,
             inputMode: 'voice',
             fluencyTelemetry: pttTelemetry,
+            acousticAnalysis: pttProsody,
           });
         } else {
           turnAcousticTrackerRef.current.reset();
+          acousticProsodyRef.current.reset();
           setStatusBanner(
             'Peramban ini belum mendukung pengenalan suara otomatis. Ketik kalimatmu di kolom bawah atau pilih dari Bantuan Cara Jawab.'
           );
@@ -4669,15 +4827,18 @@ export default function App() {
           setLiveUserDraft('');
           const pttTelemetry = turnAcousticTrackerRef.current.finalize(rawElapsedSec);
           turnAcousticTrackerRef.current.reset();
+          const pttProsody = consumeTurnAcousticProsody(dictated);
           void submitStudentTurnRef.current({
             text: dictated,
             speakingDurationSec:
               pttTelemetry.spanDurationSec > 0 ? pttTelemetry.spanDurationSec : rawElapsedSec,
             inputMode: 'voice',
             fluencyTelemetry: pttTelemetry,
+            acousticAnalysis: pttProsody,
           });
         } else {
           turnAcousticTrackerRef.current.reset();
+          acousticProsodyRef.current.reset();
           setStatusBanner(
             'Belum ada suara yang terdengar. Pastikan mikrofon aktif dan ucapkan kalimat dengan jelas, atau ketik di kolom bawah.'
           );
@@ -5043,6 +5204,12 @@ export default function App() {
       isActiveVoice: Boolean(vadRes.inSpeech && isVerifiedListeningSpeech),
       confirmedSpeech: Boolean(vadRes.inSpeech && isVerifiedListeningSpeech),
     });
+    if (vadRes.inSpeech && isVerifiedListeningSpeech) {
+      const ac16k = resampleFloat32To16k(float32, sampleRate);
+      if (ac16k.length > 0) {
+        acousticProsodyRef.current.pushSamples(ac16k);
+      }
+    }
     const wsOpen = Boolean(wsRef.current && wsRef.current.readyState === WebSocket.OPEN && isLiveConnectedRef.current);
 
     if (isVerifiedListeningSpeech) {
@@ -5443,6 +5610,11 @@ export default function App() {
           },
           onSpeechPcm16kBase64: (pcmBase64) => {
             clearLiveTurnAutoCommitTimer();
+            try {
+              acousticProsodyRef.current.pushPcm16Base64(pcmBase64);
+            } catch {
+              // Ignore malformed PCM frames
+            }
             if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN && isLiveConnectedRef.current) {
               sentAudioSinceEndRef.current = true;
               wsRef.current.send(
@@ -7167,6 +7339,7 @@ ${
 
               const liveTelemetry = turnAcousticTrackerRef.current.finalize();
               turnAcousticTrackerRef.current.reset();
+              const liveProsody = consumeTurnAcousticProsody(uText);
               const measuredTurnSec =
                 liveTelemetry.spanDurationSec > 0 ? liveTelemetry.spanDurationSec : undefined;
 
@@ -7271,42 +7444,65 @@ ${
                 setLatestReadAloudAlignment(null);
               }
               const effectiveHints = isMeasureMode ? 0 : showHint ? 1 : 0;
+              const acMiscLive = liveProsody.hasSufficientAudio
+                ? liveProsody.acousticMisconceptionId
+                : null;
+              const acCanonLive = liveProsody.hasSufficientAudio
+                ? liveProsody.canonicalTaxonomyCode
+                : null;
+              const acReasonLive = liveProsody.hasSufficientAudio ? liveProsody.whyFailsId : null;
+              const resolvedLiveMisc =
+                pteDiagResult?.misconceptionsFound[0]?.id ||
+                ev.misconceptionId ||
+                acMiscLive ||
+                null;
+              const resolvedLiveOk = pteDiagResult
+                ? pteDiagResult.scores.passedTarget
+                : Boolean(ev.ok && !acMiscLive);
               const outcome = recordSpeakingAttempt(brainStateRef.current, {
                 competencyId: activeScenario.competencyId,
                 scenarioId: activeScenario.id,
                 targetLang: activeScenario.targetLang,
                 userExactTranscript: uText,
-                ok: pteDiagResult ? pteDiagResult.scores.passedTarget : Boolean(ev.ok),
+                ok: resolvedLiveOk,
                 grammarScore: pteDiagResult ? Math.round(pteDiagResult.scores.pronunciation * 20) : ev.grammarScore,
                 fluencyScore: pteDiagResult ? Math.round(pteDiagResult.scores.fluency * 20) : ev.fluencyScore,
                 vocabUsageScore: pteDiagResult ? Math.round(pteDiagResult.templateAdherence.contentScore * 33) : ev.vocabUsageScore,
                 accuracyScore: pteDiagResult ? pteDiagResult.scores.pearsonEstimate : ev.accuracyScore,
                 speakingDurationSec: measuredTurnSec,
-                misconceptionId: pteDiagResult?.misconceptionsFound[0]?.id || ev.misconceptionId || null,
+                misconceptionId: resolvedLiveMisc,
+                canonicalCode: acCanonLive || resolvedLiveMisc,
                 correctionPattern: ev.syntacticCorrection || ev.naturalReformulation || null,
                 hintsUsed: effectiveHints,
                 confidence: 0.85,
                 measureMode: isMeasureMode,
+                acousticMetrics: liveProsody,
               });
               brainStateRef.current = outcome.nextState;
               setBrainState(outcome.nextState);
               if (isMeasureMode) {
-                playFiezelSfx(ev.ok ? 'answer_correct' : 'answer_wrong');
+                playFiezelSfx(resolvedLiveOk ? 'answer_correct' : 'answer_wrong');
               }
+              const liveTurnId = `live_u_${Date.now()}`;
               const turnDiag: TurnDiagnosis = {
-                ok: pteDiagResult ? pteDiagResult.scores.passedTarget : Boolean(ev.ok),
+                ok: resolvedLiveOk,
                 accuracyScore: pteDiagResult ? pteDiagResult.scores.pearsonEstimate : ev.accuracyScore,
                 grammarScore: pteDiagResult ? Math.round(pteDiagResult.scores.pronunciation * 20) : ev.grammarScore,
                 fluencyScore: pteDiagResult ? Math.round(pteDiagResult.scores.fluency * 20) : ev.fluencyScore,
                 vocabUsageScore: pteDiagResult ? Math.round(pteDiagResult.templateAdherence.contentScore * 33) : ev.vocabUsageScore,
                 userExactTranscript: uText,
-                misconceptionId: pteDiagResult?.misconceptionsFound[0]?.id || ev.misconceptionId || null,
-                whyFailsId: pteDiagResult?.misconceptionsFound[0]?.detail || ev.whyFailsId || null,
+                misconceptionId: resolvedLiveMisc,
+                whyFailsId:
+                  pteDiagResult?.misconceptionsFound[0]?.detail ||
+                  ev.whyFailsId ||
+                  acReasonLive ||
+                  null,
                 whyFailsTh: ev.whyFailsTh || null,
                 missingTokens: ev.missingTokens || [],
                 syntacticCorrection: ev.syntacticCorrection || null,
                 naturalReformulation: ev.naturalReformulation || uText,
-                pedagogicalFeedbackId: pteDiagResult?.clinicalDossierText || ev.pedagogicalFeedbackId,
+                pedagogicalFeedbackId:
+                  pteDiagResult?.clinicalDossierText || acReasonLive || ev.pedagogicalFeedbackId,
                 pedagogicalFeedbackTh: ev.pedagogicalFeedbackTh,
                 bktBefore: outcome.bktBefore,
                 bktAfter: outcome.bktAfter,
@@ -7317,13 +7513,21 @@ ${
               setTurns((prev) => [
                 ...prev,
                 {
-                  id: `live_u_${Date.now()}`,
+                  id: liveTurnId,
                   speaker: 'user',
                   text: uText,
                   timestamp: Date.now(),
                   diagnosis: turnDiag,
                 },
               ]);
+              if (!pteDiagResult && !resolvedLiveMisc && uText.length >= 6) {
+                scheduleAsyncNeuralDiagnosis({
+                  turnId: liveTurnId,
+                  uText,
+                  priorBktBefore: outcome.bktBefore,
+                  hintsUsed: effectiveHints,
+                });
+              }
             }
 
             if (aText) {
