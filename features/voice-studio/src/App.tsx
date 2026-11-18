@@ -9359,7 +9359,9 @@ ${
                                     ? t(locale, 'ui.youSpeak')
                                     : isPlayingAiAudio
                                     ? liveTransportMode === 'ws-duplex' && isMicHardwareReady
-                                      ? t(locale, 'ui.mochiSpeakMic')
+                                      ? locale === 'id'
+                                        ? 'Mochi Bicara · Mic Aktif'
+                                        : t(locale, 'ui.mochiSpeakMic')
                                       : t(locale, 'ui.mochiSpeak')
                                     : !isMicHardwareReady
                                     ? t(locale, 'ui.tapEnableMic')
@@ -10161,7 +10163,7 @@ ${
                         ? (
                           <>
                             {t(locale, 'ui.coachSpeakingInterrupt')}
-                            <span className="inline"> {t(locale, 'ui.coachInterruptHint')}</span>
+                            <span className="inline"> {locale === 'id' ? '· mic aktif, bicara saja untuk menyela' : t(locale, 'ui.coachInterruptHint')}</span>
                           </>
                         )
                         : isLiveConnected
