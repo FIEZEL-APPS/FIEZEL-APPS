@@ -4607,8 +4607,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
       playFiezelSfx('answer_wrong');
       if (onEvaluatePractice && firstForKey) {
         onEvaluatePractice(opt.text, correctText, boardState.patternFormula, {
-          isQuizSuccess: false,
-          isQuizFailure: true,
+          isQuizSuccess: false, isQuizFailure: true,
           trapWrongToken: opt.text,
           misconceptionId: resolvedMisconceptionId,
         });
@@ -5305,10 +5304,10 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
       data-testid="in-call-learning-workbench"
     >
       <div
-        className={`w-full ${
+        className={`w-full max-w-[calc(100vw-24px)] ${
           isPteModal
-            ? 'max-w-5xl xl:max-w-6xl max-h-[92vh] bg-[#FDFAF4] border-[#EADBCE]'
-            : 'max-w-[1260px] h-[92vh] bg-[#FAFBF9] border-[#DDE2DC]'
+            ? 'sm:max-w-5xl xl:max-w-6xl max-h-[92vh] bg-[#FDFAF4] border-[#EADBCE]'
+            : 'sm:max-w-[1260px] h-[92vh] bg-[#FAFBF9] border-[#DDE2DC]'
         } rounded-[26px] border shadow-[0_24px_60px_rgba(28,22,17,0.25)] overflow-hidden flex flex-col`}
       >
         {/* TOP HEADER BAR ALA SOLVELY + KONTROL KECEPATAN, EXPORT, MINIMIZE, AKHIRI */}
