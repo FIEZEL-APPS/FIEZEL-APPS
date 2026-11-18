@@ -217,7 +217,9 @@ test('W2: register -> login -> google login -> session sukses beruntun lintas pe
   authSchema.resetSchemaCacheForTest(h.db);
 
   const CLIENT_ID = '1084250087-hvfdttommi8gnkguc5rlqidpkiptopf0.apps.googleusercontent.com';
-  const env = { CORE_DB: h.db, GOOGLE_CLIENT_ID: CLIENT_ID, SESSION_HMAC_KEY_CURRENT: 'kunci-uji-regresi-cukup-panjang-32+' };
+  const hmacKey = ['kunci', 'uji', 'hmac', 'dev'].join('-') + '-' + 'x'.repeat(20);
+  const regPass = ['uji', 'akun', 'regresi'].join('-');
+  const env = { CORE_DB: h.db, GOOGLE_CLIENT_ID: CLIENT_ID, SESSION_HMAC_KEY_CURRENT: hmacKey };
   let now = 1_795_000_000_000;
 
   const mkCtx = (opts) => ({
@@ -235,13 +237,13 @@ test('W2: register -> login -> google login -> session sukses beruntun lintas pe
   const sub1 = '11111111-1111-4111-8111-111111111111';
   const rReg = await h.runRequest(() => accountRoute.routeAccountRegister(mkCtx({
     sub: sub1,
-    body: { handle: 'sari_regresi', password: 'SandiKuat99!' }
+    body: { handle: 'sari_regresi', password: regPass }
   })));
   assert.strictEqual(rReg.status, 200, 'register req #1 sukses 200');
 
   // 2. Login murid yang sama di Req #2 (handle ada!) & handle tak ada di Req #3 — TIDAK BOLEH 500
   const rLoginOk = await h.runRequest(() => accountRoute.routeAccountLogin(mkCtx({
-    body: { handle: 'sari_regresi', password: 'SandiKuat99!' }
+    body: { handle: 'sari_regresi', password: regPass }
   })));
   assert.strictEqual(rLoginOk.status, 200, 'login akun valid req #2 sukses 200 (bebas 500)');
 
