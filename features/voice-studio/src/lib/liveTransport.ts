@@ -28,6 +28,7 @@ import {
   buildSswContextualReplyCards,
 } from './sswSenseiEngine.ts';
 import { buildSswTurnDossierForHttp } from './sswSenseiTeacher.ts';
+import { openerSpokenText } from './boardSpeechText.ts';
 
 export type LiveTransportMode = 'ws-duplex' | 'turn-by-turn-fallback';
 
@@ -5530,11 +5531,11 @@ export async function resolveAiReply(
               try {
                 const pkt = JSON.parse(dataStr);
                 if (evName === 'opener' && !openerWarmed) {
-                  const intro = String(pkt?.headingStep?.spokenNarration || pkt?.topicTitle || '').trim();
-                  if (intro) {
+                  // SSOT: teks yang SAMA persis dengan Chunk-0 papan (boardSpeechText) agar cache TTS hit.
+                  const spokenIntro = openerSpokenText(pkt);
+                  if (spokenIntro) {
                     openerWarmed = true;
-                    const normIntro = /[.!?。！？]$/.test(intro) ? intro : `${intro}.`;
-                    const firstChunk = splitTtsIntoSentenceChunks(normIntro, 145)[0] || normIntro;
+                    const firstChunk = splitTtsIntoSentenceChunks(spokenIntro, 145)[0] || spokenIntro;
                     void synthesizeFlexibleTts({
                       text: firstChunk,
                       targetLang: params.locale,

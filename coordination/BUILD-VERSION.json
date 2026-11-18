@@ -1,7 +1,7 @@
 {
-  "version": "m025-806",
-  "claimedBy": "branch feat/english-first-complete-m025-806",
-  "claimedAt": "2026-11-18T19:22:02.667Z",
-  "reason": "feat(i18n): complete english-first auth, content sidecars, voice studio & catalog fixes",
+  "version": "m025-807",
+  "claimedBy": "branch fix/whiteboard-speed-and-pedagogical-perfection",
+  "claimedAt": "2026-11-18T21:03:52.728Z",
+  "reason": "fix(voice): speed up whiteboard reveal and cache-hit, fix React hook minimize crash, and harden quizzes",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
