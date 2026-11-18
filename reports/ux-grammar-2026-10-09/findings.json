@@ -1,0 +1,2566 @@
+{
+ "screens": [
+  {
+   "name": "01-latihan",
+   "note": "Hub Latihan",
+   "file": "01-latihan.png",
+   "lowContrast": [
+    {
+     "text": "KelasKu",
+     "ratio": 3,
+     "need": 4.5,
+     "size": 10,
+     "cls": "kelasku-wordmark"
+    }
+   ],
+   "lowContrastCount": 1,
+   "smallTargets": [
+    {
+     "label": "Ganti level belajar",
+     "w": 84,
+     "h": 32
+    },
+    {
+     "label": "Diagnostics",
+     "w": 4,
+     "h": 44
+    }
+   ],
+   "smallTargetCount": 2,
+   "overflowX": false,
+   "idLeaks": [],
+   "fontSizes": [
+    11,
+    14,
+    16
+   ],
+   "scrollHeight": 844
+  },
+  {
+   "name": "02-tur",
+   "note": "Tur pengenalan muncul di atas layar",
+   "file": "02-tur.png",
+   "lowContrast": [
+    {
+     "text": "KelasKu",
+     "ratio": 3,
+     "need": 4.5,
+     "size": 10,
+     "cls": "kelasku-wordmark"
+    }
+   ],
+   "lowContrastCount": 1,
+   "smallTargets": [
+    {
+     "label": "Ganti level belajar",
+     "w": 84,
+     "h": 32
+    },
+    {
+     "label": "Ujian Naik Level A1. Buka panel ujian.",
+     "w": 129,
+     "h": 32
+    },
+    {
+     "label": "Sesi Kilat: 20 soal",
+     "w": 141,
+     "h": 32
+    },
+    {
+     "label": "Video Grammar Lab",
+     "w": 154,
+     "h": 32
+    },
+    {
+     "label": "Lihat daftar",
+     "w": 109,
+     "h": 32
+    },
+    {
+     "label": "Buka materi",
+     "w": 127,
+     "h": 32
+    }
+   ],
+   "smallTargetCount": 6,
+   "overflowX": false,
+   "idLeaks": [],
+   "fontSizes": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16
+   ],
+   "scrollHeight": 2371
+  },
+  {
+   "name": "02-ritme",
+   "note": "Modal \"Pilih Ritme Belajarmu\" (kunjungan pertama ke Grammar)",
+   "file": "02-ritme.png",
+   "lowContrast": [
+    {
+     "text": "KelasKu",
+     "ratio": 3,
+     "need": 4.5,
+     "size": 10,
+     "cls": "kelasku-wordmark"
+    }
+   ],
+   "lowContrastCount": 1,
+   "smallTargets": [
+    {
+     "label": "Ganti level belajar",
+     "w": 84,
+     "h": 32
+    },
+    {
+     "label": "Ujian Naik Level A1. Buka panel ujian.",
+     "w": 129,
+     "h": 32
+    },
+    {
+     "label": "Sesi Kilat: 20 soal",
+     "w": 141,
+     "h": 32
+    },
+    {
+     "label": "Video Grammar Lab",
+     "w": 154,
+     "h": 32
+    },
+    {
+     "label": "Lihat daftar",
+     "w": 109,
+     "h": 32
+    },
+    {
+     "label": "Buka materi",
+     "w": 127,
+     "h": 32
+    }
+   ],
+   "smallTargetCount": 6,
+   "overflowX": false,
+   "idLeaks": [],
+   "fontSizes": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16
+   ],
+   "scrollHeight": 2371
+  },
+  {
+   "name": "02-grammar-hub",
+   "note": "Grammar Hub",
+   "file": "02-grammar-hub.png",
+   "lowContrast": [
+    {
+     "text": "KelasKu",
+     "ratio": 3,
+     "need": 4.5,
+     "size": 10,
+     "cls": "kelasku-wordmark"
+    }
+   ],
+   "lowContrastCount": 1,
+   "smallTargets": [
+    {
+     "label": "Ganti level belajar",
+     "w": 84,
+     "h": 32
+    },
+    {
+     "label": "Ujian Naik Level A1. Buka panel ujian.",
+     "w": 129,
+     "h": 32
+    },
+    {
+     "label": "Sesi Kilat: 20 soal",
+     "w": 141,
+     "h": 32
+    },
+    {
+     "label": "Video Grammar Lab",
+     "w": 154,
+     "h": 32
+    },
+    {
+     "label": "Lihat daftar",
+     "w": 109,
+     "h": 32
+    },
+    {
+     "label": "Buka materi",
+     "w": 127,
+     "h": 32
+    }
+   ],
+   "smallTargetCount": 6,
+   "overflowX": false,
+   "idLeaks": [],
+   "fontSizes": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16
+   ],
+   "scrollHeight": 2371
+  },
+  {
+   "name": "02-grammar-hub-full",
+   "note": "Grammar Hub (seluruh halaman)",
+   "file": "02-grammar-hub-full.png",
+   "lowContrast": [
+    {
+     "text": "KelasKu",
+     "ratio": 3,
+     "need": 4.5,
+     "size": 10,
+     "cls": "kelasku-wordmark"
+    }
+   ],
+   "lowContrastCount": 1,
+   "smallTargets": [
+    {
+     "label": "Ganti level belajar",
+     "w": 84,
+     "h": 32
+    },
+    {
+     "label": "Ujian Naik Level A1. Buka panel ujian.",
+     "w": 129,
+     "h": 32
+    },
+    {
+     "label": "Sesi Kilat: 20 soal",
+     "w": 141,
+     "h": 32
+    },
+    {
+     "label": "Video Grammar Lab",
+     "w": 154,
+     "h": 32
+    },
+    {
+     "label": "Lihat daftar",
+     "w": 109,
+     "h": 32
+    },
+    {
+     "label": "Buka materi",
+     "w": 127,
+     "h": 32
+    }
+   ],
+   "smallTargetCount": 6,
+   "overflowX": false,
+   "idLeaks": [],
+   "fontSizes": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16
+   ],
+   "scrollHeight": 2371
+  },
+  {
+   "name": "02-buka-materi",
+   "note": "Sesudah mengetuk \"Buka materi\"",
+   "file": "02-buka-materi.png",
+   "lowContrast": [
+    {
+     "text": "KelasKu",
+     "ratio": 3,
+     "need": 4.5,
+     "size": 10,
+     "cls": "kelasku-wordmark"
+    }
+   ],
+   "lowContrastCount": 1,
+   "smallTargets": [
+    {
+     "label": "Ganti level belajar",
+     "w": 84,
+     "h": 32
+    },
+    {
+     "label": "Ujian Naik Level A1. Buka panel ujian.",
+     "w": 129,
+     "h": 32
+    },
+    {
+     "label": "Sesi Kilat: 20 soal",
+     "w": 141,
+     "h": 32
+    },
+    {
+     "label": "Video Grammar Lab",
+     "w": 154,
+     "h": 32
+    },
+    {
+     "label": "Lihat daftar",
+     "w": 109,
+     "h": 32
+    },
+    {
+     "label": "Buka materi",
+     "w": 127,
+     "h": 32
+    }
+   ],
+   "smallTargetCount": 6,
+   "overflowX": false,
+   "idLeaks": [],
+   "fontSizes": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16
+   ],
+   "scrollHeight": 2371
+  },
+  {
+   "name": "02-quest-1",
+   "note": "FIEZEL QUEST tahap 1",
+   "file": "02-quest-1.png",
+   "lowContrast": [
+    {
+     "text": "KelasKu",
+     "ratio": 3,
+     "need": 4.5,
+     "size": 10,
+     "cls": "kelasku-wordmark"
+    }
+   ],
+   "lowContrastCount": 1,
+   "smallTargets": [
+    {
+     "label": "Ganti level belajar",
+     "w": 84,
+     "h": 32
+    },
+    {
+     "label": "Ujian Naik Level A1. Buka panel ujian.",
+     "w": 129,
+     "h": 32
+    },
+    {
+     "label": "Sesi Kilat: 20 soal",
+     "w": 141,
+     "h": 32
+    },
+    {
+     "label": "Video Grammar Lab",
+     "w": 154,
+     "h": 32
+    },
+    {
+     "label": "Lihat daftar",
+     "w": 109,
+     "h": 32
+    },
+    {
+     "label": "Buka materi",
+     "w": 127,
+     "h": 32
+    }
+   ],
+   "smallTargetCount": 6,
+   "overflowX": false,
+   "idLeaks": [],
+   "fontSizes": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16
+   ],
+   "scrollHeight": 2371
+  },
+  {
+   "name": "02-quest-2",
+   "note": "FIEZEL QUEST tahap 2",
+   "file": "02-quest-2.png",
+   "lowContrast": [
+    {
+     "text": "KelasKu",
+     "ratio": 3,
+     "need": 4.5,
+     "size": 10,
+     "cls": "kelasku-wordmark"
+    }
+   ],
+   "lowContrastCount": 1,
+   "smallTargets": [
+    {
+     "label": "Ganti level belajar",
+     "w": 84,
+     "h": 32
+    },
+    {
+     "label": "Ujian Naik Level A1. Buka panel ujian.",
+     "w": 129,
+     "h": 32
+    },
+    {
+     "label": "Sesi Kilat: 20 soal",
+     "w": 141,
+     "h": 32
+    },
+    {
+     "label": "Video Grammar Lab",
+     "w": 154,
+     "h": 32
+    },
+    {
+     "label": "Lihat daftar",
+     "w": 109,
+     "h": 32
+    },
+    {
+     "label": "Buka materi",
+     "w": 127,
+     "h": 32
+    },
+    {
+     "label": "is",
+     "w": 43,
+     "h": 48
+    }
+   ],
+   "smallTargetCount": 7,
+   "overflowX": false,
+   "idLeaks": [],
+   "fontSizes": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16
+   ],
+   "scrollHeight": 2371
+  },
+  {
+   "name": "02-quest-2-tersusun",
+   "note": "FIEZEL QUEST: kalimat tersusun, sebelum diperiksa",
+   "file": "02-quest-2-tersusun.png",
+   "lowContrast": [
+    {
+     "text": "KelasKu",
+     "ratio": 3,
+     "need": 4.5,
+     "size": 10,
+     "cls": "kelasku-wordmark"
+    }
+   ],
+   "lowContrastCount": 1,
+   "smallTargets": [
+    {
+     "label": "Ganti level belajar",
+     "w": 84,
+     "h": 32
+    },
+    {
+     "label": "Ujian Naik Level A1. Buka panel ujian.",
+     "w": 129,
+     "h": 32
+    },
+    {
+     "label": "Sesi Kilat: 20 soal",
+     "w": 141,
+     "h": 32
+    },
+    {
+     "label": "Video Grammar Lab",
+     "w": 154,
+     "h": 32
+    },
+    {
+     "label": "Lihat daftar",
+     "w": 109,
+     "h": 32
+    },
+    {
+     "label": "Buka materi",
+     "w": 127,
+     "h": 32
+    },
+    {
+     "label": "is",
+     "w": 43,
+     "h": 48
+    }
+   ],
+   "smallTargetCount": 7,
+   "overflowX": false,
+   "idLeaks": [],
+   "fontSizes": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16
+   ],
+   "scrollHeight": 2371
+  },
+  {
+   "name": "02-quest-v",
+   "note": "FIEZEL QUEST tahap menang",
+   "file": "02-quest-v.png",
+   "lowContrast": [
+    {
+     "text": "KelasKu",
+     "ratio": 3,
+     "need": 4.5,
+     "size": 10,
+     "cls": "kelasku-wordmark"
+    }
+   ],
+   "lowContrastCount": 1,
+   "smallTargets": [
+    {
+     "label": "Ganti level belajar",
+     "w": 84,
+     "h": 32
+    },
+    {
+     "label": "Ujian Naik Level A1. Buka panel ujian.",
+     "w": 129,
+     "h": 32
+    },
+    {
+     "label": "Sesi Kilat: 20 soal",
+     "w": 141,
+     "h": 32
+    },
+    {
+     "label": "Video Grammar Lab",
+     "w": 154,
+     "h": 32
+    },
+    {
+     "label": "Lihat daftar",
+     "w": 109,
+     "h": 32
+    },
+    {
+     "label": "Buka materi",
+     "w": 127,
+     "h": 32
+    }
+   ],
+   "smallTargetCount": 6,
+   "overflowX": false,
+   "idLeaks": [],
+   "fontSizes": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16
+   ],
+   "scrollHeight": 2371
+  },
+  {
+   "name": "02-sesudah-quest",
+   "note": "Sesudah FIEZEL QUEST selesai",
+   "file": "02-sesudah-quest.png",
+   "lowContrast": [
+    {
+     "text": "She called me",
+     "ratio": 1,
+     "need": 4.5,
+     "size": 15,
+     "cls": "B"
+    },
+    {
+     "text": "The teacher helped her",
+     "ratio": 1,
+     "need": 4.5,
+     "size": 15,
+     "cls": "B"
+    },
+    {
+     "text": "her bag",
+     "ratio": 1,
+     "need": 4.5,
+     "size": 15,
+     "cls": "B"
+    },
+    {
+     "text": "my name",
+     "ratio": 1,
+     "need": 4.5,
+     "size": 15,
+     "cls": "B"
+    },
+    {
+     "text": "This bag is hers",
+     "ratio": 1,
+     "need": 4.5,
+     "size": 15,
+     "cls": "B"
+    },
+    {
+     "text": "RUMUS KILAT",
+     "ratio": 1,
+     "need": 4.5,
+     "size": 15,
+     "cls": "B"
+    },
+    {
+     "text": "I, He, She, We, They",
+     "ratio": 1,
+     "need": 4.5,
+     "size": 15,
+     "cls": "B"
+    },
+    {
+     "text": "me, him, her, us, them",
+     "ratio": 1,
+     "need": 4.5,
+     "size": 15,
+     "cls": "B"
+    },
+    {
+     "text": "my, your, his, her, their",
+     "ratio": 1,
+     "need": 4.5,
+     "size": 15,
+     "cls": "B"
+    },
+    {
+     "text": "mine, hers, ours",
+     "ratio": 1,
+     "need": 4.5,
+     "size": 15,
+     "cls": "B"
+    },
+    {
+     "text": "KelasKu",
+     "ratio": 3,
+     "need": 4.5,
+     "size": 10,
+     "cls": "kelasku-wordmark"
+    }
+   ],
+   "lowContrastCount": 11,
+   "smallTargets": [
+    {
+     "label": "Ganti level belajar",
+     "w": 84,
+     "h": 32
+    },
+    {
+     "label": "Kembali ke daftar materi",
+     "w": 219,
+     "h": 40
+    },
+    {
+     "label": "Tentang latihan ini",
+     "w": 40,
+     "h": 40
+    },
+    {
+     "label": "Diagnostics",
+     "w": 4,
+     "h": 44
+    }
+   ],
+   "smallTargetCount": 4,
+   "overflowX": false,
+   "idLeaks": [],
+   "fontSizes": [
+    11,
+    14,
+    15,
+    16,
+    18,
+    26
+   ],
+   "scrollHeight": 1116
+  },
+  {
+   "name": "02-materi",
+   "note": "Kartu materi pelajaran",
+   "file": "02-materi.png",
+   "lowContrast": [
+    {
+     "text": "She called me",
+     "ratio": 1,
+     "need": 4.5,
+     "size": 15,
+     "cls": "B"
+    },
+    {
+     "text": "The teacher helped her",
+     "ratio": 1,
+     "need": 4.5,
+     "size": 15,
+     "cls": "B"
+    },
+    {
+     "text": "her bag",
+     "ratio": 1,
+     "need": 4.5,
+     "size": 15,
+     "cls": "B"
+    },
+    {
+     "text": "my name",
+     "ratio": 1,
+     "need": 4.5,
+     "size": 15,
+     "cls": "B"
+    },
+    {
+     "text": "This bag is hers",
+     "ratio": 1,
+     "need": 4.5,
+     "size": 15,
+     "cls": "B"
+    },
+    {
+     "text": "RUMUS KILAT",
+     "ratio": 1,
+     "need": 4.5,
+     "size": 15,
+     "cls": "B"
+    },
+    {
+     "text": "I, He, She, We, They",
+     "ratio": 1,
+     "need": 4.5,
+     "size": 15,
+     "cls": "B"
+    },
+    {
+     "text": "me, him, her, us, them",
+     "ratio": 1,
+     "need": 4.5,
+     "size": 15,
+     "cls": "B"
+    },
+    {
+     "text": "my, your, his, her, their",
+     "ratio": 1,
+     "need": 4.5,
+     "size": 15,
+     "cls": "B"
+    },
+    {
+     "text": "mine, hers, ours",
+     "ratio": 1,
+     "need": 4.5,
+     "size": 15,
+     "cls": "B"
+    },
+    {
+     "text": "KelasKu",
+     "ratio": 3,
+     "need": 4.5,
+     "size": 10,
+     "cls": "kelasku-wordmark"
+    }
+   ],
+   "lowContrastCount": 11,
+   "smallTargets": [
+    {
+     "label": "Ganti level belajar",
+     "w": 84,
+     "h": 32
+    },
+    {
+     "label": "Kembali ke daftar materi",
+     "w": 219,
+     "h": 40
+    },
+    {
+     "label": "Tentang latihan ini",
+     "w": 40,
+     "h": 40
+    },
+    {
+     "label": "Diagnostics",
+     "w": 4,
+     "h": 44
+    }
+   ],
+   "smallTargetCount": 4,
+   "overflowX": false,
+   "idLeaks": [],
+   "fontSizes": [
+    11,
+    14,
+    15,
+    16,
+    18,
+    26
+   ],
+   "scrollHeight": 1116
+  },
+  {
+   "name": "04-soal",
+   "note": "Soal pertama (grammar)",
+   "file": "04-soal.png",
+   "lowContrast": [],
+   "lowContrastCount": 0,
+   "smallTargets": [
+    {
+     "label": "Diagnostics",
+     "w": 4,
+     "h": 44
+    }
+   ],
+   "smallTargetCount": 1,
+   "overflowX": false,
+   "idLeaks": [],
+   "fontSizes": [
+    12,
+    15,
+    16,
+    17,
+    26
+   ],
+   "scrollHeight": 844
+  },
+  {
+   "name": "05-salah-pertama",
+   "note": "Sesudah jawaban salah pertama (coba lagi)",
+   "file": "05-salah-pertama.png",
+   "lowContrast": [],
+   "lowContrastCount": 0,
+   "smallTargets": [
+    {
+     "label": "Diagnostics",
+     "w": 4,
+     "h": 44
+    }
+   ],
+   "smallTargetCount": 1,
+   "overflowX": false,
+   "idLeaks": [],
+   "fontSizes": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    26
+   ],
+   "scrollHeight": 1346
+  },
+  {
+   "name": "05b-salah-pertama-full",
+   "note": "Sesudah salah pertama (seluruh halaman)",
+   "file": "05b-salah-pertama-full.png",
+   "lowContrast": [],
+   "lowContrastCount": 0,
+   "smallTargets": [
+    {
+     "label": "Diagnostics",
+     "w": 4,
+     "h": 44
+    }
+   ],
+   "smallTargetCount": 1,
+   "overflowX": false,
+   "idLeaks": [],
+   "fontSizes": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17
+   ],
+   "scrollHeight": 1346
+  },
+  {
+   "name": "06-keyakinan",
+   "note": "Sesudah salah kedua (popup keyakinan)",
+   "file": "06-keyakinan.png",
+   "lowContrast": [],
+   "lowContrastCount": 0,
+   "smallTargets": [
+    {
+     "label": "Diagnostics",
+     "w": 4,
+     "h": 44
+    }
+   ],
+   "smallTargetCount": 1,
+   "overflowX": false,
+   "idLeaks": [],
+   "fontSizes": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17
+   ],
+   "scrollHeight": 1345
+  },
+  {
+   "name": "07-pembahasan",
+   "note": "Pembahasan (layar pertama)",
+   "file": "07-pembahasan.png",
+   "lowContrast": [],
+   "lowContrastCount": 0,
+   "smallTargets": [],
+   "smallTargetCount": 0,
+   "overflowX": false,
+   "idLeaks": [],
+   "fontSizes": [
+    11,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
+   ],
+   "scrollHeight": 2504
+  },
+  {
+   "name": "07b-pembahasan-full",
+   "note": "Pembahasan (seluruh halaman)",
+   "file": "07b-pembahasan-full.png",
+   "lowContrast": [],
+   "lowContrastCount": 0,
+   "smallTargets": [],
+   "smallTargetCount": 0,
+   "overflowX": false,
+   "idLeaks": [],
+   "fontSizes": [
+    13,
+    14,
+    15,
+    16
+   ],
+   "scrollHeight": 2504
+  },
+  {
+   "name": "08-jenis-grammar",
+   "note": "Jenis soal: grammar",
+   "file": "08-jenis-grammar.png",
+   "lowContrast": [],
+   "lowContrastCount": 0,
+   "smallTargets": [
+    {
+     "label": "Diagnostics",
+     "w": 4,
+     "h": 44
+    }
+   ],
+   "smallTargetCount": 1,
+   "overflowX": false,
+   "idLeaks": [],
+   "fontSizes": [
+    12,
+    15,
+    16,
+    17,
+    26
+   ],
+   "scrollHeight": 844
+  },
+  {
+   "name": "09-benar",
+   "note": "Sesudah jawaban benar",
+   "file": "09-benar.png",
+   "lowContrast": [],
+   "lowContrastCount": 0,
+   "smallTargets": [
+    {
+     "label": "Diagnostics",
+     "w": 4,
+     "h": 44
+    }
+   ],
+   "smallTargetCount": 1,
+   "overflowX": false,
+   "idLeaks": [],
+   "fontSizes": [
+    12,
+    15,
+    16,
+    17,
+    26
+   ],
+   "scrollHeight": 844
+  },
+  {
+   "name": "08-jenis-token-order",
+   "note": "Jenis soal: token-order",
+   "file": "08-jenis-token-order.png",
+   "lowContrast": [
+    {
+     "text": "Hapus",
+     "ratio": 2.92,
+     "need": 4.5,
+     "size": 15,
+     "cls": "SPAN"
+    },
+    {
+     "text": "Periksa",
+     "ratio": 2.08,
+     "need": 4.5,
+     "size": 15,
+     "cls": "primary token-submit-btn"
+    }
+   ],
+   "lowContrastCount": 2,
+   "smallTargets": [
+    {
+     "label": "Diagnostics",
+     "w": 4,
+     "h": 44
+    }
+   ],
+   "smallTargetCount": 1,
+   "overflowX": false,
+   "idLeaks": [],
+   "fontSizes": [
+    11,
+    12,
+    14,
+    15,
+    16,
+    26
+   ],
+   "scrollHeight": 844
+  },
+  {
+   "name": "08-jenis-video-grammar",
+   "note": "Jenis soal: video-grammar",
+   "file": "08-jenis-video-grammar.png",
+   "lowContrast": [],
+   "lowContrastCount": 0,
+   "smallTargets": [
+    {
+     "label": "Diagnostics",
+     "w": 4,
+     "h": 44
+    }
+   ],
+   "smallTargetCount": 1,
+   "overflowX": false,
+   "idLeaks": [],
+   "fontSizes": [
+    12,
+    15,
+    16,
+    17,
+    26
+   ],
+   "scrollHeight": 955
+  },
+  {
+   "name": "10-hasil",
+   "note": "Layar hasil sesi",
+   "file": "10-hasil.png",
+   "lowContrast": [
+    {
+     "text": "SESI SELESAI · MANTAP",
+     "ratio": 1.32,
+     "need": 4.5,
+     "size": 12,
+     "cls": "modal-mark"
+    },
+    {
+     "text": "+2",
+     "ratio": 1.31,
+     "need": 4.5,
+     "size": 14,
+     "cls": "result-reward-chip is-gem"
+    },
+    {
+     "text": "9x Combo!",
+     "ratio": 1.31,
+     "need": 4.5,
+     "size": 14,
+     "cls": "result-reward-chip is-combo"
+    },
+    {
+     "text": "+50%",
+     "ratio": 1,
+     "need": 4.5,
+     "size": 15,
+     "cls": "B"
+    },
+    {
+     "text": "Lihat rincian sesi",
+     "ratio": 2.56,
+     "need": 4.5,
+     "size": 14,
+     "cls": "SUMMARY"
+    }
+   ],
+   "lowContrastCount": 5,
+   "smallTargets": [
+    {
+     "label": "Diagnostics",
+     "w": 4,
+     "h": 44
+    }
+   ],
+   "smallTargetCount": 1,
+   "overflowX": false,
+   "idLeaks": [],
+   "fontSizes": [
+    12,
+    14,
+    15,
+    16,
+    26,
+    54
+   ],
+   "scrollHeight": 854
+  },
+  {
+   "name": "10b-hasil-full",
+   "note": "Layar hasil sesi (seluruh halaman)",
+   "file": "10b-hasil-full.png",
+   "lowContrast": [
+    {
+     "text": "SESI SELESAI · MANTAP",
+     "ratio": 1.32,
+     "need": 4.5,
+     "size": 12,
+     "cls": "modal-mark"
+    },
+    {
+     "text": "+2",
+     "ratio": 1.31,
+     "need": 4.5,
+     "size": 14,
+     "cls": "result-reward-chip is-gem"
+    },
+    {
+     "text": "9x Combo!",
+     "ratio": 1.31,
+     "need": 4.5,
+     "size": 14,
+     "cls": "result-reward-chip is-combo"
+    },
+    {
+     "text": "+50%",
+     "ratio": 1,
+     "need": 4.5,
+     "size": 15,
+     "cls": "B"
+    },
+    {
+     "text": "Lihat rincian sesi",
+     "ratio": 2.56,
+     "need": 4.5,
+     "size": 14,
+     "cls": "SUMMARY"
+    }
+   ],
+   "lowContrastCount": 5,
+   "smallTargets": [
+    {
+     "label": "Diagnostics",
+     "w": 4,
+     "h": 44
+    }
+   ],
+   "smallTargetCount": 1,
+   "overflowX": false,
+   "idLeaks": [],
+   "fontSizes": [
+    12,
+    14,
+    15,
+    16,
+    26,
+    54
+   ],
+   "scrollHeight": 854
+  },
+  {
+   "name": "11-th-tur",
+   "note": "Tur pengenalan muncul di atas layar",
+   "file": "11-th-tur.png",
+   "lowContrast": [],
+   "lowContrastCount": 0,
+   "smallTargets": [
+    {
+     "label": "เปลี่ยนระดับการเรียน",
+     "w": 87,
+     "h": 32
+    },
+    {
+     "label": "สอบเลื่อนระดับ A1 เปิดหน้าต่างการสอบ",
+     "w": 118,
+     "h": 32
+    },
+    {
+     "label": "เซสชันสายฟ้า: 20 ข้อ",
+     "w": 151,
+     "h": 32
+    },
+    {
+     "label": "ห้องทดลองวิดีโอไวยากรณ์",
+     "w": 175,
+     "h": 32
+    },
+    {
+     "label": "ดูแบบรายการ",
+     "w": 113,
+     "h": 32
+    },
+    {
+     "label": "เปิดบทเรียน",
+     "w": 117,
+     "h": 32
+    }
+   ],
+   "smallTargetCount": 6,
+   "overflowX": false,
+   "idLeaks": [],
+   "fontSizes": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16
+   ],
+   "scrollHeight": 2251
+  },
+  {
+   "name": "11-th-ritme",
+   "note": "Modal \"Pilih Ritme Belajarmu\" (kunjungan pertama ke Grammar)",
+   "file": "11-th-ritme.png",
+   "lowContrast": [],
+   "lowContrastCount": 0,
+   "smallTargets": [
+    {
+     "label": "เปลี่ยนระดับการเรียน",
+     "w": 87,
+     "h": 32
+    },
+    {
+     "label": "สอบเลื่อนระดับ A1 เปิดหน้าต่างการสอบ",
+     "w": 118,
+     "h": 32
+    },
+    {
+     "label": "เซสชันสายฟ้า: 20 ข้อ",
+     "w": 151,
+     "h": 32
+    },
+    {
+     "label": "ห้องทดลองวิดีโอไวยากรณ์",
+     "w": 175,
+     "h": 32
+    },
+    {
+     "label": "ดูแบบรายการ",
+     "w": 113,
+     "h": 32
+    },
+    {
+     "label": "เปิดบทเรียน",
+     "w": 117,
+     "h": 32
+    }
+   ],
+   "smallTargetCount": 6,
+   "overflowX": false,
+   "idLeaks": [],
+   "fontSizes": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16
+   ],
+   "scrollHeight": 2251
+  },
+  {
+   "name": "11-th-grammar-hub",
+   "note": "Grammar Hub",
+   "file": "11-th-grammar-hub.png",
+   "lowContrast": [],
+   "lowContrastCount": 0,
+   "smallTargets": [
+    {
+     "label": "เปลี่ยนระดับการเรียน",
+     "w": 87,
+     "h": 32
+    },
+    {
+     "label": "สอบเลื่อนระดับ A1 เปิดหน้าต่างการสอบ",
+     "w": 118,
+     "h": 32
+    },
+    {
+     "label": "เซสชันสายฟ้า: 20 ข้อ",
+     "w": 151,
+     "h": 32
+    },
+    {
+     "label": "ห้องทดลองวิดีโอไวยากรณ์",
+     "w": 175,
+     "h": 32
+    },
+    {
+     "label": "ดูแบบรายการ",
+     "w": 113,
+     "h": 32
+    },
+    {
+     "label": "เปิดบทเรียน",
+     "w": 117,
+     "h": 32
+    }
+   ],
+   "smallTargetCount": 6,
+   "overflowX": false,
+   "idLeaks": [],
+   "fontSizes": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16
+   ],
+   "scrollHeight": 2251
+  },
+  {
+   "name": "11-th-buka-materi",
+   "note": "Sesudah mengetuk \"Buka materi\"",
+   "file": "11-th-buka-materi.png",
+   "lowContrast": [],
+   "lowContrastCount": 0,
+   "smallTargets": [
+    {
+     "label": "เปลี่ยนระดับการเรียน",
+     "w": 87,
+     "h": 32
+    },
+    {
+     "label": "สอบเลื่อนระดับ A1 เปิดหน้าต่างการสอบ",
+     "w": 118,
+     "h": 32
+    },
+    {
+     "label": "เซสชันสายฟ้า: 20 ข้อ",
+     "w": 151,
+     "h": 32
+    },
+    {
+     "label": "ห้องทดลองวิดีโอไวยากรณ์",
+     "w": 175,
+     "h": 32
+    },
+    {
+     "label": "ดูแบบรายการ",
+     "w": 113,
+     "h": 32
+    },
+    {
+     "label": "เปิดบทเรียน",
+     "w": 117,
+     "h": 32
+    }
+   ],
+   "smallTargetCount": 6,
+   "overflowX": false,
+   "idLeaks": [],
+   "fontSizes": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16
+   ],
+   "scrollHeight": 2251
+  },
+  {
+   "name": "11-th-quest-1",
+   "note": "FIEZEL QUEST tahap 1",
+   "file": "11-th-quest-1.png",
+   "lowContrast": [],
+   "lowContrastCount": 0,
+   "smallTargets": [
+    {
+     "label": "เปลี่ยนระดับการเรียน",
+     "w": 87,
+     "h": 32
+    },
+    {
+     "label": "สอบเลื่อนระดับ A1 เปิดหน้าต่างการสอบ",
+     "w": 118,
+     "h": 32
+    },
+    {
+     "label": "เซสชันสายฟ้า: 20 ข้อ",
+     "w": 151,
+     "h": 32
+    },
+    {
+     "label": "ห้องทดลองวิดีโอไวยากรณ์",
+     "w": 175,
+     "h": 32
+    },
+    {
+     "label": "ดูแบบรายการ",
+     "w": 113,
+     "h": 32
+    },
+    {
+     "label": "เปิดบทเรียน",
+     "w": 117,
+     "h": 32
+    }
+   ],
+   "smallTargetCount": 6,
+   "overflowX": false,
+   "idLeaks": [],
+   "fontSizes": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16
+   ],
+   "scrollHeight": 2251
+  },
+  {
+   "name": "11-th-quest-2",
+   "note": "FIEZEL QUEST tahap 2",
+   "file": "11-th-quest-2.png",
+   "lowContrast": [],
+   "lowContrastCount": 0,
+   "smallTargets": [
+    {
+     "label": "เปลี่ยนระดับการเรียน",
+     "w": 87,
+     "h": 32
+    },
+    {
+     "label": "สอบเลื่อนระดับ A1 เปิดหน้าต่างการสอบ",
+     "w": 118,
+     "h": 32
+    },
+    {
+     "label": "เซสชันสายฟ้า: 20 ข้อ",
+     "w": 151,
+     "h": 32
+    },
+    {
+     "label": "ห้องทดลองวิดีโอไวยากรณ์",
+     "w": 175,
+     "h": 32
+    },
+    {
+     "label": "ดูแบบรายการ",
+     "w": 113,
+     "h": 32
+    },
+    {
+     "label": "เปิดบทเรียน",
+     "w": 117,
+     "h": 32
+    },
+    {
+     "label": "is",
+     "w": 43,
+     "h": 48
+    }
+   ],
+   "smallTargetCount": 7,
+   "overflowX": false,
+   "idLeaks": [],
+   "fontSizes": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16
+   ],
+   "scrollHeight": 2251
+  },
+  {
+   "name": "11-th-quest-2-tersusun",
+   "note": "FIEZEL QUEST: kalimat tersusun, sebelum diperiksa",
+   "file": "11-th-quest-2-tersusun.png",
+   "lowContrast": [],
+   "lowContrastCount": 0,
+   "smallTargets": [
+    {
+     "label": "เปลี่ยนระดับการเรียน",
+     "w": 87,
+     "h": 32
+    },
+    {
+     "label": "สอบเลื่อนระดับ A1 เปิดหน้าต่างการสอบ",
+     "w": 118,
+     "h": 32
+    },
+    {
+     "label": "เซสชันสายฟ้า: 20 ข้อ",
+     "w": 151,
+     "h": 32
+    },
+    {
+     "label": "ห้องทดลองวิดีโอไวยากรณ์",
+     "w": 175,
+     "h": 32
+    },
+    {
+     "label": "ดูแบบรายการ",
+     "w": 113,
+     "h": 32
+    },
+    {
+     "label": "เปิดบทเรียน",
+     "w": 117,
+     "h": 32
+    },
+    {
+     "label": "is",
+     "w": 43,
+     "h": 48
+    }
+   ],
+   "smallTargetCount": 7,
+   "overflowX": false,
+   "idLeaks": [],
+   "fontSizes": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16
+   ],
+   "scrollHeight": 2251
+  },
+  {
+   "name": "11-th-quest-v",
+   "note": "FIEZEL QUEST tahap menang",
+   "file": "11-th-quest-v.png",
+   "lowContrast": [],
+   "lowContrastCount": 0,
+   "smallTargets": [
+    {
+     "label": "เปลี่ยนระดับการเรียน",
+     "w": 87,
+     "h": 32
+    },
+    {
+     "label": "สอบเลื่อนระดับ A1 เปิดหน้าต่างการสอบ",
+     "w": 118,
+     "h": 32
+    },
+    {
+     "label": "เซสชันสายฟ้า: 20 ข้อ",
+     "w": 151,
+     "h": 32
+    },
+    {
+     "label": "ห้องทดลองวิดีโอไวยากรณ์",
+     "w": 175,
+     "h": 32
+    },
+    {
+     "label": "ดูแบบรายการ",
+     "w": 113,
+     "h": 32
+    },
+    {
+     "label": "เปิดบทเรียน",
+     "w": 117,
+     "h": 32
+    }
+   ],
+   "smallTargetCount": 6,
+   "overflowX": false,
+   "idLeaks": [],
+   "fontSizes": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16
+   ],
+   "scrollHeight": 2251
+  },
+  {
+   "name": "11-th-sesudah-quest",
+   "note": "Sesudah FIEZEL QUEST selesai",
+   "file": "11-th-sesudah-quest.png",
+   "lowContrast": [],
+   "lowContrastCount": 0,
+   "smallTargets": [
+    {
+     "label": "เปลี่ยนระดับการเรียน",
+     "w": 87,
+     "h": 32
+    },
+    {
+     "label": "กลับไปหน้ารายการบทเรียน",
+     "w": 218,
+     "h": 40
+    },
+    {
+     "label": "เกี่ยวกับแบบฝึกนี้",
+     "w": 40,
+     "h": 40
+    },
+    {
+     "label": "Diagnostics",
+     "w": 4,
+     "h": 44
+    }
+   ],
+   "smallTargetCount": 4,
+   "overflowX": false,
+   "idLeaks": [],
+   "fontSizes": [
+    11,
+    14,
+    15,
+    16,
+    18,
+    26
+   ],
+   "scrollHeight": 844
+  },
+  {
+   "name": "11-th-materi",
+   "note": "Kartu materi pelajaran",
+   "file": "11-th-materi.png",
+   "lowContrast": [],
+   "lowContrastCount": 0,
+   "smallTargets": [
+    {
+     "label": "เปลี่ยนระดับการเรียน",
+     "w": 87,
+     "h": 32
+    },
+    {
+     "label": "กลับไปหน้ารายการบทเรียน",
+     "w": 218,
+     "h": 40
+    },
+    {
+     "label": "เกี่ยวกับแบบฝึกนี้",
+     "w": 40,
+     "h": 40
+    },
+    {
+     "label": "Diagnostics",
+     "w": 4,
+     "h": 44
+    }
+   ],
+   "smallTargetCount": 4,
+   "overflowX": false,
+   "idLeaks": [],
+   "fontSizes": [
+    11,
+    14,
+    15,
+    16,
+    18,
+    26
+   ],
+   "scrollHeight": 844
+  },
+  {
+   "name": "13-th-soal",
+   "note": "Soal (th)",
+   "file": "13-th-soal.png",
+   "lowContrast": [],
+   "lowContrastCount": 0,
+   "smallTargets": [
+    {
+     "label": "Diagnostics",
+     "w": 4,
+     "h": 44
+    }
+   ],
+   "smallTargetCount": 1,
+   "overflowX": false,
+   "idLeaks": [],
+   "fontSizes": [
+    12,
+    15,
+    16,
+    17,
+    26
+   ],
+   "scrollHeight": 844
+  },
+  {
+   "name": "13-th-salah",
+   "note": "Salah pertama (th)",
+   "file": "13-th-salah.png",
+   "lowContrast": [],
+   "lowContrastCount": 0,
+   "smallTargets": [
+    {
+     "label": "Diagnostics",
+     "w": 4,
+     "h": 44
+    }
+   ],
+   "smallTargetCount": 1,
+   "overflowX": false,
+   "idLeaks": [],
+   "fontSizes": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17
+   ],
+   "scrollHeight": 1309
+  },
+  {
+   "name": "14-th-pembahasan",
+   "note": "Pembahasan (th)",
+   "file": "14-th-pembahasan.png",
+   "lowContrast": [],
+   "lowContrastCount": 0,
+   "smallTargets": [],
+   "smallTargetCount": 0,
+   "overflowX": false,
+   "idLeaks": [],
+   "fontSizes": [
+    13,
+    14,
+    15,
+    16
+   ],
+   "scrollHeight": 1892
+  },
+  {
+   "name": "15-gelap-tur",
+   "note": "Tur pengenalan muncul di atas layar",
+   "file": "15-gelap-tur.png",
+   "lowContrast": [
+    {
+     "text": "KelasKu",
+     "ratio": 3,
+     "need": 4.5,
+     "size": 10,
+     "cls": "kelasku-wordmark"
+    }
+   ],
+   "lowContrastCount": 1,
+   "smallTargets": [
+    {
+     "label": "Ganti level belajar",
+     "w": 84,
+     "h": 32
+    },
+    {
+     "label": "Ujian Naik Level A1. Buka panel ujian.",
+     "w": 129,
+     "h": 32
+    },
+    {
+     "label": "Sesi Kilat: 20 soal",
+     "w": 141,
+     "h": 32
+    },
+    {
+     "label": "Video Grammar Lab",
+     "w": 154,
+     "h": 32
+    },
+    {
+     "label": "Lihat daftar",
+     "w": 109,
+     "h": 32
+    },
+    {
+     "label": "Buka materi",
+     "w": 127,
+     "h": 32
+    }
+   ],
+   "smallTargetCount": 6,
+   "overflowX": false,
+   "idLeaks": [],
+   "fontSizes": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16
+   ],
+   "scrollHeight": 2371
+  },
+  {
+   "name": "15-gelap-ritme",
+   "note": "Modal \"Pilih Ritme Belajarmu\" (kunjungan pertama ke Grammar)",
+   "file": "15-gelap-ritme.png",
+   "lowContrast": [
+    {
+     "text": "KelasKu",
+     "ratio": 3,
+     "need": 4.5,
+     "size": 10,
+     "cls": "kelasku-wordmark"
+    }
+   ],
+   "lowContrastCount": 1,
+   "smallTargets": [
+    {
+     "label": "Ganti level belajar",
+     "w": 84,
+     "h": 32
+    },
+    {
+     "label": "Ujian Naik Level A1. Buka panel ujian.",
+     "w": 129,
+     "h": 32
+    },
+    {
+     "label": "Sesi Kilat: 20 soal",
+     "w": 141,
+     "h": 32
+    },
+    {
+     "label": "Video Grammar Lab",
+     "w": 154,
+     "h": 32
+    },
+    {
+     "label": "Lihat daftar",
+     "w": 109,
+     "h": 32
+    },
+    {
+     "label": "Buka materi",
+     "w": 127,
+     "h": 32
+    }
+   ],
+   "smallTargetCount": 6,
+   "overflowX": false,
+   "idLeaks": [],
+   "fontSizes": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16
+   ],
+   "scrollHeight": 2371
+  },
+  {
+   "name": "15-gelap-grammar-hub",
+   "note": "Grammar Hub",
+   "file": "15-gelap-grammar-hub.png",
+   "lowContrast": [
+    {
+     "text": "KelasKu",
+     "ratio": 3,
+     "need": 4.5,
+     "size": 10,
+     "cls": "kelasku-wordmark"
+    }
+   ],
+   "lowContrastCount": 1,
+   "smallTargets": [
+    {
+     "label": "Ganti level belajar",
+     "w": 84,
+     "h": 32
+    },
+    {
+     "label": "Ujian Naik Level A1. Buka panel ujian.",
+     "w": 129,
+     "h": 32
+    },
+    {
+     "label": "Sesi Kilat: 20 soal",
+     "w": 141,
+     "h": 32
+    },
+    {
+     "label": "Video Grammar Lab",
+     "w": 154,
+     "h": 32
+    },
+    {
+     "label": "Lihat daftar",
+     "w": 109,
+     "h": 32
+    },
+    {
+     "label": "Buka materi",
+     "w": 127,
+     "h": 32
+    }
+   ],
+   "smallTargetCount": 6,
+   "overflowX": false,
+   "idLeaks": [],
+   "fontSizes": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16
+   ],
+   "scrollHeight": 2371
+  },
+  {
+   "name": "15-gelap-buka-materi",
+   "note": "Sesudah mengetuk \"Buka materi\"",
+   "file": "15-gelap-buka-materi.png",
+   "lowContrast": [
+    {
+     "text": "KelasKu",
+     "ratio": 3,
+     "need": 4.5,
+     "size": 10,
+     "cls": "kelasku-wordmark"
+    }
+   ],
+   "lowContrastCount": 1,
+   "smallTargets": [
+    {
+     "label": "Ganti level belajar",
+     "w": 84,
+     "h": 32
+    },
+    {
+     "label": "Ujian Naik Level A1. Buka panel ujian.",
+     "w": 129,
+     "h": 32
+    },
+    {
+     "label": "Sesi Kilat: 20 soal",
+     "w": 141,
+     "h": 32
+    },
+    {
+     "label": "Video Grammar Lab",
+     "w": 154,
+     "h": 32
+    },
+    {
+     "label": "Lihat daftar",
+     "w": 109,
+     "h": 32
+    },
+    {
+     "label": "Buka materi",
+     "w": 127,
+     "h": 32
+    }
+   ],
+   "smallTargetCount": 6,
+   "overflowX": false,
+   "idLeaks": [],
+   "fontSizes": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16
+   ],
+   "scrollHeight": 2371
+  },
+  {
+   "name": "15-gelap-quest-1",
+   "note": "FIEZEL QUEST tahap 1",
+   "file": "15-gelap-quest-1.png",
+   "lowContrast": [
+    {
+     "text": "KelasKu",
+     "ratio": 3,
+     "need": 4.5,
+     "size": 10,
+     "cls": "kelasku-wordmark"
+    }
+   ],
+   "lowContrastCount": 1,
+   "smallTargets": [
+    {
+     "label": "Ganti level belajar",
+     "w": 84,
+     "h": 32
+    },
+    {
+     "label": "Ujian Naik Level A1. Buka panel ujian.",
+     "w": 129,
+     "h": 32
+    },
+    {
+     "label": "Sesi Kilat: 20 soal",
+     "w": 141,
+     "h": 32
+    },
+    {
+     "label": "Video Grammar Lab",
+     "w": 154,
+     "h": 32
+    },
+    {
+     "label": "Lihat daftar",
+     "w": 109,
+     "h": 32
+    },
+    {
+     "label": "Buka materi",
+     "w": 127,
+     "h": 32
+    }
+   ],
+   "smallTargetCount": 6,
+   "overflowX": false,
+   "idLeaks": [],
+   "fontSizes": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16
+   ],
+   "scrollHeight": 2371
+  },
+  {
+   "name": "15-gelap-quest-2",
+   "note": "FIEZEL QUEST tahap 2",
+   "file": "15-gelap-quest-2.png",
+   "lowContrast": [
+    {
+     "text": "KelasKu",
+     "ratio": 3,
+     "need": 4.5,
+     "size": 10,
+     "cls": "kelasku-wordmark"
+    }
+   ],
+   "lowContrastCount": 1,
+   "smallTargets": [
+    {
+     "label": "Ganti level belajar",
+     "w": 84,
+     "h": 32
+    },
+    {
+     "label": "Ujian Naik Level A1. Buka panel ujian.",
+     "w": 129,
+     "h": 32
+    },
+    {
+     "label": "Sesi Kilat: 20 soal",
+     "w": 141,
+     "h": 32
+    },
+    {
+     "label": "Video Grammar Lab",
+     "w": 154,
+     "h": 32
+    },
+    {
+     "label": "Lihat daftar",
+     "w": 109,
+     "h": 32
+    },
+    {
+     "label": "Buka materi",
+     "w": 127,
+     "h": 32
+    },
+    {
+     "label": "is",
+     "w": 43,
+     "h": 48
+    }
+   ],
+   "smallTargetCount": 7,
+   "overflowX": false,
+   "idLeaks": [],
+   "fontSizes": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16
+   ],
+   "scrollHeight": 2371
+  },
+  {
+   "name": "15-gelap-quest-2-tersusun",
+   "note": "FIEZEL QUEST: kalimat tersusun, sebelum diperiksa",
+   "file": "15-gelap-quest-2-tersusun.png",
+   "lowContrast": [
+    {
+     "text": "KelasKu",
+     "ratio": 3,
+     "need": 4.5,
+     "size": 10,
+     "cls": "kelasku-wordmark"
+    }
+   ],
+   "lowContrastCount": 1,
+   "smallTargets": [
+    {
+     "label": "Ganti level belajar",
+     "w": 84,
+     "h": 32
+    },
+    {
+     "label": "Ujian Naik Level A1. Buka panel ujian.",
+     "w": 129,
+     "h": 32
+    },
+    {
+     "label": "Sesi Kilat: 20 soal",
+     "w": 141,
+     "h": 32
+    },
+    {
+     "label": "Video Grammar Lab",
+     "w": 154,
+     "h": 32
+    },
+    {
+     "label": "Lihat daftar",
+     "w": 109,
+     "h": 32
+    },
+    {
+     "label": "Buka materi",
+     "w": 127,
+     "h": 32
+    },
+    {
+     "label": "is",
+     "w": 43,
+     "h": 48
+    }
+   ],
+   "smallTargetCount": 7,
+   "overflowX": false,
+   "idLeaks": [],
+   "fontSizes": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16
+   ],
+   "scrollHeight": 2371
+  },
+  {
+   "name": "15-gelap-quest-v",
+   "note": "FIEZEL QUEST tahap menang",
+   "file": "15-gelap-quest-v.png",
+   "lowContrast": [
+    {
+     "text": "KelasKu",
+     "ratio": 3,
+     "need": 4.5,
+     "size": 10,
+     "cls": "kelasku-wordmark"
+    }
+   ],
+   "lowContrastCount": 1,
+   "smallTargets": [
+    {
+     "label": "Ganti level belajar",
+     "w": 84,
+     "h": 32
+    },
+    {
+     "label": "Ujian Naik Level A1. Buka panel ujian.",
+     "w": 129,
+     "h": 32
+    },
+    {
+     "label": "Sesi Kilat: 20 soal",
+     "w": 141,
+     "h": 32
+    },
+    {
+     "label": "Video Grammar Lab",
+     "w": 154,
+     "h": 32
+    },
+    {
+     "label": "Lihat daftar",
+     "w": 109,
+     "h": 32
+    },
+    {
+     "label": "Buka materi",
+     "w": 127,
+     "h": 32
+    }
+   ],
+   "smallTargetCount": 6,
+   "overflowX": false,
+   "idLeaks": [],
+   "fontSizes": [
+    11,
+    12,
+    13,
+    14,
+    15,
+    16
+   ],
+   "scrollHeight": 2371
+  },
+  {
+   "name": "15-gelap-sesudah-quest",
+   "note": "Sesudah FIEZEL QUEST selesai",
+   "file": "15-gelap-sesudah-quest.png",
+   "lowContrast": [
+    {
+     "text": "She called me",
+     "ratio": 1,
+     "need": 4.5,
+     "size": 15,
+     "cls": "B"
+    },
+    {
+     "text": "The teacher helped her",
+     "ratio": 1,
+     "need": 4.5,
+     "size": 15,
+     "cls": "B"
+    },
+    {
+     "text": "her bag",
+     "ratio": 1,
+     "need": 4.5,
+     "size": 15,
+     "cls": "B"
+    },
+    {
+     "text": "my name",
+     "ratio": 1,
+     "need": 4.5,
+     "size": 15,
+     "cls": "B"
+    },
+    {
+     "text": "This bag is hers",
+     "ratio": 1,
+     "need": 4.5,
+     "size": 15,
+     "cls": "B"
+    },
+    {
+     "text": "RUMUS KILAT",
+     "ratio": 1,
+     "need": 4.5,
+     "size": 15,
+     "cls": "B"
+    },
+    {
+     "text": "I, He, She, We, They",
+     "ratio": 1,
+     "need": 4.5,
+     "size": 15,
+     "cls": "B"
+    },
+    {
+     "text": "me, him, her, us, them",
+     "ratio": 1,
+     "need": 4.5,
+     "size": 15,
+     "cls": "B"
+    },
+    {
+     "text": "my, your, his, her, their",
+     "ratio": 1,
+     "need": 4.5,
+     "size": 15,
+     "cls": "B"
+    },
+    {
+     "text": "mine, hers, ours",
+     "ratio": 1,
+     "need": 4.5,
+     "size": 15,
+     "cls": "B"
+    },
+    {
+     "text": "KelasKu",
+     "ratio": 3,
+     "need": 4.5,
+     "size": 10,
+     "cls": "kelasku-wordmark"
+    }
+   ],
+   "lowContrastCount": 11,
+   "smallTargets": [
+    {
+     "label": "Ganti level belajar",
+     "w": 84,
+     "h": 32
+    },
+    {
+     "label": "Kembali ke daftar materi",
+     "w": 219,
+     "h": 40
+    },
+    {
+     "label": "Tentang latihan ini",
+     "w": 40,
+     "h": 40
+    },
+    {
+     "label": "Diagnostics",
+     "w": 4,
+     "h": 44
+    }
+   ],
+   "smallTargetCount": 4,
+   "overflowX": false,
+   "idLeaks": [],
+   "fontSizes": [
+    11,
+    14,
+    15,
+    16,
+    18,
+    26
+   ],
+   "scrollHeight": 1116
+  },
+  {
+   "name": "15-gelap-materi",
+   "note": "Kartu materi pelajaran",
+   "file": "15-gelap-materi.png",
+   "lowContrast": [
+    {
+     "text": "She called me",
+     "ratio": 1,
+     "need": 4.5,
+     "size": 15,
+     "cls": "B"
+    },
+    {
+     "text": "The teacher helped her",
+     "ratio": 1,
+     "need": 4.5,
+     "size": 15,
+     "cls": "B"
+    },
+    {
+     "text": "her bag",
+     "ratio": 1,
+     "need": 4.5,
+     "size": 15,
+     "cls": "B"
+    },
+    {
+     "text": "my name",
+     "ratio": 1,
+     "need": 4.5,
+     "size": 15,
+     "cls": "B"
+    },
+    {
+     "text": "This bag is hers",
+     "ratio": 1,
+     "need": 4.5,
+     "size": 15,
+     "cls": "B"
+    },
+    {
+     "text": "RUMUS KILAT",
+     "ratio": 1,
+     "need": 4.5,
+     "size": 15,
+     "cls": "B"
+    },
+    {
+     "text": "I, He, She, We, They",
+     "ratio": 1,
+     "need": 4.5,
+     "size": 15,
+     "cls": "B"
+    },
+    {
+     "text": "me, him, her, us, them",
+     "ratio": 1,
+     "need": 4.5,
+     "size": 15,
+     "cls": "B"
+    },
+    {
+     "text": "my, your, his, her, their",
+     "ratio": 1,
+     "need": 4.5,
+     "size": 15,
+     "cls": "B"
+    },
+    {
+     "text": "mine, hers, ours",
+     "ratio": 1,
+     "need": 4.5,
+     "size": 15,
+     "cls": "B"
+    },
+    {
+     "text": "KelasKu",
+     "ratio": 3,
+     "need": 4.5,
+     "size": 10,
+     "cls": "kelasku-wordmark"
+    }
+   ],
+   "lowContrastCount": 11,
+   "smallTargets": [
+    {
+     "label": "Ganti level belajar",
+     "w": 84,
+     "h": 32
+    },
+    {
+     "label": "Kembali ke daftar materi",
+     "w": 219,
+     "h": 40
+    },
+    {
+     "label": "Tentang latihan ini",
+     "w": 40,
+     "h": 40
+    },
+    {
+     "label": "Diagnostics",
+     "w": 4,
+     "h": 44
+    }
+   ],
+   "smallTargetCount": 4,
+   "overflowX": false,
+   "idLeaks": [],
+   "fontSizes": [
+    11,
+    14,
+    15,
+    16,
+    18,
+    26
+   ],
+   "scrollHeight": 1116
+  },
+  {
+   "name": "15-gelap-soal",
+   "note": "Soal (sistem gelap)",
+   "file": "15-gelap-soal.png",
+   "lowContrast": [],
+   "lowContrastCount": 0,
+   "smallTargets": [
+    {
+     "label": "Diagnostics",
+     "w": 4,
+     "h": 44
+    }
+   ],
+   "smallTargetCount": 1,
+   "overflowX": false,
+   "idLeaks": [],
+   "fontSizes": [
+    12,
+    15,
+    16,
+    17,
+    26
+   ],
+   "scrollHeight": 844
+  },
+  {
+   "name": "16-gelap-pembahasan",
+   "note": "Pembahasan (sistem gelap)",
+   "file": "16-gelap-pembahasan.png",
+   "lowContrast": [],
+   "lowContrastCount": 0,
+   "smallTargets": [],
+   "smallTargetCount": 0,
+   "overflowX": false,
+   "idLeaks": [],
+   "fontSizes": [
+    13,
+    14,
+    15,
+    16
+   ],
+   "scrollHeight": 2500
+  }
+ ],
+ "bootMs": 4536,
+ "02Tour": true,
+ "02AfterOpen": {
+  "modal": "FIEZEL QUEST Kata ganti subjek, objek, dan bentuk kepemilikan 1 2 3 TAHAP 1 Cocokkan Kata & Artinya 0/5 Ketuk kata bahasa Inggris lalu ketuk artinya yang pas! B",
+  "lessonHero": false
+ },
+ "firstQuestionType": "grammar",
+ "reveal": {
+  "feedback": "Belum pas, santai — kita bedah bareng.\n\nJawabanmu Mine. Jawaban yang paling tepat adalah My.\n\nMengapa kurang tepat? “Mine” dipakai berdiri sendiri di akhir kalimat, bukan sebelum kata benda.\n\nTUNTUNAN LANGKAH\n\nLangkah 1: Lihat kata sesudah titik-titik.\n\nLangkah 2: Pastikan itu kata benda.\n\nLangkah 3: Pilih kata pemilik yang ditaruh sebelum kata benda.\n\nIntinya: “My” pas di sini, sesudah titik-titik ada kata benda “bag”, jadi pakai kata pemilik “My”.\n\nAturannya: Kalau sebagai pelaku di depan kata kerja: Pakai kata ganti subjek (I, you, he, she, it, we, they). Contoh: She called me.\nKalau sebagai penerima setelah kata kerja atau kata depan: Pakai kata ganti objek (me, you, him, her, it, us, them). Contoh: The teacher helped her.\nKalau menyatakan kepemilikan: Pakai “my/your/his/her/its/our/their” kalau ada nama bendanya (contoh: her bag, my name). Tapi kalau berdiri sendiri tanpa nama benda di belakangnya, pakai “mine/yours/his/hers/ours/theirs” (contoh: This bag is hers).\n\n💡 RUMUS KILAT:\nDi depan kata kerja (sebagai pelaku) ➡️ Pakai subjek (I, He, She, We, They).\nDi belakang kata kerja / kata depan (sebagai penerima) ➡️ Pakai objek (me, him, her, us, them).\nDiikuti nama benda ➡️ Pakai my, your, his, her, their (kalau berdiri sendiri tanpa benda, pakai mine, hers, ours).\n\nBandingkan pilihan lain\nTRIK CEPAT INGAT\n“My” selalu ditemani kata benda: “my bag”, “my book”.\nJelaskan dengan cara yang lebih sederhana",
+  "tutor": "Petunjuk GuruPilihan “Me” kurang tepat: “Me” bentuk objek, nggak bisa menunjukkan pemilik tas. Coba pilih opsi lainnya ya!Pegangan ingatanPetunjuknya ada di kata-kata di sekitar bagian yang kosong. Baca lagi pelan-pelan, lalu coba lagi ya.Buntu? Buka pembahasan lengkap",
+  "telemetryShown": false
+ },
+ "questionTypes": [
+  "grammar",
+  "token-order",
+  "video-grammar"
+ ],
+ "result": "SESI SELESAI · MANTAP\nLatihan selesai\n90%\n\n9 dari 10 soal kamu jawab benar langsung.\n\n+2\n9/10\n9x Combo!\n\nKata ganti subjek, objek, dan bentuk kepemilikan\n+50%\n\n8 materi menunggu diulang\n\nLihat rincian sesi\nLanjut Materi Baru\nKembali ke Home",
+ "11-thTour": true,
+ "11-thAfterOpen": {
+  "modal": "FIEZEL QUEST สรรพนามประธาน กรรม และรูปแสดงความเป็นเจ้าของ 1 2 3 ขั้นที่ 1 จับคู่คำศัพท์และความหมาย 0/5 แตะคำภาษาอังกฤษแล้วแตะความหมายที่ถูกต้อง! ภาษาอังกฤษ name",
+  "lessonHero": false
+ },
+ "15-gelapTour": true,
+ "15-gelapAfterOpen": {
+  "modal": "FIEZEL QUEST Kata ganti subjek, objek, dan bentuk kepemilikan 1 2 3 TAHAP 1 Cocokkan Kata & Artinya 0/5 Ketuk kata bahasa Inggris lalu ketuk artinya yang pas! B",
+  "lessonHero": false
+ }
+}

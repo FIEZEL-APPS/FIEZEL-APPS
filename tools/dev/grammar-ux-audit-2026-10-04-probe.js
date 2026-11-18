@@ -105,7 +105,7 @@ function inspectPage(opts) {
     if ((r.width < 44 || r.height < 44) && r.top < innerHeight * 2) smallTargets.push({ label: (el.getAttribute('aria-label') || el.textContent || el.id || el.className || '').trim().slice(0, 40), w: Math.round(r.width), h: Math.round(r.height) });
   }
   const overflowX = document.documentElement.scrollWidth > innerWidth + 1;
-  const idWords = /\b(Pilihan|kurang|tepat|Coba|Petunjuk|Kesempatan|Lanjut|Benar|Salah|Mulai|Soal|Latihan|Pembahasan|Kembali|Penjelasan|Keyakinan|TATA BAHASA|Jawaban|Lihat)\b/;
+  const idWords = /\b(Pilihan|kurang|tepat|Coba|Petunjuk|Kesempatan|Lanjut|Benar|Salah|Mulai|Soal|Latihan|Pembahasan|Kembali|Penjelasan|Keyakinan|TATA BAHASA|Jawaban|Lihat)\b/i;
   const idLeaks = opts && opts.locale === 'th' ? [...new Set([...document.querySelectorAll('body *')].filter(e => visible(e) && [...e.childNodes].some(n => n.nodeType === 3 && idWords.test(n.textContent))).map(e => [...e.childNodes].filter(n => n.nodeType === 3).map(n => n.textContent.trim()).join(' ').slice(0, 60)))].slice(0, 12) : [];
   const fonts = [...new Set([...document.querySelectorAll('#app *')].filter(visible).map(e => Math.round(parseFloat(getComputedStyle(e).fontSize))))].sort((a, b) => a - b);
   return { lowContrast: lowContrast.slice(0, 25), lowContrastCount: lowContrast.length, smallTargets: smallTargets.slice(0, 15), smallTargetCount: smallTargets.length, overflowX, idLeaks, fontSizes: fonts, scrollHeight: document.documentElement.scrollHeight };
@@ -113,8 +113,11 @@ function inspectPage(opts) {
 
 async function run() {
   const pw = loadPlaywright();
-  if (!pw) { console.log('Playwright tidak tersedia'); return; }
-  const browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+  if (!pw) { console.error('Playwright tidak tersedia'); process.exitCode = 1; return; }
+  const browser = await pw.chromium.launch({ args: ['--no-sandbox'], ...(process.env.FIEZEL_CHROMIUM ? { executablePath: process.env.FIEZEL_CHROMIUM } : {}) });
+  /* Galat di tengah alur tidak boleh meninggalkan Chromium hidup: proses browser menahan Node
+     sehingga probe menggantung alih-alih keluar dengan kode galat. */
+  try {
   const shoot = async (page, name, note, opts = {}) => {
     await page.waitForTimeout(450);
     const file = path.join(OUT, name + '.png');
@@ -159,7 +162,7 @@ async function run() {
       window.__q = null;
       const U = self.FiezelGrammarUpgrade, show = U.showGrammarHint, rt = U.renderTokenOrder;
       U.renderTokenOrder = function (q) { window.__q = q; return rt.apply(this, arguments); };
-      window.__peek = () => { const keep = U.showGrammarHint; U.showGrammarHint = q => { window.__q = q; }; document.getElementById('quizGrammarHint')?.click(); U.showGrammarHint = keep; return window.__q; };
+      window.__peek = () => { window.__q = null; const keep = U.showGrammarHint; U.showGrammarHint = q => { window.__q = q; }; document.getElementById('quizGrammarHint')?.click(); U.showGrammarHint = keep; return window.__q; };
     });
     return { context, page };
   };
@@ -236,7 +239,10 @@ async function run() {
     findings[prefix + 'AfterOpen'] = await page.evaluate(() => ({ modal: (document.querySelector('.modal.show')?.innerText || '').replace(/\s+/g, ' ').slice(0, 160), lessonHero: !!document.querySelector('.grammar-start-hero') }));
     await shoot(page, `${prefix}-buka-materi`, 'Sesudah mengetuk "Buka materi"', opts);
     await dismissTour(page, prefix, opts);
-    if (await tap(page, /Mini Game|มินิเกม/)) { await page.waitForTimeout(1300); await playQuest(page, prefix, opts); }
+    /* m025-526: FIEZEL QUEST kini terbuka LANGSUNG sesudah "Buka materi" (tanpa tombol Mini Game).
+       Tanpa cabang pertama ini probe berhenti di tahap 1 dan memotret layar yang sama berulang. */
+    if (await page.evaluate(() => !!(self.FiezelGrammarVocabBridge && FiezelGrammarVocabBridge.getActiveMiniGame()))) await playQuest(page, prefix, opts);
+    else if (await tap(page, /Mini Game|มินิเกม/)) { await page.waitForTimeout(1300); await playQuest(page, prefix, opts); }
     await page.waitForTimeout(800);
     await shoot(page, `${prefix}-sesudah-quest`, 'Sesudah FIEZEL QUEST selesai', opts);
     if (await page.evaluate(() => !!document.querySelector('.grammar-start-hero'))) {
@@ -324,8 +330,10 @@ async function run() {
     }
     await context.close();
   }
-  await browser.close();
   fs.writeFileSync(path.join(OUT, 'findings.json'), JSON.stringify(findings, null, 2));
   console.log('\nselesai ->', path.relative(ROOT, OUT));
+  } finally {
+    await browser.close().catch(() => {});
+  }
 }
 run().catch(e => { console.error(e); process.exitCode = 1; });
