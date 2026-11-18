@@ -382,7 +382,7 @@ async function tryGeminiTts(text, persona) {
   const geminiVoice = persona.geminiVoice || 'Puck';
   for (let attempt = 0; attempt < Math.min(geminiKeys.length, 6); attempt++) {
     const key = geminiKeys[(currentKeyIndex + attempt) % geminiKeys.length];
-    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${encodeURIComponent(key)}`;
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-tts-preview:generateContent?key=${encodeURIComponent(key)}`;
     const payload = {
       contents: [{ role: 'user', parts: [{ text }] }],
       generationConfig: {
@@ -544,9 +544,8 @@ function parseJsonBody(req) {
 
 const LOCAL_COPILOT_MODELS = [
   'gemini-3.5-flash-lite',
-  'gemini-3.8-flash',
-  'gemini-2.5-flash-lite',
-  'gemini-2.5-flash',
+  'gemini-3.1-flash-lite-preview',
+  'gemini-3-flash-preview',
 ];
 const localKeyCooldowns = new Map();
 

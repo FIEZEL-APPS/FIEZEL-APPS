@@ -25,6 +25,9 @@ import {
   SmpVectorIcon,
   TimelineTrackDiagram,
   VisualZoomLightbox,
+  countSpatialTokenHits,
+  resolveSequentialItemFocus,
+  resolveSpatialPanelFocus,
 } from './WhiteboardVisualDiagrams';
 import { MathText, splitMathSegments } from './MathText';
 import { layoutGraphToShapes } from '../lib/dagreLayout';
@@ -227,7 +230,7 @@ const RoughMarkedText: React.FC<{
           strokeWidth,
           multiline: true,
           padding: type === 'circle' ? 5 : 2,
-          animationDuration: 540,
+          animationDuration: 320,
           iterations: type === 'highlight' ? 2 : 1,
         });
         annotationRef.current = ann;
@@ -235,7 +238,7 @@ const RoughMarkedText: React.FC<{
       } catch {
         // Ignore annotation fallback
       }
-    }, 60);
+    }, 12);
 
     return () => {
       window.clearTimeout(timer);
@@ -305,21 +308,18 @@ const RoughContrastScaleDiagram: React.FC<{
   const effP = isLightbox ? 1 : queuedPreview ? 0.04 : progress;
   const terms = queuedPreview ? [] : step.highlightTerms || [];
 
-  const spokenL = String(spokenText || '').toLowerCase();
-  const toksA = `${termA} ${descA}`.toLowerCase().split(/[\s,/():;!?'"-]+/).filter((w) => w.length >= 3);
-  const toksB = `${termB} ${descB}`.toLowerCase().split(/[\s,/():;!?'"-]+/).filter((w) => w.length >= 3);
-  const hitsA = toksA.filter((w) => spokenL.includes(w)).length;
-  const hitsB = toksB.filter((w) => spokenL.includes(w)).length;
-  const focusPan: 'left' | 'right' | 'none' =
-    !isLightbox && !queuedPreview && autoZoom && isActive && isPlaying && effP >= 0.01 && effP < 0.93
-      ? hitsA > hitsB && hitsA > 0
-        ? 'left'
-        : hitsB > hitsA && hitsB > 0
-          ? 'right'
-          : effP < 0.47
-            ? 'left'
-            : 'right'
-      : 'none';
+  const focusPan = resolveSpatialPanelFocus({
+    spokenText,
+    progress: effP,
+    leftText: `${termA} ${descA}`,
+    rightText: `${termB} ${descB}`,
+    isActive,
+    isPlaying,
+    autoZoom,
+    isLightbox,
+    queuedPreview,
+    chronologicalSplit: 0.47,
+  });
 
   const leftIsErrorTrap = /\b(?:salah|keliru|hindari|trap|jebakan|wrong|error)\b|✕|×/i.test(
     `${termA} ${step.leftPanel?.badge || ''}`
@@ -429,7 +429,7 @@ const RoughContrastScaleDiagram: React.FC<{
             <div className="relative z-10 flex items-center gap-1.5 mb-0.5">
               <SmpVectorIcon name={leftIsErrorTrap ? 'warn' : 'target'} color={leftStroke} size={16} />
               <span
-                className="px-2 py-0.5 rounded-full text-white text-[9px] font-black tracking-wider uppercase"
+                className="px-2 py-0.5 rounded-full text-white text-[9px] font-extrabold tracking-wider uppercase"
                 style={{ backgroundColor: leftStroke }}
               >
                 {step.leftPanel?.badge || formatBadgeLabel(termA)}
@@ -463,7 +463,7 @@ const RoughContrastScaleDiagram: React.FC<{
             />
             <div className="relative z-10 flex items-center gap-1.5 mb-0.5">
               <SmpVectorIcon name="star" color="#15803D" size={16} />
-              <span className="px-2 py-0.5 rounded-full bg-[#15803D] text-white text-[9px] font-black tracking-wider uppercase">
+              <span className="px-2 py-0.5 rounded-full bg-[#15803D] text-white text-[9px] font-extrabold tracking-wider uppercase">
                 {step.rightPanel?.badge || formatBadgeLabel(termB)}
               </span>
             </div>
@@ -529,25 +529,16 @@ const RoughSyntaxFlowDiagram: React.FC<{
   const boxRefs = useRef<Array<SVGSVGElement | null>>([]);
   const effP = isLightbox ? 1 : queuedPreview ? 0.04 : progress;
   const terms = queuedPreview ? [] : step.highlightTerms || [];
-  const spokenL = String(spokenText || '').toLowerCase();
-  let matchedNode = -1;
-  if (spokenL.length >= 6) {
-    let bestHits = 0;
-    nodes.forEach((nd, idx) => {
-      const toks = `${nd.role || ''} ${nd.word || ''}`.toLowerCase().split(/[\s,/():;!?'"-]+/).filter((w) => w.length >= 2);
-      const hits = toks.filter((w) => spokenL.includes(w)).length;
-      if (hits > bestHits) {
-        bestHits = hits;
-        matchedNode = idx;
-      }
-    });
-  }
-  const activeNodeIdx =
-    !isLightbox && !queuedPreview && autoZoom && isActive && isPlaying && nodes.length > 0 && effP >= 0.01 && effP < 0.93
-      ? matchedNode >= 0
-        ? matchedNode
-        : Math.min(nodes.length - 1, Math.floor(((effP - 0.01) / 0.92) * nodes.length))
-      : -1;
+  const activeNodeIdx = resolveSequentialItemFocus({
+    spokenText,
+    progress: effP,
+    itemTexts: nodes.map((nd) => `${nd.role || ''} ${nd.word || ''}`),
+    isActive,
+    isPlaying,
+    autoZoom,
+    isLightbox,
+    queuedPreview,
+  });
 
   useEffect(() => {
     boxRefs.current.forEach((svg, idx) => {
@@ -601,6 +592,7 @@ const RoughSyntaxFlowDiagram: React.FC<{
             <React.Fragment key={idx}>
               <div
                 data-wb-box={`syntax-${idx}`}
+                data-wb-panel-focus={isFocused ? 'zoom-in' : activeNodeIdx >= 0 ? 'dim' : 'idle'}
                 className="relative min-w-[140px] max-w-[235px] min-h-[76px] h-auto flex flex-col items-center justify-center px-3.5 py-2 transition-all duration-300"
                 style={{
                   opacity: activeNodeIdx >= 0 && !isFocused ? 0.48 : visible ? 1 : 0.72,
@@ -1145,7 +1137,7 @@ const InteractiveToneWaveWidget: React.FC<{
       </div>
       {step.text && (
         <div className="fz-handwriting-body text-sm text-[#1E293B] bg-[#F8FAFC] px-2.5 py-1 rounded-lg">
-          {step.text} — <span className="text-[#0284C7] font-bold">{step.reading}</span>
+          {step.text}, <span className="text-[#0284C7] font-bold">{step.reading}</span>
         </div>
       )}
     </div>
@@ -1610,35 +1602,37 @@ const RoughFreeformSceneDiagram: React.FC<{
   }, [rawShapes, w]);
 
   const effP = isLightbox ? 1 : queuedPreview ? 0.04 : Math.min(1, Math.max(0, progress));
-  const activeBoxIndices = useMemo(
-    () => shapes.map((sh, i) => (sh._isBoxContainer ? i : -1)).filter((i) => i >= 0),
-    [shapes]
-  );
-  const spokenLower = String(spokenText || '').toLowerCase();
-  let activeShapeIdx = -1;
-  if (!isLightbox && !queuedPreview && autoZoom && isActive && isPlaying && shapes.length > 0 && effP >= 0.01 && effP < 0.93) {
-    let bestHits = 0;
-    let matchedBox = -1;
-    if (spokenLower.length >= 6) {
-      activeBoxIndices.forEach((sIdx) => {
-        const sh = shapes[sIdx];
-        const toks = `${sh._label} ${sh._sub}`.toLowerCase().split(/[\s,/():;!?'"-]+/).filter((w) => w.length >= 2);
-        const hits = toks.filter((w) => spokenLower.includes(w)).length;
-        if (hits > bestHits) {
-          bestHits = hits;
-          matchedBox = sIdx;
-        }
-      });
-    }
-    if (matchedBox >= 0) {
-      activeShapeIdx = matchedBox;
-    } else if (activeBoxIndices.length > 0) {
-      const boxPos = Math.min(activeBoxIndices.length - 1, Math.floor(((effP - 0.01) / 0.92) * activeBoxIndices.length));
-      activeShapeIdx = activeBoxIndices[boxPos];
-    } else {
-      activeShapeIdx = Math.min(shapes.length - 1, Math.floor(((effP - 0.01) / 0.92) * shapes.length));
-    }
-  }
+  const activeBoxIndices = useMemo(() => {
+    const boxes = shapes.map((sh, i) => (sh._isBoxContainer ? i : -1)).filter((i) => i >= 0);
+    // Urutkan urutan baca spasial: Atas -> Bawah (toleransi baris 48px), lalu Kiri -> Kanan
+    return boxes.sort((a, b) => {
+      const sa = shapes[a];
+      const sb = shapes[b];
+      const ay = sa._cy ?? 0;
+      const by = sb._cy ?? 0;
+      if (Math.abs(ay - by) > 48) return ay - by;
+      return (sa._cx ?? 0) - (sb._cx ?? 0);
+    });
+  }, [shapes]);
+  const focusPosIdx = resolveSequentialItemFocus({
+    spokenText,
+    progress: effP,
+    itemTexts:
+      activeBoxIndices.length > 0
+        ? activeBoxIndices.map((sIdx) => `${shapes[sIdx]._label} ${shapes[sIdx]._sub}`)
+        : shapes.map((sh) => `${sh._label} ${sh._sub} ${sh._text}`),
+    isActive,
+    isPlaying,
+    autoZoom,
+    isLightbox,
+    queuedPreview,
+  });
+  const activeShapeIdx =
+    focusPosIdx < 0
+      ? -1
+      : activeBoxIndices.length > 0
+        ? activeBoxIndices[focusPosIdx] ?? -1
+        : focusPosIdx;
   const reachedCount =
     isLightbox || queuedPreview || !isActive || !isPlaying
       ? shapes.length
@@ -1932,14 +1926,14 @@ const RoughFreeformSceneDiagram: React.FC<{
           sy + Math.sin(localT * Math.PI) * 10,
         );
       }
-      const prevAnchor = idx > 0 ? getEndAnchor(shapes[idx - 1]) : [sx - 24, sy];
+      const prevAnchor = penShapeIdx > 0 ? getEndAnchor(shapes[penShapeIdx - 1]) : [sx - 24, sy];
       return toPct(
         prevAnchor[0] + (sx - prevAnchor[0]) * localT,
         prevAnchor[1] + (sy - prevAnchor[1]) * localT,
       );
     }
-    // Phase 0.65..0.98: smooth pointer sweep across drawn shapes while tutor explains
-    const sweepT = Math.min(0.999, Math.max(0, (effP - 0.65) / 0.33));
+    // Phase 0.86..0.98: smooth pointer sweep across drawn shapes while tutor finishes sentence
+    const sweepT = Math.min(0.999, Math.max(0, (effP - 0.86) / 0.12));
     if (shapes.length === 1) {
       const [sx, sy] = getEndAnchor(shapes[0]);
       return toPct(sx + Math.cos(sweepT * Math.PI * 2) * 18, sy + Math.sin(sweepT * Math.PI * 2) * 8);
@@ -2221,12 +2215,21 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
   const onZoomChangeRef = useRef<((z: number) => void) | undefined>(onZoomChange);
   onZoomChangeRef.current = onZoomChange;
 
-  // Track natural unscaled dimensions of canvasInnerRef + viewport container width for layout-safe zooming
+  // Track natural unscaled dimensions of canvasInnerRef + viewport container content width for layout-safe zooming
   useEffect(() => {
     const innerEl = canvasInnerRef.current;
     const containerEl = resolvedBoardContainerRef.current;
     if (typeof ResizeObserver === 'undefined') return;
-    const obs = new ResizeObserver(() => {
+    const measure = () => {
+      if (containerEl) {
+        let hPad = 0;
+        try {
+          const cs = window.getComputedStyle(containerEl);
+          hPad = (parseFloat(cs.paddingLeft || '0') || 0) + (parseFloat(cs.paddingRight || '0') || 0);
+        } catch {}
+        const cw = Math.max(0, Math.round(containerEl.clientWidth - hPad));
+        setContainerWidth((prev) => (prev === cw ? prev : cw));
+      }
       if (innerEl) {
         const w = innerEl.offsetWidth;
         const h = Math.max(innerEl.offsetHeight, innerEl.scrollHeight);
@@ -2236,26 +2239,27 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
           );
         }
       }
-      if (containerEl) {
-        const cw = containerEl.clientWidth;
-        setContainerWidth((prev) => (prev === cw ? prev : cw));
-      }
-    });
+    };
+    measure();
+    const obs = new ResizeObserver(measure);
     if (innerEl) obs.observe(innerEl);
     if (containerEl) obs.observe(containerEl);
     return () => obs.disconnect();
-  }, [resolvedBoardContainerRef, steps.length, plan.boardTitle]);
+  }, [resolvedBoardContainerRef, steps.length, plan.boardTitle, zoomLevel]);
 
-  // Pause auto-scroll briefly on manual scroll, plus support smooth Ctrl/Cmd+Wheel zoom
+  // Pause auto-scroll briefly on real manual scroll intent, plus support smooth Ctrl/Cmd+Wheel zoom
   useEffect(() => {
     const container = resolvedBoardContainerRef.current;
     if (!container) return;
+    let lastScrollTop = container.scrollTop;
+    let lastScrollLeft = container.scrollLeft;
     const markManualIntent = () => {
       userManualScrollUntilRef.current = Date.now() + 4500;
     };
     const handleWheel = (e: WheelEvent) => {
       if ((e.ctrlKey || e.metaKey) && onZoomChangeRef.current) {
         e.preventDefault();
+        programmaticScrollUntilRef.current = Date.now() + 500;
         const delta = e.deltaY < 0 ? 0.1 : -0.1;
         const nextZ =
           Math.round(Math.max(0.75, Math.min(1.6, zoomLevelRef.current + delta)) * 100) / 100;
@@ -2265,8 +2269,13 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
       markManualIntent();
     };
     const handleScroll = () => {
+      const movedY = Math.abs(container.scrollTop - lastScrollTop);
+      const movedX = Math.abs(container.scrollLeft - lastScrollLeft);
+      lastScrollTop = container.scrollTop;
+      lastScrollLeft = container.scrollLeft;
+      if (movedY < 4 && movedX < 4) return;
       if (Date.now() > programmaticScrollUntilRef.current) {
-        // User dragged scrollbar directly
+        // User dragged scrollbar or scrolled manually
         userManualScrollUntilRef.current = Math.max(
           userManualScrollUntilRef.current,
           Date.now() + 3000,
@@ -2285,6 +2294,9 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
 
   const maxBulletByStepRef = useRef<Map<string, number>>(new Map());
   const maxRowByStepRef = useRef<Map<string, number>>(new Map());
+  const prevStepProgByIdRef = useRef<Map<string, number>>(new Map());
+  const prevActiveStepIdxRef = useRef<number>(activeStepIndex);
+  const prevZoomLevelRef = useRef<number>(zoomLevel);
   const cameraGlideRafRef = useRef<number>(0);
 
   // Clear manual scroll lock + monotonic sub-highlight history on Replay or topic change
@@ -2292,13 +2304,36 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
     userManualScrollUntilRef.current = 0;
     maxBulletByStepRef.current.clear();
     maxRowByStepRef.current.clear();
+    prevStepProgByIdRef.current.clear();
   }, [replayNonce, plan.boardTitle, steps.length]);
+
+  // Keep monotonic cursors accurate when jumping backward across steps (e.g. Phase Scrubber rewind)
+  useEffect(() => {
+    if (activeStepIndex < prevActiveStepIdxRef.current) {
+      for (let i = activeStepIndex; i < steps.length; i++) {
+        const st = steps[i];
+        if (st) {
+          maxBulletByStepRef.current.delete(st.id);
+          maxRowByStepRef.current.delete(st.id);
+          prevStepProgByIdRef.current.delete(st.id);
+        }
+      }
+    }
+    prevActiveStepIdxRef.current = activeStepIndex;
+  }, [activeStepIndex, steps]);
 
   // Unified Damped Camera Controller (tracks active card & sub-item smoothly across X and Y without competing observers)
   useEffect(() => {
     if (!autoSpotlight) return;
     const container = resolvedBoardContainerRef.current;
     if (!container || steps.length === 0) return;
+
+    const zoomChanged = Math.abs(prevZoomLevelRef.current - zoomLevel) > 0.005;
+    prevZoomLevelRef.current = zoomLevel;
+    if (zoomChanged) {
+      userManualScrollUntilRef.current = 0;
+      programmaticScrollUntilRef.current = Date.now() + 500;
+    }
 
     const targetIdx = Math.min(Math.max(0, activeStepIndex), steps.length - 1);
     const activeStep = steps[targetIdx];
@@ -2325,33 +2360,43 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
         const tRect = targetEl.getBoundingClientRect();
         if (tRect.height <= 0 || tRect.width <= 0) return;
 
-        const padTop = focusedSub ? 36 : 24;
-        const padBottom = focusedSub ? 48 : 34;
-        const padSide = 22;
+        const padTop = focusedSub ? 28 : 20;
+        const padBottom = focusedSub ? 36 : 28;
+        const padSide = 20;
         const inViewY = tRect.top >= cRect.top + padTop && tRect.bottom <= cRect.bottom - padBottom;
         const inViewX = tRect.left >= cRect.left + padSide && tRect.right <= cRect.right - padSide;
-        if (inViewY && inViewX) return;
+        const maxLeft = Math.max(0, container.scrollWidth - container.clientWidth);
+        if (inViewY && (inViewX || maxLeft <= 8) && !(maxLeft <= 8 && container.scrollLeft > 4)) return;
 
         const maxTop = Math.max(0, container.scrollHeight - container.clientHeight);
-        const maxLeft = Math.max(0, container.scrollWidth - container.clientWidth);
 
         let goalTop = container.scrollTop;
         if (!inViewY) {
           const absTop = tRect.top - cRect.top + container.scrollTop;
-          const desiredOffset = Math.max(24, Math.min(cRect.height * 0.22, cRect.height - tRect.height - 36));
+          const desiredOffset =
+            tRect.height >= cRect.height - 48
+              ? padTop
+              : focusedSub
+                ? Math.max(padTop, Math.min(cRect.height * 0.34, (cRect.height - tRect.height) / 2))
+                : Math.max(padTop, Math.min(cRect.height * 0.22, cRect.height - tRect.height - padBottom));
           goalTop = Math.max(0, Math.min(maxTop, absTop - desiredOffset));
         }
 
-        let goalLeft = container.scrollLeft;
-        if (!inViewX && maxLeft > 8) {
+        let goalLeft = maxLeft <= 8 ? 0 : container.scrollLeft;
+        if (maxLeft > 8 && !inViewX) {
           const absLeft = tRect.left - cRect.left + container.scrollLeft;
-          const desiredX = Math.max(16, Math.min(cRect.width * 0.14, cRect.width - tRect.width - 24));
-          goalLeft = Math.max(0, Math.min(maxLeft, absLeft - desiredX));
+          const absCenterX = absLeft + tRect.width / 2;
+          const centeredLeft = absCenterX - cRect.width / 2;
+          const edgeSafeLeft = absLeft - padSide;
+          goalLeft = Math.max(
+            0,
+            Math.min(maxLeft, tRect.width < cRect.width - padSide * 2 ? centeredLeft : edgeSafeLeft)
+          );
         }
 
         const diffY = Math.abs(goalTop - container.scrollTop);
         const diffX = Math.abs(goalLeft - container.scrollLeft);
-        if (diffY < 24 && diffX < 24) return;
+        if (diffY < 10 && diffX < 10) return;
 
         if (cameraGlideRafRef.current) {
           cancelAnimationFrame(cameraGlideRafRef.current);
@@ -2361,14 +2406,14 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
         const startTop = container.scrollTop;
         const startLeft = container.scrollLeft;
         const startPerf = performance.now();
-        const durationMs = 360;
-        programmaticScrollUntilRef.current = Date.now() + durationMs + 120;
+        const durationMs = 320;
+        programmaticScrollUntilRef.current = Date.now() + durationMs + 140;
 
         const glide = (now: number) => {
           const p = Math.min(1, (now - startPerf) / durationMs);
           const eased = 1 - Math.pow(1 - p, 3);
           container.scrollTop = startTop + (goalTop - startTop) * eased;
-          if (maxLeft > 8) {
+          if (maxLeft > 8 || Math.abs(goalLeft - startLeft) > 2) {
             container.scrollLeft = startLeft + (goalLeft - startLeft) * eased;
           }
           if (p < 1 && Date.now() >= userManualScrollUntilRef.current) {
@@ -2383,14 +2428,17 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
           (window as unknown as { __fzWbLastAutoScroll?: Record<string, unknown> }).__fzWbLastAutoScroll = {
             stepId: activeStep.id,
             stepIndex: targetIdx,
+            focusedSubTag: focusedSub ? focusedSub.getAttribute('data-wb-box') || focusedSub.tagName : null,
             nextScrollTop: Math.round(goalTop),
             nextScrollLeft: Math.round(goalLeft),
             scrollHeight: container.scrollHeight,
             clientHeight: container.clientHeight,
+            scrollWidth: container.scrollWidth,
+            clientWidth: container.clientWidth,
             at: Date.now(),
           };
         } catch {}
-      }, 65);
+      }, 45);
     };
 
     const observer =
@@ -2404,7 +2452,11 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
             }
           })
         : null;
-    observer?.observe(stepEl, { attributes: true, attributeFilter: ['class'], subtree: true });
+    observer?.observe(stepEl, {
+      attributes: true,
+      attributeFilter: ['class', 'data-wb-panel-focus'],
+      subtree: true,
+    });
     scheduleCameraCheck();
 
     return () => {
@@ -2474,6 +2526,9 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
 
   const jumpToPhase = (phaseIdx: number) => {
     userManualScrollUntilRef.current = 0;
+    maxBulletByStepRef.current.clear();
+    maxRowByStepRef.current.clear();
+    prevStepProgByIdRef.current.clear();
     if (phaseIdx <= 0) {
       if (onSelectStepIndex) {
         onSelectStepIndex(0);
@@ -2634,9 +2689,15 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
     const isCompleted = stepIdx < activeStepIndex;
     const isCurrent = stepIdx === activeStepIndex;
     const isQueued = stepIdx > activeStepIndex;
-    // Skala progres penulisan & highlight agar tuntas seirama sampai kata terakhir (0.01..0.95); kartu belum giliran TIDAK pre-render penuh!
+    // Skala progres penulisan & highlight agar mulai instan sejak detik 0 dan tuntas sebelum transisi zoom-out (0..0.92).
     const stepProg = isCompleted ? 1 : isCurrent ? activeStepProgress : 0;
-    const activeRevealP = isCompleted ? 1 : isCurrent ? Math.max(0, Math.min(1, (stepProg - 0.01) / 0.94)) : 0;
+    const prevKnownProg = prevStepProgByIdRef.current.get(step.id) ?? 0;
+    if (isCurrent && stepProg < prevKnownProg - 0.04) {
+      maxBulletByStepRef.current.delete(step.id);
+      maxRowByStepRef.current.delete(step.id);
+    }
+    prevStepProgByIdRef.current.set(step.id, stepProg);
+    const activeRevealP = isCompleted ? 1 : isCurrent ? Math.max(0, Math.min(1, stepProg / 0.92)) : 0;
     const textProg = isQueued ? 0 : activeRevealP;
     const inFocusWindow =
       autoSpotlight && isPlaying && isCurrent && activeStepProgress >= 0.01 && activeStepProgress <= 0.93;
@@ -2645,7 +2706,7 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
     const isDimmedByFocus =
       autoSpotlight && isPlaying && !isCurrent && activeStepProgress >= 0.01 && activeStepProgress <= 0.93;
     const showActivePen =
-      isPlaying && isCurrent && activeStepProgress > 0.01 && activeStepProgress < 0.95;
+      step.kind !== 'checkpoint' && isPlaying && isCurrent && activeStepProgress > 0.01 && activeStepProgress < 0.95;
     const wrapQueued = (node: React.ReactNode) => (
       <div
         key={step.id}
@@ -2659,7 +2720,7 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
         data-wb-step-id={step.id}
         data-wb-step-state={isCompleted ? 'completed' : isCurrent ? 'active' : 'queued'}
         data-wb-auto-zoom={inFocusWindow ? 'in' : isZoomingOutTransition ? 'out' : 'idle'}
-        className={`relative rounded-2xl px-3.5 pt-2.5 pb-9 mx-0.5 border fz-wb-spotlight-card ${
+        className={`relative rounded-2xl px-3.5 pt-2.5 ${step.kind === 'checkpoint' ? 'pb-3.5' : 'pb-9'} mx-0.5 border fz-wb-spotlight-card ${
           isCurrent
             ? inFocusWindow
               ? 'border-[#22C55E]/90 bg-white opacity-100 fz-wb-spotlight-zoom-in'
@@ -2689,7 +2750,7 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
             <AnimatedTutorPenSvg color="#15803D" label={wbPick('Tutor Writing...', 'Tutor Menulis...')} />
           </div>
         )}
-        <div className={isQueued ? (step.kind === 'checkpoint' ? 'opacity-75 transition-opacity duration-300' : 'opacity-25 select-none transition-opacity duration-300') : 'fz-wb-card-enter'}>{node}</div>
+        <div className={isQueued ? (step.kind === 'checkpoint' ? 'opacity-95 focus-within:opacity-100 hover:opacity-100 transition-opacity duration-300' : 'opacity-25 select-none transition-opacity duration-300') : 'fz-wb-card-enter'}>{node}</div>
       </div>
     );
 
@@ -2727,28 +2788,49 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
 
     if (step.kind === 'note') {
       const bullets = (step.bullets || []).map((b) => cleanBracketArtifacts(b)).filter(Boolean);
+      const bulletWeight = (item: string) => {
+        const txt = String(item || '').trim();
+        const words = txt.split(/\s+/).filter(Boolean).length;
+        const pauses = (txt.match(/[,:;—\-()]/g) || []).length;
+        return Math.max(4, words + pauses * 0.45);
+      };
+      const bWeights = bullets.map(bulletWeight);
+      const safeTotalBulletW = Math.max(1, bWeights.reduce((a, b) => a + b, 0));
+      let accBW = 0;
+      const bulletSegs = bWeights.map((w) => {
+        const segStart = accBW / safeTotalBulletW;
+        accBW += w;
+        return {
+          segStart,
+          segLen: Math.max(0.05, w / safeTotalBulletW),
+          segEnd: accBW / safeTotalBulletW,
+        };
+      });
+      let weightedBulletIdx = Math.max(0, bullets.length - 1);
+      for (let bi = 0; bi < bulletSegs.length; bi += 1) {
+        if (activeRevealP <= bulletSegs[bi].segEnd || bi === bulletSegs.length - 1) {
+          weightedBulletIdx = bi;
+          break;
+        }
+      }
       let activeBulletIdx = -1;
       if (inFocusWindow && bullets.length > 0 && stepProg >= 0.01 && stepProg <= 0.93) {
-        const linearIdx = Math.min(bullets.length - 1, Math.floor(((stepProg - 0.01) / 0.92) * bullets.length));
-        const prevIdx = stepProg < 0.04 ? -1 : (maxBulletByStepRef.current.get(step.id) ?? -1);
+        const prevIdx = stepProg < 0.03 ? -1 : (maxBulletByStepRef.current.get(step.id) ?? -1);
         const spokenL = (activeSpokenText || '').toLowerCase();
         let bestIdx = -1;
         let bestHits = 0;
-        if (spokenL.length >= 6) {
+        if (spokenL.length >= 4) {
           bullets.forEach((b, idx) => {
-            if (idx < prevIdx || idx > Math.min(bullets.length - 1, Math.max(linearIdx, Math.max(0, prevIdx + 1)))) return;
-            const words = b
-              .toLowerCase()
-              .split(/[\s,/():;!?'"-]+/)
-              .filter((w) => w.length >= 3 && !/^(yang|dan|atau|untuk|pakai|dengan|dari|pada|ini|itu|adalah|khusus)$/.test(w));
-            const hits = words.filter((w) => spokenL.includes(w)).length;
+            // Batasi pencocokan suara hanya di sekitar jendela bobot aktif agar highlight tidak melompat jauh mendahului tutor
+            if (idx < Math.max(0, prevIdx) || idx > Math.min(bullets.length - 1, Math.max(weightedBulletIdx, Math.max(0, prevIdx)) + 1)) return;
+            const hits = countSpatialTokenHits(spokenL, b);
             if (hits > bestHits) {
               bestHits = hits;
               bestIdx = idx;
             }
           });
         }
-        const candIdx = bestHits >= 2 && bestIdx >= 0 ? bestIdx : linearIdx;
+        const candIdx = bestHits >= 1 && bestIdx >= 0 ? bestIdx : weightedBulletIdx;
         activeBulletIdx = Math.max(prevIdx, Math.min(bullets.length - 1, candIdx));
         maxBulletByStepRef.current.set(step.id, activeBulletIdx);
       }
@@ -2768,25 +2850,8 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
             </div>
           )}
           {bullets.map((b, bIdx) => {
-            const bulletWeight = (item: string) => {
-              const txt = String(item || '').trim();
-              const words = txt.split(/\s+/).filter(Boolean).length;
-              const pauses = (txt.match(/[,:;—\-()]/g) || []).length;
-              return Math.max(4, words + pauses * 0.45);
-            };
-            let totalBulletW = 0;
-            let priorBulletW = 0;
-            let currBulletW = 4;
-            for (let wi = 0; wi < bullets.length; wi += 1) {
-              const w = bulletWeight(bullets[wi]);
-              if (wi < bIdx) priorBulletW += w;
-              if (wi === bIdx) currBulletW = w;
-              totalBulletW += w;
-            }
-            const safeTotalW = Math.max(1, totalBulletW);
-            const segStart = priorBulletW / safeTotalW;
-            const segLen = Math.max(0.05, currBulletW / safeTotalW);
-            const baseP = Math.max(0, Math.min(1, (activeRevealP - segStart) / segLen));
+            const seg = bulletSegs[bIdx] || { segStart: 0, segLen: 1 };
+            const baseP = Math.max(0, Math.min(1, (activeRevealP - seg.segStart) / seg.segLen));
             // Kunci kursor penulisan agar SEIRAMA dengan bullet yang sedang dizoom/diucapkan
             const localP = isQueued
               ? 1
@@ -2795,7 +2860,7 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
                   ? 1
                   : bIdx > activeBulletIdx
                     ? 0
-                    : Math.max(0.22, baseP)
+                    : Math.max(baseP, 0.14)
                 : baseP;
             const isBulletZoomed =
               activeBulletIdx >= 0 &&
@@ -3018,17 +3083,17 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
                 isActive={false}
                 queuedPreview
               />
-            ) : textProg >= 0.82 ? (
+            ) : textProg >= 0.72 ? (
               <RoughMarkedText
                 text={hlPhrase}
                 type="highlight"
                 color={step.highlightColor || 'rgba(125, 211, 252, 0.48)'}
-                show={isCompleted || (isCurrent && textProg >= 0.82)}
+                show={isCompleted || (isCurrent && textProg >= 0.72)}
               />
             ) : (
               <HandwrittenReveal
                 text={hlPhrase}
-                progress={Math.min(1, textProg / 0.82)}
+                progress={Math.min(1, textProg / 0.72)}
                 isActive={isPlaying && isCurrent}
                 highlightTerms={step.highlightTerms}
                 emphasize={inFocusWindow}
@@ -3044,34 +3109,44 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
       const rows = (step.tableRows || [])
         .map((r) => r.map((c) => cleanBracketArtifacts(c)))
         .filter((r) => r.some(Boolean));
-      const totalCells = headers.length + rows.reduce((sum, r) => sum + r.length, 0);
+      const rowWeights = rows.map((r) =>
+        Math.max(4, r.join(' ').split(/\s+/).filter(Boolean).length)
+      );
+      const totalRowW = Math.max(1, rowWeights.reduce((a, b) => a + b, 0));
+      let accRowW = 0;
+      const rowSegs = rowWeights.map((rw) => {
+        const segStart = accRowW / totalRowW;
+        accRowW += rw;
+        return { segStart, segEnd: accRowW / totalRowW, segLen: Math.max(0.05, rw / totalRowW) };
+      });
+      const rowPhaseP = Math.max(0, Math.min(1, (activeRevealP - 0.14) / 0.86));
+      let weightedRowIdx = Math.max(0, rows.length - 1);
+      for (let ri = 0; ri < rowSegs.length; ri += 1) {
+        if (rowPhaseP <= rowSegs[ri].segEnd || ri === rowSegs.length - 1) {
+          weightedRowIdx = ri;
+          break;
+        }
+      }
       let activeRowIdx = -1;
       if (inFocusWindow && rows.length > 0 && stepProg >= 0.02 && stepProg <= 0.93) {
-        const linearRow = Math.min(rows.length - 1, Math.floor(((stepProg - 0.02) / 0.91) * rows.length));
-        const prevRow = stepProg < 0.04 ? -1 : (maxRowByStepRef.current.get(step.id) ?? -1);
+        const prevRow = stepProg < 0.03 ? -1 : (maxRowByStepRef.current.get(step.id) ?? -1);
         const spokenL = (activeSpokenText || '').toLowerCase();
         let bestRow = -1;
         let bestHits = 0;
-        if (spokenL.length >= 6) {
+        if (spokenL.length >= 4) {
           rows.forEach((row, rIdx) => {
-            if (rIdx < prevRow || rIdx > Math.min(rows.length - 1, Math.max(linearRow, Math.max(0, prevRow + 1)))) return;
-            const words = row
-              .join(' ')
-              .toLowerCase()
-              .split(/[\s,/():;!?'"-]+/)
-              .filter((w) => w.length >= 3);
-            const hits = words.filter((w) => spokenL.includes(w)).length;
+            if (rIdx < Math.max(0, prevRow) || rIdx > Math.min(rows.length - 1, Math.max(weightedRowIdx, Math.max(0, prevRow)) + 1)) return;
+            const hits = countSpatialTokenHits(spokenL, row.join(' '));
             if (hits > bestHits) {
               bestHits = hits;
               bestRow = rIdx;
             }
           });
         }
-        const candRow = bestHits >= 2 && bestRow >= 0 ? bestRow : linearRow;
+        const candRow = bestHits >= 1 && bestRow >= 0 ? bestRow : weightedRowIdx;
         activeRowIdx = Math.max(prevRow, Math.min(rows.length - 1, candRow));
         maxRowByStepRef.current.set(step.id, activeRowIdx);
       }
-      let cellCursor = 0;
 
       return wrapQueued(
         <div
@@ -3094,14 +3169,13 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
               <span>Perbesar</span>
             </button>
           </div>
-          <div className="rounded-2xl overflow-hidden border border-[#E2E0D8] bg-white/80 shadow-2xs">
-            <table className="w-full border-collapse text-left">
+          <div className="rounded-2xl overflow-visible border border-[#E2E0D8] bg-white/85 shadow-2xs p-0.5">
+            <table className="w-full border-collapse text-left rounded-xl overflow-visible">
               <thead>
                 <tr className="bg-[#F2F1EC] border-b border-[#E2E0D8]">
                   {headers.map((h, hIdx) => {
-                    const start = (cellCursor / Math.max(1, totalCells)) * 0.25;
-                    const len = Math.max(0.08, (1 / Math.max(1, totalCells)) * 0.65);
-                    cellCursor += 1;
+                    const start = (hIdx / Math.max(1, headers.length)) * 0.14;
+                    const len = Math.max(0.06, 0.14 / Math.max(1, headers.length));
                     const cellP = isQueued ? 1 : Math.max(0, Math.min(1, (activeRevealP - start) / len));
                     return (
                       <th
@@ -3124,6 +3198,8 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
                 {rows.map((row, rIdx) => {
                   const isRowFocused = rIdx === activeRowIdx;
                   const isRowDimmed = activeRowIdx >= 0 && rIdx !== activeRowIdx;
+                  const rSeg = rowSegs[rIdx] || { segStart: 0, segLen: 1 };
+                  const rowLocalP = isQueued ? 1 : Math.max(0, Math.min(1, (rowPhaseP - rSeg.segStart) / rSeg.segLen));
                   return (
                     <tr
                       key={rIdx}
@@ -3132,17 +3208,15 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
                       }`}
                       style={
                         isRowFocused
-                          ? { transform: 'scale(1.04)', transformOrigin: 'left center', opacity: 1 }
+                          ? { transform: 'scale(1.018)', transformOrigin: 'center center', opacity: 1 }
                           : isRowDimmed
-                            ? { opacity: 0.46, transform: 'scale(0.985)', transformOrigin: 'left center' }
+                            ? { opacity: 0.46, transform: 'scale(0.985)', transformOrigin: 'center center' }
                             : undefined
                       }
                     >
                       {row.map((cell, cIdx) => {
-                        const start = cellCursor / Math.max(1, totalCells);
-                        const len = Math.max(0.08, 1 / Math.max(1, totalCells));
-                        cellCursor += 1;
-                        const baseCellP = Math.max(0, Math.min(1, (activeRevealP - start) / len));
+                        const cSpan = 1 / Math.max(1, row.length);
+                        const baseCellP = Math.max(0, Math.min(1, (rowLocalP - cIdx * cSpan) / Math.max(0.18, cSpan)));
                         const cellP = isQueued
                           ? 1
                           : activeRowIdx >= 0
@@ -3150,7 +3224,7 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
                               ? 1
                               : rIdx > activeRowIdx
                                 ? 0
-                                : Math.max(0.28, baseCellP)
+                                : Math.max(baseCellP, 0.16)
                             : baseCellP;
                         return (
                           <td
@@ -3179,8 +3253,25 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
     }
 
     if (step.kind === 'trap_vs_fix') {
-      const focusWrong = inFocusWindow && stepProg >= 0.02 && stepProg < 0.46;
-      const focusRight = inFocusWindow && stepProg >= 0.46 && stepProg <= 0.93;
+      const trapSpoken = String(activeSpokenText || '').toLowerCase();
+      const wrongHits = countSpatialTokenHits(trapSpoken, step.wrongText || '');
+      const rightHits = countSpatialTokenHits(trapSpoken, step.rightText || '');
+      const saysWrongCue = /\b(?:hindari|salah|keliru|jangan|avoid|wrong|mistake)\b/i.test(trapSpoken);
+      const saysRightCue = /\b(?:yang\s+benar|yang\s+tepat|seharusnya|instead\s+use|correct\s+form)\b/i.test(trapSpoken);
+      const pickRightSide =
+        inFocusWindow && stepProg >= 0.02 && stepProg <= 0.93
+          ? saysRightCue && !saysWrongCue
+            ? true
+            : saysWrongCue && !saysRightCue
+              ? false
+              : rightHits > wrongHits && stepProg >= 0.24
+                ? true
+                : wrongHits > rightHits
+                  ? false
+                  : stepProg >= 0.46
+          : false;
+      const focusWrong = inFocusWindow && stepProg >= 0.02 && stepProg <= 0.93 && !pickRightSide;
+      const focusRight = inFocusWindow && stepProg >= 0.02 && stepProg <= 0.93 && pickRightSide;
       return wrapQueued(
         <div
           data-wb-excerpt={`${step.wrongText || ''} -> ${step.rightText || ''}`}
@@ -3191,6 +3282,7 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
           </div>
           {step.wrongText && (
             <div
+              data-wb-panel-focus={focusWrong ? 'zoom-in' : focusRight ? 'dim' : 'idle'}
               className="flex items-start gap-2 rounded-xl px-2.5 py-1.5 transition-all duration-400"
               style={{
                 transform: focusWrong ? 'scale(1.065)' : focusRight ? 'scale(0.97)' : 'scale(1)',
@@ -3200,7 +3292,7 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
                 transformOrigin: 'left center',
               }}
             >
-              <span className="text-xs font-black px-1.5 py-0.5 rounded bg-[#FEE2E2] text-[#B91C1C] shrink-0">
+              <span className="text-xs font-extrabold px-1.5 py-0.5 rounded bg-[#FEE2E2] text-[#B91C1C] shrink-0">
                 ✕
               </span>
               <div className="fz-handwriting-body text-sm sm:text-[15px] text-[#7F1D1D]">
@@ -3230,6 +3322,7 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
           )}
           {step.rightText && (
             <div
+              data-wb-panel-focus={focusRight ? 'zoom-in' : focusWrong ? 'dim' : 'idle'}
               className="flex items-start gap-2 rounded-xl px-2.5 py-1.5 transition-all duration-400"
               style={{
                 transform: focusRight ? 'scale(1.04)' : focusWrong ? 'scale(0.98)' : 'scale(1)',
@@ -3239,7 +3332,7 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
                 transformOrigin: 'left center',
               }}
             >
-              <span className="text-xs font-black px-1.5 py-0.5 rounded bg-[#DCFCE7] text-[#15803D] shrink-0">
+              <span className="text-xs font-extrabold px-1.5 py-0.5 rounded bg-[#DCFCE7] text-[#15803D] shrink-0">
                 ✓
               </span>
               <div className="fz-handwriting-body text-sm sm:text-[15.5px] font-bold text-[#14532D]">
@@ -3290,7 +3383,7 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
           data-wb-excerpt={step.text || ''}
           className="rounded-2xl bg-[#EFF6FF]/90 border border-[#BFDBFE] p-3 space-y-1.5 shadow-2xs"
         >
-          <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#2563EB] text-white text-[10px] font-black tracking-wider uppercase">
+          <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#2563EB] text-white text-[10px] font-extrabold tracking-wider uppercase">
             <span>PERTANYAANMU</span>
           </div>
           {step.highlightPhrase && (
@@ -3383,9 +3476,9 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
             >
               <span>🔍</span>
               <span>
-                {activeStepProgress > 0.84
+                {activeStepProgress > 0.93
                   ? wbPick('Zoom Out Transition', 'Zoom Out Transisi')
-                  : activeStepProgress >= 0.015
+                  : activeStepProgress >= 0.01
                     ? wbPick('Focus Zoom', 'Zoom In Fokus')
                     : wbPick('Focus Ready', 'Fokus Siap')}
               </span>
@@ -3422,6 +3515,29 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
           )}
         </div>
       </div>
+      {/* Live Lesson Progress Rail (smooth forward momentum bar) */}
+      <div
+        className="h-[3px] w-full bg-[#E5E8E3] shrink-0 overflow-hidden"
+        aria-hidden="true"
+        data-testid="wb-lesson-progress-rail"
+      >
+        <div
+          className="h-full bg-gradient-to-r from-[#15803D] via-[#10B981] to-[#34D399] transition-[width] duration-150 ease-out"
+          style={{
+            width: `${Math.max(
+              0,
+              Math.min(
+                100,
+                plan.steps.length > 0
+                  ? ((Math.min(plan.steps.length, activeStepIndex) + (activeStepIndex < plan.steps.length ? activeStepProgress : 0)) /
+                      plan.steps.length) *
+                      100
+                  : 0
+              )
+            ).toFixed(1)}%`,
+          }}
+        />
+      </div>
 
       {/* Dot-Grid Scrollable / Zoomable Whiteboard Surface */}
       <div
@@ -3434,10 +3550,10 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
         {(() => {
           const isScaled = Math.abs(zoomLevel - 1) > 0.005;
           const baseNaturalW =
-            innerNaturalSize.width > 0
-              ? innerNaturalSize.width
-              : containerWidth > 80
-                ? Math.min(1120, containerWidth - 48)
+            containerWidth > 80
+              ? Math.min(1120, containerWidth)
+              : innerNaturalSize.width > 0
+                ? innerNaturalSize.width
                 : 0;
           const scaledW =
             isScaled && baseNaturalW > 0 ? Math.round(baseNaturalW * zoomLevel) : undefined;

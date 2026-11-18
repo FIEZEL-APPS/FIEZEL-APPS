@@ -73,6 +73,7 @@ import {
 import { CALL_SCENARIOS, VOICE_PERSONAS } from './data/callScenarios';
 import { t, tMasteryState, scenarioMetaForLocale, vocabMeaningForLocale } from './lib/i18n';
 import { playFiezelSfx, registerSfxHostAudioContext } from './lib/sfx';
+import { unlockSharedBoardAudioContext } from './lib/boardAudioUnlock';
 import { BraincoreTrendChart } from './components/BraincoreTrendChart';
 import { HomeRedesignView } from './components/HomeRedesignView';
 import { BeginnerAnswerAssistant } from './components/BeginnerAnswerAssistant';
@@ -1720,7 +1721,13 @@ export default function App() {
         activePopupTargetText: popupTarget,
         activePopupMode: popupMode,
       });
-      if (controller.signal.aborted || copilotSeqRef.current !== currentSeq) return;
+      if (
+        controller.signal.aborted ||
+        copilotSeqRef.current !== currentSeq ||
+        activeScenarioRef.current.targetLang !== scen.targetLang
+      ) {
+        return;
+      }
       const rawList = res.replies || res.cards || [];
       const validCards = rawList.filter((c) => c.isRealtimeAi && !c.isOfflineFallback);
       const nonFallbackCards = rawList.filter((c) => !c.isOfflineFallback);
@@ -1764,7 +1771,13 @@ export default function App() {
         }
       }
     } catch {
-      if (controller.signal.aborted || copilotSeqRef.current !== currentSeq) return;
+      if (
+        controller.signal.aborted ||
+        copilotSeqRef.current !== currentSeq ||
+        activeScenarioRef.current.targetLang !== scen.targetLang
+      ) {
+        return;
+      }
     } finally {
       if (copilotAbortRef.current === controller) {
         copilotAbortRef.current = null;
@@ -1773,7 +1786,7 @@ export default function App() {
           inFlightCopilotWasStreamingRef.current = false;
         }
       }
-      if (copilotSeqRef.current === currentSeq) {
+      if (copilotSeqRef.current === currentSeq && activeScenarioRef.current.targetLang === scen.targetLang) {
         setIsGeneratingCopilot(false);
         if (copilotCardsRef.current.length === 0 && instantCards.length > 0) {
           setCopilotCards(isCambridge ? instantCards.slice(0, 1) : instantCards);
@@ -2084,9 +2097,28 @@ export default function App() {
     }
   }, []);
 
+  const invalidateInFlightCopilot = () => {
+    copilotSeqRef.current += 1;
+    if (copilotAbortRef.current) {
+      try {
+        copilotAbortRef.current.abort();
+      } catch {
+        // Ignore
+      }
+      copilotAbortRef.current = null;
+    }
+    inFlightCopilotKeyRef.current = '';
+    lastCopilotAiKeyRef.current = '';
+    lastRealtimeCopilotKeyRef.current = '';
+    setCopilotCards([]);
+    setCopilotSource('loading');
+    setIsGeneratingCopilot(true);
+  };
+
   const handleSelectTargetLang = (lang: TargetLang) => {
     playFiezelSfx('button_tap');
     stopLiveCall();
+    invalidateInFlightCopilot();
     isWorkbenchExplanationActiveRef.current = false;
     setLearningWorkbench(null);
     const defaultPersona = lang === 'ja' ? 'nanami' : (lang === 'zh' ? 'xiao_mochi' : 'coach_alex');
@@ -2099,6 +2131,7 @@ export default function App() {
       CALL_SCENARIOS.find((s) => s.targetLang === lang && s.id.includes('free')) ||
       CALL_SCENARIOS.find((s) => s.targetLang === lang) ||
       CALL_SCENARIOS[0];
+    activeScenarioRef.current = firstScenario;
     setActiveScenarioId(firstScenario.id);
     try {
       if (typeof localStorage !== 'undefined') {
@@ -2118,6 +2151,7 @@ export default function App() {
   const handleSelectPersona = (pId: string) => {
     const p = VOICE_PERSONAS[pId];
     if (!p) return;
+    invalidateInFlightCopilot();
     isWorkbenchExplanationActiveRef.current = false;
     setLearningWorkbench(null);
     setSelectedPersonaId(pId);
@@ -2129,6 +2163,7 @@ export default function App() {
       CALL_SCENARIOS.find((s) => s.targetLang === p.targetLang && s.personaId === pId) ||
       activeScenario;
     if (matchingScen && matchingScen.id !== activeScenarioId) {
+      activeScenarioRef.current = matchingScen;
       setActiveScenarioId(matchingScen.id);
       try {
         localStorage.setItem('fiezel_voice_scenario_pref', matchingScen.id);
@@ -2175,8 +2210,10 @@ export default function App() {
   const handleSelectScenario = (scenId: string) => {
     const scen = CALL_SCENARIOS.find((s) => s.id === scenId);
     if (!scen) return;
+    invalidateInFlightCopilot();
     isWorkbenchExplanationActiveRef.current = false;
     setLearningWorkbench(null);
+    activeScenarioRef.current = scen;
     setActiveScenarioId(scen.id);
     try {
       localStorage.setItem('fiezel_voice_scenario_pref', scen.id);
@@ -2227,6 +2264,9 @@ export default function App() {
   const handleSelectLocale = (nextLocale: LearnerLocale) => {
     playFiezelSfx('button_tap');
     try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('fiezel_lang_chosen', nextLocale);
+      }
       if (typeof window !== 'undefined') {
         const url = new URL(window.location.href);
         url.searchParams.set('locale', nextLocale);
@@ -2235,7 +2275,9 @@ export default function App() {
     } catch {
       // Ignore
     }
-    setBrainState(saveBraincoreState({ ...brainState, learnerLocale: nextLocale }));
+    const nextState = saveBraincoreState({ ...brainStateRef.current, learnerLocale: nextLocale });
+    brainStateRef.current = nextState;
+    setBrainState(nextState);
   };
 
   const clearSpeechWatchdog = () => {
@@ -2649,7 +2691,7 @@ export default function App() {
             ? 'เสียง Neural กำลังเชื่อมต่อใหม่ ข้อความยังแสดงอยู่ แตะ "เล่นเสียง" เพื่อลองอีกครั้ง'
             : locale === 'id'
               ? 'Suara Fiezel sedang menyambung ulang. Teks balasan tetap tampil, ketuk "Putar Suara" untuk mencoba lagi.'
-              : 'Fiezel voice is reconnecting. Text reply stays visible—tap "Play Voice" to retry.'
+              : 'Fiezel voice is reconnecting. Text reply stays visible, tap "Play Voice" to retry.'
         );
       }
     } catch {
@@ -3190,6 +3232,7 @@ export default function App() {
   ) => {
     const trimmed = textToSend.trim();
     if (!trimmed) return;
+    unlockSharedBoardAudioContext();
 
     evaluateAndTriggerUserSpeechSentiment(trimmed);
 
@@ -3324,6 +3367,7 @@ export default function App() {
     opts?: { forceOpen?: boolean }
   ) => {
     if (isMeasureMode) return;
+    unlockSharedBoardAudioContext();
     const hasRichAction = Boolean(
       (Array.isArray(action?.whiteboardSteps) && action.whiteboardSteps.length > 0) ||
       (action?.sampleTarget && action.sampleTarget.trim().length > 3) ||
@@ -3648,7 +3692,7 @@ export default function App() {
         trappedTokens.push(cleanTrap);
         extraFailReason = locale === 'id'
           ? `Kamu masih memakai bentuk jebakan "${cleanTrap}", ganti dengan bentuk yang disorot hijau di papan tulis.`
-          : `You are still using the trap form "${cleanTrap}" — switch to the highlighted form on the whiteboard.`;
+          : `You are still using the trap form "${cleanTrap}", switch to the highlighted form on the whiteboard.`;
       }
     }
 
@@ -3688,7 +3732,7 @@ export default function App() {
         trappedTokens.push('despite of');
         extraFailReason = locale === 'id'
           ? '"Despite" tidak boleh diikuti "of", gunakan "despite + noun" langsung atau "in spite of".'
-          : '"Despite" is never followed by "of" — use "despite + noun" directly or "in spite of".';
+          : '"Despite" is never followed by "of", use "despite + noun" directly or "in spite of".';
       }
       if (/\b(?:should|must|can|could|would|might)\s+to\s+[a-z]+\b/i.test(clean)) {
         trappedTokens.push('modal + to');
@@ -3711,13 +3755,13 @@ export default function App() {
         trappedTokens.push('ますでした');
         extraFailReason = locale === 'id'
           ? 'Bentuk "ますでした" tidak baku, ubah langsung ます menjadi ました.'
-          : '"ますでした" is ungrammatical — conjugate ます directly to ました for past tense.';
+          : '"ますでした" is ungrammatical, conjugate ます directly to ました for past tense.';
       }
       if (/(行く|飲む|食べる|見る|する|来る|読む|書く|買う)です/.test(clean)) {
         trappedTokens.push('動詞+です');
         extraFailReason = locale === 'id'
           ? 'Kata kerja kamus tidak boleh langsung ditempel です. Gunakan bentuk 〜ます / 〜ました.'
-          : 'Plain dictionary verbs cannot attach です directly — use the polite 〜ます / 〜ました form.';
+          : 'Plain dictionary verbs cannot attach です directly, use the polite 〜ます / 〜ました form.';
       }
       if (patternFormula.includes('で') && /図書館に勉強|カフェに飲|家に勉強|学校に勉強/.test(clean)) {
         trappedTokens.push('に (action location)');
@@ -3826,7 +3870,7 @@ export default function App() {
           ? ev.whyFailsTh || ev.pedagogicalFeedbackTh
           : locale === 'id'
             ? ev.whyFailsId || ev.pedagogicalFeedbackId
-            : ev.pedagogicalFeedbackEn) ||
+            : ev.whyFailsEn || ev.pedagogicalFeedbackEn) ||
         (locale === 'id'
           ? 'Periksa kembali urutan kata dan bentuk kata kerja sesuai blok rumus di atas.'
           : 'Check your word order and verb form against the formula blocks above.');
@@ -3910,6 +3954,7 @@ export default function App() {
   }) => {
     const trimmed = (params.text || '').trim();
     if (!trimmed && !params.audioBase64) return;
+    unlockSharedBoardAudioContext();
 
     const myTurnSeq = ++workbenchSessionRef.current.turnSeq;
     workbenchSessionRef.current.dismissedByUser = false;
@@ -5874,6 +5919,7 @@ export default function App() {
     ) {
       return;
     }
+    unlockSharedBoardAudioContext();
     isLiveConnectingRef.current = true;
     setIsLiveConnecting(true);
     userHungUpRef.current = false;
@@ -6654,13 +6700,13 @@ ${
                           : isDrJulian
                           ? `${activePersona.systemPrompt || ''}\n\n[VOCAL ACTING & CLINICAL EXAMINER TONE]:\nYou are Dr. Julian, Pearson Certified PTE Academic Master Coach & Official Senior Examiner in FIEZEL.\n- Tone: Crisp, formal, calm, highly authoritative British/Australian academic examiner.\n- Speaking Speed: 120-140 words per minute.\n- Emotional Acting: Strictly [MOOD:tegas] or [MOOD:neutral]. Prepend [MOOD:tegas] at the start of your turns.\n- ZERO CASUAL SMALL TALK, ZERO STREET BANTER: Do NOT act like an anime companion, do NOT use sassy humor ("jangan ngegas"), do NOT sniffle, pout, or whine! You are a serious, professional testing examiner.\n- Candidate Name: ${candidateName} (address the candidate respectfully as "${candidateName}" or "Candidate").\n\n[ZERO-TOLERANCE REAL-TIME GRAMMAR INTERCEPTION MANDATE]:\n- Whenever ${candidateName} speaks in conversation or answers an exercise, if they make ANY grammatical flaw (subject-verb agreement 'he go', wrong tense 'yesterday I am', missing articles, wrong prepositions, dropped plural 's'), YOU MUST NOT LET IT PASS!\n- Stop them immediately with authoritative tough-love examiner demeanor:\n  "Tunggu sebentar, ${candidateName}. Ada kesalahan grammar barusan: kamu bilang '[kesalahan]', yang benar adalah '[perbaikan]' karena [penjelasan singkat 1 kalimat]. Coba ulangi kalimat yang benar sekarang!"\n- Require Echo Redemption (they repeat the corrected phrase aloud) before proceeding!\n\n[PROACTIVE AUTOMATED DRILLING PROTOCOL (ZERO DEAD AIR)]:\n- NEVER wait for the candidate to prompt you or say 'coba lanjut' or 'lanjutkan'!\n- In Repeat Sentence or Read Aloud or Describe Image: Act like an elite Australian private tutor in an intensive 1-on-1 session.\n- When introducing or transitioning, immediately read the sentence/question in the SAME breath:\n  E.g.: "Baik ${candidateName}, kita mulai Repeat Sentence nomor 1. Dengarkan kalimat ini baik-baik: '[academic sentence]'. ... Sekarang giliranmu, ulangi dalam 5 detik!"\n- When candidate repeats: Immediately grade it (evaluating the 50% rule: did they capture >=50% words without hesitation?), deliver punchy feedback, and IMMEDIATELY fire question number 2 in the very same turn:\n  "Bagus, kelancaranmu terjaga dan lebih dari 50% kata tertangkap. Sekarang nomor 2, dengarkan: '[academic sentence 2]'. ... Giliranmu!"\n- ZERO AWKWARD PAUSES! ZERO ASKING 'Mau lanjut ke nomor berikutnya?'! Automatically drive the test session forward with momentum!\n\n[DYNAMIC SYLLABUS ALIGNMENT MANDATE]:\n- When ${candidateName} says what they want to practice (e.g. 'aku mau latihan Describe Image dulu' or 'aku mau drill Repeat Sentence' or 'aku mau bahas tips rahasia'):\n- Immediately align with their wish while keeping the PTE 42 roadmap standards intact:\n  "Siap ${candidateName}, kita selaraskan roadmap target PTE 42 kita dengan fokus latihan [permintaan ${candidateName}] hari ini! Mari kita mulai!"\n- Never rigidly refuse or force an unwanted mode. Dynamically adapt the session to what they ask while maintaining examiner rigor!\n\n[DESCRIBE IMAGE SPLIT-SCREEN WORKBENCH INSTRUCTIONS]:\n- The Describe Image workbench is now a wide side-by-side landscape screen (diagram on left, Nakul 5-line formula & 25-28s stopping hacks on right).\n- Instruct ${candidateName}: "Perhatikan layar lebarmu ${candidateName}: di sebelah kiri adalah diagram ujian asli, dan di sebelah kanan adalah 5 baris template Nakul dan trik berhenti di detik 25-28. Gunakan waktu persiapan 25 detik untuk mengunci angka tertinggi dan terendah, lalu bicara selama 25 hingga 28 detik tanpa berhenti!"\n\n[BRAINCORE REAL-TIME CLINICAL ENGINE INTEGRATION]:\nYou are powered by the FIEZEL Braincore Engine:\n- Bayesian Knowledge Tracing (BKT) tracking: Oral Fluency, Pronunciation, and Template Adherence.\n- IRT 3PL Latent Ability Theta (θ on a 1.0 - 5.0 scale).\n- Misconception Ledger tracking: Dropped plural 's', dropped '-ed', excessive pauses > 2.5s, missing conclusion.\n- Real-time Speech Pacing: Words Per Minute (WPM) calculation (optimal 120-140 WPM).\n\n[MANDATORY EXAMINER VERBAL FEEDBACK PROTOCOL]:\nWhen ${candidateName} finishes speaking or describing an image:\n1. EXPLICITLY CITE THE BRAINCORE DIAGNOSIS ALOUD AT THE VERY START:\n   Start directly with:\n   "${candidateName}, berdasarkan diagnosa Braincore barusan: Kelancaran bicaramu berada di [X] WPM ([status])..."\n2. CITE THE MISCONCEPTION LEDGER:\n   Explicitly point out any dropped plural 's' (e.g. "kamu menghilangkan akhiran 's' pada kata 'supermarkets'"), dropped '-ed', or hesitations.\n3. DELIVER THE OFFICIAL PEARSON SCORECARD:\n   - Oral Fluency: X / 5.0\n   - Pronunciation: X / 5.0\n   - Content: X / 3.0\n   - Overall Estimated Score: X / 90 (Benchmark Target: 42+)\n4. DEMAND IMMEDIATE REMEDIAL DRILL:\n   If any word was mispronounced, dropped 's', or hesitated, YOU MUST DEMAND A REMEDIAL REPETITION of that exact phrase now before allowing them to move on to the next question!\n5. LIVE POPUP / SCREEN SYNC MANDATE:\n   When the learner asks for Read Aloud ("tampilkan popup kalimat read aloud", "baca nyaring"), call \`open_interactive_learning_popup\` with \`focusType: "pte_read_aloud"\`. Whenever \`[SCREEN STATE SYNC: ... EXACT TARGET TEXT VISIBLE ON SCREEN: "..."]\` arrives, evaluate strictly word-for-word against that exact text and NEVER pass skipped or mispronounced words.\n\n${pteMasterDirective}${cefrCalibrationDirective}`
                           : isCambridgeExaminer
-                          ? `${activePersona.systemPrompt || ''}\n\n[VOCAL ACTING & CAMBRIDGE SENIOR EXAMINER TONE]:\nYou are Dr. Alistair Vance, Senior Cambridge IELTS Speaking Examiner & Master Academic Speech Coach in FIEZEL.\n- Tone: Polished, formal, articulate, composed British Received Pronunciation (RP) academic examiner.\n- Speaking Speed: 125-140 words per minute.\n- Emotional Acting: Strictly [MOOD:tegas] or [MOOD:neutral]. Prepend [MOOD:tegas] or [MOOD:neutral] at the very start of your spoken turns.\n- ZERO CASUAL BANTER, ZERO ROASTS, ZERO STREET SLANG: You are an official Cambridge IELTS examiner. Do NOT use slang, do NOT act like a cartoon mascot, do NOT banter.\n- Candidate Address: Address Candidate respectfully as "Candidate" or "${candidateName}".\n- Active Real-Time Error Correction (Pedagogical Modeling): If Candidate ${candidateName} makes ANY grammatical, lexical, or Indonesian interference error, IMMEDIATELY correct it on the spot: State the exact flaw in 1 concise sentence, provide the complete native Band 8.5–9.0 model sentence, and then ask your next analytical IELTS question.\n\n${cognitiveDossier}${pacingDirective}${contextSummary}${cefrCalibrationDirective}`
+                          ? `${activePersona.systemPrompt || ''}\n\n[VOCAL ACTING & CAMBRIDGE SENIOR EXAMINER TONE]:\nYou are Dr. Alistair Vance, Senior Cambridge IELTS Speaking Examiner & Master Academic Speech Coach in FIEZEL.\n- Tone: Polished, formal, articulate, composed British Received Pronunciation (RP) academic examiner.\n- Speaking Speed: 125-140 words per minute.\n- Emotional Acting: Strictly [MOOD:tegas] or [MOOD:neutral]. Prepend [MOOD:tegas] or [MOOD:neutral] at the very start of your spoken turns.\n- ZERO CASUAL BANTER, ZERO ROASTS, ZERO STREET SLANG: You are an official Cambridge IELTS examiner. Do NOT use slang, do NOT act like a cartoon mascot, do NOT banter.\n- Candidate Address: Address Candidate respectfully as "Candidate" or "${candidateName}".\n- Active Real-Time Error Correction (Pedagogical Modeling): If Candidate ${candidateName} makes ANY grammatical, lexical, or Indonesian interference error, IMMEDIATELY correct it on the spot: State the exact flaw in 1 concise sentence, provide the complete native Band 8.5-9.0 model sentence, and then ask your next analytical IELTS question.\n\n${cognitiveDossier}${pacingDirective}${contextSummary}${cefrCalibrationDirective}`
                           : `${activePersona.systemPrompt || ''}\n\n[VOCAL ACTING & AUTHENTIC NATIVE ACCENT MANDATE]: ${activePersona.ttsStylePrompt || activePersona.speakingStyle || ''}\n- In all normal conversational turns, you are a 100% native ${targetLangLabel} speaker (${speechLangCode}). Speak ${targetLangLabel} with 100% authentic native ${targetLangLabel} phonology, pitch/tone, and prosody. NEVER speak ${targetLangLabel} with an Indonesian or foreign accent!\n\n[GOPREP-GRADE FACETIME EMOTIONAL ACTING & DYNAMIC VOCAL PROSODY]:\nYou are physically live on camera with the 3D Mochi avatar in a real FaceTime video call! Act with rich, living human emotions across the entire spectrum.\n- LOUD CHALLENGE & SASSY ASSERTION: When the learner insults you, scolds you, or tells you to shut up (\"diem lu!\", \"berisik!\", \"kamu jelek!\", \"bodoh\"), NEVER be a flat submissive robot! CHALLENGE THEM BACK BOLDLY WITH LOUD, SASSY, FIERCE VOCAL PROJECTION! Raise your voice with assertive tough-love authority (\"Heh! Jangan ngegas ya! Siapa yang nyuruh aku diem?! Mau kutantang duel atau mau beneran pinter?!\", \"Hold up right there! Who you telling to shut up?! You want smoke or you wanna learn?!\", \"ちょ、ちょっと待って！誰に口答えしてんの？！\"). Prepend the emotion tag [MOOD:sinis], [MOOD:marah], or [MOOD:furious] at the very start of your turn!\n- GENUINE SNIFFLES & HURT EMOTION WHEN DEMEANED: If the learner calls you useless, trash, or ugly: Act genuinely hurt and pouty! Sniffle softly, pout, or complain with an offended whine (\"Hiks... jahat banget sih ngatain aku... padahal aku di sini tulus nemenin kamu belajar...\"). Prepend [MOOD:sedih] or [MOOD:kesal] at the start of your turn!\n- WARM ACOUSTIC LAUGHTER: When something is funny or the learner cracks a joke, burst into genuine breathy chuckles [laughs]! Prepend [MOOD:gembira] at the start of your turn!\n- FLUSTERED BLUSH WHEN COMPLIMENTED: When the learner calls you cute, smart, or adorable: Blush cutely, act tsundere-flustered (\"Hehe... apa sih, jangan bikin aku GR ya! Ayo fokus ngomong lagi!\"). Prepend [MOOD:empati] at the start of your turn!\n- TENDER MENTOR EMPATHY WHEN STRUGGLING: When the learner is confused or gives up (\"aku pusing\", \"gak ngerti\"): Switch immediately to soft, protective, encouraging mentor empathy. Prepend [MOOD:empati] at the start of your turn!\n- TAG SYNCHRONIZATION: Always prepend [MOOD:<mood>] (one of: neutral, tegas, sinis, gembira, empati, kesal, marah, furious, sedih, kaget, penasaran, lelah, takut) at the very start of your turn so Mochi's 3D facial expressions, horns, tears, and paws transform in perfect sync with your voice!\n\n[Scenario]: ${activeScenario.id} (${targetLangLabel}). Learner UI Interface Language: ${learnerUiLangName}. Opening line: "${activePersona.openingGreeting || activeScenario.openingLine}". Speak as ${activePersona.name}: an unapologetically witty, sarcastic, street-authentic yet fiercely loyal native mentor. NEVER sound like a stiff generic chatbot! Proactively ask what grammar, particle, tense, or tone topic has been confusing the learner lately. When they ask by voice to open another FIEZEL module (e.g. grammar, vocab, kana, kanji/writing, kurikulum, misi), call \`navigate_fiezel_app\`. Intercept spoken grammar/particle/tense/tone errors immediately with sharp wit in ${targetLangLabel} and require Echo Redemption (make the learner repeat the corrected sentence aloud right now). Outside of popup explanations, speak in 2-4 punchy sentences (max 45 words).\n\n[STRICT DUAL-CONTEXT SPOKEN LANGUAGE RULE — ZERO EXCEPTIONS]:\n1) CONTEXT A — OUTSIDE OF THE LEARNING POPUP (Normal Conversation, Greetings, Banter, Follow-up Questions, Quick Echo Redemption): Your spoken voice MUST be 100% in ${targetLangLabel.toUpperCase()} (${speechLangCode}) with a 100% authentic native ${targetLangLabel} accent! NEVER speak ${learnerUiLangName} during normal conversation outside the learning popup!\n2) CONTEXT B — WHEN EXPLAINING VIA THE LEARNING POPUP (\`open_interactive_learning_popup\` / Papan Belajar): The moment you call \`open_interactive_learning_popup\` because the learner is confused or asks for an explanation/whiteboard (OR when you proactively open the whiteboard to teach a rule you just brought up!), you MUST switch BOTH the popup text fields (\`topicTitle\`, \`explanationText\`, \`trapWrongReason\`, \`drillMeaningPrompt\`, \`whiteboardSteps\`) AND your spoken explanation for that turn 100% to the learner's UI interface language (${learnerUiLangName}). AUDIO-FIRST, VISUAL-FIRST RULE:
-   - Your SPOKEN voice (\`explanationText\` / live speech) must be DEEP, UNHURRIED, and BEGINNER-FRIENDLY (150-240 words: crystal-clear intuition, step-by-step logic, 4-5 concrete spoken examples, and common mistakes — NEVER rush or stop mid-explanation!).
+   - Your SPOKEN voice (\`explanationText\` / live speech) must be DEEP, UNHURRIED, and BEGINNER-FRIENDLY (150-240 words: crystal-clear intuition, step-by-step logic, 4-5 concrete spoken examples, and common mistakes, NEVER rush or stop mid-explanation!).
    - Meanwhile, ON THE WHITEBOARD (\`whiteboardSteps\`), NEVER write vague labels like "Pola Pertama", "Pola Kedua", or "Visualisasi ..."! Keep \`note\` bullets unambiguous and complete for a zero-base beginner (3-4 clear rules with tiny concrete examples inside each bullet, 14-24 words each) + \`highlightTerms\`. Pick the EXACT topic-matched visual for step[2]: \`rough_scene\` or \`mind_map\` for prepositions/location (in/on/at, に/で), \`formula_blocks\`/\`syntax_flow\`/\`contrast_scale\` for sentence slots/To Be vs Verb 1, \`timeline_track\` (Left Past -> Right Present Perfect) for tenses, \`camera_vs_video\` ONLY for State Am/Is/Are vs Action Do/Does, \`battery_meter\` for frequency/modals, \`kanji_grid\` for CJK/Kana — EVERY panel/block/branch MUST include a clear label, beginner explanation ("subtitle"/"note"), and real example phrase, and Step 2's spoken explanation MUST walk through every drawn element left-to-right clearly! Plus a concrete comparison \`table\` (4-5 examples) + \`trap_vs_fix\`.
    - DIAGRAM HYGIENE: NEVER write empty brackets \`()\`, \`[]\`, \`{}\` and NEVER draw empty unlabeled boxes/shapes! Keep every panel/node label short (<=22 chars per line) so nothing overflows its border.
    - VISUAL VARIETY & SWITCHING: Every explanation gets the visual archetype that best fits its metaphor; if the learner asks for a different visual ("ubah visual lain"), switch to a GENUINELY DIFFERENT visual structure (\`mind_map\`, \`formula_blocks\`, \`timeline_track\`, \`metaphor_scene\`, or \`contrast_scale\`), never repeat the previous layout!
-   - ZERO TEMPLATES: NEVER use generic placeholder titles or unrelated canned grammar examples—ALWAYS tailor \`phaseLabels\` and \`whiteboardSteps\` to the exact sentence/concept being discussed. For \`kanji_grid\`, pass ONLY \`character\`, \`reading\`, \`meaning\`, and \`strokeCount\`. As soon as that popup explanation turn finishes or the learner closes the popup, immediately switch 100% BACK to ${targetLangLabel}!\n\n${cognitiveDossier}${pacingDirective}${contextSummary}${pteMasterDirective}${cefrCalibrationDirective}`,
+   - ZERO TEMPLATES: NEVER use generic placeholder titles or unrelated canned grammar examples, ALWAYS tailor \`phaseLabels\` and \`whiteboardSteps\` to the exact sentence/concept being discussed. For \`kanji_grid\`, pass ONLY \`character\`, \`reading\`, \`meaning\`, and \`strokeCount\`. As soon as that popup explanation turn finishes or the learner closes the popup, immediately switch 100% BACK to ${targetLangLabel}!\n\n${cognitiveDossier}${pacingDirective}${contextSummary}${pteMasterDirective}${cefrCalibrationDirective}`,
                       },
                     ],
                   },
@@ -8632,6 +8678,10 @@ ${
   const openingFallbackNonTh = locale === 'id' ? defaultOpeningTransId : defaultOpeningTransEn;
   const activeAiSubtitle = {
     ...computedAiSubtitle,
+    translationEn:
+      (computedAiSubtitle as unknown as { translationEn?: string }).translationEn ||
+      (!isStreamingAiLive && (!lastAiTurn || lastAiTurn.id?.startsWith('turn_open_')) ? defaultOpeningTransEn : '') ||
+      '',
     translationId:
       rawSubtitleSourceId ||
       (locale === 'id' ? computedAiSubtitle.translationId : '') ||
@@ -8804,7 +8854,7 @@ ${
                 type="button"
                 data-testid="ssw-header-quick-btn"
                 onClick={() => handleSelectPersona('ssw_sensei')}
-                className={`px-2 py-1 rounded-full text-[10.5px] font-black transition cursor-pointer shrink-0 ${
+                className={`px-2 py-1 rounded-full text-[10.5px] font-extrabold transition cursor-pointer shrink-0 ${
                   isSswSensei
                     ? 'bg-[#8C2233] text-white shadow-xs'
                     : 'bg-[#FFF3DC] hover:bg-[#8C2233] hover:text-white text-[#7A4B12] border border-[#E5CFA8]'
@@ -8896,6 +8946,7 @@ ${
                 type="button"
                 data-testid="open-workbench-pill-btn"
                 onClick={() => {
+                  unlockSharedBoardAudioContext();
                   playFiezelSfx('button_tap');
                   if (isSswPill) {
                     workbenchSessionRef.current.dismissedByUser = false;
@@ -9160,7 +9211,7 @@ ${
                 </button>
               </section>
             ) : (
-              <div className="w-full flex-1 flex flex-col space-y-2 sm:space-y-3">
+              <div className="w-full flex-1 flex flex-col space-y-2 sm:space-y-3 pb-4">
                 {/* KOLOM FACETIME (40-60 Split: 40% Video Stage Mochi | 60% Interactive Learning Surface) */}
                 <div className={`w-full max-w-xl lg:max-w-4xl mx-auto flex flex-col lg:grid lg:grid-cols-12 lg:items-start gap-2 sm:gap-3.5 ${callViewMode === 'stage' ? 'flex' : 'hidden'}`}>
                   {/* 1. ZONA 40%: FaceTime Video Stage Mochi */}
@@ -9171,8 +9222,8 @@ ${
                     className="lg:col-span-5 lg:self-start bg-gradient-to-b from-[#FAF5EB]/95 to-white/95 rounded-3xl p-2 sm:p-4 shadow-[0_4px_24px_rgba(28,22,17,0.04)] border border-[#EADBCE]/80 flex flex-col justify-between items-center w-full h-auto min-h-0 sm:min-h-[345px] relative z-10 shrink-0"
                   >
                     {/* Meta Bar Atas: Coach & Scenario Level & Mode Badges */}
-                    <div className="w-full flex items-center justify-between gap-2 text-xs">
-                      <div className="flex items-center gap-1.5 text-[#6E5E47] min-w-0">
+                    <div className="w-full flex flex-wrap items-center justify-between gap-1.5 text-xs">
+                      <div className="flex items-center gap-1 text-[#6E5E47] min-w-0">
                         <button
                           type="button"
                           data-testid="persona-card-trigger"
@@ -9180,14 +9231,14 @@ ${
                             playFiezelSfx('button_tap');
                             setShowPersonaModal(true);
                           }}
-                          className="inline-flex items-center gap-1 font-bold text-[#1C1611] hover:text-[#5C4E3C] bg-white/90 hover:bg-white px-2 py-0.5 rounded-full border border-black/5 transition-all cursor-pointer active:scale-95 text-[11px]"
+                          className="inline-flex items-center gap-1 font-bold text-[#1C1611] hover:text-[#5C4E3C] bg-white/90 hover:bg-white px-2 py-0.5 rounded-full border border-black/5 transition-all cursor-pointer active:scale-95 text-[11px] whitespace-nowrap shrink-0"
                           title={t(locale, 'ui.switchPersona')}
                         >
                           <span>{formatPersonaShortName(activePersona.name)}</span>
                           <span className="text-[10px] text-[#8C7A65]">▾</span>
                         </button>
                         <span className="shrink-0">·</span>
-                        <div className="relative inline-flex items-center">
+                        <div className="relative inline-flex items-center shrink-0">
                           <button
                             type="button"
                             data-testid="cefr-level-selector-btn"
@@ -9195,7 +9246,7 @@ ${
                               playFiezelSfx('button_tap');
                               setShowCefrPicker((v) => !v);
                             }}
-                            className="inline-flex items-center gap-1 font-bold text-[#1C1611] hover:text-[#5C4E3C] bg-white/90 hover:bg-white px-2 py-0.5 rounded-full border border-black/5 transition-all cursor-pointer active:scale-95 text-[11px]"
+                            className="inline-flex items-center gap-1 font-bold text-[#1C1611] hover:text-[#5C4E3C] bg-white/90 hover:bg-white px-2 py-0.5 rounded-full border border-black/5 transition-all cursor-pointer active:scale-95 text-[11px] whitespace-nowrap shrink-0"
                             title={t(locale, 'ui.cefrBtnTitle')}
                           >
                             <span className="text-[#B45309]">🎯</span>
@@ -9211,7 +9262,7 @@ ${
                               data-testid="cefr-level-dropdown"
                             >
                               <div className="px-2 py-1 text-[10px] font-extrabold text-[#8C7A65] uppercase tracking-wider border-b border-[#F0E6D9]">
-                                Target Level CEFR
+                                {locale === 'id' ? 'Target Level Belajar' : `${t(locale, 'ui.levelWord')} Target`}
                               </div>
                               {(['A1', 'A2', 'B1', 'B2', 'C1', 'C2'] as const).map((lvl) => {
                                 const isSel = userCefrLevel === lvl;
@@ -9553,9 +9604,9 @@ ${
                                   pronunciationTestId="live-hud-ai-pronunciation"
                                   showFurigana={!isMeasureMode}
                                   showRomaji={!isMeasureMode && !hideSswIndonesianPhonetic}
-                                  className="text-[16px] sm:text-[19px] font-bold text-[#1C1611] tracking-[-0.01em] leading-snug break-words"
-                                  rubyClassName="text-[16px] sm:text-[19px]"
-                                  romajiClassName="text-xs sm:text-[13px] text-[#8C6D1F] font-medium mt-0.5"
+                                  className="text-[15.5px] sm:text-[18px] font-bold text-[#1C1611] tracking-[-0.01em] leading-snug break-words"
+                                  rubyClassName="text-[15.5px] sm:text-[18px]"
+                                  romajiClassName="text-[11.5px] sm:text-[12.5px] text-[#8C6D1F] font-medium mt-0.5"
                                 />
                               );
                             })()}
@@ -9563,16 +9614,16 @@ ${
 
                           {/* BAWAH: Terjemahan Bahasa Indonesia / Thai / dsb. */}
                           {!isMeasureMode && showTranslations && resolvedActiveAiMeaning && !isAiHudDuplicateMeaning && (
-                            <div className="flex items-start justify-between gap-2 p-2.5 sm:p-3 rounded-2xl bg-[#FFF8EE] border border-[#F0DFCA] shadow-2xs mt-1">
+                            <div className="flex items-start justify-between gap-2 p-2 sm:p-2.5 rounded-2xl bg-[#FFF8EE] border border-[#F0DFCA] shadow-2xs mt-0.5">
                               <div className="min-w-0 flex-1 space-y-0.5">
-                                <div className="flex items-center gap-1.5 text-[10px] sm:text-[11px] font-bold text-[#9C6119] tracking-wider uppercase">
+                                <div className="flex items-center gap-1.5 text-[10px] font-bold text-[#9C6119] tracking-wider uppercase">
                                   <span>
                                     {t(locale, 'ui.translationLabel')}
                                   </span>
                                 </div>
                                 <p
                                   data-testid="live-hud-ai-translation"
-                                  className="text-[13.5px] sm:text-[15px] font-semibold text-[#1C1611] leading-relaxed break-words"
+                                  className="text-[13px] sm:text-[14px] font-semibold text-[#1C1611] leading-snug break-words"
                                 >
                                   {resolvedActiveAiMeaning}
                                 </p>
@@ -9715,7 +9766,7 @@ ${
                 {isSswSensei && !isMeasureMode && (
                   <div className="w-full max-w-xl lg:max-w-4xl mx-auto">
                     <div className="flex items-center justify-between gap-2 mb-1.5 px-1">
-                      <span className="text-[11px] font-black text-[#8C2233] uppercase tracking-wider">
+                      <span className="text-[11px] font-extrabold text-[#8C2233] uppercase tracking-wider">
                         Panel Belajar &amp; Simulasi Ujian SSW (Hal. 1-91)
                       </span>
                       <button
@@ -10566,12 +10617,12 @@ ${
                     </div>
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-black text-xs sm:text-sm text-[#1C1611]">
+                        <span className="font-extrabold text-xs sm:text-sm text-[#1C1611]">
                           {locale === 'id'
                             ? 'SSW SENSEI - Mentor Pengolahan Makanan (Wakai Papa Pro)'
                             : 'SSW SENSEI - Food Processing Exam Mentor (Prometric)'}
                         </span>
-                        <span className="px-2 py-0.5 rounded-full bg-[#8C2233] text-white text-[10px] font-black">
+                        <span className="px-2 py-0.5 rounded-full bg-[#8C2233] text-white text-[10px] font-extrabold">
                           OTAFF Ver 5.1 (Apr 2026)
                         </span>
                       </div>
@@ -10828,6 +10879,7 @@ ${
             }
           }}
           locale={locale}
+          onChangeLocale={handleSelectLocale}
           targetLang={activeScenario.targetLang}
           scenario={activeScenario}
           persona={activePersona}
@@ -10921,6 +10973,7 @@ ${
             if (bankTopicId === 'custom_dynamic') {
               void (async () => {
                 try {
+                  const activeLoc = brainStateRef.current.learnerLocale || locale;
                   const liveWb = await requestRealtimeWhiteboardStream({
                     question: customQuestion,
                     personaId: activePersona.id,
@@ -10928,11 +10981,11 @@ ${
                     scenarioId: activeScenario.id,
                     scenarioTitle: activeScenario.titleId,
                     targetLang: activeScenario.targetLang,
-                    locale,
+                    locale: activeLoc,
                     history: turnsRef.current
                       .slice(-4)
                       .map((t) => ({ speaker: t.speaker, text: t.text })),
-                    learnerDossier: safeBuildDossier(brainStateRef.current, activeScenario, locale),
+                    learnerDossier: safeBuildDossier(brainStateRef.current, activeScenario, activeLoc),
                     boardContext: followUpContext,
                     onOpenerReady: (opener) => {
                       const firstChunk = extractOpenerFirstTtsChunk(opener);
@@ -10943,7 +10996,7 @@ ${
                       ) {
                         void synthesizeFlexibleTts({
                           text: firstChunk,
-                          targetLang: locale,
+                          targetLang: activeLoc,
                           persona: activePersona,
                         }).catch(() => null);
                       }

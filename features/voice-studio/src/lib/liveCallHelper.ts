@@ -1354,13 +1354,13 @@ function approximateEnglishToIndonesian(text: string): string {
     return 'Uji coba pilot di sekolah adalah langkah awal yang luar biasa! Apakah kamu sudah punya kontak guru atau kepala sekolah?';
   }
   if (lower.includes('boom') && lower.includes('there you go') && lower.includes('what else did you do')) {
-    return 'Mantap! Nah, itu dia! Struktur kalimatnya sudah pas banget. Ayo lanjutkan semangat itu—apa lagi yang kamu lakukan hari ini?';
+    return 'Mantap! Nah, itu dia! Struktur kalimatnya sudah pas banget. Ayo lanjutkan semangat itu, apa lagi yang kamu lakukan hari ini?';
   }
   if (lower.includes('boom') && lower.includes('there you go')) {
     return 'Mantap! Nah, itu dia! Tepat sekali!';
   }
   if (lower.includes('exact structure') || lower.includes('keep that energy moving')) {
-    return 'Struktur kalimatnya sudah pas! Ayo pertahankan ritme ini—apa lagi yang kamu lakukan hari ini?';
+    return 'Struktur kalimatnya sudah pas! Ayo pertahankan ritme ini, apa lagi yang kamu lakukan hari ini?';
   }
   if (lower.includes('what else did you do')) {
     return 'Apa lagi yang kamu lakukan hari ini?';
@@ -1377,19 +1377,19 @@ function approximateEnglishToThai(text: string): string {
     return 'สวัสดีครับ! ดีใจมากที่ได้คุยกันวันนี้ เราคุยกันสบายๆ ได้ทุกเรื่องเลย ตอนนี้กำลังคิดเรื่องอะไรอยู่ครับ?';
   }
   if (lower.includes('boom') && lower.includes('there you go') && lower.includes('what else did you do')) {
-    return 'Mantap! Nah, itu dia! Struktur kalimatnya sudah pas banget. Ayo lanjutkan semangat itu—apa lagi yang kamu lakukan hari ini?';
+    return 'Mantap! Nah, itu dia! Struktur kalimatnya sudah pas banget. Ayo lanjutkan semangat itu, apa lagi yang kamu lakukan hari ini?';
   }
   if (lower.includes('boom') && lower.includes('there you go')) {
     return 'Mantap! Nah, itu dia! Tepat sekali!';
   }
   if (lower.includes('exact structure') || lower.includes('keep that energy moving')) {
-    return 'Struktur kalimatnya sudah pas! Ayo pertahankan ritme ini—apa lagi yang kamu lakukan hari ini?';
+    return 'Struktur kalimatnya sudah pas! Ayo pertahankan ritme ini, apa lagi yang kamu lakukan hari ini?';
   }
   if (lower.includes('what else did you do')) {
     return 'Apa lagi yang kamu lakukan hari ini?';
   }
   if (lower.includes('boom') && lower.includes('there you go') && lower.includes('what else did you do')) {
-    return 'เยี่ยมมาก! แบบนั้นแหละ โครงสร้างประโยคเป๊ะเลย มาลุยต่อกันเถอะ—วันนี้คุณทำอะไรอีกบ้างครับ/ค่ะ?';
+    return 'เยี่ยมมาก! แบบนั้นแหละ โครงสร้างประโยคเป๊ะเลย มาลุยต่อกันเถอะ, วันนี้คุณทำอะไรอีกบ้างครับ/ค่ะ?';
   }
   if (lower.includes('boom') && lower.includes('there you go')) {
     return 'เยี่ยมเลย! แบบนั้นแหละ ถูกต้องที่สุด!';

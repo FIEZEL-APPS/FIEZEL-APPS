@@ -70,7 +70,7 @@ export const JapaneseRubyDisplay: React.FC<JapaneseRubyDisplayProps> = ({
         <span
           lang="zh-CN"
           data-testid="mandarin-ruby-text"
-          className={`fz-zh-ruby-text leading-[2.6] pt-1.5 break-words block ${rubyClassName}`}
+          className={`fz-zh-ruby-text leading-[2.2] pt-1 break-words block ${rubyClassName}`}
           dangerouslySetInnerHTML={{ __html: rubyHtml }}
         />
 
@@ -107,7 +107,7 @@ export const JapaneseRubyDisplay: React.FC<JapaneseRubyDisplayProps> = ({
         <span
           lang="ja"
           data-testid="japanese-ruby-text"
-          className={`fz-ja-ruby-text leading-[2.6] pt-1.5 break-words block ${rubyClassName}`}
+          className={`fz-ja-ruby-text leading-[2.2] pt-1 break-words block ${rubyClassName}`}
           dangerouslySetInnerHTML={{ __html: furiganaHtml }}
         />
 

@@ -1,7 +1,7 @@
 {
-  "version": "m025-808",
-  "claimedBy": "branch feat/account-cloud-sync-m025",
-  "claimedAt": "2026-11-18T21:42:00.338Z",
-  "reason": "fix(auth,sync): persist full multi-language progress, gems, and Braincore state across devices [ALLOW-PROTECTED: auth]",
+  "version": "m025-809",
+  "claimedBy": "branch fix/whiteboard-sync-camera-highlight",
+  "claimedAt": "2026-11-18T22:34:02.043Z",
+  "reason": "fix(voice-studio): whiteboard word-clock sync, mobile PWA autoplay unlocker, left-right spatial focus & camera",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

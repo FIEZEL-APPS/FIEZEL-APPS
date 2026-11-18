@@ -784,6 +784,65 @@ function sanitizeStepVisualFields(step: WhiteboardStepCommand): WhiteboardStepCo
   return next;
 }
 
+function extractNarrationTokens(raw: string): string[] {
+  const stopRe = /^(?:yang|dan|atau|dengan|untuk|pakai|bisa|tidak|adalah|dari|pada|ini|itu|dalam|akan|saat|jika|kalau|karena|bukan|sisi|panel|bagian|sebelah|the|and|for|with|are|can|not|use|used|this|that|from|left|right)$/;
+  return Array.from(
+    new Set(
+      cleanBoardDisplayText(raw || '')
+        .toLowerCase()
+        .split(/[^a-z0-9\u3040-\u30ff\u4e00-\u9faf\u0e00-\u0e7f]+/i)
+        .filter((t) => (t.length >= 2 || /[\u3040-\u30ff\u4e00-\u9faf\u0e00-\u0e7f]/.test(t)) && !stopRe.test(t))
+    )
+  );
+}
+
+function hasNarrationInvertedLeftRight(narrationLower: string, leftRaw: string, rightRaw: string): boolean {
+  const firstLeft = narrationLower.search(/\b(?:sisi|sebelah|panel|kolom|kotak)\s+kiri\b|\bleft\s+(?:side|panel|column)\b|\bon\s+the\s+left\b/);
+  const firstRight = narrationLower.search(/\b(?:sisi|sebelah|panel|kolom|kotak)\s+kanan\b|\bright\s+(?:side|panel|column)\b|\bon\s+the\s+right\b/);
+  if (firstRight >= 0 && (firstLeft < 0 || firstRight < firstLeft)) {
+    return true;
+  }
+  if (firstLeft >= 0) {
+    const afterLeft = narrationLower.slice(firstLeft);
+    const rightSplit = afterLeft.search(/\b(?:di\s+)?(?:sisi|sebelah|panel|kolom)\s+kanan\b|\bkedua\b|\bsebaliknya\b|\bsedangkan\b/);
+    const leftClause = rightSplit > 0 ? afterLeft.slice(0, rightSplit) : afterLeft.slice(0, 140);
+    const leftClean = leftClause.replace(/\b(?:bukan|alih-alih|instead\s+of)\s+[^.!?,;]{1,42}/gi, ' ');
+    const lToks = extractNarrationTokens(leftRaw);
+    const rToks = extractNarrationTokens(rightRaw);
+    const lOnly = lToks.filter((t) => !rToks.includes(t));
+    const rOnly = rToks.filter((t) => !lToks.includes(t));
+    const lHits = lOnly.filter((t) => leftClean.includes(t)).length;
+    const rHits = rOnly.filter((t) => leftClean.includes(t)).length;
+    if (rHits > lHits && lHits === 0) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function doesNarrationCoverPanelPair(narration: string, leftRaw: string, rightRaw: string): boolean {
+  const low = narration.toLowerCase();
+  if (hasNarrationInvertedLeftRight(low, leftRaw, rightRaw)) return false;
+  const lToks = extractNarrationTokens(leftRaw);
+  const rToks = extractNarrationTokens(rightRaw);
+  const lMatched = lToks.length === 0 || lToks.some((t) => low.includes(t));
+  const rMatched = rToks.length === 0 || rToks.some((t) => low.includes(t));
+  return lMatched && rMatched;
+}
+
+function sortShapesReadingOrder<T extends { op?: string; label?: string; text?: string; x?: number; y?: number; cx?: number; cy?: number; w?: number; h?: number }>(
+  rawShapes: T[]
+): T[] {
+  return [...rawShapes].sort((a, b) => {
+    const ax = (typeof a.cx === 'number' ? a.cx : (a.x ?? 0) + (a.w ?? 0) / 2);
+    const ay = (typeof a.cy === 'number' ? a.cy : (a.y ?? 0) + (a.h ?? 0) / 2);
+    const bx = (typeof b.cx === 'number' ? b.cx : (b.x ?? 0) + (b.w ?? 0) / 2);
+    const by = (typeof b.cy === 'number' ? b.cy : (b.y ?? 0) + (b.h ?? 0) / 2);
+    if (Math.abs(ay - by) > 48) return ay - by;
+    return ax - bx;
+  });
+}
+
 function deriveStepSpokenNarration(
   step: WhiteboardStepCommand,
   topicTitle: string,
@@ -837,13 +896,9 @@ function deriveStepSpokenNarration(
     /^(?:visualisasi|alur|skema|diagram|peta|struktur)\s+[\w\s]{1,36}\.?$/i.test(existing);
   const existingWords = isVagueDiagramTitleOnly ? 0 : existing.split(/\s+/).filter(Boolean).length;
 
-  // Pertahankan narasi kontekstual dari tutor bila sudah bermakna dan utuh (hindari menggantinya dengan template generik)
+  // Pertahankan narasi kontekstual dari tutor bila sudah lengkap & selaras spasial Kiri->Kanan
   if (step.kind === 'heading') {
     return deriveHeadingSpokenNarration(step, topicTitle);
-  }
-
-  if (existingWords >= 10 && step.kind !== 'kanji_grid' && step.kind !== 'note' && step.kind !== 'trap_vs_fix') {
-    return /[.!?。！？]$/.test(existing) ? existing : `${existing}.`;
   }
 
   switch (step.kind) {
@@ -867,9 +922,13 @@ function deriveStepSpokenNarration(
       return buildStrokeStepNarration(entry, targetLang);
     }
     case 'metaphor_scene': {
-      if (existingWords >= 14) return /[.!?。！？]$/.test(existing) ? existing : `${existing}.`;
       const lp = step.leftPanel;
       const rp = step.rightPanel;
+      const leftBlob = `${lp?.title || ''} ${step.termA || ''} ${lp?.subtitle || ''} ${lp?.example || ''}`;
+      const rightBlob = `${rp?.title || ''} ${step.termB || ''} ${rp?.subtitle || ''} ${rp?.example || ''}`;
+      if (existingWords >= 16 && doesNarrationCoverPanelPair(existing, leftBlob, rightBlob)) {
+        return /[.!?。！？]$/.test(existing) ? existing : `${existing}.`;
+      }
       const an = cleanBoardDisplayText(step.analogy || '');
       const leftCue = lp
         ? wbPick(
@@ -886,9 +945,13 @@ function deriveStepSpokenNarration(
       return `${leftCue ? `${leftCue}. ` : ''}${rightCue ? `${rightCue}. ` : ''}${an && !/^visualisasi/i.test(an) ? `${wbPick('Key idea', 'Kuncinya')}: ${an}.` : ''}`.replace(/\.{2,}/g, '.').trim();
     }
     case 'mind_map': {
-      if (existingWords >= 14) return /[.!?。！？]$/.test(existing) ? existing : `${existing}.`;
-      const items = (step.branches || [])
-        .slice(0, 4)
+      const brs = (step.branches || []).slice(0, 6);
+      const low = existing.toLowerCase();
+      const coveredBrs = brs.filter((b) => extractNarrationTokens(`${b.label || ''} ${b.example || ''}`).some((t) => low.includes(t))).length;
+      if (existingWords >= 16 && coveredBrs >= Math.min(2, brs.length)) {
+        return /[.!?。！？]$/.test(existing) ? existing : `${existing}.`;
+      }
+      const items = brs
         .map((b, bIdx) => wbPick(
           `Branch ${bIdx + 1}, ${b.label}${b.sublabel ? `, meaning ${b.sublabel}` : ''}${b.example ? `, for example ${b.example}` : ''}`,
           `Cabang ${bIdx + 1}, ${b.label}${b.sublabel ? `, yaitu ${b.sublabel}` : ''}${b.example ? `, contohnya ${b.example}` : ''}`
@@ -900,9 +963,13 @@ function deriveStepSpokenNarration(
       ).replace(/\.{2,}/g, '.').trim();
     }
     case 'timeline_track': {
-      if (existingWords >= 14) return /[.!?。！？]$/.test(existing) ? existing : `${existing}.`;
-      const stops = (step.timelineEvents || [])
-        .slice(0, 4)
+      const evs = (step.timelineEvents || []).slice(0, 5);
+      const low = existing.toLowerCase();
+      const coveredEvs = evs.filter((ev) => extractNarrationTokens(`${ev.timeLabel || ''} ${ev.title || ''}`).some((t) => low.includes(t))).length;
+      if (existingWords >= 16 && coveredEvs >= Math.min(2, evs.length)) {
+        return /[.!?。！？]$/.test(existing) ? existing : `${existing}.`;
+      }
+      const stops = evs
         .map((ev) => `${ev.timeLabel}: ${ev.title}${ev.example ? wbPick(`, e.g. ${ev.example}`, `, contohnya ${ev.example}`) : ''}`)
         .join(wbPick('. Then ', '. Kemudian '));
       return wbPick(
@@ -911,9 +978,13 @@ function deriveStepSpokenNarration(
       ).replace(/\.{2,}/g, '.').trim();
     }
     case 'formula_blocks': {
-      if (existingWords >= 14) return /[.!?。！？]$/.test(existing) ? existing : `${existing}.`;
-      const pieceDesc = (step.blocks || [])
-        .slice(0, 5)
+      const bls = (step.blocks || []).slice(0, 6);
+      const low = existing.toLowerCase();
+      const coveredBls = bls.filter((bl) => extractNarrationTokens(`${bl.role || ''} ${bl.token || ''}`).some((t) => low.includes(t))).length;
+      if (existingWords >= 16 && coveredBls >= Math.min(2, bls.length)) {
+        return /[.!?。！？]$/.test(existing) ? existing : `${existing}.`;
+      }
+      const pieceDesc = bls
         .map((bl, bIdx) => wbPick(
           `Block ${bIdx + 1}, ${bl.role}, contains ${bl.token}${bl.note ? `, used for ${bl.note}` : ''}`,
           `Blok ${bIdx + 1}, ${bl.role}, berisi ${bl.token}${bl.note ? `, digunakan untuk ${bl.note}` : ''}`
@@ -925,16 +996,30 @@ function deriveStepSpokenNarration(
       ).replace(/\.{2,}/g, '.').trim();
     }
     case 'rough_scene': {
-      if (existingWords >= 8) return /[.!?。！？]$/.test(existing) ? existing : `${existing}.`;
-      const partsDesc = (step.shapes || [])
+      const orderedShapes = sortShapesReadingOrder(step.shapes || []).filter(
+        (s) => s.op !== 'arrow' && s.op !== 'line'
+      );
+      const partsList = orderedShapes
         .map((s) => {
           const lbl = cleanBoardDisplayText(s.label || s.text || '');
-          const sub = cleanBoardDisplayText(s.sublabel || '');
-          return lbl && sub ? `${lbl}: ${sub}` : lbl;
+          const sub = cleanBoardDisplayText((s as { sublabel?: string }).sublabel || '');
+          return { lbl, text: lbl && sub ? `${lbl}: ${sub}` : lbl };
         })
-        .filter((s) => s && s.length <= 80)
-        .slice(0, 4);
-      const visualCue = partsDesc.length ? wbPick(` Starting from ${partsDesc.join(', then ')}.`, ` Mulai dari ${partsDesc.join(', lalu ')}.`) : '';
+        .filter((p) => p.text && p.text.length <= 96)
+        .slice(0, 6);
+      const low = existing.toLowerCase();
+      const coveredParts = partsList.filter((p) => extractNarrationTokens(p.text).some((t) => low.includes(t))).length;
+      const firstTwo = partsList.slice(0, 2);
+      const invertedPair =
+        firstTwo.length === 2 &&
+        hasNarrationInvertedLeftRight(low, firstTwo[0].text, firstTwo[1].text);
+      if (existingWords >= 14 && !invertedPair && coveredParts >= Math.min(2, partsList.length)) {
+        return /[.!?。！？]$/.test(existing) ? existing : `${existing}.`;
+      }
+      const partsDesc = partsList.map((p) => p.text);
+      const visualCue = partsDesc.length
+        ? wbPick(` Let's go from top-left to right: ${partsDesc.join(', then ')}.`, ` Mari kita urutkan dari kiri: ${partsDesc.join(', lalu ')}.`)
+        : '';
       const cap = step.caption ? ` ${cleanBoardDisplayText(step.caption)}.` : '';
       return wbPick(
         `Look closely at the ${cleanBoardDisplayText(step.title || topicTitle)} diagram on the board.${cap}${visualCue}`,
@@ -942,16 +1027,18 @@ function deriveStepSpokenNarration(
       ).trim();
     }
     case 'contrast_scale': {
-      if (existingWords >= 8) return /[.!?。！？]$/.test(existing) ? existing : `${existing}.`;
       const a = cleanBoardDisplayText(step.termA || wbPick('Primary form', 'Bentuk utama'));
       const dA = cleanBoardDisplayText(step.descA || '');
       const b = cleanBoardDisplayText(step.termB || wbPick('Comparison form', 'Bentuk pembanding'));
       const dB = cleanBoardDisplayText(step.descB || '');
+      if (existingWords >= 14 && doesNarrationCoverPanelPair(existing, `${a} ${dA}`, `${b} ${dB}`)) {
+        return /[.!?。！？]$/.test(existing) ? existing : `${existing}.`;
+      }
       const an = cleanBoardDisplayText(step.analogy || '');
       return wbPick(
-        `Compare both sides: ${a}${dA ? ` (${dA})` : ''} versus ${b}${dB ? ` (${dB})` : ''}.${an ? ` Key insight: ${an}.` : ''}`,
-        `Bandingkan sisi kiri dan kanan: ${a}${dA ? ` (${dA})` : ''}, versus ${b}${dB ? ` (${dB})` : ''}.${an ? ` Kuncinya: ${an}.` : ''}`
-      ).trim();
+        `First on the left, ${a}${dA ? `: ${dA}` : ''}. Second on the right, ${b}${dB ? `: ${dB}` : ''}.${an ? ` Key insight: ${an}.` : ''}`,
+        `Pertama di sisi kiri, ${a}${dA ? `: ${dA}` : ''}. Kedua di sisi kanan, ${b}${dB ? `: ${dB}` : ''}.${an ? ` Kuncinya: ${an}.` : ''}`
+      ).replace(/\.{2,}/g, '.').trim();
     }
     case 'syntax_flow': {
       if (existingWords >= 12) return /[.!?。！？]$/.test(existing) ? existing : `${existing}.`;
@@ -977,9 +1064,13 @@ function deriveStepSpokenNarration(
       ).replace(/\.{2,}/g, '.').trim();
     }
     case 'table': {
-      if (existingWords >= 8) return /[.!?。！？]$/.test(existing) ? existing : `${existing}.`;
-      const rowSummaries = (step.tableRows || [])
-        .slice(0, 4)
+      const tblRows = (step.tableRows || []).slice(0, 6);
+      const low = existing.toLowerCase();
+      const coveredRows = tblRows.filter((r) => extractNarrationTokens(r.join(' ')).some((t) => low.includes(t))).length;
+      if (existingWords >= 14 && coveredRows >= Math.min(2, tblRows.length)) {
+        return /[.!?。！？]$/.test(existing) ? existing : `${existing}.`;
+      }
+      const rowSummaries = tblRows
         .map((r) => r.map((c) => cleanBoardDisplayText(c)).filter(Boolean).slice(0, 3).join(', '))
         .filter(Boolean)
         .join(wbPick('. Next: ', '. Berikutnya: '));
@@ -2324,11 +2415,14 @@ export function buildWhiteboardScenePlan(params: {
             metaphorCenterLabel: `${cleanLeft?.title || st.termA || 'Subjek'} ↔ ${cleanRight?.title || st.termB || 'Kata Kerja'}`,
             leftPanel: cleanLeft,
             rightPanel: cleanRight,
+            ...(st.spokenNarration && /kamera|video|foto\s*mati/i.test(st.spokenNarration)
+              ? { spokenNarration: undefined }
+              : {}),
           };
         }
         // Jangan memaksa analogi RPG/kamera pada topik slot/perbandingan kata: konversi ke contrast_scale yang jernih!
-        const leftDesc = [st.leftPanel?.subtitle, st.leftPanel?.example ? `Contoh: ${st.leftPanel.example}` : ''].filter(Boolean).join(' — ');
-        const rightDesc = [st.rightPanel?.subtitle, st.rightPanel?.example ? `Contoh: ${st.rightPanel.example}` : ''].filter(Boolean).join(' — ');
+        const leftDesc = [st.leftPanel?.subtitle, st.leftPanel?.example ? `Contoh: ${st.leftPanel.example}` : ''].filter(Boolean).join(', ');
+        const rightDesc = [st.rightPanel?.subtitle, st.rightPanel?.example ? `Contoh: ${st.rightPanel.example}` : ''].filter(Boolean).join(', ');
         const stripCamTitle = (s?: string) => (s && !/kamera|video/i.test(s) ? s : '');
         return {
           ...st,
@@ -2362,6 +2456,8 @@ export function buildWhiteboardScenePlan(params: {
           termA: st.rightPanel!.title,
           termB: st.leftPanel!.title,
           metaphorCenterLabel: 'Kondisi vs Aksi',
+          // Hapus narasi lama setelah panel Kiri <-> Kanan ditukar agar penjelasan selalu cocok kiri -> kanan!
+          spokenNarration: undefined,
         };
       }
     }
@@ -3345,7 +3441,7 @@ export function buildWhiteboardScenePlan(params: {
           ...st.leftPanel,
           subtitle: cleanBoardDisplayText(
             noteStepForEnrich?.bullets?.[0] ||
-            tableStepForEnrich?.tableRows?.[0]?.slice(1).filter(Boolean).join(' — ') ||
+            tableStepForEnrich?.tableRows?.[0]?.slice(1).filter(Boolean).join(', ') ||
             boardState.patternFormula ||
             `Gunakan ${st.leftPanel.title} sesuai konteks utamanya.`
           ),
@@ -3375,7 +3471,7 @@ export function buildWhiteboardScenePlan(params: {
           ...st.rightPanel,
           subtitle: cleanBoardDisplayText(
             noteStepForEnrich?.bullets?.[1] ||
-            tableStepForEnrich?.tableRows?.[1]?.slice(1).filter(Boolean).join(' — ') ||
+            tableStepForEnrich?.tableRows?.[1]?.slice(1).filter(Boolean).join(', ') ||
             boardState.coachExplanation ||
             `Gunakan ${st.rightPanel.title} untuk situasi pembandingnya.`
           ),
@@ -3417,14 +3513,14 @@ export function buildWhiteboardScenePlan(params: {
       };
     }
     if ((!st.termA || genericSideRe.test(cleanPairText(st.termA))) && (st.leftPanel?.title || resolvedPairA)) {
+      if (st.kind === 'contrast_scale') repaired = true;
       st.termA = st.leftPanel?.title || resolvedPairA;
-      repaired = true;
     } else {
       st.termA = cleanPairText(st.termA || '') || st.termA;
     }
     if ((!st.termB || genericSideRe.test(cleanPairText(st.termB))) && (st.rightPanel?.title || resolvedPairB)) {
+      if (st.kind === 'contrast_scale') repaired = true;
       st.termB = st.rightPanel?.title || resolvedPairB;
-      repaired = true;
     } else {
       st.termB = cleanPairText(st.termB || '') || st.termB;
     }
@@ -3437,8 +3533,16 @@ export function buildWhiteboardScenePlan(params: {
         st.descB = st.rightPanel?.subtitle || tblForDesc?.tableRows?.[1]?.slice(1).filter(Boolean).join(' • ') || cleanBoardDisplayText(sampleSentenceGlobal || st.termB || '');
       }
     }
-    const existingNarWords = String(st.spokenNarration || '').split(/\s+/).filter(Boolean).length;
-    if (repaired || existingNarWords < 16 || /\bsisi\s*[ab12]\b|\bsisi\s+(?:pertama|kedua)\b|\bpola\s+(?:pertama|kedua)\b/i.test(st.spokenNarration || '')) {
+    const existingNar = String(st.spokenNarration || '');
+    const existingNarWords = existingNar.split(/\s+/).filter(Boolean).length;
+    const leftFullForNar = `${st.leftPanel?.title || st.termA || ''} ${st.leftPanel?.subtitle || st.descA || ''} ${st.leftPanel?.example || ''}`;
+    const rightFullForNar = `${st.rightPanel?.title || st.termB || ''} ${st.rightPanel?.subtitle || st.descB || ''} ${st.rightPanel?.example || ''}`;
+    if (
+      repaired ||
+      existingNarWords < 16 ||
+      !doesNarrationCoverPanelPair(existingNar, leftFullForNar, rightFullForNar) ||
+      /\bsisi\s*[ab12]\b|\bsisi\s+(?:pertama|kedua)\b|\bpola\s+(?:pertama|kedua)\b/i.test(existingNar)
+    ) {
       const freshNarration = deriveStepSpokenNarration({ ...st, spokenNarration: '' }, shortTitle, boardState.coachExplanation || '', targetLang);
       st.spokenNarration = freshNarration;
       st.durationMs = computeStepDurationMs(st, freshNarration);

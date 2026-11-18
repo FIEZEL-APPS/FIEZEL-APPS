@@ -42,11 +42,13 @@ export interface FlexibleTurnEvaluationResult {
   misconceptionId: string | null;
   whyFailsId: string | null;
   whyFailsTh: string | null;
+  whyFailsEn?: string | null;
   missingTokens: string[];
   syntacticCorrection: string | null;
   naturalReformulation: string;
   pedagogicalFeedbackId: string;
   pedagogicalFeedbackTh: string;
+  pedagogicalFeedbackEn?: string;
   aiReply: string;
   aiReplyTranslationId: string;
   aiReplyTranslationTh: string;
@@ -1995,7 +1997,7 @@ export function buildContextualFallbackCards(params: {
           pronunciation: '"Bù" hé "méi" de qūbié lǎoshì gǎohùn, nǐ néng dài wǒ liàn yīxià ma?',
           hintId: 'Bedanya "bù" dan "méi" sering ketukar terus, bisa bantu latih aku sebentar?',
           hintTh: 'ฉันสับสนความแตกต่างระหว่าง "bù" กับ "méi" ตลอดเลย ช่วยพาฉันฝึกหน่อยได้ไหม?',
-          hintEn: 'I keep mixing up "bù" and "méi"—could you drill that with me briefly?',
+          hintEn: 'I keep mixing up "bù" and "méi", could you drill that with me briefly?',
           meaningId: 'Bedanya "bù" dan "méi" sering ketukar terus, bisa bantu latih aku sebentar?',
           meaningTh: 'ฉันสับสนความแตกต่างระหว่าง "bù" กับ "méi" ตลอดเลย ช่วยพาฉันฝึกหน่อยได้ไหม?',
           isRealtimeAi: false,
@@ -2182,7 +2184,7 @@ export function buildContextualFallbackCards(params: {
           pronunciation: 'Wǒ kàn dǒng píngmù shàng de guīzé le, bǐrú: zhè shì wǒ de Zhōngwén shū.',
           hintId: 'Aku sudah paham aturan di layar, misalnya: ini adalah buku bahasa Mandarinku.',
           hintTh: 'ฉันเข้าใจกฎบนหน้าจอแล้ว เช่น นี่คือหนังสือภาษาจีนของฉัน',
-          hintEn: 'I see the rule on screen now—for example: this is my Chinese book.',
+          hintEn: 'I see the rule on screen now, for example: this is my Chinese book.',
           meaningId: 'Aku sudah paham aturan di layar, misalnya: ini adalah buku bahasa Mandarinku.',
           meaningTh: 'ฉันเข้าใจกฎบนหน้าจอแล้ว เช่น นี่คือหนังสือภาษาจีนของฉัน',
           isRealtimeAi: false,
@@ -2237,7 +2239,7 @@ export function buildContextualFallbackCards(params: {
           pronunciation: 'Gamen no kaisetsu de sukkiri wakarimashita, renshuu shite mimasu ne.',
           hintId: 'Penjelasan di layar bikin langsung paham, aku coba latihannya ya.',
           hintTh: 'คำอธิบายบนหน้าจอทำให้เข้าใจชัดเจนเลย เดี๋ยวลองฝึกดูนะ',
-          hintEn: 'The on-screen breakdown made it clear—I will practice it now.',
+          hintEn: 'The on-screen breakdown made it clear, I will practice it now.',
           meaningId: 'Penjelasan di layar bikin langsung paham, aku coba latihannya ya.',
           meaningTh: 'คำอธิบายบนหน้าจอทำให้เข้าใจชัดเจนเลย เดี๋ยวลองฝึกดูนะ',
           isRealtimeAi: false,
@@ -3302,7 +3304,7 @@ export async function requestRealtimeCopilotAssist(params: {
             `The examiner just said: "${cleanAiText}".`,
             params.lastUserText ? `Candidate just said: "${params.lastUserText}".` : '',
             hist ? `Exam Context:\n${hist}` : '',
-            `Candidate's Target Proficiency: Level ${cefrLevel} (Target PTE 42 / IELTS 5.0–5.5).`,
+            `Candidate's Target Proficiency: Level ${cefrLevel} (Target PTE 42 / IELTS 5.0-5.5).`,
             `CRITICAL MANDATE: Produce EXACTLY ONE single best Model Answer that 100% DIRECTLY answers the examiner's actual statement/question.`,
             `Use natural, accessible Level ${cefrLevel} vocabulary and clear compound syntax. STRICTLY FORBIDDEN: Do NOT use obscure C2 academic jargon (such as "cogent", "unilateral", "invariably yields").`,
             `Provide an accurate first-person translation in ${learnerLangName} in the "hint" field, and a readable phonetic pronunciation guide in "pronunciation".`,
@@ -6422,13 +6424,15 @@ export async function synthesizeViaWorkerGeminiTts(params: {
   if (!cleanText) return null;
 
   const rawLang = String(params.targetLang || 'en').toLowerCase().split(/[-_]/)[0].trim();
-  const isUiExplainLang = ['id', 'th', 'vi', 'ru', 'ms', 'ko', 'es', 'fr', 'de'].includes(rawLang);
+  const isUiExplainLang = [
+    'id', 'th', 'vi', 'ru', 'km', 'fil', 'tl', 'ms', 'ko', 'ar', 'es', 'fr', 'de', 'pt', 'hi', 'my', 'lo', 'it',
+  ].includes(rawLang);
   const baseStylePrompt = params.persona?.ttsStylePrompt || params.persona?.speakingStyle || '';
 
   for (const base of resolveVoiceApiCandidateBases()) {
     await ensureVoiceWorkerSession(base);
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), cleanText.length > 420 ? 13000 : 9500);
+    const timer = setTimeout(() => controller.abort(), cleanText.length > 420 ? 9200 : 7200);
     try {
       const res = await fetch(`${base}/api/voice/gemini-tts`, {
         method: 'POST',
@@ -6463,9 +6467,11 @@ export async function synthesizeViaWorkerGeminiTts(params: {
         }
       } else if (res.status >= 500) {
         _workerGeminiTtsConsecErrors += 1;
-        if (_workerGeminiTtsConsecErrors >= 3) {
-          _workerGeminiTtsCooldownUntil = Date.now() + 4000;
+        if (_workerGeminiTtsConsecErrors >= 2) {
+          _workerGeminiTtsCooldownUntil = Date.now() + 4500;
         }
+        // Fail fast to /api/tts/line neural fallback instead of stacking another 9s wait on a secondary base
+        break;
       }
     } catch {
       clearTimeout(timer);
