@@ -1019,7 +1019,15 @@ rt.zh-rt {
   .fz-wb-spotlight-zoom-out {
     transform: none !important;
   }
-  .fz-sub-zoom-in {
+  .fz-sub-zoom-in,
+  .fz-table-row-focus,
+  .fz-table-row-focus-active {
     transform: none !important;
+  }
+  .fz-pen-float-badge,
+  .fz-marker-nib-bob,
+  .fz-wb-spotlight-card .animate-ping,
+  .fz-wb-spotlight-card .animate-pulse {
+    animation: none !important;
   }
 }

@@ -5406,6 +5406,15 @@
       }
       // Single-WebGL-Context Invariant: resume Host 3D Mochi ONLY AFTER iframe teardown completes
       try { if (root.FiezelMochiCompanion && typeof root.FiezelMochiCompanion.resume === 'function') root.FiezelMochiCompanion.resume(); } catch (_) {}
+      // m025-811: Resume deferred offline neural-voice autoload only after exiting Kawan Bicara / Whiteboard
+      try {
+        if (root.FiezelVoiceOfflineAutoload && typeof root.FiezelVoiceOfflineAutoload.status === 'function') {
+          var _alSt = root.FiezelVoiceOfflineAutoload.status();
+          if (_alSt && _alSt.armed && !_alSt.done && typeof root.FiezelVoiceOfflineAutoload.resume === 'function') {
+            root.FiezelVoiceOfflineAutoload.resume();
+          }
+        }
+      } catch (_) {}
     },
     cleanup: function () {
       return api.unmount();

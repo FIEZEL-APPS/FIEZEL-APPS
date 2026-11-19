@@ -3663,6 +3663,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
         quizSpeechHtmlAudioRef.current.onended = null;
         quizSpeechHtmlAudioRef.current.pause();
         quizSpeechHtmlAudioRef.current.removeAttribute('src');
+        quizSpeechHtmlAudioRef.current.load();
       } catch {}
       quizSpeechHtmlAudioRef.current = null;
     }
@@ -3696,6 +3697,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
         lockstepAudioRef.current.onended = null;
         lockstepAudioRef.current.pause();
         lockstepAudioRef.current.removeAttribute('src');
+        lockstepAudioRef.current.load();
       } catch {
         // Ignore cleanup error
       }
@@ -4235,6 +4237,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
     let cancelled = false;
     const seqId = ++lockstepSeqIdRef.current;
     let rafId = 0;
+    const isMobileLowMem = isMobileLowMemoryDevice();
 
     const estTotalSec = Math.max(
       4,
@@ -4591,8 +4594,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
         : Math.max(0, Math.min(0.95, (resumeFrac - chunkBounds[startChunkIdx].startFrac) / startSpan));
 
     const activePersona = personaRef.current;
-    const isMobileLowMem = isMobileLowMemoryDevice();
-    const maxTrackCacheSize = isMobileLowMem ? 5 : 16;
+    const maxTrackCacheSize = isMobileLowMem ? 2 : 16;
 
     const decodeChunkPayload = async (
       idx: number,
@@ -4600,10 +4602,10 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
       audioMimeType?: string
     ): Promise<ChunkRes> => {
       const chunkText = chunks[idx] || '';
-      const dataUrl = `data:${audioMimeType || 'audio/wav'};base64,${audioBase64}`;
       let audioBuffer: AudioBuffer | null = null;
       let durationSec = 0;
       let alignment: SpeechAlignment | null = null;
+      let ctxRunning = false;
       try {
         const bin = atob(audioBase64);
         const bytes = new Uint8Array(bin.length);
@@ -4611,10 +4613,14 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
         const ctx = getSharedBoardAudioContext();
         if (ctx && ctx.state !== 'closed') {
           trackAudioCtxRef.current = ctx;
+          ctxRunning = ctx.state === 'running';
           const decoded = await decodeAudioDataSafe(ctx, bytes.buffer, isMobileLowMem ? 3800 : 5000);
           if (decoded && decoded.duration > 0.18) {
-            // Pertahankan suara asli utuh tanpa WSOLA/pemotongan kata, lalu sejajarkan kata tepat dengan teks ter-sanitasi 1:1
-            audioBuffer = processSpeechBuffer(ctx, decoded, BOARD_SPEECH_PROCESSING);
+            // Mobile PWA Memory Discipline: skip extra Float32 AudioBuffer reallocation via processSpeechBuffer
+            // (alignWordsToSpeech uses zero-copy toMonoView on mono buffers -> slashes peak RAM ~15MB -> ~2.5MB/chunk!)
+            audioBuffer = isMobileLowMem
+              ? decoded
+              : processSpeechBuffer(ctx, decoded, BOARD_SPEECH_PROCESSING);
             durationSec = audioBuffer.duration;
             const exactSpokenForAlign = alignedChunkTexts[idx] || chunkText;
             alignment = alignWordsToSpeech(exactSpokenForAlign, audioBuffer);
@@ -4626,6 +4632,11 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
       if (!durationSec) {
         durationSec = Math.max(1.8, chunkWeights[idx] * 0.068);
       }
+      // On Mobile PWA, do NOT retain ~700KB base64 dataUrl string when WebAudio decoded & context is running
+      const dataUrl =
+        isMobileLowMem && audioBuffer && ctxRunning
+          ? ''
+          : `data:${audioMimeType || 'audio/wav'};base64,${audioBase64}`;
       return { audioBuffer, dataUrl, durationSec, alignment };
     };
 
@@ -4877,11 +4888,17 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
         window.clearTimeout(safetyWatchdogId);
         if (cancelled || lockstepSeqIdRef.current !== seqId) return;
         cancelAnimationFrame(rafId);
-        // Mobile PWA Memory Discipline: release finished Float32 PCM buffer immediately once played
+        // Mobile PWA Memory Discipline: release finished Float32 PCM buffer & base64 dataUrl immediately once played
         if (isMobileLowMem) {
           const finished = resolvedChunkMap.get(chunkIdx);
           if (finished) {
             finished.audioBuffer = null;
+            finished.dataUrl = '';
+          }
+          resolvedChunkMap.delete(chunkIdx);
+          const playedChunkText = chunks[chunkIdx];
+          if (playedChunkText) {
+            trackCacheRef.current.delete(`${activePersona.id}::${locCode}::chunk::${playedChunkText}`);
           }
         }
         if (isLastChunk) {
@@ -5060,6 +5077,11 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
 
       // Prioritas 2: HTMLAudioElement terpisah per-kalimat jika WebAudio suspended
       if (cancelled || lockstepSeqIdRef.current !== seqId) return;
+      if (!chunkRes.dataUrl) {
+        revealCanvasNow();
+        runTimedSilentFallback(chunkDurSec, 'silent_autoplay_blocked');
+        return;
+      }
       const audio = new Audio(chunkRes.dataUrl);
       audio.playbackRate = playbackSpeedRef.current;
       lockstepAudioRef.current = audio;
@@ -5067,16 +5089,27 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
         if (seekInChunkSec > 0.05) audio.currentTime = seekInChunkSec;
       } catch {}
 
+      const releaseHtmlAudio = () => {
+        try {
+          audio.onended = null;
+          audio.onerror = null;
+          audio.pause();
+          audio.removeAttribute('src');
+          audio.load();
+        } catch {}
+      };
       let settled = false;
       const completeHtmlAudio = () => {
         if (settled || cancelled || lockstepSeqIdRef.current !== seqId) return;
         settled = true;
+        releaseHtmlAudio();
         advanceToNextOrDone();
       };
       audio.onended = completeHtmlAudio;
       audio.onerror = () => {
         if (!settled && !cancelled && lockstepSeqIdRef.current === seqId) {
           settled = true;
+          releaseHtmlAudio();
           runTimedSilentFallback(chunkDurSec, 'html_audio_error', 'html_audio_decode_error');
         }
       };
@@ -5084,10 +5117,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
       onStopMainAudioRef.current?.();
       const htmlPlayStatus = await playHtmlAudioBounded(audio, 650);
       if (cancelled || lockstepSeqIdRef.current !== seqId) {
-        try {
-          audio.pause();
-          audio.removeAttribute('src');
-        } catch {}
+        releaseHtmlAudio();
         return;
       }
       if (htmlPlayStatus === 'playing') {
@@ -5291,7 +5321,8 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
               const bin = atob(tts.audioBase64);
               const bytes = new Uint8Array(bin.length);
               for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
-              const decoded = await ctx.decodeAudioData(bytes.buffer.slice(0));
+              const decoded = await decodeAudioDataSafe(ctx, bytes.buffer, 3800);
+              if (!decoded) throw new Error('decode_failed');
               if (quizSpeechTokenRef.current !== token) return;
               const src = ctx.createBufferSource();
               src.buffer = decoded;
@@ -5312,14 +5343,26 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
         const dataUrl = `data:${tts.audioMimeType || 'audio/wav'};base64,${tts.audioBase64}`;
         const a = new Audio(dataUrl);
         quizSpeechHtmlAudioRef.current = a;
+        const releaseQuizAudio = () => {
+          try {
+            a.onended = null;
+            a.pause();
+            a.removeAttribute('src');
+            a.load();
+          } catch {}
+        };
         a.onended = () => {
+          releaseQuizAudio();
           if (quizSpeechTokenRef.current === token) {
             setQuizCoachReply((prev) => (prev ? { ...prev, isSpeaking: false } : prev));
           }
         };
         const st = await playHtmlAudioBounded(a, 650);
-        if (st !== 'playing' && quizSpeechTokenRef.current === token) {
-          setQuizCoachReply((prev) => (prev ? { ...prev, isSpeaking: false } : prev));
+        if (st !== 'playing') {
+          releaseQuizAudio();
+          if (quizSpeechTokenRef.current === token) {
+            setQuizCoachReply((prev) => (prev ? { ...prev, isSpeaking: false } : prev));
+          }
         }
       } catch {
         if (quizSpeechTokenRef.current === token) {

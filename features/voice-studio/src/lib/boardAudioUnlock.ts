@@ -22,6 +22,7 @@ function primeSilentHtmlAudio(): void {
           try {
             a.pause();
             a.removeAttribute('src');
+            a.load();
           } catch {
             // Ignore cleanup
           }
@@ -91,9 +92,47 @@ export function ensureGlobalGestureUnlockListener(): void {
 }
 
 /**
- * Returns the shared singleton AudioContext for the whiteboard (creating one if available).
+ * Bind an already-unlocked shared AudioContext (e.g. from Host index.html or active Kawan Bicara call)
+ * so Mobile PWA (iOS WebKit / Android Chrome) stays within 1 hardware AudioContext instead of spawning 4-5.
+ */
+export function registerSharedBoardAudioContext(ctx: AudioContext | null | undefined): void {
+  if (ctx && ctx.state !== 'closed') {
+    sharedBoardAudioCtx = ctx;
+  }
+}
+
+function resolveExistingSharedAudioContext(): AudioContext | null {
+  if (sharedBoardAudioCtx && sharedBoardAudioCtx.state !== 'closed') {
+    return sharedBoardAudioCtx;
+  }
+  if (typeof window !== 'undefined') {
+    try {
+      const own = (window as unknown as { __fzSharedLiveAudioCtx?: AudioContext }).__fzSharedLiveAudioCtx;
+      if (own && own.state !== 'closed') {
+        sharedBoardAudioCtx = own;
+        return own;
+      }
+      if (window.parent && window.parent !== window) {
+        const parentCtx = (window.parent as unknown as { __fzSharedLiveAudioCtx?: AudioContext })
+          .__fzSharedLiveAudioCtx;
+        if (parentCtx && parentCtx.state !== 'closed') {
+          sharedBoardAudioCtx = parentCtx;
+          return parentCtx;
+        }
+      }
+    } catch {
+      // Cross-origin parent access guard
+    }
+  }
+  return null;
+}
+
+/**
+ * Returns the shared singleton AudioContext for the whiteboard (adopting an existing Host/Call AudioContext first).
  */
 export function getSharedBoardAudioContext(): AudioContext | null {
+  const existing = resolveExistingSharedAudioContext();
+  if (existing) return existing;
   const Ctor = resolveAudioContextCtor();
   if (!Ctor) return null;
   if (!sharedBoardAudioCtx || sharedBoardAudioCtx.state === 'closed') {

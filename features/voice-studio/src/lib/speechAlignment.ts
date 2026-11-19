@@ -610,6 +610,12 @@ function toMono(buf: AudioBuffer): Float32Array {
   return out;
 }
 
+/** Zero-copy read-only mono view for RMS/alignment analysis (avoids 2-3MB Float32 clones on Mobile PWA). */
+function toMonoView(buf: AudioBuffer): Float32Array {
+  if (buf.numberOfChannels === 1) return buf.getChannelData(0);
+  return toMono(buf);
+}
+
 function rmsEnvelope(x: Float32Array, sr: number): Float32Array {
   const hop = Math.max(1, Math.round(sr * HOP_SEC));
   const frames = Math.max(1, Math.floor(x.length / hop));
@@ -783,7 +789,7 @@ export function alignWordsToSpeech(text: string, buf: AudioBuffer): SpeechAlignm
 
   let mask: boolean[];
   try {
-    mask = voicedMask(rmsEnvelope(toMono(buf), buf.sampleRate));
+    mask = voicedMask(rmsEnvelope(toMonoView(buf), buf.sampleRate));
   } catch {
     return fallbackLinear(0, duration);
   }
