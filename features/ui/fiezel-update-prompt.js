@@ -409,6 +409,13 @@
   var deferred = null;
   function lessonActive() {
     try {
+      if (
+        typeof document !== 'undefined' &&
+        ((document.body && document.body.classList && document.body.classList.contains('fz-view-chat')) ||
+          (typeof document.getElementById === 'function' && document.getElementById('fzMitraKaiwaStudioFrame')))
+      ) {
+        return true;
+      }
       var stage = (typeof globalThis !== 'undefined' && globalThis.FiezelStage) || null;
       return !!(stage && typeof stage.lessonMode === 'function' && stage.lessonMode() === true);
     } catch (_) { return false; }

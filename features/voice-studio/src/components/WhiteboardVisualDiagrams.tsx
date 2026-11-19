@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import type { WhiteboardSceneStep } from '../lib/whiteboardDirector';
 import { MathText } from './MathText';
 import { wbPick } from '../lib/i18n';
+import { isMobileLowMemoryDevice } from '../lib/boardAudioUnlock';
 
 const escapeRegExp = (str: string) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
@@ -771,6 +772,7 @@ export const MetaphorSceneDiagram: React.FC<{
   });
   const analogyZoomed =
     !isLightbox && autoZoom && isActive && isPlaying && effProgress >= 0.68 && effProgress < 0.93;
+  const isMobileLite = isMobileLowMemoryDevice();
 
   return (
     <div className="space-y-3" data-testid="wb-metaphor-scene">
@@ -801,8 +803,9 @@ export const MetaphorSceneDiagram: React.FC<{
             backgroundColor: lp.bgColor || '#E0F2FE',
             borderColor: focusSide === 'left' ? lp.accentColor || '#0284C7' : `${lp.accentColor || '#0284C7'}55`,
             opacity: focusSide === 'right' ? 0.44 : effProgress >= 0.12 ? 1 : 0.18,
-            transform:
-              focusSide === 'left'
+            transform: isMobileLite
+              ? undefined
+              : focusSide === 'left'
                 ? 'translateY(-3px) scale(1.04)'
                 : focusSide === 'right'
                   ? 'translateY(0) scale(0.97)'
@@ -811,9 +814,11 @@ export const MetaphorSceneDiagram: React.FC<{
                     : 'translateY(4px) scale(0.98)',
             boxShadow:
               focusSide === 'left'
-                ? `0 18px 38px ${lp.accentColor || '#0284C7'}38, 0 0 0 2.5px ${lp.accentColor || '#0284C7'}`
+                ? isMobileLite
+                  ? `0 0 0 2.5px ${lp.accentColor || '#0284C7'}`
+                  : `0 18px 38px ${lp.accentColor || '#0284C7'}38, 0 0 0 2.5px ${lp.accentColor || '#0284C7'}`
                 : undefined,
-            zIndex: focusSide === 'left' ? 20 : undefined,
+            zIndex: focusSide === 'left' && !isMobileLite ? 20 : undefined,
           }}
         >
           <div className="flex items-center justify-between gap-2 mb-1.5">
@@ -855,8 +860,9 @@ export const MetaphorSceneDiagram: React.FC<{
             backgroundColor: rp.bgColor || '#DCFCE7',
             borderColor: focusSide === 'right' ? rp.accentColor || '#15803D' : `${rp.accentColor || '#15803D'}55`,
             opacity: focusSide === 'left' ? 0.44 : effProgress >= 0.3 ? 1 : 0.18,
-            transform:
-              focusSide === 'right'
+            transform: isMobileLite
+              ? undefined
+              : focusSide === 'right'
                 ? 'translateY(-3px) scale(1.04)'
                 : focusSide === 'left'
                   ? 'translateY(0) scale(0.97)'
@@ -865,9 +871,11 @@ export const MetaphorSceneDiagram: React.FC<{
                     : 'translateY(4px) scale(0.98)',
             boxShadow:
               focusSide === 'right'
-                ? `0 18px 38px ${rp.accentColor || '#15803D'}38, 0 0 0 2.5px ${rp.accentColor || '#15803D'}`
+                ? isMobileLite
+                  ? `0 0 0 2.5px ${rp.accentColor || '#15803D'}`
+                  : `0 18px 38px ${rp.accentColor || '#15803D'}38, 0 0 0 2.5px ${rp.accentColor || '#15803D'}`
                 : undefined,
-            zIndex: focusSide === 'right' ? 20 : undefined,
+            zIndex: focusSide === 'right' && !isMobileLite ? 20 : undefined,
           }}
         >
           <div className="flex items-center justify-between gap-2 mb-1.5">
@@ -906,8 +914,12 @@ export const MetaphorSceneDiagram: React.FC<{
         <div
           className="px-3.5 py-2.5 rounded-2xl bg-[#FFFBEB] border border-[#F59E0B]/45 text-[12px] font-semibold text-[#78350F] flex items-start gap-2 transition-transform duration-500 ease-out"
           style={{
-            transform: analogyZoomed ? 'scale(1.045)' : 'scale(1)',
-            boxShadow: analogyZoomed ? '0 12px 26px rgba(245, 158, 11, 0.28)' : undefined,
+            transform: isMobileLite ? undefined : analogyZoomed ? 'scale(1.045)' : 'scale(1)',
+            boxShadow: analogyZoomed
+              ? isMobileLite
+                ? '0 0 0 2px rgba(245, 158, 11, 0.55)'
+                : '0 12px 26px rgba(245, 158, 11, 0.28)'
+              : undefined,
           }}
         >
           <span className="shrink-0 text-sm">💡</span>
@@ -947,6 +959,7 @@ export const MindMapDiagram: React.FC<{
     isLightbox,
     queuedPreview,
   });
+  const isMobileLite = isMobileLowMemoryDevice();
 
   return (
     <div className="space-y-3" data-testid="wb-mind-map">
@@ -1017,15 +1030,21 @@ export const MindMapDiagram: React.FC<{
                 style={{
                   borderColor: isFocused ? c : `${c}66`,
                   opacity: activeBranchIdx >= 0 && !isFocused ? 0.46 : visible ? 1 : 0.16,
-                  transform: !visible
-                    ? 'scale(0.98)'
-                    : isFocused
-                      ? 'translateY(-2px) scale(1.04)'
-                      : activeBranchIdx >= 0
-                        ? 'scale(0.955)'
-                        : 'scale(1)',
-                  boxShadow: isFocused ? `0 16px 34px ${c}38, 0 0 0 2.5px ${c}` : undefined,
-                  zIndex: isFocused ? 20 : undefined,
+                  transform: isMobileLite
+                    ? undefined
+                    : !visible
+                      ? 'scale(0.98)'
+                      : isFocused
+                        ? 'translateY(-2px) scale(1.04)'
+                        : activeBranchIdx >= 0
+                          ? 'scale(0.955)'
+                          : 'scale(1)',
+                  boxShadow: isFocused
+                    ? isMobileLite
+                      ? `0 0 0 2.5px ${c}`
+                      : `0 16px 34px ${c}38, 0 0 0 2.5px ${c}`
+                    : undefined,
+                  zIndex: isFocused && !isMobileLite ? 20 : undefined,
                 }}
               >
                 <div className="flex items-center gap-2 mb-1">
@@ -1084,6 +1103,7 @@ export const TimelineTrackDiagram: React.FC<{
     isLightbox,
     queuedPreview,
   });
+  const isMobileLite = isMobileLowMemoryDevice();
 
   return (
     <div className="space-y-3" data-testid="wb-timeline-track">
@@ -1113,7 +1133,13 @@ export const TimelineTrackDiagram: React.FC<{
               className="relative z-10 w-8 h-8 rounded-full border-2 flex items-center justify-center bg-white shadow-xs transition-transform duration-300"
               style={{
                 borderColor: ev.color || '#0EA5E9',
-                transform: i === activeEventIdx ? 'scale(1.22)' : ev.isActive ? 'scale(1.12)' : 'scale(1)',
+                transform: isMobileLite
+                  ? undefined
+                  : i === activeEventIdx
+                    ? 'scale(1.22)'
+                    : ev.isActive
+                      ? 'scale(1.12)'
+                      : 'scale(1)',
               }}
             >
               <SmpVectorIcon name={ev.icon || 'clock'} color={ev.color || '#0EA5E9'} size={15} />
@@ -1135,13 +1161,19 @@ export const TimelineTrackDiagram: React.FC<{
                   backgroundColor: isFocused || ev.isActive ? '#ECFDF5' : '#FFFFFF',
                   borderColor: isFocused ? c : ev.isActive ? '#10B981' : '#E2E8F0',
                   opacity: activeEventIdx >= 0 && !isFocused ? 0.46 : visible ? 1 : 0.16,
-                  transform: isFocused
-                    ? 'translateY(-2px) scale(1.04)'
-                    : activeEventIdx >= 0
-                      ? 'scale(0.97)'
-                      : 'scale(1)',
-                  boxShadow: isFocused ? `0 16px 34px ${c}38, 0 0 0 2.5px ${c}` : undefined,
-                  zIndex: isFocused ? 20 : undefined,
+                  transform: isMobileLite
+                    ? undefined
+                    : isFocused
+                      ? 'translateY(-2px) scale(1.04)'
+                      : activeEventIdx >= 0
+                        ? 'scale(0.97)'
+                        : 'scale(1)',
+                  boxShadow: isFocused
+                    ? isMobileLite
+                      ? `0 0 0 2.5px ${c}`
+                      : `0 16px 34px ${c}38, 0 0 0 2.5px ${c}`
+                    : undefined,
+                  zIndex: isFocused && !isMobileLite ? 20 : undefined,
                 }}
               >
                 <div className="text-[10px] font-extrabold uppercase tracking-wider" style={{ color: ev.color || '#0369A1' }}>
@@ -1190,6 +1222,7 @@ export const FormulaBlocksDiagram: React.FC<{
     isLightbox,
     queuedPreview,
   });
+  const isMobileLite = isMobileLowMemoryDevice();
 
   return (
     <div className="space-y-3" data-testid="wb-formula-blocks">
@@ -1228,15 +1261,21 @@ export const FormulaBlocksDiagram: React.FC<{
                         borderColor: c,
                         backgroundColor: isFocused ? `${c}26` : `${c}15`,
                         opacity: activeBlockIdx >= 0 && !isFocused ? 0.46 : visible ? 1 : 0.16,
-                        transform: !visible
-                          ? 'translateY(2px) scale(0.98)'
-                          : isFocused
-                            ? 'translateY(-4px) scale(1.075)'
-                            : activeBlockIdx >= 0
-                              ? 'translateY(0) scale(0.955)'
-                              : 'translateY(0) scale(1)',
-                        boxShadow: isFocused ? `0 16px 34px ${c}3C, 0 0 0 2.5px ${c}` : undefined,
-                        zIndex: isFocused ? 20 : undefined,
+                        transform: isMobileLite
+                          ? undefined
+                          : !visible
+                            ? 'translateY(2px) scale(0.98)'
+                            : isFocused
+                              ? 'translateY(-4px) scale(1.075)'
+                              : activeBlockIdx >= 0
+                                ? 'translateY(0) scale(0.955)'
+                                : 'translateY(0) scale(1)',
+                        boxShadow: isFocused
+                          ? isMobileLite
+                            ? `0 0 0 2.5px ${c}`
+                            : `0 16px 34px ${c}3C, 0 0 0 2.5px ${c}`
+                          : undefined,
+                        zIndex: isFocused && !isMobileLite ? 20 : undefined,
                       }}
                     >
                       <div className="text-[9.5px] font-extrabold uppercase tracking-wider mb-0.5" style={{ color: c }}>

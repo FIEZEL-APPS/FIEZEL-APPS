@@ -203,6 +203,7 @@ function loadSileroBundle(): Promise<{ vad: GlobalVadNamespace; baseHref: string
 export class SileroNeuralVadGate {
   private instance: { start: () => void; pause: () => void; destroy?: () => void } | null = null;
   private active = false;
+  private paused = false;
   private disposed = false;
   private confirmedSpeaking = false;
   private lastHumanSpeechAt = 0;
@@ -210,7 +211,31 @@ export class SileroNeuralVadGate {
   private lastProb = 0;
 
   public isActive(): boolean {
-    return this.active && !this.disposed && Date.now() - this.lastFrameAt < 600;
+    return this.active && !this.paused && !this.disposed && Date.now() - this.lastFrameAt < 600;
+  }
+
+  public pause(): void {
+    this.paused = true;
+    this.confirmedSpeaking = false;
+    if (this.instance) {
+      try {
+        this.instance.pause?.();
+      } catch {
+        // ignore
+      }
+    }
+  }
+
+  public resume(): void {
+    if (this.disposed || !this.active || !this.paused) return;
+    this.paused = false;
+    if (this.instance) {
+      try {
+        this.instance.start?.();
+      } catch {
+        // ignore
+      }
+    }
   }
 
   public isConfirmedSpeaking(): boolean {
@@ -292,8 +317,8 @@ export class SileroNeuralVadGate {
         resumeStream: async () => stream,
         audioContext,
         onFrameProcessed: (probs: { isSpeech?: number }, frame: Float32Array) => {
+          if (this.disposed || this.paused || cb.isMicMuted() || cb.isWorkbenchOpen?.()) return;
           this.lastFrameAt = Date.now();
-          if (this.disposed || cb.isMicMuted()) return;
           const pSpeech = typeof probs?.isSpeech === 'number' ? probs.isSpeech : 0;
           this.lastProb = pSpeech;
 
@@ -443,7 +468,16 @@ export class SileroNeuralVadGate {
 
       this.instance = micVad;
       this.active = true;
-      micVad.start();
+      if (this.paused || cb.isWorkbenchOpen?.()) {
+        this.paused = true;
+        try {
+          micVad.pause?.();
+        } catch {
+          // ignore
+        }
+      } else {
+        micVad.start();
+      }
       try {
         (window as any).__fzVoiceStudioSileroVad = this;
       } catch {

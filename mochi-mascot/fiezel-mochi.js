@@ -8180,6 +8180,20 @@ export class FiezelMochi {
     }
     if (this._sparkleTexture) { try { this._sparkleTexture.dispose(); } catch (_) {} this._sparkleTexture = null; }
     if (this._heartTexture) { try { this._heartTexture.dispose(); } catch (_) {} this._heartTexture = null; }
+    if (this.mochiSkinTexture) { try { this.mochiSkinTexture.dispose(); } catch (_) {} this.mochiSkinTexture = null; }
+    if (this.faceTexture) { try { this.faceTexture.dispose(); } catch (_) {} this.faceTexture = null; }
+    if (this.auraBackTexture) { try { this.auraBackTexture.dispose(); } catch (_) {} this.auraBackTexture = null; }
+    if (this.fxTexture) { try { this.fxTexture.dispose(); } catch (_) {} this.fxTexture = null; }
+    // Release offscreen 2D Canvas backing stores (~16 MB on iOS CoreGraphics) immediately on teardown
+    [this.skinCanvas, this.faceCanvas, this.auraBackCanvas, this.fxCanvas].forEach((cv) => {
+      if (cv) {
+        try { cv.width = 0; cv.height = 0; } catch (_) {}
+      }
+    });
+    this.skinCanvas = null; this.sCtx = null;
+    this.faceCanvas = null; this.fCtx = null;
+    this.auraBackCanvas = null; this.auraBackCtx = null;
+    this.fxCanvas = null; this.fxCtx = null;
     if (this.renderer) {
       if (this.renderer.domElement) {
         if (this._onContextLost) {
@@ -8188,6 +8202,7 @@ export class FiezelMochi {
         if (this._onContextRestored) {
           try { this.renderer.domElement.removeEventListener('webglcontextrestored', this._onContextRestored, false); } catch (_) {}
         }
+        try { this.renderer.domElement.width = 0; this.renderer.domElement.height = 0; } catch (_) {}
         if (this.renderer.domElement.parentNode) {
           this.renderer.domElement.parentNode.removeChild(this.renderer.domElement);
         }

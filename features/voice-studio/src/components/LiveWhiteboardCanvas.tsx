@@ -282,6 +282,8 @@ const RoughMarkedText: React.FC<{
 };
 
 function animateRoughSvgPaths(svgEl: Element) {
+  // Mobile PWA compositor discipline: skip synchronous getTotalLength() reflows & dashoffset animations on 100+ SVG paths
+  if (isMobileLowMemoryDevice()) return;
   const paths = Array.from(svgEl.querySelectorAll('path'));
   paths.forEach((p, idx) => {
     try {
@@ -349,6 +351,7 @@ const RoughContrastScaleDiagram: React.FC<{
   const leftFill = leftIsErrorTrap ? '#FEF3C7' : '#E0F2FE';
   const leftTitleClass = leftIsErrorTrap ? 'text-[#92400E]' : 'text-[#0369A1]';
   const leftShadow = leftIsErrorTrap ? 'rgba(180,83,9,0.22)' : 'rgba(2,132,199,0.22)';
+  const isMobileLite = isMobileLowMemoryDevice();
   const formatBadgeLabel = (label: string) => {
     const up = label.trim().toUpperCase();
     if (up.length <= 18) return up;
@@ -436,9 +439,16 @@ const RoughContrastScaleDiagram: React.FC<{
             className="relative min-h-[96px] px-3.5 py-3 flex flex-col items-center justify-center text-center rounded-2xl transition-all duration-400"
             style={{
               opacity: focusPan === 'right' ? 0.48 : 1,
-              transform: focusPan === 'left' ? 'translateY(-3px) scale(1.065)' : focusPan === 'right' ? 'scale(0.96)' : 'scale(1)',
-              zIndex: focusPan === 'left' ? 15 : undefined,
-              filter: focusPan === 'left' ? `drop-shadow(0 12px 24px ${leftShadow})` : undefined,
+              transform: isMobileLite
+                ? undefined
+                : focusPan === 'left'
+                  ? 'translateY(-3px) scale(1.065)'
+                  : focusPan === 'right'
+                    ? 'scale(0.96)'
+                    : 'scale(1)',
+              zIndex: focusPan === 'left' && !isMobileLite ? 15 : undefined,
+              filter: !isMobileLite && focusPan === 'left' ? `drop-shadow(0 12px 24px ${leftShadow})` : undefined,
+              boxShadow: isMobileLite && focusPan === 'left' ? `0 0 0 2.5px ${leftStroke}` : undefined,
             }}
           >
             <svg
@@ -471,9 +481,16 @@ const RoughContrastScaleDiagram: React.FC<{
             className="relative min-h-[96px] px-3.5 py-3 flex flex-col items-center justify-center text-center rounded-2xl transition-all duration-400"
             style={{
               opacity: focusPan === 'left' ? 0.48 : 1,
-              transform: focusPan === 'right' ? 'translateY(-3px) scale(1.065)' : focusPan === 'left' ? 'scale(0.96)' : 'scale(1)',
-              zIndex: focusPan === 'right' ? 15 : undefined,
-              filter: focusPan === 'right' ? 'drop-shadow(0 12px 24px rgba(21,128,61,0.22))' : undefined,
+              transform: isMobileLite
+                ? undefined
+                : focusPan === 'right'
+                  ? 'translateY(-3px) scale(1.065)'
+                  : focusPan === 'left'
+                    ? 'scale(0.96)'
+                    : 'scale(1)',
+              zIndex: focusPan === 'right' && !isMobileLite ? 15 : undefined,
+              filter: !isMobileLite && focusPan === 'right' ? 'drop-shadow(0 12px 24px rgba(21,128,61,0.22))' : undefined,
+              boxShadow: isMobileLite && focusPan === 'right' ? '0 0 0 2.5px #15803D' : undefined,
             }}
           >
             <svg
@@ -560,6 +577,7 @@ const RoughSyntaxFlowDiagram: React.FC<{
     isLightbox,
     queuedPreview,
   });
+  const isMobileLite = isMobileLowMemoryDevice();
 
   useEffect(() => {
     boxRefs.current.forEach((svg, idx) => {
@@ -617,9 +635,16 @@ const RoughSyntaxFlowDiagram: React.FC<{
                 className="relative min-w-[140px] max-w-[235px] min-h-[76px] h-auto flex flex-col items-center justify-center px-3.5 py-2 transition-all duration-300"
                 style={{
                   opacity: activeNodeIdx >= 0 && !isFocused ? 0.48 : visible ? 1 : 0.72,
-                  transform: isFocused ? 'translateY(-3px) scale(1.075)' : activeNodeIdx >= 0 ? 'scale(0.955)' : 'scale(1)',
-                  zIndex: isFocused ? 15 : undefined,
-                  filter: isFocused ? 'drop-shadow(0 10px 20px rgba(37,99,235,0.22))' : undefined,
+                  transform: isMobileLite
+                    ? undefined
+                    : isFocused
+                      ? 'translateY(-3px) scale(1.075)'
+                      : activeNodeIdx >= 0
+                        ? 'scale(0.955)'
+                        : 'scale(1)',
+                  zIndex: isFocused && !isMobileLite ? 15 : undefined,
+                  filter: !isMobileLite && isFocused ? 'drop-shadow(0 10px 20px rgba(37,99,235,0.22))' : undefined,
+                  boxShadow: isMobileLite && isFocused ? '0 0 0 2.5px #2563EB' : undefined,
                 }}
               >
                 <svg
@@ -1861,26 +1886,27 @@ const RoughFreeformSceneDiagram: React.FC<{
   useEffect(() => {
     const svg = svgRef.current;
     if (!svg) return;
+    const isMobileLite = isMobileLowMemoryDevice();
     const groups = Array.from(svg.querySelectorAll<SVGGElement>('[data-wb-shape-idx]'));
     groups.forEach((g) => {
       const idx = Number(g.getAttribute('data-wb-shape-idx') || '-1');
       const isReached = stageFilter !== null || idx < reachedCount;
       if (activeShapeIdx < 0) {
         g.style.opacity = queuedPreview ? '0.2' : isReached ? '1' : '0.28';
-        g.style.transform = 'scale(1)';
+        g.style.transform = isMobileLite ? '' : 'scale(1)';
         g.style.filter = '';
       } else if (idx === activeShapeIdx) {
         g.style.opacity = '1';
-        g.style.transform = 'scale(1.045)';
-        g.style.filter = 'drop-shadow(0 8px 18px rgba(21,128,61,0.28))';
+        g.style.transform = isMobileLite ? '' : 'scale(1.045)';
+        g.style.filter = isMobileLite ? '' : 'drop-shadow(0 8px 18px rgba(21,128,61,0.28))';
       } else if (!isReached) {
         g.style.opacity = '0.34';
-        g.style.transform = 'scale(0.985)';
+        g.style.transform = isMobileLite ? '' : 'scale(0.985)';
         g.style.filter = '';
       } else {
         const sh = shapes[idx];
         g.style.opacity = sh?._isBoxContainer ? '0.54' : '0.82';
-        g.style.transform = 'scale(1)';
+        g.style.transform = isMobileLite ? '' : 'scale(1)';
         g.style.filter = '';
       }
     });
@@ -2101,15 +2127,18 @@ const RoughFreeformSceneDiagram: React.FC<{
             const pillW = Math.min(280, Math.max(40, maxLineChars * 7.6 + 16));
             const isBoxActive = activeShapeIdx === sIdx;
             const isBoxDimmed = activeShapeIdx >= 0 && activeShapeIdx !== sIdx && sh._isBoxContainer;
+            const isMobileLabelLite = isMobileLowMemoryDevice();
             return (
               <g
                 key={`lbl_${sIdx}`}
                 style={{
                   opacity: isBoxDimmed ? 0.52 : queuedPreview ? 0.16 : 1,
-                  transform: isBoxActive ? 'scale(1.045)' : 'scale(1)',
-                  transformBox: 'fill-box',
-                  transformOrigin: 'center',
-                  transition: 'opacity 200ms ease, transform 240ms cubic-bezier(0.22, 1, 0.36, 1)',
+                  transform: isMobileLabelLite ? undefined : isBoxActive ? 'scale(1.045)' : 'scale(1)',
+                  transformBox: isMobileLabelLite ? undefined : 'fill-box',
+                  transformOrigin: isMobileLabelLite ? undefined : 'center',
+                  transition: isMobileLabelLite
+                    ? 'opacity 200ms ease'
+                    : 'opacity 200ms ease, transform 240ms cubic-bezier(0.22, 1, 0.36, 1)',
                 }}
               >
                 {isConnector && (
@@ -2370,12 +2399,15 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
     let lastFocusedSub: Element | null = null;
     let lastGoalTop = -1;
     let lastGoalLeft = -1;
+    let lastMobileScrollAt = 0;
+    let lastMutCheckAt = 0;
     const isMobileCompositor = isMobileLowMemoryDevice();
-    const checkDelayMs = isMobileCompositor ? 110 : 45;
+    const checkDelayMs = isMobileCompositor ? 130 : 45;
     const scheduleCameraCheck = () => {
       if (timerId) return;
       timerId = window.setTimeout(() => {
         timerId = 0;
+        if (typeof document !== 'undefined' && document.hidden) return;
         if (Date.now() < userManualScrollUntilRef.current) return;
         const cRect = container.getBoundingClientRect();
         if (cRect.height <= 40 || cRect.width <= 40) return;
@@ -2428,9 +2460,18 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
         if (
           isMobileCompositor &&
           lastGoalTop >= 0 &&
-          Math.abs(goalTop - lastGoalTop) < 14 &&
-          Math.abs(goalLeft - lastGoalLeft) < 14
+          Math.abs(goalTop - lastGoalTop) < 16 &&
+          Math.abs(goalLeft - lastGoalLeft) < 16
         ) {
+          return;
+        }
+        // Mobile PWA: never interrupt an in-flight native compositor smooth scroll mid-animation (<380ms)
+        const nowMs = Date.now();
+        if (isMobileCompositor && nowMs - lastMobileScrollAt < 380) {
+          timerId = window.setTimeout(() => {
+            timerId = 0;
+            scheduleCameraCheck();
+          }, Math.max(80, 390 - (nowMs - lastMobileScrollAt)));
           return;
         }
         lastGoalTop = goalTop;
@@ -2445,6 +2486,7 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
         programmaticScrollUntilRef.current = Date.now() + durationMs + 220;
 
         if (isMobileCompositor && typeof container.scrollTo === 'function') {
+          lastMobileScrollAt = Date.now();
           // Mobile PWA: delegate smooth auto-scrolling to native iOS/Android compositor thread
           // (eliminates 60fps main-thread scrollTop reflow storms & WebKit CoreAnimation crashes while keeping identical auto-scroll!).
           try {
@@ -2498,10 +2540,15 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
     const observer =
       typeof MutationObserver !== 'undefined'
         ? new MutationObserver(() => {
+            if (timerId) return;
+            const nowMut = Date.now();
+            if (isMobileCompositor && nowMut - lastMutCheckAt < 140) return;
+            lastMutCheckAt = nowMut;
             const currentSub = stepEl.querySelector(
               '.fz-sub-zoom-in, .fz-table-row-focus-active, [data-wb-panel-focus="zoom-in"]'
             );
             if (currentSub !== lastFocusedSub) {
+              lastFocusedSub = currentSub;
               scheduleCameraCheck();
             }
           })
@@ -2739,10 +2786,23 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
     }
   };
 
+  const isMobileBoardLite = isMobileLowMemoryDevice();
+
   const renderStepNode = (step: WhiteboardSceneStep, stepIdx: number) => {
     const isCompleted = stepIdx < activeStepIndex;
     const isCurrent = stepIdx === activeStepIndex;
     const isQueued = stepIdx > activeStepIndex;
+    const isFarQueuedHeavyDiagram =
+      isMobileBoardLite &&
+      isQueued &&
+      stepIdx > activeStepIndex + 1 &&
+      (step.kind === 'metaphor_scene' ||
+        step.kind === 'mind_map' ||
+        step.kind === 'timeline_track' ||
+        step.kind === 'formula_blocks' ||
+        step.kind === 'rough_scene' ||
+        step.kind === 'contrast_scale' ||
+        step.kind === 'syntax_flow');
     // Skala progres penulisan & highlight agar mulai instan sejak detik 0 dan tuntas sebelum transisi zoom-out (0..0.92).
     const stepProg = isCompleted ? 1 : isCurrent ? activeStepProgress : 0;
     const prevKnownProg = prevStepProgByIdRef.current.get(step.id) ?? 0;
@@ -2945,6 +3005,25 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
       );
     }
 
+    if (isFarQueuedHeavyDiagram) {
+      return wrapQueued(
+        <div
+          data-wb-deferred-diagram="1"
+          data-wb-excerpt={`${step.title || ''} ${step.caption || ''}`.trim()}
+          className="rounded-2xl border border-dashed border-[#CBD5E1] bg-[#FFFDF7]/90 px-4 py-5 min-h-[152px] flex flex-col justify-center gap-1.5"
+        >
+          <div className="fz-handwriting-heading text-base font-bold text-[#334155]">
+            {cleanBracketArtifacts(step.title) || wbPick('Visual Diagram Coming Up', 'Diagram Visual Berikutnya')}
+          </div>
+          {(step.caption || step.text || step.analogy) && (
+            <div className="text-xs text-[#64748B] leading-snug line-clamp-2">
+              {cleanBracketArtifacts(step.caption || step.text || step.analogy)}
+            </div>
+          )}
+        </div>
+      );
+    }
+
     if (step.kind === 'metaphor_scene') {
       return wrapQueued(
         <div data-wb-excerpt={`${step.title || ''} ${step.caption || ''}`.trim()}>
@@ -3096,7 +3175,7 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
           </div>
           <div
             className="transition-transform duration-500 ease-out origin-center"
-            style={{ transform: inFocusWindow ? 'scale(1.06)' : 'scale(1)' }}
+            style={{ transform: isMobileBoardLite ? undefined : inFocusWindow ? 'scale(1.06)' : 'scale(1)' }}
           >
             <RoughKanjiGridDiagram step={step} progress={stepProg} targetLang={targetLang} />
           </div>
@@ -3120,7 +3199,7 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
           data-wb-excerpt={mainText}
           className="py-1.5 space-y-1 rounded-xl px-2.5 transition-all duration-500 ease-out"
           style={{
-            transform: inFocusWindow ? 'scale(1.045)' : 'scale(1)',
+            transform: isMobileBoardLite ? undefined : inFocusWindow ? 'scale(1.045)' : 'scale(1)',
             backgroundColor: inFocusWindow ? 'rgba(254, 249, 195, 0.65)' : 'transparent',
           }}
         >
@@ -3262,9 +3341,13 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
                       }`}
                       style={
                         isRowFocused
-                          ? { transform: 'scale(1.018)', transformOrigin: 'center center', opacity: 1 }
+                          ? isMobileBoardLite
+                            ? { opacity: 1 }
+                            : { transform: 'scale(1.018)', transformOrigin: 'center center', opacity: 1 }
                           : isRowDimmed
-                            ? { opacity: 0.46, transform: 'scale(0.985)', transformOrigin: 'center center' }
+                            ? isMobileBoardLite
+                              ? { opacity: 0.46 }
+                              : { opacity: 0.46, transform: 'scale(0.985)', transformOrigin: 'center center' }
                             : undefined
                       }
                     >
@@ -3339,11 +3422,21 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
               data-wb-panel-focus={focusWrong ? 'zoom-in' : focusRight ? 'dim' : 'idle'}
               className="flex items-start gap-2 rounded-xl px-2.5 py-1.5 transition-all duration-400"
               style={{
-                transform: focusWrong ? 'scale(1.065)' : focusRight ? 'scale(0.97)' : 'scale(1)',
+                transform: isMobileBoardLite
+                  ? undefined
+                  : focusWrong
+                    ? 'scale(1.065)'
+                    : focusRight
+                      ? 'scale(0.97)'
+                      : 'scale(1)',
                 opacity: focusRight ? 0.44 : 1,
                 backgroundColor: focusWrong ? 'rgba(254, 226, 226, 0.7)' : 'transparent',
-                boxShadow: focusWrong ? '0 8px 20px rgba(220, 38, 38, 0.16)' : undefined,
-                transformOrigin: 'left center',
+                boxShadow: focusWrong
+                  ? isMobileBoardLite
+                    ? '0 0 0 2px rgba(220, 38, 38, 0.35)'
+                    : '0 8px 20px rgba(220, 38, 38, 0.16)'
+                  : undefined,
+                transformOrigin: isMobileBoardLite ? undefined : 'left center',
               }}
             >
               <span className="text-xs font-extrabold px-1.5 py-0.5 rounded bg-[#FEE2E2] text-[#B91C1C] shrink-0">
@@ -3379,11 +3472,21 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
               data-wb-panel-focus={focusRight ? 'zoom-in' : focusWrong ? 'dim' : 'idle'}
               className="flex items-start gap-2 rounded-xl px-2.5 py-1.5 transition-all duration-400"
               style={{
-                transform: focusRight ? 'scale(1.04)' : focusWrong ? 'scale(0.98)' : 'scale(1)',
+                transform: isMobileBoardLite
+                  ? undefined
+                  : focusRight
+                    ? 'scale(1.04)'
+                    : focusWrong
+                      ? 'scale(0.98)'
+                      : 'scale(1)',
                 opacity: focusWrong ? 0.44 : 1,
                 backgroundColor: focusRight ? 'rgba(220, 252, 231, 0.78)' : 'transparent',
-                boxShadow: focusRight ? '0 10px 24px rgba(22, 163, 74, 0.18)' : undefined,
-                transformOrigin: 'left center',
+                boxShadow: focusRight
+                  ? isMobileBoardLite
+                    ? '0 0 0 2px rgba(22, 163, 74, 0.38)'
+                    : '0 10px 24px rgba(22, 163, 74, 0.18)'
+                  : undefined,
+                transformOrigin: isMobileBoardLite ? undefined : 'left center',
               }}
             >
               <span className="text-xs font-extrabold px-1.5 py-0.5 rounded bg-[#DCFCE7] text-[#15803D] shrink-0">
@@ -3648,43 +3751,45 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
                   </div>
                 </div>
 
-                {/* Student Freehand Ink SVG Layer (perfect-freehand) */}
-                <svg
-                  onPointerDown={handlePointerDown}
-                  onPointerMove={handlePointerMove}
-                  onPointerUp={handlePointerUp}
-                  onPointerCancel={handlePointerUp}
-                  className={`absolute inset-0 w-full h-full z-20 ${
-                    isPenActive ? 'pointer-events-auto cursor-crosshair touch-none' : 'pointer-events-none'
-                  }`}
-                >
-                  {strokes.map((stk) => {
-                    const outline = getStroke(stk.points, {
-                      size: 6,
-                      thinning: 0.45,
-                      smoothing: 0.55,
-                      streamline: 0.5,
-                    });
-                    return <path key={stk.id} d={getSvgPathFromStroke(outline)} fill={stk.color} opacity="0.72" />;
-                  })}
-                  {draftPoints && draftPoints.length === 1 && (
-                    <circle cx={draftPoints[0][0]} cy={draftPoints[0][1]} r="3.5" fill={penColor} opacity="0.72" />
-                  )}
-                  {draftPoints && draftPoints.length > 1 && (
-                    <path
-                      d={getSvgPathFromStroke(
-                        getStroke(draftPoints, {
-                          size: 6,
-                          thinning: 0.45,
-                          smoothing: 0.55,
-                          streamline: 0.5,
-                        })
-                      )}
-                      fill={penColor}
-                      opacity="0.72"
-                    />
-                  )}
-                </svg>
+                {/* Student Freehand Ink SVG Layer (mounted ONLY when pen active or strokes exist — avoids ~70MB 3x DPR idle WebKit GPU texture!) */}
+                {(isPenActive || strokes.length > 0 || Boolean(draftPoints)) && (
+                  <svg
+                    onPointerDown={handlePointerDown}
+                    onPointerMove={handlePointerMove}
+                    onPointerUp={handlePointerUp}
+                    onPointerCancel={handlePointerUp}
+                    className={`absolute inset-0 w-full h-full z-20 ${
+                      isPenActive ? 'pointer-events-auto cursor-crosshair touch-none' : 'pointer-events-none'
+                    }`}
+                  >
+                    {strokes.map((stk) => {
+                      const outline = getStroke(stk.points, {
+                        size: 6,
+                        thinning: 0.45,
+                        smoothing: 0.55,
+                        streamline: 0.5,
+                      });
+                      return <path key={stk.id} d={getSvgPathFromStroke(outline)} fill={stk.color} opacity="0.72" />;
+                    })}
+                    {draftPoints && draftPoints.length === 1 && (
+                      <circle cx={draftPoints[0][0]} cy={draftPoints[0][1]} r="3.5" fill={penColor} opacity="0.72" />
+                    )}
+                    {draftPoints && draftPoints.length > 1 && (
+                      <path
+                        d={getSvgPathFromStroke(
+                          getStroke(draftPoints, {
+                            size: 6,
+                            thinning: 0.45,
+                            smoothing: 0.55,
+                            streamline: 0.5,
+                          })
+                        )}
+                        fill={penColor}
+                        opacity="0.72"
+                      />
+                    )}
+                  </svg>
+                )}
 
                 {/* Circle-to-Ask Floating Action Pill */}
                 {pendingCircleAsk && (

@@ -74,7 +74,11 @@ import {
 import { CALL_SCENARIOS, VOICE_PERSONAS } from './data/callScenarios';
 import { t, tMasteryState, scenarioMetaForLocale, vocabMeaningForLocale } from './lib/i18n';
 import { playFiezelSfx, registerSfxHostAudioContext } from './lib/sfx';
-import { isMobileLowMemoryDevice, unlockSharedBoardAudioContext } from './lib/boardAudioUnlock';
+import {
+  isMobileLowMemoryDevice,
+  registerSharedBoardAudioContext,
+  unlockSharedBoardAudioContext,
+} from './lib/boardAudioUnlock';
 import { BraincoreTrendChart } from './components/BraincoreTrendChart';
 import { HomeRedesignView } from './components/HomeRedesignView';
 import { BeginnerAnswerAssistant } from './components/BeginnerAnswerAssistant';
@@ -1049,6 +1053,23 @@ export default function App() {
   } | null>(null);
 
   useEffect(() => {
+    if (learningWorkbench?.isOpen) {
+      // m025-811: Pause Silero Neural VAD WASM (25-40 MB heap + 32ms main-thread ScriptProcessor)
+      // while Whiteboard is open so Mobile PWA NEVER hits iOS Jetsam / Android OOM during slideshow!
+      try {
+        sileroVadGateRef.current?.pause();
+      } catch {
+        // Ignore
+      }
+      if (
+        inputAudioCtxRef.current &&
+        inputAudioCtxRef.current !== liveAudioCtxRef.current &&
+        inputAudioCtxRef.current.state === 'running'
+      ) {
+        void inputAudioCtxRef.current.suspend().catch(() => {});
+      }
+      return;
+    }
     if (!learningWorkbench?.isOpen) {
       activeWorkbenchTargetRef.current = {
         isOpen: false,
@@ -1058,6 +1079,20 @@ export default function App() {
       };
       lastSyncedWorkbenchKeyRef.current = '';
       setLatestReadAloudAlignment(null);
+      if (isLiveConnectedRef.current && !userHungUpRef.current) {
+        if (
+          inputAudioCtxRef.current &&
+          inputAudioCtxRef.current !== liveAudioCtxRef.current &&
+          inputAudioCtxRef.current.state === 'suspended'
+        ) {
+          void inputAudioCtxRef.current.resume().catch(() => {});
+        }
+        try {
+          sileroVadGateRef.current?.resume();
+        } catch {
+          // Ignore
+        }
+      }
     }
   }, [learningWorkbench?.isOpen]);
 
@@ -1330,6 +1365,7 @@ export default function App() {
         const liveCtx = liveAudioCtxRef.current;
         if (liveCtx) {
           registerSfxHostAudioContext(liveCtx);
+          registerSharedBoardAudioContext(liveCtx);
           liveCtx.onstatechange = () => {
             if (
               (liveCtx.state === 'suspended' || (liveCtx.state as string) === 'interrupted') &&
@@ -3408,6 +3444,11 @@ export default function App() {
     // outer SpeechRecognition, and pending drafts so the popup AI never collides with the outer call monitor.
     isWorkbenchOpenRef.current = true;
     isWorkbenchExplanationActiveRef.current = true;
+    try {
+      sileroVadGateRef.current?.pause();
+    } catch {
+      // Ignore
+    }
     interruptAiAndStartListening();
     if (liveSilenceTimerRef.current) {
       window.clearTimeout(liveSilenceTimerRef.current);
@@ -5633,6 +5674,7 @@ export default function App() {
       }
     }
     registerSfxHostAudioContext(micCtx);
+    registerSharedBoardAudioContext(liveCtx);
     const trackedCtxs: AudioContext[] = micCtx !== liveCtx ? [liveCtx, micCtx] : [liveCtx];
     trackedCtxs.forEach((ctx) => {
       const onCtxStateChange = () => {
@@ -5984,6 +6026,7 @@ export default function App() {
     }
     const liveCtx = liveAudioCtxRef.current!;
     registerSfxHostAudioContext(liveCtx);
+    registerSharedBoardAudioContext(liveCtx);
     liveCtx.onstatechange = () => {
       if (
         (liveCtx.state === 'suspended' || (liveCtx.state as string) === 'interrupted') &&

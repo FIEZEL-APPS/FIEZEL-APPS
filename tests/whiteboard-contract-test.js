@@ -258,4 +258,63 @@ const unlockSrc = read('features/voice-studio/src/lib/boardAudioUnlock.ts');
   console.log('  ✅ PASS 13: Mobile PWA OOM/WebGL discipline, sliding-window audio, ErrorBoundary & Home stability verified');
 }
 
-console.log('\n🎉 ALL 13 WHITEBOARD CONTRACT TESTS PASSED 100%!');
+// ============================================================================
+// TEST 14: Mobile PWA Real-Device Zero-Force-Close Invariants (m025-811)
+// ============================================================================
+{
+  const autoloadSrc = read('features/neural-voice/fiezel-voice-offline-autoload.js');
+  const bootTailSrc = read('features/ui/fiezel-boot-tail.js');
+  const updatePromptSrc = read('features/ui/fiezel-update-prompt.js');
+  const mochiSrc = read('mochi-mascot/fiezel-mochi.js');
+  const vadSrc = read('features/voice-studio/src/lib/sileroVadGate.ts');
+  const appSrc = read('features/voice-studio/src/App.tsx');
+  const audioUnlockSrc = read('features/voice-studio/src/lib/boardAudioUnlock.ts');
+  const alignSrc = read('features/voice-studio/src/lib/speechAlignment.ts');
+  const canvasSrcLocal = read('features/voice-studio/src/components/LiveWhiteboardCanvas.tsx');
+  const diagramsSrc = read('features/voice-studio/src/components/WhiteboardVisualDiagrams.tsx');
+
+  assert.ok(
+    autoloadSrc.includes("'in_voice_studio'") && autoloadSrc.includes('holdBeforeAssemble'),
+    'Offline neural-voice autoload must hold during fz-view-chat and before 156MB assembled() merge'
+  );
+  assert.ok(
+    bootTailSrc.includes('fz-view-chat') &&
+      bootTailSrc.includes('fzMitraKaiwaStudioFrame') &&
+      updatePromptSrc.includes('fz-view-chat'),
+    'Boot-tail split-brain reloader & update-prompt must treat Kawan Bicara / Whiteboard as active lesson (zero forced splash reload)'
+  );
+  assert.ok(
+    vadSrc.includes('public pause(): void') &&
+      vadSrc.includes('public resume(): void') &&
+      vadSrc.includes('cb.isWorkbenchOpen?.()') &&
+      appSrc.includes('sileroVadGateRef.current?.pause()'),
+    'Silero Neural VAD WASM must pause during Whiteboard to avoid 32ms ScriptProcessor & WASM OOM'
+  );
+  assert.ok(
+    audioUnlockSrc.includes('registerSharedBoardAudioContext') &&
+      audioUnlockSrc.includes('__fzSharedLiveAudioCtx') &&
+      appSrc.includes('registerSharedBoardAudioContext(liveCtx)'),
+    'Whiteboard must adopt the single shared Host/Live AudioContext instead of spawning duplicate AudioContexts'
+  );
+  assert.ok(
+    alignSrc.includes('function toMonoView') &&
+      modalSrc.includes('isMobileLowMem\n              ? decoded') &&
+      modalSrc.includes('resolvedChunkMap.delete(chunkIdx)') &&
+      modalSrc.includes('audio.load()'),
+    'Mobile Whiteboard audio pipeline must avoid Float32 copies, drop played dataUrls, and release HTMLAudio decoders'
+  );
+  assert.ok(
+    canvasSrcLocal.includes('isFarQueuedHeavyDiagram') &&
+      canvasSrcLocal.includes('lastMobileScrollAt') &&
+      canvasSrcLocal.includes('isPenActive || strokes.length > 0 || Boolean(draftPoints)') &&
+      diagramsSrc.includes('isMobileLowMemoryDevice'),
+    'Mobile Whiteboard canvas must omit idle full-canvas ink SVG, defer far-queued diagrams, throttle smooth auto-scroll, and disable mobile scale/drop-shadow GPU storms'
+  );
+  assert.ok(
+    mochiSrc.includes('cv.width = 0; cv.height = 0;'),
+    'Mochi WebGL destroy() must zero offscreen 2D canvases to immediately release CoreGraphics bitmap RAM'
+  );
+  console.log('  ✅ PASS 14: Mobile PWA zero-force-close invariants (autoload hold, split-brain guard, Silero pause, 1-AudioContext, zero-copy PCM, idle SVG removal) verified');
+}
+
+console.log('\n🎉 ALL 14 WHITEBOARD CONTRACT TESTS PASSED 100%!');

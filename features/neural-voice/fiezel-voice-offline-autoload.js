@@ -130,6 +130,18 @@
     if (!root.caches || !root.fetch) return 'no_cache_storage';
     if (root.isSecureContext === false) return 'insecure_context';
     if (root.navigator && root.navigator.onLine === false) return 'offline';
+    // m025-811: Hold background 20 MB chunk fetches & 156 MB Uint8Array merges while Kawan Bicara /
+    // Whiteboard iframe is active in the same WebContent process (prevents iOS/Android PWA Jetsam OOM).
+    try {
+      var doc = root.document;
+      if (
+        doc &&
+        ((doc.body && doc.body.classList && doc.body.classList.contains('fz-view-chat')) ||
+          (typeof doc.getElementById === 'function' && doc.getElementById('fzMitraKaiwaStudioFrame')))
+      ) {
+        return 'in_voice_studio';
+      }
+    } catch (_) {}
     // Hemat kuota data murid. Kalau ia menyalakan Mode Hemat Data, unduhan 152 MB adalah
     // hal terakhir yang ia inginkan berjalan tanpa diminta.
     //
@@ -324,6 +336,12 @@
             continue;
           }
           await delay(IDLE_GAP_MS);
+        }
+        var holdBeforeAssemble = blockedReason();
+        if (holdBeforeAssemble) {
+          log({ phase: 'autoload_hold', reason: holdBeforeAssemble, asset: item.path, stage: 'pre_assemble' });
+          running = false;
+          return;
         }
         if (!(await assembled(cache, item, url))) {
           log({ phase: 'autoload_assemble_failed', asset: item.path });
