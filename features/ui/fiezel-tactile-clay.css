@@ -8970,7 +8970,6 @@ html.fz-view-chat body,
 body.fz-view-chat {
   overscroll-behavior: none !important;
   overscroll-behavior-y: none !important;
-  overflow: hidden !important;
 }
 
 @media (min-width: 768px) and (max-width: 1099px) {
