@@ -311,6 +311,14 @@
       : (ex.measurementSource || (typeof ex.activeSpeechSec === 'number' ? 'acoustic_vad' : 'timer_measured'));
     var isEst = Boolean(ex.isEstimatedTiming || ex.isManual);
 
+    var _isId = (function () {
+      try {
+        var g = (typeof self !== 'undefined' ? self : globalThis);
+        var i = g && g.FiezelI18n;
+        return !i || typeof i.getLocale !== 'function' || i.getLocale() === 'id';
+      } catch (_) { return true; }
+    })();
+
     function ptePick(en, id) {
       try {
         var g = (typeof self !== 'undefined' ? self : globalThis);

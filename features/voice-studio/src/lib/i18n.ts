@@ -1,11 +1,11 @@
-import { CallScenario, LearnerLocale, MasteryStateName, VocabPrerequisiteItem, VoicePersona } from '../types/voiceCall';
+import type { CallScenario, LearnerLocale, MasteryStateName, VocabPrerequisiteItem, VoicePersona } from '../types/voiceCall.ts';
 import {
   VS_EXTRA_MULTI_UI,
   VS_PERSONA_TRANS,
   VS_SCENARIO_TRANS,
   VS_VOCAB_TRANS,
   VS_WB_TRANSLATIONS,
-} from './generated9LocPack';
+} from './generated9LocPack.ts';
 
 const COPY: Partial<Record<LearnerLocale, Record<string, string>>> = {
   id: {
