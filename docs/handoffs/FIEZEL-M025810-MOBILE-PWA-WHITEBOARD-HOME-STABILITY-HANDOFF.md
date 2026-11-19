@@ -47,12 +47,14 @@
   - Menambah `isMobileLowMemoryDevice()` dan `decodeAudioDataSafe()` (tahan iOS Safari callback/Promise + fresh ArrayBuffer copy + bounded timeout).
 - `features/voice-studio/src/lib/liveTransport.ts`:
   - Menurunkan batas cache WAV memori mobile menjadi `8` entri (`24` desktop) dan menambah `pruneTtsMemoryCache()`.
+- `features/voice-studio/src/components/LiveWhiteboardCanvas.tsx`:
+  - Memindahkan auto-scroll mobile ke compositor thread native (`container.scrollTo({ behavior: 'smooth' })`) dengan deduplikasi target scroll & debounce `MutationObserver` (`110ms`), mengunci `overscroll-behavior: contain` pada `solvely-dotgrid-whiteboard`, mematikan `ResizeObserver` `innerEl` saat `zoomLevel === 1`, dan mengganti `rough-notation` pada mobile ke dekorasi CSS ink ringan bebas `ResizeObserver` loop.
 - `features/voice-studio/src/components/InCallLearningWorkbenchModal.tsx`:
-  - Sliding-window audio mobile ketat (`1` lookahead worker, maksimal `activePlayChunk + 1`, eviksi `audioBuffer` segera setelah selesai diputar, clear `trackCacheRef` saat modal ditutup).
+  - Sliding-window audio mobile ketat (`1` lookahead worker, maksimal `activePlayChunk + 1`, eviksi `audioBuffer` segera setelah selesai diputar, clear `trackCacheRef` saat modal ditutup) + throttle `applyTrackFraction` mobile (`~14 fps` alih-alih `36 fps`) agar slideshow otomatis tidak membanjiri main thread & GC.
   - Mengganti `h-[92vh]` ke `h-[94dvh] sm:h-[92dvh]`, merapikan kartu buffering mobile agar tidak terjepit 5 baris, membatasi `backdrop-blur` hanya pada `sm:`, dan membungkus `LiveWhiteboardCanvas` dalam `WhiteboardErrorBoundary`.
-- `features/voice-studio/src/App.tsx` & `features/voice-studio/src/index.css`:
+- `features/voice-studio/src/App.tsx`, `features/voice-studio/src/index.css`, `call.html`, `features/voice-studio/call.html`:
   - Membongkar konteks WebGL Mochi iframe (`destroy()` + `forceContextLoss()`) selama Papan Tulis layar penuh terbuka di mobile (0 konteks WebGL aktif bersamaan!), lalu memulihkannya mulus saat papan ditutup.
-  - Membungkus `InCallLearningWorkbenchModal` dalam `WhiteboardErrorBoundary`, membatasi `backdrop-blur` ke `sm:`, dan menonaktifkan `will-change` statis pada layar `< 768px`.
+  - Membungkus `InCallLearningWorkbenchModal` dalam `WhiteboardErrorBoundary`, membatasi `backdrop-blur` ke `sm:`, menonaktifkan `will-change` statis & nested `transform: scale` pada kartu spotlight mobile (`< 768px`) agar CoreAnimation tidak kehabisan VRAM saat auto-scroll, serta mengunci `overscroll-behavior: none` pada `call.html` dan `html.fz-view-chat` untuk mencegah pull-to-refresh saat auto-scrolling.
 - `features/ui/fiezel-tactile-clay.css`:
   - Mengunci `.fz-vissol-welcome .tactile-kicker-dot`, `.tactile-kicker-text`, dan `.tactile-streak-badge` tetap `display: none !important;`, menghapus weight `900` -> `800`, serta mengunci dimensi stabil `min-height: 142px` & `flex` pada `.fz-vissol-mascot-wrap`.
 - `app.js`:
@@ -85,4 +87,3 @@
 
 - Pantau seluruh 10 gerbang wajib CI PR (`quality`, `A6`, `A7`, `A9`, `A10`, `A11`, `A13`, `A14`, `Auto PR Review & Invariant Audit`, `MASTER-only authority`) sampai 100% HIJAU sebelum squash-merge ke `main`.
 - Pantau `FIEZEL Deploy Site` setelah merge hingga `https://fiezel.my.id/app/coordination/BUILD-VERSION.json` menyajikan `m025-810` secara live di perangkat murid.
-

@@ -235,6 +235,17 @@ const unlockSrc = read('features/voice-studio/src/lib/boardAudioUnlock.ts');
       modalSrc.includes('h-[94dvh]'),
     'Whiteboard must enforce mobile sliding-window audio decode, safe decodeAudioDataSafe, and dvh height'
   );
+  const canvasSrcLocal = read('features/voice-studio/src/components/LiveWhiteboardCanvas.tsx');
+  const studioCssSrc = read('features/voice-studio/src/index.css');
+  const callHtmlSrc = read('call.html');
+  assert.ok(
+    canvasSrcLocal.includes('overscroll-contain') &&
+      canvasSrcLocal.includes("behavior: 'smooth'") &&
+      studioCssSrc.includes('.fz-wb-spotlight-card') &&
+      callHtmlSrc.includes('overscroll-behavior: none') &&
+      clayCssSrc.includes('html.fz-view-chat'),
+    'Mobile auto-scroll & auto-slideshow must use compositor-safe scrollTo, overscroll lock (anti pull-to-refresh), and mobile GPU layer discipline'
+  );
   assert.ok(
     clayCssSrc.includes('html body #app .fz-vissol-welcome .tactile-streak-badge') &&
       clayCssSrc.includes('html body #app .fz-vissol-welcome .tactile-kicker-dot'),

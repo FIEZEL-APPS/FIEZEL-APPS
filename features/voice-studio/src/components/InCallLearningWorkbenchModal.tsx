@@ -4452,12 +4452,15 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
         setLockstepIndex(matched.stepIndex);
       }
       const progDelta = Math.abs(localP - lastCommitProgRef.current);
+      const minCommitIntervalMs = isMobileLowMem ? 72 : 28;
+      const minProgDelta = isMobileLowMem ? 0.022 : 0.008;
       if (
         idxChanged ||
         localP <= 0.025 ||
         localP >= 0.99 ||
-        progDelta >= 0.008 ||
-        nowPerf - lastCommitProgAtRef.current >= 28
+        (localP > 0.93 && lastCommitProgRef.current <= 0.93) ||
+        (progDelta >= minProgDelta && nowPerf - lastCommitProgAtRef.current >= (isMobileLowMem ? 45 : 0)) ||
+        nowPerf - lastCommitProgAtRef.current >= minCommitIntervalMs
       ) {
         lastCommitProgRef.current = localP;
         lastCommitProgAtRef.current = nowPerf;

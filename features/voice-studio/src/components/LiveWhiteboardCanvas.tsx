@@ -32,6 +32,7 @@ import {
 import { MathText, splitMathSegments } from './MathText';
 import { layoutGraphToShapes } from '../lib/dagreLayout';
 import { wbPick } from '../lib/i18n';
+import { isMobileLowMemoryDevice } from '../lib/boardAudioUnlock';
 
 export type PenColor = '#2563EB' | '#DC2626' | '#059669' | '#D97706';
 
@@ -207,8 +208,10 @@ const RoughMarkedText: React.FC<{
 }> = ({ text, type, color, show, strokeWidth = 2.4, className = '' }) => {
   const spanRef = useRef<HTMLSpanElement | null>(null);
   const annotationRef = useRef<ReturnType<typeof annotate> | null>(null);
+  const isMobileLite = isMobileLowMemoryDevice();
 
   useEffect(() => {
+    if (isMobileLite) return;
     const el = spanRef.current;
     if (!el) return;
     if (annotationRef.current) {
@@ -251,7 +254,25 @@ const RoughMarkedText: React.FC<{
         annotationRef.current = null;
       }
     };
-  }, [show, type, color, strokeWidth, text]);
+  }, [isMobileLite, show, type, color, strokeWidth, text]);
+
+  // Mobile PWA compositor-safe equivalent (avoids rough-notation global ResizeObserver/SVG storms during auto-scroll)
+  if (isMobileLite) {
+    const mobileMarkStyle: React.CSSProperties | undefined = !show
+      ? undefined
+      : type === 'strike-through'
+        ? { textDecorationLine: 'line-through', textDecorationColor: color, textDecorationThickness: '2.2px' }
+        : type === 'underline'
+          ? { textDecorationLine: 'underline', textDecorationColor: color, textDecorationThickness: '2.4px', textUnderlineOffset: '3px' }
+          : type === 'circle'
+            ? { border: `2px solid ${color}`, borderRadius: '999px', padding: '1px 7px' }
+            : { backgroundColor: `${color}28`, borderRadius: '6px', padding: '0 4px' };
+    return (
+      <span ref={spanRef} style={mobileMarkStyle} className={`relative inline ${className}`}>
+        <MathText text={text} active={false} />
+      </span>
+    );
+  }
 
   return (
     <span ref={spanRef} className={`relative inline ${className}`}>
@@ -2215,8 +2236,11 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
   const onZoomChangeRef = useRef<((z: number) => void) | undefined>(onZoomChange);
   onZoomChangeRef.current = onZoomChange;
 
-  // Track natural unscaled dimensions of canvasInnerRef + viewport container content width for layout-safe zooming
+  // Track natural unscaled dimensions of canvasInnerRef ONLY when zoomed (zoomLevel !== 1).
+  // Observing innerEl at 100% zoom caused cascading ResizeObserver re-renders on every auto-slideshow line wrap!
   useEffect(() => {
+    const isScaledNow = Math.abs(zoomLevel - 1) > 0.005;
+    if (!isScaledNow) return;
     const innerEl = canvasInnerRef.current;
     const containerEl = resolvedBoardContainerRef.current;
     if (typeof ResizeObserver === 'undefined') return;
@@ -2344,6 +2368,10 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
 
     let timerId = 0;
     let lastFocusedSub: Element | null = null;
+    let lastGoalTop = -1;
+    let lastGoalLeft = -1;
+    const isMobileCompositor = isMobileLowMemoryDevice();
+    const checkDelayMs = isMobileCompositor ? 110 : 45;
     const scheduleCameraCheck = () => {
       if (timerId) return;
       timerId = window.setTimeout(() => {
@@ -2397,32 +2425,58 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
         const diffY = Math.abs(goalTop - container.scrollTop);
         const diffX = Math.abs(goalLeft - container.scrollLeft);
         if (diffY < 10 && diffX < 10) return;
+        if (
+          isMobileCompositor &&
+          lastGoalTop >= 0 &&
+          Math.abs(goalTop - lastGoalTop) < 14 &&
+          Math.abs(goalLeft - lastGoalLeft) < 14
+        ) {
+          return;
+        }
+        lastGoalTop = goalTop;
+        lastGoalLeft = goalLeft;
 
         if (cameraGlideRafRef.current) {
           cancelAnimationFrame(cameraGlideRafRef.current);
           cameraGlideRafRef.current = 0;
         }
 
-        const startTop = container.scrollTop;
-        const startLeft = container.scrollLeft;
-        const startPerf = performance.now();
         const durationMs = 320;
-        programmaticScrollUntilRef.current = Date.now() + durationMs + 140;
+        programmaticScrollUntilRef.current = Date.now() + durationMs + 220;
 
-        const glide = (now: number) => {
-          const p = Math.min(1, (now - startPerf) / durationMs);
-          const eased = 1 - Math.pow(1 - p, 3);
-          container.scrollTop = startTop + (goalTop - startTop) * eased;
-          if (maxLeft > 8 || Math.abs(goalLeft - startLeft) > 2) {
-            container.scrollLeft = startLeft + (goalLeft - startLeft) * eased;
+        if (isMobileCompositor && typeof container.scrollTo === 'function') {
+          // Mobile PWA: delegate smooth auto-scrolling to native iOS/Android compositor thread
+          // (eliminates 60fps main-thread scrollTop reflow storms & WebKit CoreAnimation crashes while keeping identical auto-scroll!).
+          try {
+            container.scrollTo({
+              top: Math.round(goalTop),
+              left: maxLeft > 8 ? Math.round(goalLeft) : 0,
+              behavior: 'smooth',
+            });
+          } catch {
+            container.scrollTop = Math.round(goalTop);
+            if (maxLeft > 8) container.scrollLeft = Math.round(goalLeft);
           }
-          if (p < 1 && Date.now() >= userManualScrollUntilRef.current) {
-            cameraGlideRafRef.current = requestAnimationFrame(glide);
-          } else {
-            cameraGlideRafRef.current = 0;
-          }
-        };
-        cameraGlideRafRef.current = requestAnimationFrame(glide);
+        } else {
+          const startTop = container.scrollTop;
+          const startLeft = container.scrollLeft;
+          const startPerf = performance.now();
+
+          const glide = (now: number) => {
+            const p = Math.min(1, (now - startPerf) / durationMs);
+            const eased = 1 - Math.pow(1 - p, 3);
+            container.scrollTop = startTop + (goalTop - startTop) * eased;
+            if (maxLeft > 8 || Math.abs(goalLeft - startLeft) > 2) {
+              container.scrollLeft = startLeft + (goalLeft - startLeft) * eased;
+            }
+            if (p < 1 && Date.now() >= userManualScrollUntilRef.current) {
+              cameraGlideRafRef.current = requestAnimationFrame(glide);
+            } else {
+              cameraGlideRafRef.current = 0;
+            }
+          };
+          cameraGlideRafRef.current = requestAnimationFrame(glide);
+        }
 
         try {
           (window as unknown as { __fzWbLastAutoScroll?: Record<string, unknown> }).__fzWbLastAutoScroll = {
@@ -2438,7 +2492,7 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
             at: Date.now(),
           };
         } catch {}
-      }, 45);
+      }, checkDelayMs);
     };
 
     const observer =
@@ -3543,9 +3597,10 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
       <div
         ref={resolvedBoardContainerRef}
         data-testid="solvely-dotgrid-whiteboard"
-        className={`relative flex-1 overflow-auto fz-solvely-dotgrid p-4 sm:p-6 lg:p-8 ${
+        className={`relative flex-1 overflow-auto overscroll-contain fz-solvely-dotgrid p-4 sm:p-6 lg:p-8 ${
           isPenActive ? 'select-none' : ''
         }`}
+        style={{ WebkitOverflowScrolling: 'touch', overscrollBehavior: 'contain' }}
       >
         {(() => {
           const isScaled = Math.abs(zoomLevel - 1) > 0.005;

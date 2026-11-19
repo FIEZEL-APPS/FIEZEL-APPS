@@ -8963,6 +8963,16 @@ html body #app .today-home-cockpit .fz-vissol-mascot-wrap {
   min-height: 142px !important;
 }
 
+/* Lock outer PWA overscroll while inside Kawan Bicara / Whiteboard so auto-scroll
+   or touch-scroll inside the iframe NEVER chains into Android/iOS pull-to-refresh! */
+html.fz-view-chat,
+html.fz-view-chat body,
+body.fz-view-chat {
+  overscroll-behavior: none !important;
+  overscroll-behavior-y: none !important;
+  overflow: hidden !important;
+}
+
 @media (min-width: 768px) and (max-width: 1099px) {
   html body #app .today-home-cockpit .fz-vissol-welcome,
   html body #app .today-home-cockpit .fz-vissol-welcome-inner {

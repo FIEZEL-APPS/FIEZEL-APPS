@@ -993,13 +993,33 @@ rt.zh-rt {
   line-height: 1.1;
 }
 
-/* Mobile PWA GPU Layer Discipline (m025-810): avoid promoting dozens of static/idle elements
-   into separate WebKit backing-store textures on iPhone & Android standalone PWAs. */
+/* Mobile PWA GPU Layer & Auto-Scroll Discipline (m025-810):
+   Prevent WebKit CoreAnimation / Android Chrome tile-cache OOM crashes during Whiteboard
+   auto-slideshow & auto-scrolling by removing static will-change promotions on tall cards
+   and locking overscroll so scroll chaining NEVER triggers PWA pull-to-refresh! */
 @media (max-width: 767px) {
   .fz-atelier-nib,
   .fz-atelier-wave-bar,
   .fz-studio-breathe-orb,
-  .fz-studio-launch-card {
-    will-change: auto;
+  .fz-studio-launch-card,
+  .fz-wb-spotlight-card,
+  .fz-wb-step-panel,
+  .fz-wb-sheet,
+  .fz-wb-tab-glider,
+  .fz-wb-mastery-fill,
+  .fz-marker-nib-bob {
+    will-change: auto !important;
+  }
+  .fz-wb-spotlight-dimmed,
+  .fz-sub-dim {
+    transform: none !important;
+  }
+  .fz-wb-spotlight-zoom-in,
+  .fz-wb-spotlight-active,
+  .fz-wb-spotlight-zoom-out {
+    transform: none !important;
+  }
+  .fz-sub-zoom-in {
+    transform: none !important;
   }
 }
