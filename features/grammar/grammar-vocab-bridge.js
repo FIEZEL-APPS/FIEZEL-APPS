@@ -281,13 +281,19 @@
   function getVocabForLesson(skill, intensityId, stateRef) {
     const targetCount = getIntensityVocabTarget(intensityId, stateRef);
     const map = loadGrammarVocabMap() || _grammarVocabMapCache;
-    const isTh = (typeof self !== 'undefined' && self.FiezelI18n?.getLocale?.() === 'th') ||
-                 (typeof FiezelI18n !== 'undefined' && FiezelI18n.getLocale?.() === 'th');
+    const curLoc = (typeof self !== 'undefined' && self.FiezelI18n?.getLocale?.()) ||
+                   (typeof FiezelI18n !== 'undefined' && FiezelI18n.getLocale?.()) || 'id';
+    const isTh = curLoc === 'th';
     const thEntries = isTh ? ((typeof self !== 'undefined' && self.FiezelThData?.vocab?.entries) ||
                              (typeof window !== 'undefined' && window.FiezelThData?.vocab?.entries) || null) : null;
-    
-    // G2: Pastikan overlay Thai di V aktif bila locale th
-    if (isTh && typeof applyContentLocale === 'function') {
+    const sideEntries = (curLoc !== 'id' && !isTh)
+      ? ((typeof self !== 'undefined' && self.FiezelEnData?.vocab?.entries) ||
+         (typeof window !== 'undefined' && window.FiezelEnData?.vocab?.entries) || null)
+      : null;
+    const locEntries = thEntries || sideEntries;
+
+    // Pastikan overlay bahasa di V aktif bila locale non-id
+    if (curLoc !== 'id' && typeof applyContentLocale === 'function') {
       try { applyContentLocale(); } catch (_) {}
     }
 
@@ -297,13 +303,13 @@
       if (details.length) {
         const bank = (typeof V !== 'undefined' && Array.isArray(V)) ? V : [];
         return details.slice(0, targetCount).map(d => {
-          let thMeaning = null;
-          if (isTh && thEntries) {
-            const thItem = thEntries[String(d.id || '')] || thEntries[String(d.word || '')];
-            if (thItem && thItem.meaning) thMeaning = thItem.meaning;
+          let locMeaning = null;
+          if (locEntries) {
+            const locItem = locEntries[String(d.id || '')] || locEntries[String(d.word || '')];
+            if (locItem && locItem.meaning) locMeaning = locItem.meaning;
           }
           const v = bank.find(x => x && x.id === d.id);
-          if (thMeaning) return Object.assign({}, d, { meaning: thMeaning });
+          if (locMeaning) return Object.assign({}, d, { meaning: locMeaning });
           return v && v.meaning ? Object.assign({}, d, { meaning: v.meaning }) : d;
         });
       }
@@ -319,9 +325,9 @@
       const fallbackList = sameLevel.length >= targetCount ? sameLevel : V;
       return fallbackList.slice(0, targetCount).map(v => {
         let m = v.meaning || (v.meanings?.[0]?.meaning || '');
-        if (isTh && thEntries) {
-          const thItem = thEntries[String(v.id || '')] || thEntries[String(v.word || '')];
-          if (thItem && thItem.meaning) m = thItem.meaning;
+        if (locEntries) {
+          const locItem = locEntries[String(v.id || '')] || locEntries[String(v.word || '')];
+          if (locItem && locItem.meaning) m = locItem.meaning;
         }
         return {
           id: v.id,
@@ -863,9 +869,10 @@
   function startVocabMiniGame(skill) {
     stopPuzzleVoice(false);
     const s = typeof state !== 'undefined' ? state : null;
-    const isTh = (typeof self !== 'undefined' && self.FiezelI18n?.getLocale?.() === 'th') ||
-                 (typeof FiezelI18n !== 'undefined' && FiezelI18n.getLocale?.() === 'th');
-    if (isTh && typeof applyContentLocale === 'function') {
+    const curLoc = (typeof self !== 'undefined' && self.FiezelI18n?.getLocale?.()) ||
+                   (typeof FiezelI18n !== 'undefined' && FiezelI18n.getLocale?.()) || 'id';
+    const isTh = curLoc === 'th';
+    if (curLoc !== 'id' && typeof applyContentLocale === 'function') {
       try { applyContentLocale(); } catch (_) {}
     }
     const status = getVocabPrerequisiteStatus(skill, s);
@@ -878,14 +885,19 @@
 
     const thEntries = isTh ? ((typeof self !== 'undefined' && self.FiezelThData?.vocab?.entries) ||
                              (typeof window !== 'undefined' && window.FiezelThData?.vocab?.entries) || null) : null;
+    const sideEntries = (curLoc !== 'id' && !isTh)
+      ? ((typeof self !== 'undefined' && self.FiezelEnData?.vocab?.entries) ||
+         (typeof window !== 'undefined' && window.FiezelEnData?.vocab?.entries) || null)
+      : null;
+    const locEntries = thEntries || sideEntries;
 
     // Prepare matching game arrays for Round 1
     const enCards = words.map(w => ({ id: w.id, text: w.word, word: w.word }));
     const idCards = words.map(w => {
       let m = w.meaning;
-      if (isTh && thEntries) {
-        const thItem = thEntries[String(w.id || '')] || thEntries[String(w.word || '')];
-        if (thItem && thItem.meaning) m = thItem.meaning;
+      if (locEntries) {
+        const locItem = locEntries[String(w.id || '')] || locEntries[String(w.word || '')];
+        if (locItem && locItem.meaning) m = locItem.meaning;
       }
       return { id: w.id, text: String(m || '').split(';')[0].trim(), word: w.word };
     });
@@ -1805,7 +1817,21 @@
     }
     const chosen = shuffled.slice(0, count);
 
-    const fallbacks = ['tangan', 'mulut', 'kaki', 'rumah', 'jalan', 'buku', 'teman', 'hari', 'makan', 'minum'];
+    const _lp = (typeof self !== 'undefined' && typeof self.FiezelLocPick === 'function')
+      ? self.FiezelLocPick
+      : (en, id) => (((typeof FiezelI18n !== 'undefined' && FiezelI18n.getLocale?.()) || 'id') === 'id' ? id : en);
+    const fallbacks = [
+      _lp('hand', 'tangan'),
+      _lp('mouth', 'mulut'),
+      _lp('foot', 'kaki'),
+      _lp('house', 'rumah'),
+      _lp('road', 'jalan'),
+      _lp('book', 'buku'),
+      _lp('friend', 'teman'),
+      _lp('day', 'hari'),
+      _lp('eat', 'makan'),
+      _lp('drink', 'minum')
+    ];
     while (chosen.length < count) {
       const fb = fallbacks[chosen.length % fallbacks.length];
       if (fb !== targetMeaning && !chosen.includes(fb)) chosen.push(fb);

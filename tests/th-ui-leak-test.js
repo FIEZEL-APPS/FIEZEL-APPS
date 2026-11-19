@@ -234,13 +234,13 @@ function stripComments(text) {
   });
 }
 
-/* Literal yang menjadi ARGUMEN KEDUA t()/T() adalah fallback i18n — itu jalur yang benar,
-   bukan kebocoran. */
+/* Literal yang menjadi ARGUMEN KEDUA t()/T()/FiezelLocPick()/ptePick() adalah fallback i18n —
+   itu jalur yang benar, bukan kebocoran. */
 function fallbackLiterals(text) {
   const out = new Set();
-  const re = /\b[tT]\(\s*['"][^'"]+['"]\s*,\s*(['"])((?:\\.|(?!\1)[^\\])*)\1/g;
+  const re = /\b(?:[tT]|FiezelLocPick|ptePick|njPick|pickM|jlptPick)\(\s*(['"])(?:\\.|(?!\1)[^\\])*\1\s*,\s*(['"])((?:\\.|(?!\2)[^\\])*)\2/g;
   let m;
-  while ((m = re.exec(text))) out.add(m[2].replace(/\\'/g, "'").trim());
+  while ((m = re.exec(text))) out.add(m[3].replace(/\\'/g, "'").trim());
   return out;
 }
 

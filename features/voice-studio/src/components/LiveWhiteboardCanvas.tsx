@@ -31,7 +31,7 @@ import {
 } from './WhiteboardVisualDiagrams';
 import { MathText, splitMathSegments } from './MathText';
 import { layoutGraphToShapes } from '../lib/dagreLayout';
-import { wbPick } from '../lib/i18n';
+import { wbPick, wbFmt } from '../lib/i18n';
 import { isMobileLowMemoryDevice } from '../lib/boardAudioUnlock';
 
 export type PenColor = '#2563EB' | '#DC2626' | '#059669' | '#D97706';
@@ -1051,7 +1051,7 @@ const RoughKanjiGridDiagram: React.FC<{
               type="button"
               data-testid={`kanji-stroke-step-${boxIdx + 1}`}
               onClick={() => setFocusedStrokeIdx(boxIdx)}
-              title={wbPick(`Click to view stroke ${boxIdx + 1}`, `Klik untuk lihat cara tulis Goresan ${boxIdx + 1}`)}
+              title={wbFmt('Click to view stroke {num}', 'Klik untuk lihat cara tulis Goresan {num}', undefined, { num: boxIdx + 1 })}
               className={`group flex flex-col items-center p-1 rounded-xl border transition-all cursor-pointer ${
                 isSelected
                   ? 'border-[#DC2626] bg-[#FEF2F2] ring-2 ring-[#FCA5A5]/60 scale-105'

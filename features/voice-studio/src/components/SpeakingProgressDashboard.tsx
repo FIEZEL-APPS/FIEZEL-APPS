@@ -8,7 +8,7 @@ import {
   Tooltip,
 } from 'recharts';
 import { LearnerLocale, SpeakingSessionMetric } from '../types/voiceCall';
-import { t } from '../lib/i18n';
+import { t, wbFmt } from '../lib/i18n';
 
 interface SpeakingProgressDashboardProps {
   locale: LearnerLocale;
@@ -21,11 +21,7 @@ function formatSpeakingDuration(totalSeconds: number, locale: LearnerLocale): st
   const sec = Math.max(0, Math.round(totalSeconds));
   const mins = Math.floor(sec / 60);
   const remSec = sec % 60;
-  if (locale === 'th') {
-    return `${mins}น. ${String(remSec).padStart(2, '0')}ว.`;
-  }
-  const secSuffix = locale === 'id' ? 'd' : 's';
-  return `${mins}m ${String(remSec).padStart(2, '0')}${secSuffix}`;
+  return wbFmt('{m}m {s}s', '{m}m {s}d', '{m}น. {s}ว.', { m: mins, s: String(remSec).padStart(2, '0') }, locale);
 }
 
 export const SpeakingProgressDashboard: React.FC<SpeakingProgressDashboardProps> = ({

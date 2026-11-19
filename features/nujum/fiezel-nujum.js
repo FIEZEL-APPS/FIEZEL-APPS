@@ -22,26 +22,54 @@
 
   var doc = root.document;
 
-  function njIsId() {
+  function njCurLocale() {
     try {
       var I = (typeof root !== 'undefined' && root && root.FiezelI18n) || (typeof self !== 'undefined' ? self.FiezelI18n : null);
-      return ((I && typeof I.getLocale === 'function' && I.getLocale()) || 'id') === 'id';
-    } catch (_) { return true; }
+      return (I && typeof I.getLocale === 'function' && I.getLocale()) || 'id';
+    } catch (_) { return 'id'; }
   }
 
-  function njPick(en, id) {
-    return njIsId() ? id : en;
+  function njIsId() {
+    return njCurLocale() === 'id';
+  }
+
+  function njPick(en, id, vars) {
+    try {
+      var fn = (typeof root !== 'undefined' && root && root.FiezelLocPick) || (typeof self !== 'undefined' ? self.FiezelLocPick : null);
+      if (typeof fn === 'function') return fn(en, id, null, vars);
+    } catch (_) {}
+    var out = njIsId() ? id : en;
+    if (vars && typeof vars === 'object') {
+      out = String(out || '').replace(/\{([a-zA-Z0-9_]+)\}/g, function (m, k) {
+        return Object.prototype.hasOwnProperty.call(vars, k) ? String(vars[k]) : m;
+      });
+    }
+    return out;
   }
 
   function njTxt(s) {
     if (!s) return '';
     if (typeof s === 'string') return s;
-    return njIsId() ? (s.text_id || s.text_en || '') : (s.text_en || s.text_id || '');
+    if (njIsId()) return s.text_id || s.text_en || '';
+    var enStr = s.text_en || s.text_id || '';
+    try {
+      var loc = njCurLocale();
+      var ed = (typeof root !== 'undefined' && root && root.FiezelEnData) || (typeof self !== 'undefined' ? self.FiezelEnData : null);
+      if (loc !== 'en' && ed && ed.uiExtra && ed.uiExtra[enStr]) return ed.uiExtra[enStr];
+    } catch (_) {}
+    return enStr;
   }
 
   function njRule(q) {
     if (!q) return '';
-    return njIsId() ? (q.rule || q.ruleEn || '') : (q.ruleEn || q.rule || '');
+    if (njIsId()) return q.rule || q.ruleEn || '';
+    var enRule = q.ruleEn || q.rule || '';
+    try {
+      var loc = njCurLocale();
+      var ed = (typeof root !== 'undefined' && root && root.FiezelEnData) || (typeof self !== 'undefined' ? self.FiezelEnData : null);
+      if (loc !== 'en' && ed && ed.uiExtra && ed.uiExtra[enRule]) return ed.uiExtra[enRule];
+    } catch (_) {}
+    return enRule;
   }
 
   function t(k, fallback) {
@@ -69,7 +97,7 @@
     { id: "PB-01", section: "pre_bet", category: "intuition_trap", text_id: "Hehehe... Gue udah hafal pola malas mikir lu. Di soal ini, gue bertaruh 80% lu bakal kejebak di lubang yang sama persis!", text_en: "I logged your lazy habits. On this sentence, I bet 80% you will slip into the exact same trap." },
     { id: "PB-02", section: "pre_bet", category: "trap_alert", text_id: "Hahaha! Liat nih baik-baik. Ada jebakan manis buat yang mikir bahasa Inggris cukup modal nebak pake perasaan!", text_en: "Look closely. An obvious trap is set for anyone who assumes English grammar is mere intuition." },
     { id: "PB-03", section: "pre_bet", category: "patience", text_id: "Heh! Tahan dulu jarimu, jangan asal pencet! Otak autopilotmu pasti udah gatel pengen nebak tanpa baca kan?", text_en: "Do not touch the button before reading to the period. Your autopilot brain is itching to guess." },
-    { id: "PB-04", section: "pre_bet", category: "literal_translation", text_id: "Pffft... Hahaha! Di soal ini, hampir semua orang gagal gara-gara nerjemahin kata per kata. Lu mau ikutan jadi korban juga?", text_en: "78% fail here because of literal Indonesian translation habits. Are you joining that casualty list?" },
+    { id: "PB-04", section: "pre_bet", category: "literal_translation", text_id: "Pffft... Hahaha! Di soal ini, hampir semua orang gagal gara-gara nerjemahin kata per kata. Lu mau ikutan jadi korban juga?", text_en: "78% fail here because of literal word-for-word translation habits. Are you joining that casualty list?" },
     { id: "PB-05", section: "pre_bet", category: "tense_contrast", text_id: "Hehehe... Pasti lu mau langsung pilih kata pertama yang kepikiran di kepala kan? Cek dulu waktunya, jangan buru-buru!", text_en: "I bet you will pick the first word that crosses your mind without checking the temporal anchor." },
     { id: "PB-06", section: "pre_bet", category: "sva_distractor", text_id: "Hahaha! Keliatannya gampang banget ya? Hati-hati, biasanya yang ngerasa gampang langsung nyungsep di sini!", text_en: "This looks deceptively simple. That is the graveyard for learners who refuse to trace the true subject." },
     { id: "PB-07", section: "pre_bet", category: "high_bet", text_id: "Heh! Taruhan gue tinggi di ronde ini. Coba buktiin lu lebih pinter dari tebakan gue. Jangan bikin malu pake salah sepele!", text_en: "My bet is high this round. Prove your brain outperforms my prediction model. Do not bore me with elementary mistakes." },
@@ -81,7 +109,7 @@
     { id: "MW-SVA1", section: "machine_win", category: "sva_intervening", text_id: "Hahaha! Kebiasaan banget! Cuma ngeliat satu kata sebelum titik-titik, terus males nyari subjek aslinya siapa. Males baca kok dipelihara sih!", text_en: "Cheap autopilot! You only glanced at the adjacent noun, too lazy to trace the true subject. Why nurture laziness?" },
     { id: "MW-SVA2", section: "machine_win", category: "sva_neither", text_id: "Heh! Hahaha! Subjeknya kan cuma satu orang, kenapa kata kerjanya malah jamak? Ketipu sama kata-kata di tengah kalimat kan? Gampang banget dikecoh!", text_en: "The subject is singular; why a plural verb? You got blinded by an intervening phrase. Your focus is bought so easily." },
     { id: "MW-SVA3", section: "machine_win", category: "sva_auxiliary_double", text_id: "Pffft! Hahaha! Udah ada kata does not, ngapain kata kerjanya lu tambahin es lagi? Dobel-dobel begitu, boros amat aturan lu pake!", text_en: "Does not already absorbed the third-person marker! Adding another -s to the main verb is an embarrassing logical waste." },
-    { id: "MW-SVA4", section: "machine_win", category: "sva_collective", text_id: "Hehehe... Mau berapa kali salah di pola yang sama? Bahasa Inggris tuh beda aturannya sama bahasa kita, jangan dipaksain sama dong!", text_en: "How many times must you encounter this before your brain stops projecting Indonesian syntax onto English?" },
+    { id: "MW-SVA4", section: "machine_win", category: "sva_collective", text_id: "Hehehe... Mau berapa kali salah di pola yang sama? Bahasa Inggris tuh beda aturannya sama bahasa kita, jangan dipaksain sama dong!", text_en: "How many times must you encounter this before your brain stops projecting native-language syntax onto English?" },
 
     // 2. Kemalasan Tenses & Waktu
     { id: "MW-TNS1", section: "machine_win", category: "tense_past", text_id: "Hahaha! Udah jelas-jelas ada keterangan waktu lampau, jarimu malah mencet present tense. Lu hidup di masa sekarang apa terjebak masa lalu?", text_en: "The time marker is clearly in the past, yet your autopilot fingers clicked present tense. Denying reality or just intellectually lazy?" },
@@ -90,8 +118,8 @@
     { id: "MW-TNS4", section: "machine_win", category: "subjunctive", text_id: "Heh! Hahaha! Kalau kalimat pengandaian tuh pakenya were, bukan was! Kebiasaan denger orang ngomong asal di medsos sih, tata bahasa bakunya kelupaan!", text_en: "You rejected subjunctive 'were' because your ear is addicted to colloquial slang in movies. Casual habit just handed me this victory." },
 
     // 3. Terjemahan Harfiah Bahasa Indonesia
-    { id: "MW-TRN1", section: "machine_win", category: "literal_translation", text_id: "Hahaha! Stop nerjemahin kata per kata dari bahasa Indo di kepala lu! Bahasa Inggris punya tenses, jangan disamain sama bahasa kita yang santai!", text_en: "Stop translating word-for-word from Indonesian in your head! Indonesian has no verb inflections, which is why your brain is pampered." },
-    { id: "MW-TRN2", section: "machine_win", category: "preposition_good_at", text_id: "Hehehe... Good at, bukan good in! Di bahasa Indo emang pandai dalam, tapi di bahasa Inggris pasangannya beda. Jangan main tebak pake perasaan!", text_en: "Good at, never good in! Stop forcing Indonesian idioms into foreign syntax. English operates on strict collocations." },
+    { id: "MW-TRN1", section: "machine_win", category: "literal_translation", text_id: "Hahaha! Stop nerjemahin kata per kata dari bahasa Indo di kepala lu! Bahasa Inggris punya tenses, jangan disamain sama bahasa kita yang santai!", text_en: "Stop translating word-for-word from your native language in your head! English has strict verb inflections—don't treat it loosely." },
+    { id: "MW-TRN2", section: "machine_win", category: "preposition_good_at", text_id: "Hehehe... Good at, bukan good in! Di bahasa Indo emang pandai dalam, tapi di bahasa Inggris pasangannya beda. Jangan main tebak pake perasaan!", text_en: "Good at, never good in! Stop forcing literal native idioms into English syntax. English operates on strict collocations." },
     { id: "MW-TRN3", section: "machine_win", category: "preposition_interested", text_id: "Pffft! Hahaha! Interested in, bukan interested with! Gara-gara mikir pake bahasa Indo tertarik dengan, poin lu langsung melayang ke kantong gue!", text_en: "Interested in, not interested with! Your mother-tongue projection just surrendered an effortless point to my ledger. Embarrassing." },
     { id: "MW-TRN4", section: "machine_win", category: "preposition_depend", text_id: "Hahaha! Depend on, bukan depend to! Kebiasaan pake Google Translate di kepala sih. Dengerin pasangannya yang bener dong!", text_en: "Depend on, never depend to! Stop your mental Google Translate. Adhere to actual English syntactic dependencies." },
 
@@ -775,13 +803,13 @@
     if (!screenEl) { callback(); return; }
     var overlay = doc.createElement('div');
     overlay.className = 'nujum-ready-overlay';
-    overlay.innerHTML = '<div class="nujum-ready-count">⚡</div><div class="nujum-ready-label">' + esc(njTxt('GET READY...', 'BERSIAP...')) + '</div>';
+    overlay.innerHTML = '<div class="nujum-ready-count">⚡</div><div class="nujum-ready-label">' + esc(njPick('GET READY...', 'BERSIAP...')) + '</div>';
     screenEl.appendChild(overlay);
 
     setTimeout(function () {
       if (!overlay.parentNode) return;
       overlay.querySelector('.nujum-ready-count').textContent = '1';
-      overlay.querySelector('.nujum-ready-label').textContent = njTxt('GO!', 'MULAI!');
+      overlay.querySelector('.nujum-ready-label').textContent = njPick('GO!', 'MULAI!');
       setTimeout(function () {
         if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
         callback();
@@ -979,7 +1007,7 @@
 
     showVerdict([
       '<div class="nujum-loss-card is-timeout">',
-      '  <div class="nujum-loss-title">' + njPick('⏱️ TIME UP (+' + points + ' MACHINE PTS)', '⏱️ WAKTU HABIS (+' + points + ' POIN MESIN)') + '</div>',
+      '  <div class="nujum-loss-title">' + njPick('⏱️ TIME UP (+{pts} MACHINE PTS)', '⏱️ WAKTU HABIS (+{pts} POIN MESIN)', { pts: points }) + '</div>',
       doubleLossBanner,
       '  <div class="nujum-loss-quote">«' + njTxt(toScript) + '»</div>',
       '  <div class="nujum-loss-pattern">',
@@ -1085,7 +1113,7 @@
 
       showVerdict([
         '<div class="nujum-win-card">',
-        '  <div class="nujum-win-title">' + njPick('✦ MACHINE BET BROKEN (-' + nujumState.currentBet + '%)', '✦ TARUHAN MESIN PATAH (-' + nujumState.currentBet + '%)') + '</div>',
+        '  <div class="nujum-win-title">' + njPick('✦ MACHINE BET BROKEN (-{bet}%)', '✦ TARUHAN MESIN PATAH (-{bet}%)', { bet: nujumState.currentBet }) + '</div>',
         doubleDownBanner,
         '  <div style="font-size:0.86rem;font-weight:600;margin-bottom:8px;line-height:1.45">«' + njTxt(swScript) + '» ' + t('stage.chat-benar', 'Jawaban benar: ').trim() + ' <b>' + q.options[q.correctIndex] + '</b>. ' + njRule(q) + '</div>',
         '  <button class="nujum-teleport-btn" id="nujumNextRoundBtn" style="background:#059669;margin-top:6px">' + t('nujum.next_duel', 'Lanjut Duel Berikutnya →') + '</button>',
@@ -1134,7 +1162,7 @@
 
       showVerdict([
         '<div class="nujum-loss-card">',
-        '  <div class="nujum-loss-title">' + njPick('✕ MACHINE WON (' + nujumState.currentBet + '%)', '✕ MESIN MENANG (' + nujumState.currentBet + '%)') + '</div>',
+        '  <div class="nujum-loss-title">' + njPick('✕ MACHINE WON ({bet}%)', '✕ MESIN MENANG ({bet}%)', { bet: nujumState.currentBet }) + '</div>',
         doubleLossBanner,
         '  <div class="nujum-loss-quote">«' + njTxt(mwScript) + '»</div>',
         '  <div style="background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:8px 10px;font-size:0.75rem;margin-bottom:10px;color:#FECDD3">',
@@ -1445,7 +1473,7 @@
       timeLeft--;
       var lbl = doc.getElementById('nujumProbeTimerLabel');
       var bar = doc.getElementById('nujumProbeTimerBar');
-      if (lbl) lbl.textContent = njPick('Time: ', 'Waktu: ') + timeLeft + 's';
+      if (lbl) lbl.textContent = njPick('Time: {time}s', 'Waktu: {time}s', { time: timeLeft });
       if (bar) bar.style.width = (timeLeft * 10) + '%';
 
       if (timeLeft <= 0) {
@@ -1547,7 +1575,7 @@
         '    <span class="nujum-pill-tag" style="background:#F43F5E;color:#fff">' + njPick('✕ DISPUTE FAILED', '✕ SANGGAHAN GAGAL') + '</span>',
         '  </div>',
         '  <div class="nujum-loss-card" style="margin-top:20px">',
-        '    <div class="nujum-loss-title">' + njPick('ONLY ', 'HANYA ') + nujumState.disputeCorrectCount + njPick('/3 CORRECT', '/3 BENAR') + '</div>',
+        '    <div class="nujum-loss-title">' + njPick('ONLY {count}/3 CORRECT', 'HANYA {count}/3 BENAR', { count: nujumState.disputeCorrectCount }) + '</div>',
         '    <div class="nujum-loss-quote">«' + njTxt(dlScript) + '»</div>',
         '    <div style="background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.1);padding:10px;border-radius:10px;font-size:0.75rem;color:#FECDD3">',
         '      ' + t('nujum.dispute_status_failed', 'Status: Tuduhan mesin tetap berlaku. Masuk ke ruang latihan dan latih polanya.') + '',
@@ -1599,7 +1627,7 @@
 
     // Progressive timer display
     var timerDuration = getRoundTimerDuration();
-    var roundLabel = (nujumState.roundIndex >= 7) ? 'FINAL' : njPick('Round ', 'Ronde ') + (nujumState.roundIndex + 1) + '/8';
+    var roundLabel = (nujumState.roundIndex >= 7) ? njPick('FINAL', 'FINAL') : njPick('Round {num}/8', 'Ronde {num}/8', { num: nujumState.roundIndex + 1 });
     var roundPhase = (nujumState.roundIndex <= 2) ? njPick('STANDARD', 'STANDAR') : (nujumState.roundIndex <= 4) ? njPick('INTENSIVE', 'INTENSIF') : (nujumState.roundIndex <= 6) ? njPick('CRITICAL', 'KRITIS') : '⚡ ALL-IN';
 
     // Shield break bonus banner
@@ -1876,7 +1904,7 @@
       '    <ul class="nujum-broken-list">',
       nujumState.brokenClaims.length > 0
         ? nujumState.brokenClaims.map(function (c) {
-            return '<li class="nujum-broken-item">' + njPick('Bet ', 'Taruhan ') + '<b>' + c.bet + '%</b> ' + njPick('missed: you answered «', 'meleset: kamu mengucapkan «') + c.actual + njPick('» (machine predicted «', '» (mesin memprediksi «') + c.predicted + '»).</li>';
+            return '<li class="nujum-broken-item">' + njPick('Bet <b>{bet}%</b> missed: you answered «{actual}» (machine predicted «{predicted}»).', 'Taruhan <b>{bet}%</b> meleset: kamu mengucapkan «{actual}» (mesin memprediksi «{predicted}»).', { bet: c.bet, actual: c.actual, predicted: c.predicted }) + '</li>';
           }).join('')
         : '<li style="color:var(--nj-text-muted);font-style:italic">' + t('nujum.empty_victories', 'Belum ada taruhan yang dipatahkan di sesi ini.') + '</li>',
       '    </ul>',
