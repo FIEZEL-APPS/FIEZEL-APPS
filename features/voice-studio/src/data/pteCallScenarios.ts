@@ -10,7 +10,7 @@ export const PTE_CALL_SCENARIOS: CallScenario[] = [
     id: 'scen_pte_coach_intro',
     titleId: 'PTE Academic: Orientasi Formula & Tes Diagnostik',
     titleTh: 'PTE Academic: แนะนำสูตรและแบบทดสอบวัดระดับ',
-    subtitleId: 'PTE Target 42–58+ · Pemetaan Kemampuan Bicara & Ujian Awal',
+    subtitleId: 'PTE Target 42-58+ · Pemetaan Kemampuan Bicara & Ujian Awal',
     subtitleTh: 'PTE Target 42-58+ · ทดสอบและวางแผนการเรียนรู้',
     targetLang: 'en',
     level: 'PTE Academic Score 42-58+',
@@ -62,7 +62,7 @@ export const PTE_CALL_SCENARIOS: CallScenario[] = [
     ],
     sampleUtterances: [
       {
-        labelId: 'Jawaban Lancar Target 42–58+',
+        labelId: 'Jawaban Lancar Target 42-58+',
         labelTh: 'คำตอบระดับเป้าหมาย 42-58+',
         text: 'My primary goal is to achieve a PTE score of 50 for my Australian visa application. I have not taken the exam before, and I want to master the official templates.',
         intent: 'accurate'

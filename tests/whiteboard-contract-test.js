@@ -65,14 +65,15 @@ const modalSrc = read('features/voice-studio/src/components/InCallLearningWorkbe
   console.log('  ✅ PASS 2: Zero conditional React hooks after early return');
 }
 
-// 3. Fast canvas reveal + follow-up freeze + debounced preparing pill + audioClock reset
+// 3. Synchronized curtain reveal + bounded HTMLAudio + follow-up freeze + audioClock reset
 {
-  assert.match(modalSrc, /const\s+showInitialBuffering\s*=\s*!isReady\s*;/, 'Canvas must reveal as soon as boardState is ready');
+  assert.match(modalSrc, /const\s+showInitialBuffering\s*=\s*!isReady\s*\|\|\s*\(!isSpecialCanvasModal\s*&&\s*isInitialAudioGateActive\)\s*;/, 'Buffering curtain must wait for Chunk-0 audio readiness so visual and voice ignite together with zero post-buffering delay');
+  assert.ok(modalSrc.includes('revealCanvasNow()') && modalSrc.includes('playHtmlAudioBounded(audio, 650)'), 'playChunkAt must lift curtain right on audio start and bound HTMLAudio.play on mobile PWA');
   assert.ok(!/safetyTimer[^;]{0,120}11500/.test(modalSrc), 'Old 11.5s initial audio gate timer must not exist');
   assert.match(modalSrc, /if\s*\(isGeneratingTopic\)\s*\{\s*stopLockstepAudio\(\);\s*return;\s*\}/, 'Follow-up generation must freeze old board instead of racing silent clock');
   assert.match(modalSrc, /topicKey\s*=[\s\S]{0,220}currentKey\s*=/, 'Ganti Soal (`quizSeed`) must not clear topic audio cache');
   assert.match(modalSrc, /setAudioClock\(null\)/, 'Step seek must reset audioClock immediately');
-  console.log('  ✅ PASS 3: Fast reveal, follow-up freeze, cache key isolation & clock reset verified');
+  console.log('  ✅ PASS 3: Synchronized curtain reveal, bounded HTMLAudio, follow-up freeze & clock reset verified');
 }
 
 // 4. Quiz quality (MCQ >= 3 options, cloze >= 3 chips, genuine Fisher-Yates shuffle, all visual kinds)
@@ -111,13 +112,19 @@ const transportSrc = read('features/voice-studio/src/lib/liveTransport.ts');
   console.log('  ✅ PASS 5: Worker session auth, SSOT pre-warm & visual cycle distinctness verified');
 }
 
-// 6. LiveWhiteboardCanvas camera throttle, nib sync, phase jump & copy hygiene
+// 6. LiveWhiteboardCanvas camera throttle, 2D focus observer, nib sync, phase jump & copy hygiene
 const canvasSrc = read('features/voice-studio/src/components/LiveWhiteboardCanvas.tsx');
+const diagramsSrc = read('features/voice-studio/src/components/WhiteboardVisualDiagrams.tsx');
+const cssSrc = read('features/voice-studio/src/index.css');
 {
   assert.ok(canvasSrc.includes('if (currentSub !== lastFocusedSub)'), 'MutationObserver must only schedule camera check when focus target changes');
+  assert.ok(canvasSrc.includes("attributeFilter: ['class', 'data-wb-panel-focus']"), 'MutationObserver must watch data-wb-panel-focus for left/right diagram panning');
   assert.ok(!/if\s*\(effP\s*<\s*0\.65\s*&&\s*activeShape\)/.test(canvasSrc), 'Marker nib threshold must stay aligned with 0.86 reachedCount');
+  assert.ok(!canvasSrc.includes('shapes[idx - 1]'), 'RoughFreeformSceneDiagram must use penShapeIdx instead of undeclared idx');
   assert.ok(canvasSrc.includes('lastPhaseStepIdx'), 'Last phase button must target step at final phase rather than overshooting');
-  console.log('  ✅ PASS 6: Canvas camera throttle, nib sync & phase scrubber verified');
+  assert.ok(diagramsSrc.includes('MindMapDiagram') && !/Organic Hub Banner \*\/\s*\n\s*<div[^>]*overflow-hidden/.test(diagramsSrc), 'MindMapDiagram must not clip zoomed cards with overflow-hidden');
+  assert.ok(/\.fz-keyword-highlight\s*\{[\s\S]*display:\s*inline;/.test(cssSrc), '.fz-keyword-highlight must use display: inline so multi-word spans wrap across lines cleanly');
+  console.log('  ✅ PASS 6: Canvas camera 2D focus, nib safety, overflow hygiene & inline highlight wrapping verified');
 }
 
 // 7. Backend Worker opener re-lock after retryGen & dist parity check
@@ -131,4 +138,72 @@ const workerSrc = read('workers/api/voice/route-voice-live.js');
   console.log('  ✅ PASS 7: Worker retry opener sync & dist bundle parity verified');
 }
 
-console.log('\n🎉 ALL 7 WHITEBOARD CONTRACT TESTS PASSED 100%!');
+// 8. Word-clock sanitized token parity, gapless WebAudio scheduling, spoken sliding window & PTE locale props
+{
+  assert.ok(modalSrc.includes('alignedChunkTexts') && modalSrc.includes('stepAlignedWordsMap'), 'Word-clock map must use sanitizeSpokenTextForClassicTts tokens 1:1 with alignWordsToSpeech');
+  assert.ok(modalSrc.includes('resolvedChunkMap') && modalSrc.includes('interChunkGapsMs'), 'WebAudio sequencer must keep synchronous resolvedChunkMap for gapless transitions');
+  assert.ok(modalSrc.includes('activeSpokenWindowText'), 'Diagram matchers must receive progressive sliding spoken window instead of future full-sentence leak');
+  assert.ok(modalSrc.includes('PteDescribeImageCanvas') && /PteReadAloudCanvas[\s\S]{0,420}locale\?:\s*LearnerLocale/.test(modalSrc), 'PTE subcomponents must receive locale prop cleanly');
+  console.log('  ✅ PASS 8: Word-clock parity, gapless WebAudio, sliding spoken window & PTE locale safety verified');
+}
+
+// 9. Mobile PWA WebAudio gesture unlocker, bounded ctx.resume() & non-skipping autoplay fallback
+const unlockSrc = read('features/voice-studio/src/lib/boardAudioUnlock.ts');
+{
+  assert.ok(unlockSrc.includes('export function getSharedBoardAudioContext'), 'boardAudioUnlock must export getSharedBoardAudioContext');
+  assert.ok(unlockSrc.includes('export function unlockSharedBoardAudioContext'), 'boardAudioUnlock must export unlockSharedBoardAudioContext');
+  assert.ok(unlockSrc.includes('export async function resumeAudioContextBounded'), 'boardAudioUnlock must export resumeAudioContextBounded');
+  assert.ok(modalSrc.includes('resumeAudioContextBounded(ctx, 220)'), 'WebAudio resume must use bounded timeout instead of hanging indefinitely on mobile PWA');
+  assert.ok(modalSrc.includes('wb-tap-unmute-btn'), 'Whiteboard header must render one-tap unmute pill when mobile autoplay is blocked');
+  assert.ok(!modalSrc.includes('chunkWeights[chunkIdx] / 2.2'), 'Silent timeout fallback must use unified 0.068 duration constant');
+  const catchIdx = modalSrc.indexOf("runTimedSilentFallback(chunkDurSec, 'silent_autoplay_blocked')");
+  assert.ok(catchIdx > 0, 'HTMLAudio play().catch() must enter runTimedSilentFallback instead of calling advanceToNextOrDone()');
+  console.log('  ✅ PASS 9: Mobile PWA WebAudio bounded resume & non-skipping autoplay fallback verified');
+}
+
+// 10. Left-to-Right spatial diagram order, negation-safe focus matching & complete swapped narrations
+{
+  assert.ok(diagramsSrc.includes('export function resolveSpatialPanelFocus'), 'WhiteboardVisualDiagrams must export SSOT resolveSpatialPanelFocus');
+  assert.ok(diagramsSrc.includes('export function resolveSequentialItemFocus'), 'WhiteboardVisualDiagrams must export SSOT resolveSequentialItemFocus');
+  assert.ok(diagramsSrc.includes('resolveSpatialPanelFocus(') && canvasSrc.includes('resolveSpatialPanelFocus('), 'Both MetaphorSceneDiagram and RoughContrastScaleDiagram must reuse resolveSpatialPanelFocus');
+  assert.ok(canvasSrc.includes('if (Math.abs(ay - by) > 48) return ay - by'), 'RoughFreeformSceneDiagram must sort containers in Top->Bottom, Left->Right reading order');
+  assert.ok(directorSrc.includes('hasNarrationInvertedLeftRight') && directorSrc.includes('doesNarrationCoverPanelPair'), 'whiteboardDirector must detect Left/Right narration inversion and incomplete blurbs');
+  assert.ok(
+    /if\s*\(hasCamLeft\s*&&\s*isActionSide\(leftBlob\)\s*&&\s*isStateSide\(rightBlob\)\)[\s\S]{0,900}spokenNarration:\s*undefined/.test(directorSrc),
+    'Swapping leftPanel/rightPanel must clear stale spokenNarration'
+  );
+  console.log('  ✅ PASS 10: Left-to-Right spatial visual alignment & complete step narration verified');
+}
+
+// 11. Guided Socratic Mastery Loop after quiz & Universal Native Explanation Language Lock
+{
+  assert.ok(modalSrc.includes('wb-quiz-coach-card') && modalSrc.includes('wb-remediate-btn') && modalSrc.includes('wb-next-drill-btn') && modalSrc.includes('wb-other-topic-btn'), 'Quiz must render interactive guided AI mastery coach responses for both wrong and correct answers');
+  assert.ok(modalSrc.includes('wb-explanation-lang-select'), 'Whiteboard header must expose native explanation language selector');
+  assert.ok(modalSrc.includes('[REMEDIATION_DIFFERENT_ANGLE]'), 'Wrong quiz remediation must instruct backend to explain using a different visual & analogy');
+  assert.ok(workerSrc.includes('IRONCLAD NATIVE EXPLANATION LANGUAGE LOCK') && workerSrc.includes('detectExplicitCourseExplainRequest'), 'Worker must enforce native explanation language unless user explicitly requests course language');
+  for (const code of ['ru:', 'km:', 'fil:', 'th:', 'ja:']) {
+    assert.ok(workerSrc.includes(code), `Worker WHITEBOARD_LOCALE_LABELS must support ${code}`);
+  }
+  console.log('  ✅ PASS 11: Guided Socratic quiz mastery loop & universal native explanation language lock verified');
+}
+
+// 12. Full Ecosystem Audit Hardening: Anti-503 Dead-Key Guard, Multi-Lang Live TTS, Race-Free Language Switch, Quiz Dedup & Zero Copy/Bold Leaks
+{
+  const appSrc = read('features/voice-studio/src/App.tsx');
+  const transportSrc = read('features/voice-studio/src/lib/liveTransport.ts');
+  assert.ok(
+    workerSrc.includes('_quotaDeadKeys.add(key)') &&
+      /function invokeGeminiLiveWavTts[\s\S]*?_ttsCooldownMap\.delete\(cooldownKey\)/.test(workerSrc),
+    'Worker TTS must quarantine quota-dead keys and delete from _ttsCooldownMap'
+  );
+  assert.ok(workerSrc.includes('LIVE_TTS_LANG_LABELS') && workerSrc.includes('LIVE_BCP47_MAP'), 'Worker invokeGeminiLiveWavTts must map all 20 universal explanation languages');
+  assert.ok(workerSrc.includes('Math.min(18, prioritizedLiveKeys.length)'), 'Worker runLiveWavRace must sweep full rotated pool instead of stopping at 6 dead keys');
+  assert.ok(appSrc.includes('invalidateInFlightCopilot') && appSrc.includes('activeScenarioRef.current.targetLang !== scen.targetLang'), 'Language switch must abort in-flight copilot to prevent cross-language card leaks');
+  assert.ok(modalSrc.includes('const normQuizKey ='), 'Quiz option deduplication must normalize trailing punctuation to prevent duplicates like "I am agree." vs "I am agree"');
+  assert.ok(!appSrc.includes('Target Level CEFR'), 'Learner UI must never expose forbidden "Target Level CEFR" label');
+  assert.ok(!/\bfont-black\b/.test(appSrc) && !/\bfont-black\b/.test(modalSrc), 'Voice studio UI must use weight <= 800 (font-extrabold) instead of faux bold 900 (font-black)');
+  assert.ok(transportSrc.includes("'km', 'fil'"), 'Client Gemini TTS lang detector must include universal locales like km and fil');
+  console.log('  ✅ PASS 12: Anti-503 TTS key pool, race-free language switch, quiz dedup & copy/bold hygiene verified');
+}
+
+console.log('\n🎉 ALL 12 WHITEBOARD CONTRACT TESTS PASSED 100%!');
