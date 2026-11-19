@@ -3047,9 +3047,9 @@ export function buildContextualFallbackCards(params: {
     badgeTh: string;
     row: CardRow;
   }> = [
-    { tier: 'easy', badgeId: wbPick('Short & Easy', 'Singkat & Mudah', 'สั้นและง่าย', locale), badgeTh: 'สั้นและง่าย', row: tpl.easy },
-    { tier: 'mission', badgeId: wbPick('Natural & Contextual', 'Alami & Kontekstual', 'เป็นธรรมชาติ', locale), badgeTh: 'เป็นธรรมชาติ', row: tpl.mission },
-    { tier: 'rescue', badgeId: wbPick('Reply + Follow-up', 'Jawab + Tanya Balik', 'ตอบและถามกลับ', locale), badgeTh: 'ตอบและถามกลับ', row: tpl.rescue },
+    { tier: 'easy', badgeId: wbPick('Short & Easy', 'Singkat & Mudah', 'สั้นและง่าย', params.locale), badgeTh: 'สั้นและง่าย', row: tpl.easy },
+    { tier: 'mission', badgeId: wbPick('Natural & Contextual', 'Alami & Kontekstual', 'เป็นธรรมชาติ', params.locale), badgeTh: 'เป็นธรรมชาติ', row: tpl.mission },
+    { tier: 'rescue', badgeId: wbPick('Reply + Follow-up', 'Jawab + Tanya Balik', 'ตอบและถามกลับ', params.locale), badgeTh: 'ตอบและถามกลับ', row: tpl.rescue },
   ];
 
   const stamp = Date.now();

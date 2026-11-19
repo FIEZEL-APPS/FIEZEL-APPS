@@ -1,7 +1,7 @@
 {
-  "version": "m025-812",
-  "claimedBy": "branch feat/all-9-locales-wave1-m025-812",
-  "claimedAt": "2026-11-19T20:10:54.706Z",
-  "reason": "feat(i18n): [ALLOW-MASS-DELETE] 9-locale native localization wave 1 (UI, Voice Studio, Workers, 79 sidecars)",
+  "version": "m025-813",
+  "claimedBy": "branch fix/ci-shard2-3-m025-813",
+  "claimedAt": "2026-11-19T20:32:03.260Z",
+  "reason": "fix(voice-studio,ci): fix params.locale in liveTransport & align ui-architecture test",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

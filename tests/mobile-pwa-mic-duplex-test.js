@@ -254,8 +254,17 @@ await runTest('Source & dist/voice-studio.js enforce Mobile PWA continuous mic d
   assert.ok(appTsx.includes('setDuplexAudioSessionMode(false)'), 'App.tsx must restore playback audioSession on stop/unmount');
   assert.ok(appTsx.includes('{ preferScriptProcessor: isMobileOrIOSWebKit }'), 'App.tsx must pass preferScriptProcessor to Silero on mobile');
   assert.ok(appTsx.includes('!micCaptureHardFailedRef.current'), 'App.tsx must prevent SpeechRec flapping while ws-duplex mic is pending/recovering');
-  assert.ok(appTsx.includes("Mochi Bicara · Mic Aktif"), 'App.tsx must keep active mic badge visible during Mochi speech on ws-duplex');
-  assert.ok(appTsx.includes('bicara saja untuk menyela'), 'App.tsx must keep mobile interrupt hint visible');
+  const i18nTs = fs.readFileSync(path.join(ROOT, 'features/voice-studio/src/lib/i18n.ts'), 'utf8');
+  assert.ok(
+    appTsx.includes("Mochi Bicara · Mic Aktif") ||
+      (appTsx.includes("t(locale, 'ui.mochiSpeakMic')") && i18nTs.includes('Mochi Bicara · Mic Aktif')),
+    'App.tsx must keep active mic badge visible during Mochi speech on ws-duplex'
+  );
+  assert.ok(
+    appTsx.includes('bicara saja untuk menyela') ||
+      (appTsx.includes("t(locale, 'ui.tapInterrupt')") && i18nTs.includes('Ketuk untuk menyela Mochi')),
+    'App.tsx must keep mobile interrupt hint visible'
+  );
 
   assert.ok(sileroTs.includes("processorType: useScriptProcessor ? 'ScriptProcessor' : 'auto'"), 'sileroVadGate.ts must avoid unstable mobile AudioWorklet');
   assert.ok(sileroTs.includes('isMobileAecHumanBarge'), 'sileroVadGate.ts must include mobile AEC barge-in path');

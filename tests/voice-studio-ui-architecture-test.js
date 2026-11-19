@@ -98,12 +98,15 @@ assert.ok(
   appContent.includes("const callStateKey: 'speaking' | 'recording' | 'waiting' | 'live' | 'ready' = isPlayingAiAudio"),
   'callStateKey prioritizes speaking state over live connected state during audio playback'
 );
+const i18nTsContent = fs.readFileSync(path.join(__dirname, '..', 'features', 'voice-studio', 'src', 'lib', 'i18n.ts'), 'utf8');
 assert.ok(
-  appContent.includes("Mochi berbicara... (${formatTimer(callDurationSec)})"),
+  appContent.includes("${t(locale, 'ui.mochiSpeakingStatus')} (${formatTimer(callDurationSec)})") &&
+  i18nTsContent.includes("'ui.mochiSpeakingStatus': 'Mochi berbicara...'"),
   'Status text explicitly indicates when Mochi is actively speaking during live duplex calls'
 );
 assert.ok(
-  appContent.includes("Merekam suara... (${formatTimer(pttRecordingSec)})"),
+  appContent.includes("${t(locale, 'ui.recordingStatus')} (${formatTimer(pttRecordingSec)})") &&
+  i18nTsContent.includes("'ui.recordingStatus': 'Merekam suara...'"),
   'Status text explicitly indicates when user is speaking/recording'
 );
 assert.ok(
