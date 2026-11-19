@@ -64,6 +64,7 @@ import {
   type WorkbenchEvaluationMeta,
   type WorkbenchPracticeCheckResult,
 } from './components/InCallLearningWorkbenchModal';
+import { WhiteboardErrorBoundary } from './components/WhiteboardErrorBoundary';
 import {
   extractOpenerFirstTtsChunk,
   requestRealtimeWhiteboardAction,
@@ -73,7 +74,7 @@ import {
 import { CALL_SCENARIOS, VOICE_PERSONAS } from './data/callScenarios';
 import { t, tMasteryState, scenarioMetaForLocale, vocabMeaningForLocale } from './lib/i18n';
 import { playFiezelSfx, registerSfxHostAudioContext } from './lib/sfx';
-import { unlockSharedBoardAudioContext } from './lib/boardAudioUnlock';
+import { isMobileLowMemoryDevice, unlockSharedBoardAudioContext } from './lib/boardAudioUnlock';
 import { BraincoreTrendChart } from './components/BraincoreTrendChart';
 import { HomeRedesignView } from './components/HomeRedesignView';
 import { BeginnerAnswerAssistant } from './components/BeginnerAnswerAssistant';
@@ -8478,16 +8479,25 @@ ${
   const lastAiTurn = [...turns].reverse().find((tr) => tr.speaker === 'ai');
   const lastUserTurn = [...turns].reverse().find((tr) => tr.speaker === 'user');
 
-  // Mount authentic 3D Volumetric Daifuku Mochi Mascot (FiezelMochi) inside the Call Stage
+  const shouldReleaseMochiWebGlForMobileWb = Boolean(
+    learningWorkbench?.isOpen && isMobileLowMemoryDevice()
+  );
+
+  // Mount authentic 3D Volumetric Daifuku Mochi Mascot (FiezelMochi) inside the Call Stage.
+  // Mobile PWA OOM Guard (m025-810): when the fullscreen Whiteboard opens on iOS/Android,
+  // tear down the hidden background WebGL context (forceContextLoss + dispose) so ZERO GPU contexts
+  // compete with the Whiteboard audio/SVG pipeline, then cleanly restore Mochi upon closing.
   useEffect(() => {
-    if (activeTab !== 'call' || !prereqStatus.isReady) {
+    if (activeTab !== 'call' || !prereqStatus.isReady || shouldReleaseMochiWebGlForMobileWb) {
       if (mochiInstanceRef.current) {
         try {
+          mochiInstanceRef.current.detachAudioAnalyser?.();
           mochiInstanceRef.current.destroy?.();
         } catch {
           // Ignore
         }
         mochiInstanceRef.current = null;
+        try { (window as any).__fzVoiceMochiInstance = null; } catch {}
         setIs3dMochiReady(false);
       }
       return;
@@ -8577,10 +8587,11 @@ ${
           // Ignore
         }
         mochiInstanceRef.current = null;
+        try { (window as any).__fzVoiceMochiInstance = null; } catch {}
       }
       setIs3dMochiReady(false);
     };
-  }, [activeTab, prereqStatus.isReady]);
+  }, [activeTab, prereqStatus.isReady, shouldReleaseMochiWebGlForMobileWb]);
 
   // Pause background 3D WebGL Mochi loop while whiteboard popup is open to eliminate UI lag & GPU contention
   useEffect(() => {
@@ -8827,7 +8838,7 @@ ${
   return (
     <div className="h-[100dvh] max-h-[100dvh] overflow-hidden bg-[#F6F3EC] text-[#1C1611] flex flex-col">
       {/* TOP BAR RINGKAS & BERSIH (h-11 / 44px - FaceTime & Duolingo Max Style) */}
-      <header className="shrink-0 sticky top-0 z-20 bg-[#F6F3EC]/95 backdrop-blur-md border-b border-[#E8DFC8]/60 pt-[env(safe-area-inset-top,0.25rem)]">
+      <header className="shrink-0 sticky top-0 z-20 bg-[#F6F3EC] sm:bg-[#F6F3EC]/95 sm:backdrop-blur-md border-b border-[#E8DFC8]/60 pt-[env(safe-area-inset-top,0.25rem)]">
         <div className="max-w-4xl lg:max-w-6xl xl:max-w-7xl mx-auto px-2.5 sm:px-6 min-h-11 py-1 sm:py-0 sm:h-11 flex flex-wrap sm:flex-nowrap items-center justify-between gap-x-1.5 gap-y-1 sm:gap-2">
           {/* SISI KIRI: Tombol Kembali & Persona Active */}
           <div className="order-1 flex items-center gap-1 sm:gap-2 min-w-0">
@@ -9571,7 +9582,7 @@ ${
                     {/* SUBTITLE MELAYANG HALUS (Floating Subtitles Glass HUD) */}
                     <div
                       data-testid="live-translation-hud"
-                      className="w-full text-left rounded-3xl bg-white/95 backdrop-blur-md border border-[#EDE5D4] p-2.5 sm:p-5 shadow-sm space-y-1.5 sm:space-y-3 flex flex-col justify-between min-h-[108px] sm:min-h-[260px] lg:min-h-[300px]"
+                      className="w-full text-left rounded-3xl bg-white sm:bg-white/95 sm:backdrop-blur-md border border-[#EDE5D4] p-2.5 sm:p-5 shadow-sm space-y-1.5 sm:space-y-3 flex flex-col justify-between min-h-[108px] sm:min-h-[260px] lg:min-h-[300px]"
                     >
                       {isAiThinking ? (
                         <div
@@ -10240,7 +10251,7 @@ ${
       {activeTab === 'call' && prereqStatus.isReady && (
         <div
           data-testid="mitra-kaiwa-bottom-dock"
-          className="shrink-0 w-full z-30 bg-[#F6F3EC]/95 backdrop-blur-md border-t border-[#E8DFC8]/70 px-3 sm:px-4 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-4px_16px_rgba(28,22,17,0.04)]"
+          className="shrink-0 w-full z-30 bg-[#F6F3EC] sm:bg-[#F6F3EC]/95 sm:backdrop-blur-md border-t border-[#E8DFC8]/70 px-3 sm:px-4 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-4px_16px_rgba(28,22,17,0.04)]"
         >
           <div className="w-full min-w-0 max-w-2xl lg:max-w-4xl mx-auto space-y-1.5">
             {/* COPILOT TELEPROMPTER DOCK: Menempel langsung di atas input bar - NO SCROLL NEEDED */}
@@ -10512,7 +10523,7 @@ ${
         aria-label="Primary navigation"
         aria-hidden="true"
         style={{ display: 'none' }}
-        className="hidden fixed bottom-0 left-0 right-0 z-40 bg-[#FFF9EE]/95 backdrop-blur-xl border-t border-[#F0E4CF] px-4 py-2 sm:hidden"
+        className="hidden fixed bottom-0 left-0 right-0 z-40 bg-[#FFF9EE] sm:bg-[#FFF9EE]/95 sm:backdrop-blur-xl border-t border-[#F0E4CF] px-4 py-2 sm:hidden"
       >
         <div className="max-w-md mx-auto grid grid-cols-3 gap-2">
           <button
@@ -10559,7 +10570,7 @@ ${
         <div
           role="dialog"
           aria-modal="true"
-          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-xs transition-opacity"
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/65 sm:bg-black/60 sm:backdrop-blur-xs transition-opacity"
           onClick={() => setShowPersonaModal(false)}
         >
           <div
@@ -10768,6 +10779,15 @@ ${
 
       {/* Pop-up Kartu Latihan Tulis Interaktif (Warm Paper & Tactile Flashcard + Braincore BKT) */}
       {learningWorkbench && !isMeasureMode && (
+        <WhiteboardErrorBoundary
+          locale={locale}
+          onClose={() => {
+            workbenchSessionRef.current.dismissedByUser = true;
+            isWorkbenchOpenRef.current = false;
+            isWorkbenchExplanationActiveRef.current = false;
+            setLearningWorkbench(null);
+          }}
+        >
         <InCallLearningWorkbenchModal
           isOpen={learningWorkbench.isOpen}
           onClose={() => {
@@ -11063,6 +11083,7 @@ ${
             handleVoiceNavigateApp(dest, 'workbench_open_full_module');
           }}
         />
+        </WhiteboardErrorBoundary>
       )}
 
       {/* Modal Konfirmasi Panggilan Kawan Bicara (Ringkas & Jelas) */}

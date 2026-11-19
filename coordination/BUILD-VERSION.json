@@ -1,7 +1,7 @@
 {
-  "version": "m025-809",
-  "claimedBy": "branch fix/whiteboard-sync-camera-highlight",
-  "claimedAt": "2026-11-18T22:34:02.043Z",
-  "reason": "fix(voice-studio): whiteboard word-clock sync, mobile PWA autoplay unlocker, left-right spatial focus & camera",
+  "version": "m025-810",
+  "claimedBy": "branch fix/mobile-pwa-whiteboard-home-stability",
+  "claimedAt": "2026-11-19T11:19:38.543Z",
+  "reason": "fix(voice-studio,ui): eliminate mobile PWA whiteboard OOM/WebGL crashes and lock Home greeting & Mochi stage stability",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

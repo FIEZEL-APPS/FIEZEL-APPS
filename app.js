@@ -5960,6 +5960,9 @@ function applyAccountCloudSnapshot(remoteSnap){
 
     const currentView=state?.view||'home';
     const currentSession=state?.activeSession||null;
+    const prevHomeSig=currentView==='home'
+      ? `${state?.userName||''}|${state?.level||''}|${Number(state?.streak)||0}|${Number(state?.gems?.balance)||0}|${prevLang}|${Array.isArray(state?.history)?state.history.length:0}`
+      : '';
     const reloaded=loadState(activeStateStorageKey);
     Object.keys(state).forEach(k=>{if(!Object.prototype.hasOwnProperty.call(reloaded,k))delete state[k]});
     Object.assign(state,reloaded);
@@ -5975,10 +5978,16 @@ function applyAccountCloudSnapshot(remoteSnap){
       const xVal=$('topbarXpVal');
       if(xVal&&(state.xp===undefined||state.xp===null))xVal.textContent=String(gemsBalance());
     }catch(_){}
+    const nextHomeSig=currentView==='home'
+      ? `${state?.userName||''}|${state?.level||''}|${Number(state?.streak)||0}|${Number(state?.gems?.balance)||0}|${nextLang}|${Array.isArray(state?.history)?state.history.length:0}`
+      : '';
     if(nextLang!==prevLang&&typeof load==='function'&&appOpened){
       load({kontenSaja:true}).then(()=>{try{reconcileStateAfterBankLoad();render()}catch(_){}}).catch(()=>{});
     }else if(appOpened){
-      try{render()}catch(_){}
+      // Avoid destructive full-#app innerHTML wipe on Home when visible stats did not change (prevents 3D Mochi & greeting flash)
+      if(!(currentView==='home'&&prevHomeSig&&prevHomeSig===nextHomeSig)){
+        try{render()}catch(_){}
+      }
     }
     return true;
   }catch(_){
@@ -13116,9 +13125,9 @@ function todayHomeMarkup(){
     + `<span>${esc(FiezelI18n.t('home.semangat-sub-2', 'Kamu pasti bisa!'))}</span>`
     + `</div>`
     + `</div>`
-    + `<div class="fz-vissol-mascot-wrap${(typeof window !== 'undefined' && (window.FiezelMochiCompanion || window.FiezelMochi)) ? ' has-3d-mochi' : ''}" role="button" tabindex="0" aria-label="Mochi 3D Mascot" data-testid="home-mochi-mascot" onclick="try{window.FiezelMochiCompanion?.interact?.();}catch(_){}" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();try{window.FiezelMochiCompanion?.interact?.();}catch(_){}}">`
+    + `<div class="fz-vissol-mascot-wrap${(typeof window !== 'undefined' && !(window.FiezelMochiCompanion?.isFailed?.()) && !(window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches)) ? ' has-3d-mochi' : ''}" role="button" tabindex="0" aria-label="Mochi 3D Mascot" data-testid="home-mochi-mascot" onclick="try{window.FiezelMochiCompanion?.interact?.();}catch(_){}" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();try{window.FiezelMochiCompanion?.interact?.();}catch(_){}}">`
     + `<div class="fz-vissol-mascot-cloud-bg" aria-hidden="true"></div>`
-    + `<img src="./assets/brand/paw-mochi-idle.svg" alt="Mochi Mascot" class="fz-vissol-mascot-img"${(typeof window !== 'undefined' && (window.FiezelMochiCompanion || window.FiezelMochi)) ? ' style="display:none;"' : ''} />`
+    + `<img src="./assets/brand/paw-mochi-idle.svg" alt="Mochi Mascot" class="fz-vissol-mascot-img"${(typeof window !== 'undefined' && !(window.FiezelMochiCompanion?.isFailed?.()) && !(window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches)) ? ' style="display:none;"' : ''} />`
     + `</div>`
     + (currentStreak > 0 ? `<div class="tactile-streak-badge" style="display:none;" title="${esc(FiezelI18n.t('today.streak', { days: currentStreak }))}">`
     + flameSvg
@@ -14609,7 +14618,14 @@ function shellCssSettled(){
       var extras=self.document.querySelectorAll('link[data-fz-shell-css]');
       for(var i=0;extras&&i<extras.length;i++){
         var el=extras[i];
-        if(el&&el.media==='print'&&el.dataset?.fzShellReady!=='1'&&el.dataset?.fzShellReady!=='error'){extraOk=false;break}
+        if(el&&el.media==='print'&&el.dataset?.fzShellReady!=='1'&&el.dataset?.fzShellReady!=='error'){
+          // WebKit/iOS PWA cached <link media="print"> quirk: sheet is already attached even if onload was skipped
+          if(el.sheet){
+            try{el.media='all';if(el.dataset)el.dataset.fzShellReady='1'}catch(_){}
+          }else{
+            extraOk=false;break;
+          }
+        }
       }
     }
     if(self.__fzShellCss==='ready')return extraOk;
@@ -14637,6 +14653,20 @@ function dismissBootSplash(){
     setTimeout(dismissBootSplash,60);
     return true;
   }
+  // Safety promotion: before lifting splash, force-promote any still-print shell CSS links so Home never FOUC-morphs
+  try{
+    if(typeof self.document?.querySelectorAll==='function'){
+      var pendingCss=self.document.querySelectorAll('link[data-fz-shell-css]');
+      for(var pi=0;pendingCss&&pi<pendingCss.length;pi++){
+        if(pendingCss[pi]&&pendingCss[pi].media==='print'){
+          pendingCss[pi].media='all';
+          if(pendingCss[pi].dataset)pendingCss[pi].dataset.fzShellReady='1';
+        }
+      }
+    }
+    var mainCss=self.document?.querySelector?.('link[href="./style.css"]');
+    if(mainCss&&mainCss.rel==='preload'){mainCss.rel='stylesheet';self.__fzShellCss='ready'}
+  }catch(_){}
   try{self.__fiezelBootSplash?.clearRecovery?.()}catch(_){}
   try{self.__fiezelBootSplash?.clearWatchdog?.()}catch(_){}
   try{const r=self.document?.getElementById?.('fiezelBootRecovery');if(r)r.remove()}catch(_){}

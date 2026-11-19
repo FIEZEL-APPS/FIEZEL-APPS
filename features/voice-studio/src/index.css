@@ -992,3 +992,14 @@ rt.zh-rt {
   font-weight: 600;
   line-height: 1.1;
 }
+
+/* Mobile PWA GPU Layer Discipline (m025-810): avoid promoting dozens of static/idle elements
+   into separate WebKit backing-store textures on iPhone & Android standalone PWAs. */
+@media (max-width: 767px) {
+  .fz-atelier-nib,
+  .fz-atelier-wave-bar,
+  .fz-studio-breathe-orb,
+  .fz-studio-launch-card {
+    will-change: auto;
+  }
+}

@@ -479,11 +479,16 @@ export class FiezelMochi {
     this.camera.position.set(0, this.baseCameraY, this.baseCameraZ || 5.05); // Configurable camera framing (e.g. 4.70 for full stage presence in FaceTime)
 
 
+    const isTouchMobile = typeof window !== 'undefined' && (
+      window.innerWidth < 768 ||
+      (typeof navigator !== 'undefined' && /iPhone|iPad|iPod|Android|Mobile/i.test(navigator.userAgent || ''))
+    );
+
     this.renderer = new THREE.WebGLRenderer({
       antialias: true, // Universal hardware MSAA: silky-smooth silhouette on mobile & desktop
       alpha: true,
       preserveDrawingBuffer: false, // Set to false to eliminate mobile GPU stall due to ReadPixels
-      powerPreference: 'high-performance'
+      powerPreference: isTouchMobile ? 'default' : 'high-performance'
     });
     // Tone mapping is strictly NoToneMapping to banish dark/black edge fringes along transparent alpha borders!
     this.renderer.toneMapping = THREE.NoToneMapping;
@@ -529,6 +534,14 @@ export class FiezelMochi {
 
   _computeTargetPixelRatio() {
     const baseDpr = (typeof window !== 'undefined' && window.devicePixelRatio) || 1;
+    const isTouchMobile = typeof window !== 'undefined' && (
+      window.innerWidth < 768 ||
+      (typeof navigator !== 'undefined' && /iPhone|iPad|iPod|Android|Mobile/i.test(navigator.userAgent || ''))
+    );
+    if (isTouchMobile) {
+      // Cap at 2.0 on mobile PWA (saves ~56% GPU framebuffer VRAM on 3x iPhones while keeping crisp Retina HD)
+      return Math.min(Math.max(baseDpr, 1.5), 2.0);
+    }
     return this.isCompactCard
       ? Math.min(Math.max(baseDpr, 2.0), 3.0)
       : Math.min(Math.max(baseDpr, 1.5), 2.25);
