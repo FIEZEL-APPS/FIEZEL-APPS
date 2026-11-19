@@ -206,4 +206,56 @@ const unlockSrc = read('features/voice-studio/src/lib/boardAudioUnlock.ts');
   console.log('  ✅ PASS 12: Anti-503 TTS key pool, race-free language switch, quiz dedup & copy/bold hygiene verified');
 }
 
-console.log('\n🎉 ALL 12 WHITEBOARD CONTRACT TESTS PASSED 100%!');
+// 13. Mobile PWA OOM/WebGL Release, Sliding-Window Audio, ErrorBoundary & Home Greeting/Mochi Stability
+{
+  const appSrc = read('features/voice-studio/src/App.tsx');
+  const audioUnlockSrc = read('features/voice-studio/src/lib/boardAudioUnlock.ts');
+  const errBoundarySrc = read('features/voice-studio/src/components/WhiteboardErrorBoundary.tsx');
+  const mochiCompSrc = read('features/mascot/fiezel-mochi-companion.js');
+  const chatSrc = read('features/interactive-chat/fiezel-interactive-chat.js');
+  const clayCssSrc = read('features/ui/fiezel-tactile-clay.css');
+  const hostAppSrc = read('app.js');
+
+  assert.ok(
+    mochiCompSrc.includes('suspendWebGL:') && chatSrc.includes('suspendWebGL()'),
+    'Entering Kawan Bicara must release Host Three.js WebGL context via suspendWebGL()'
+  );
+  assert.ok(
+    appSrc.includes('shouldReleaseMochiWebGlForMobileWb') && appSrc.includes('<WhiteboardErrorBoundary'),
+    'Voice Studio must release iframe WebGL during mobile Whiteboard and wrap Whiteboard in WhiteboardErrorBoundary'
+  );
+  assert.ok(
+    errBoundarySrc.includes('getDerivedStateFromError') && errBoundarySrc.includes('wb-error-boundary-fallback'),
+    'WhiteboardErrorBoundary must catch runtime render errors gracefully'
+  );
+  assert.ok(
+    audioUnlockSrc.includes('decodeAudioDataSafe') &&
+      audioUnlockSrc.includes('isMobileLowMemoryDevice') &&
+      modalSrc.includes('ensureMobileSlidingLookahead') &&
+      modalSrc.includes('h-[94dvh]'),
+    'Whiteboard must enforce mobile sliding-window audio decode, safe decodeAudioDataSafe, and dvh height'
+  );
+  const canvasSrcLocal = read('features/voice-studio/src/components/LiveWhiteboardCanvas.tsx');
+  const studioCssSrc = read('features/voice-studio/src/index.css');
+  const callHtmlSrc = read('call.html');
+  assert.ok(
+    canvasSrcLocal.includes('overscroll-contain') &&
+      canvasSrcLocal.includes("behavior: 'smooth'") &&
+      studioCssSrc.includes('.fz-wb-spotlight-card') &&
+      callHtmlSrc.includes('overscroll-behavior: none') &&
+      clayCssSrc.includes('html.fz-view-chat'),
+    'Mobile auto-scroll & auto-slideshow must use compositor-safe scrollTo, overscroll lock (anti pull-to-refresh), and mobile GPU layer discipline'
+  );
+  assert.ok(
+    clayCssSrc.includes('html body #app .fz-vissol-welcome .tactile-streak-badge') &&
+      clayCssSrc.includes('html body #app .fz-vissol-welcome .tactile-kicker-dot'),
+    'Home welcome CSS must explicitly hide legacy tactile-kicker-dot and tactile-streak-badge to prevent Home greeting deformation'
+  );
+  assert.ok(
+    hostAppSrc.includes('prevHomeSig===nextHomeSig') && hostAppSrc.includes('if(el.sheet)'),
+    'Host app.js must skip no-op Home re-renders on cloud sync and promote cached WebKit print stylesheets before splash lift'
+  );
+  console.log('  ✅ PASS 13: Mobile PWA OOM/WebGL discipline, sliding-window audio, ErrorBoundary & Home stability verified');
+}
+
+console.log('\n🎉 ALL 13 WHITEBOARD CONTRACT TESTS PASSED 100%!');

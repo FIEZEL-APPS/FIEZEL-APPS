@@ -4843,7 +4843,16 @@ export function evaluateUtteranceClientSide(params: {
 let _turnApiAvailable: boolean | null = null;
 let _ttsCooldownUntil = 0;
 let _ttsConsecutiveFailures = 0;
-const TTS_MEMORY_CACHE_MAX = 32;
+const TTS_MEMORY_CACHE_MAX_DESKTOP = 24;
+const TTS_MEMORY_CACHE_MAX_MOBILE = 8;
+function getTtsMemoryCacheMax(): number {
+  if (typeof window === 'undefined') return TTS_MEMORY_CACHE_MAX_DESKTOP;
+  const ua = typeof navigator !== 'undefined' ? navigator.userAgent || '' : '';
+  if (/iPhone|iPad|iPod|Android|Mobile/i.test(ua) || (window.innerWidth > 0 && window.innerWidth < 768)) {
+    return TTS_MEMORY_CACHE_MAX_MOBILE;
+  }
+  return TTS_MEMORY_CACHE_MAX_DESKTOP;
+}
 const _ttsMemoryCache = new Map<
   string,
   { audioBase64: string; audioMimeType: string; engine: string }
@@ -4854,7 +4863,16 @@ function ttsCacheSet(
 ): void {
   if (_ttsMemoryCache.has(key)) _ttsMemoryCache.delete(key);
   _ttsMemoryCache.set(key, val);
-  while (_ttsMemoryCache.size > TTS_MEMORY_CACHE_MAX) {
+  const limit = getTtsMemoryCacheMax();
+  while (_ttsMemoryCache.size > limit) {
+    const oldest = _ttsMemoryCache.keys().next().value;
+    if (oldest !== undefined) _ttsMemoryCache.delete(oldest);
+    else break;
+  }
+}
+export function pruneTtsMemoryCache(maxKeep = 2): void {
+  const cap = Math.max(0, maxKeep);
+  while (_ttsMemoryCache.size > cap) {
     const oldest = _ttsMemoryCache.keys().next().value;
     if (oldest !== undefined) _ttsMemoryCache.delete(oldest);
     else break;

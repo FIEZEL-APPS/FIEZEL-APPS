@@ -696,9 +696,10 @@
       svg.style.display = '';
     }
     var fallbackImg = host.querySelector ? host.querySelector('.fz-vissol-mascot-img') : null;
-    if (fallbackImg) {
+    if (fallbackImg && pool.failed) {
       fallbackImg.style.opacity = '';
       fallbackImg.style.display = '';
+      fallbackImg.style.visibility = '';
     }
     if (pool.ro) {
       try { pool.ro.unobserve(host); } catch (_) {}
@@ -710,9 +711,12 @@
   function mountOn(host) {
     if (pool.host === host && host.__mochiInstance) return;
 
-    // Ensure host has relative positioning so viewport covers it
+    // Ensure host has relative positioning so viewport covers it without breaking Home flex centering
+    var isHomeHost = !!(host.classList && host.classList.contains('fz-vissol-mascot-wrap'));
     host.style.position = 'relative';
-    host.style.display = 'block';
+    if (!isHomeHost) {
+      host.style.display = 'block';
+    }
     if (host.closest('.fsl-mascot-slot') || host.closest('.jlpt-mascot-slot') || host.classList.contains('jlpt-mascot')) {
       host.style.width = '100%';
       host.style.height = '100%';
@@ -726,6 +730,15 @@
         // No WebGL here: every host keeps its 2D rig, and we stop retrying on each scan.
         console.warn('[FiezelMochiCompanion] Failed to initialize 3D Mochi:', err);
         pool.failed = true;
+        try {
+          var fb = host.querySelector ? host.querySelector('.fz-vissol-mascot-img') : null;
+          if (fb) {
+            fb.style.removeProperty('opacity');
+            fb.style.removeProperty('display');
+            fb.style.removeProperty('visibility');
+          }
+          host.classList.remove('has-3d-mochi');
+        } catch (_) {}
         return;
       }
     }
@@ -763,24 +776,27 @@
     if (pool.ro) pool.ro.observe(host);
     m.updateSize(size.w, size.h);
 
-    // Same entrance a freshly built Mochi used to make on a new host
+    // Apply session mood + accessories BEFORE first visible resumed frame so Home Mochi never flashes bare 'dots' -> headset jump
     try {
-      if (m.mood !== 'dots') m.setMood('dots');
+      var targetSession = detectSession(host);
       m.setBadge(null); // Purple badge GONE on mount/idle!
       m.setFx(null);
       m.retractHands();
-      m.resume();
-      if (typeof m.triggerEarWiggle === 'function') m.triggerEarWiggle(1.3);
+      if (targetSession !== 'home' && m.mood !== 'dots') m.setMood('dots');
       applySessionAccessories(m, host);
+      m.resume();
+      if (typeof m.triggerEarWiggle === 'function') m.triggerEarWiggle(1.1);
     } catch (_) {}
 
-    // Re-calibrate size after CSS modal/card pop animations settle (280ms)
+    // Re-calibrate size after CSS modal/card pop animations settle (280ms) ONLY if box actually changed
     setTimeout(function () {
       try {
         if (pool.host === host && pool.mochi) {
           var r = host.getBoundingClientRect();
-          if (r.width > 20 && r.height > 20) {
-            pool.mochi.updateSize(Math.round(r.width), Math.round(r.height));
+          var rw = Math.round(r.width);
+          var rh = Math.round(r.height);
+          if (rw > 20 && rh > 20 && (Math.abs(rw - (pool.mochi.width || 0)) >= 2 || Math.abs(rh - (pool.mochi.height || 0)) >= 2)) {
+            pool.mochi.updateSize(rw, rh);
           }
         }
       } catch (_) {}
@@ -817,15 +833,36 @@
     return (el.parentElement || el).getClientRects().length > 0;
   }
 
+  function isActiveStageHost(el) {
+    if (!el || !el.closest) return false;
+    return !!(
+      el.closest('.quiz-stage') ||
+      el.closest('.quiz-shell') ||
+      el.closest('.fsl-player') ||
+      el.closest('.fsl-mascot-slot') ||
+      el.closest('.jlpt-mascot-slot') ||
+      el.closest('#listeningPanelModal') ||
+      el.closest('.writing-stage') ||
+      el.closest('.lesson-stage-paw') ||
+      el.closest('.lesson-mascot') ||
+      el.closest('.result-stage') ||
+      el.closest('.fz-sos-modal') ||
+      el.closest('.fz-sos-stage')
+    );
+  }
+
   // Is host `a` a better home for Mochi than host `b`? Rendered beats display:none, then
-  // the most recently discovered host, then the larger one. Ties keep the current host.
+  // active practice/quiz stages beat the Home card, while transient home overlays/popups
+  // never steal Mochi off Home's stable stage.
   function outranks(a, b) {
     var ra = isRendered(a), rb = isRendered(b);
     if (ra !== rb) return ra;
-    // Practice sessions & quiz stages strictly take precedence over the home card
     var aIsHome = a.classList.contains('fz-vissol-mascot-wrap') || !!a.closest('.tactile-welcome-bar');
     var bIsHome = b.classList.contains('fz-vissol-mascot-wrap') || !!b.closest('.tactile-welcome-bar');
-    if (aIsHome !== bIsHome) return !aIsHome;
+    if (aIsHome !== bIsHome) {
+      if (aIsHome) return !isActiveStageHost(b);
+      return isActiveStageHost(a);
+    }
     if (a.__mochiSeen !== b.__mochiSeen) return a.__mochiSeen > b.__mochiSeen;
     return a.offsetWidth * a.offsetHeight > b.offsetWidth * b.offsetHeight;
   }
@@ -1027,9 +1064,18 @@
     scan: scanAndAttach,
     attach: attachMochi,
     getInstance: function () { return pool.mochi; },
-    pause: function () {
+    isFailed: function () { return !!pool.failed; },
+    pause: function (opts) {
       pool._manuallyPaused = true;
+      if (opts && opts.releaseWebGL) {
+        try { destroyPool(); } catch (_) {}
+        return;
+      }
       try { if (pool.mochi && typeof pool.mochi.pause === 'function') pool.mochi.pause(); } catch (_) {}
+    },
+    suspendWebGL: function () {
+      pool._manuallyPaused = true;
+      try { destroyPool(); } catch (_) {}
     },
     resume: function () {
       pool._manuallyPaused = false;

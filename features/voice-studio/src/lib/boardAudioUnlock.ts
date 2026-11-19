@@ -216,6 +216,63 @@ export function subscribeBoardAudioUnlock(cb: () => void): () => void {
 }
 
 /**
+ * Detect mobile / touch PWA runtimes (iOS Safari Standalone & Android Chrome PWA)
+ * where strict Jetsam/WebGL/AudioBuffer memory discipline prevents OOM crashes.
+ */
+export function isMobileLowMemoryDevice(): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    const ua = typeof navigator !== 'undefined' ? navigator.userAgent || '' : '';
+    if (/iPhone|iPad|iPod|Android|Mobile/i.test(ua)) return true;
+    return window.innerWidth > 0 && window.innerWidth < 768;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * iOS WebKit & Android safe decodeAudioData wrapper:
+ * - Always clones into a fresh ArrayBuffer so callers never hit detached-buffer errors
+ * - Supports both modern Promise and legacy Safari callback forms
+ * - Enforces a bounded timeout so a stalled mobile audio decoder never hangs the board
+ */
+export function decodeAudioDataSafe(
+  ctx: AudioContext,
+  rawBuffer: ArrayBuffer,
+  timeoutMs = 4500
+): Promise<AudioBuffer | null> {
+  if (!ctx || ctx.state === 'closed' || !rawBuffer || rawBuffer.byteLength < 16) {
+    return Promise.resolve(null);
+  }
+  return new Promise<AudioBuffer | null>((resolve) => {
+    let settled = false;
+    const finish = (buf: AudioBuffer | null) => {
+      if (settled) return;
+      settled = true;
+      window.clearTimeout(timer);
+      resolve(buf);
+    };
+    const timer = window.setTimeout(() => finish(null), Math.max(800, timeoutMs));
+    try {
+      const copy = rawBuffer.slice(0);
+      const maybePromise = ctx.decodeAudioData(
+        copy,
+        (decoded) => finish(decoded || null),
+        () => finish(null)
+      );
+      if (maybePromise && typeof maybePromise.then === 'function') {
+        void maybePromise.then(
+          (decoded) => finish(decoded || null),
+          () => finish(null)
+        );
+      }
+    } catch {
+      finish(null);
+    }
+  });
+}
+
+/**
  * Bounded HTMLAudioElement.play() guard for Mobile PWA / iOS Safari where play()
  * can stay pending without rejecting, or resolve while still paused.
  */

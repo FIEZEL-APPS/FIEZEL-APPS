@@ -7662,8 +7662,8 @@ body.has-home-today,
 }
 
 .fz-vissol-title {
-  font-size: 32px !important;
-  font-weight: 900 !important;
+  font-size: 26px !important;
+  font-weight: 800 !important;
   color: #0F172A !important;
   line-height: 1.15 !important;
   letter-spacing: -0.03em !important;
@@ -8929,7 +8929,75 @@ html body #app .today-home-cockpit .fz-vissol-kawan-icon {
 }
 
 html body #app .today-home-cockpit .fz-vissol-welcome {
-  margin-bottom: -10px !important;
+  margin: 4px 0 -10px 0 !important;
+  min-height: 142px !important;
+  display: block !important;
+  contain: layout style !important;
+}
+
+/* Home Greeting & Mochi Stage Stability Lock (m025-810):
+   Prevent legacy tactile-kicker-dot, tactile-kicker-text, and tactile-streak-badge
+   !important rules from popping into .fz-vissol-welcome when streak > 0 or after cloud sync,
+   and lock .fz-vissol-mascot-wrap geometry so Home NEVER shifts or morphs on Mobile PWA. */
+html body #app .fz-vissol-welcome .tactile-kicker-dot,
+html body #app .fz-vissol-welcome .tactile-kicker-text,
+html body #app .fz-vissol-welcome .tactile-streak-badge {
+  display: none !important;
+}
+
+html body #app .today-home-cockpit .fz-vissol-welcome-inner {
+  min-height: 142px !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  flex-wrap: nowrap !important;
+}
+
+html body #app .today-home-cockpit .fz-vissol-mascot-wrap {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex: 0 0 142px !important;
+  width: 142px !important;
+  height: 142px !important;
+  min-width: 142px !important;
+  min-height: 142px !important;
+}
+
+/* Lock outer PWA overscroll while inside Kawan Bicara / Whiteboard so auto-scroll
+   or touch-scroll inside the iframe NEVER chains into Android/iOS pull-to-refresh! */
+html.fz-view-chat,
+html.fz-view-chat body,
+body.fz-view-chat {
+  overscroll-behavior: none !important;
+  overscroll-behavior-y: none !important;
+}
+
+@media (min-width: 768px) and (max-width: 1099px) {
+  html body #app .today-home-cockpit .fz-vissol-welcome,
+  html body #app .today-home-cockpit .fz-vissol-welcome-inner {
+    min-height: 160px !important;
+  }
+  html body #app .today-home-cockpit .fz-vissol-mascot-wrap {
+    flex: 0 0 160px !important;
+    width: 160px !important;
+    height: 160px !important;
+    min-width: 160px !important;
+    min-height: 160px !important;
+  }
+}
+
+@media (min-width: 1100px) {
+  html body #app .today-home-cockpit .fz-vissol-welcome,
+  html body #app .today-home-cockpit .fz-vissol-welcome-inner {
+    min-height: 168px !important;
+  }
+  html body #app .today-home-cockpit .fz-vissol-mascot-wrap {
+    flex: 0 0 168px !important;
+    width: 168px !important;
+    height: 168px !important;
+    min-width: 168px !important;
+    min-height: 168px !important;
+  }
 }
 
 html body #app .today-home-cockpit button.hero-cta-btn,

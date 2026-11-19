@@ -39,6 +39,7 @@ import {
   getWakaiPapaTacticalInsightsForPage,
 } from '../lib/sswSenseiTeacher';
 import { LiveWhiteboardCanvas, type PenColor } from './LiveWhiteboardCanvas';
+import { WhiteboardErrorBoundary } from './WhiteboardErrorBoundary';
 import {
   buildCohesiveBoardNarrationScript,
   buildWhiteboardScenePlan,
@@ -54,10 +55,12 @@ import {
   resolveKakijunRequestFromPrompt,
   subscribeKanjiVgUpdates,
 } from '../data/kakijunStrokeBank';
-import { sanitizeSpokenTextForClassicTts, synthesizeFlexibleTts } from '../lib/liveTransport';
+import { pruneTtsMemoryCache, sanitizeSpokenTextForClassicTts, synthesizeFlexibleTts } from '../lib/liveTransport';
 import {
+  decodeAudioDataSafe,
   ensureGlobalGestureUnlockListener,
   getSharedBoardAudioContext,
+  isMobileLowMemoryDevice,
   playHtmlAudioBounded,
   resumeAudioContextBounded,
   subscribeBoardAudioUnlock,
@@ -3987,6 +3990,11 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
     if (!isOpen) {
       hasRevealedCanvasRef.current = false;
       setIsInitialAudioGateActive(true);
+      // Release decoded Float32 AudioBuffers & trim base64 cache on close to keep Mobile PWA RAM lean
+      if (isMobileLowMemoryDevice()) {
+        trackCacheRef.current.clear();
+        pruneTtsMemoryCache(2);
+      }
       return;
     }
     if (isReady && !isInitialAudioGateActive) return;
@@ -4444,12 +4452,15 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
         setLockstepIndex(matched.stepIndex);
       }
       const progDelta = Math.abs(localP - lastCommitProgRef.current);
+      const minCommitIntervalMs = isMobileLowMem ? 72 : 28;
+      const minProgDelta = isMobileLowMem ? 0.022 : 0.008;
       if (
         idxChanged ||
         localP <= 0.025 ||
         localP >= 0.99 ||
-        progDelta >= 0.008 ||
-        nowPerf - lastCommitProgAtRef.current >= 28
+        (localP > 0.93 && lastCommitProgRef.current <= 0.93) ||
+        (progDelta >= minProgDelta && nowPerf - lastCommitProgAtRef.current >= (isMobileLowMem ? 45 : 0)) ||
+        nowPerf - lastCommitProgAtRef.current >= minCommitIntervalMs
       ) {
         lastCommitProgRef.current = localP;
         lastCommitProgAtRef.current = nowPerf;
@@ -4580,6 +4591,8 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
         : Math.max(0, Math.min(0.95, (resumeFrac - chunkBounds[startChunkIdx].startFrac) / startSpan));
 
     const activePersona = personaRef.current;
+    const isMobileLowMem = isMobileLowMemoryDevice();
+    const maxTrackCacheSize = isMobileLowMem ? 5 : 16;
 
     const decodeChunkPayload = async (
       idx: number,
@@ -4598,7 +4611,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
         const ctx = getSharedBoardAudioContext();
         if (ctx && ctx.state !== 'closed') {
           trackAudioCtxRef.current = ctx;
-          const decoded = await ctx.decodeAudioData(bytes.buffer.slice(0));
+          const decoded = await decodeAudioDataSafe(ctx, bytes.buffer, isMobileLowMem ? 3800 : 5000);
           if (decoded && decoded.duration > 0.18) {
             // Pertahankan suara asli utuh tanpa WSOLA/pemotongan kata, lalu sejajarkan kata tepat dengan teks ter-sanitasi 1:1
             audioBuffer = processSpeechBuffer(ctx, decoded, BOARD_SPEECH_PROCESSING);
@@ -4662,9 +4675,10 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
         }
       });
 
-      if (trackCacheRef.current.size >= 20) {
+      while (trackCacheRef.current.size >= maxTrackCacheSize) {
         const oldestKey = trackCacheRef.current.keys().next().value;
         if (oldestKey !== undefined) trackCacheRef.current.delete(oldestKey);
+        else break;
       }
       trackCacheRef.current.set(chunkKey, promise);
       return promise.then((res) => {
@@ -4678,9 +4692,10 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
       });
     };
 
-    // Sliding Lookahead Pipeline (Synchronous Fast-Path + 4x Lookahead Pool):
-    // 1) Simpan hasil ke resolvedChunkMap agar transisi antar-chunk berlangsung 0ms (tanpa jeda Promise.race)
-    // 2) K+1..K+4 berjalan paralel secepat mungkin (mulai dari 20ms) agar chunk berikutnya selalu siap sebelum chunk aktif selesai
+    // Sliding Lookahead Pipeline:
+    // - Desktop: 4x Lookahead Pool for 0ms inter-chunk transitions across full board
+    // - Mobile PWA (iOS Safari / Android Chrome): Strict 1-ahead sliding window (max 2 chunks decoded at once)
+    //   so PCM Float32 memory stays <15MB and NEVER triggers WebKit Jetsam / OOM kill!
     const startedFlags = new Set<number>();
     let activePlayChunk = startChunkIdx;
     const resolvedChunkMap = new Map<number, ChunkRes | null>();
@@ -4705,26 +4720,47 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
     };
 
     const pickNextPendingChunkIdx = (): number | null => {
-      for (let i = activePlayChunk; i < chunks.length; i++) {
+      const upperBound = isMobileLowMem
+        ? Math.min(chunks.length, activePlayChunk + 2)
+        : chunks.length;
+      for (let i = activePlayChunk; i < upperBound; i++) {
         if (!startedFlags.has(i)) return i;
       }
-      for (let i = 0; i < activePlayChunk; i++) {
-        if (!startedFlags.has(i)) return i;
+      if (!isMobileLowMem) {
+        for (let i = 0; i < activePlayChunk; i++) {
+          if (!startedFlags.has(i)) return i;
+        }
       }
       return null;
     };
 
+    let mobileWorkerActive = false;
     const runLookaheadWorker = async () => {
-      while (!cancelled && lockstepSeqIdRef.current === seqId) {
-        const nextIdx = pickNextPendingChunkIdx();
-        if (nextIdx === null) break;
-        startedFlags.add(nextIdx);
-        const res = await fetchAndDecodeChunk(nextIdx);
-        resolveChunkResult(nextIdx, res);
+      if (isMobileLowMem) {
+        if (mobileWorkerActive) return;
+        mobileWorkerActive = true;
+      }
+      try {
+        while (!cancelled && lockstepSeqIdRef.current === seqId) {
+          const nextIdx = pickNextPendingChunkIdx();
+          if (nextIdx === null) break;
+          startedFlags.add(nextIdx);
+          const res = await fetchAndDecodeChunk(nextIdx);
+          resolveChunkResult(nextIdx, res);
+        }
+      } finally {
+        if (isMobileLowMem) mobileWorkerActive = false;
       }
     };
 
-    // Launch Chunk 0 / target start chunk immediately; kick 4x lookahead workers after 20ms (or immediately on cache hit)
+    const ensureMobileSlidingLookahead = () => {
+      if (cancelled || lockstepSeqIdRef.current !== seqId) return;
+      if (isMobileLowMem) {
+        void runLookaheadWorker();
+      }
+    };
+
+    // Launch Chunk 0 / target start chunk immediately; kick lookahead cleanly
     if (chunks.length > 0) {
       startedFlags.add(startChunkIdx);
       const firstPromise = fetchAndDecodeChunk(startChunkIdx).then((res) => {
@@ -4735,13 +4771,17 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
       const kickLookahead = () => {
         if (lookaheadStarted || cancelled || lockstepSeqIdRef.current !== seqId) return;
         lookaheadStarted = true;
-        const lookaheadWorkers = Math.min(4, Math.max(0, chunks.length - 1));
+        const lookaheadWorkers = isMobileLowMem
+          ? Math.min(1, Math.max(0, chunks.length - 1))
+          : Math.min(4, Math.max(0, chunks.length - 1));
         for (let w = 0; w < lookaheadWorkers; w++) {
           void runLookaheadWorker();
         }
       };
       void firstPromise.then(kickLookahead);
-      window.setTimeout(kickLookahead, 20);
+      if (!isMobileLowMem) {
+        window.setTimeout(kickLookahead, 20);
+      }
     }
 
     // Tahan kursor tepat di pembuka langkah awal selagi Chunk-0 disintesis (ZERO pre-advance sebelum suara mulai!).
@@ -4763,6 +4803,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
     const playChunkAt = async (chunkIdx: number, intraFrac = 0): Promise<void> => {
       if (cancelled || lockstepSeqIdRef.current !== seqId) return;
       activePlayChunk = chunkIdx;
+      ensureMobileSlidingLookahead();
       if (chunkIdx >= chunks.length) {
         setIsStepAudioActive(false);
         setIsAudioPreparing(false);
@@ -4836,6 +4877,13 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
         window.clearTimeout(safetyWatchdogId);
         if (cancelled || lockstepSeqIdRef.current !== seqId) return;
         cancelAnimationFrame(rafId);
+        // Mobile PWA Memory Discipline: release finished Float32 PCM buffer immediately once played
+        if (isMobileLowMem) {
+          const finished = resolvedChunkMap.get(chunkIdx);
+          if (finished) {
+            finished.audioBuffer = null;
+          }
+        }
         if (isLastChunk) {
           setIsStepAudioActive(false);
           setNeedsAudioUnlock(false);
@@ -6240,11 +6288,11 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
       data-testid="in-call-learning-workbench"
     >
       <div
-        className={`w-full max-w-[calc(100vw-24px)] ${
+        className={`w-full max-w-[calc(100vw-16px)] sm:max-w-[calc(100vw-24px)] ${
           isPteModal
-            ? 'sm:max-w-5xl xl:max-w-6xl max-h-[92vh] bg-[#FDFAF4] border-[#EADBCE]'
-            : 'sm:max-w-[1260px] h-[92vh] bg-[#FAFBF9] border-[#DDE2DC]'
-        } rounded-[26px] border shadow-[0_24px_60px_rgba(28,22,17,0.25)] overflow-hidden flex flex-col`}
+            ? 'sm:max-w-5xl xl:max-w-6xl max-h-[94dvh] sm:max-h-[92dvh] bg-[#FDFAF4] border-[#EADBCE]'
+            : 'sm:max-w-[1260px] h-[94dvh] sm:h-[92dvh] bg-[#FAFBF9] border-[#DDE2DC]'
+        } rounded-[24px] sm:rounded-[26px] border shadow-[0_24px_60px_rgba(28,22,17,0.25)] overflow-hidden flex flex-col`}
       >
         {/* TOP HEADER BAR ALA SOLVELY + KONTROL KECEPATAN, EXPORT, MINIMIZE, AKHIRI */}
         <div
@@ -6453,38 +6501,54 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
           >
             <div className="w-full max-w-lg rounded-[26px] bg-[#FDFAF4] border border-[#E6DFD1] shadow-[0_22px_52px_rgba(28,22,17,0.10)] p-6 sm:p-7 space-y-5 relative overflow-hidden">
               {/* Architectural Ink & Acoustic Waveform Slate */}
-              <div className="rounded-2xl bg-[#F7F3E9] border border-[#EAE2D2] px-4 py-4 flex items-center justify-between gap-4 relative overflow-hidden">
-                <div className="flex items-center gap-3.5 min-w-0">
-                  <div className="w-16 h-12 rounded-xl bg-white/90 border border-[#E6DFD1] shadow-2xs flex items-center justify-center shrink-0 relative">
-                    <svg viewBox="0 0 80 44" className="w-14 h-9 overflow-visible" aria-hidden="true">
-                      <line x1="6" y1="35" x2="74" y2="35" stroke="#D6CEC0" strokeWidth="1.2" strokeDasharray="3 3" />
-                      <path
-                        d="M 8 32 C 20 8, 34 36, 48 16 C 56 6, 65 24, 72 15"
-                        fill="none"
-                        stroke="#DCFCE7"
-                        strokeWidth="6"
-                        strokeLinecap="round"
-                      />
-                      <path
-                        d="M 8 32 C 20 8, 34 36, 48 16 C 56 6, 65 24, 72 15"
-                        fill="none"
-                        stroke="#15803D"
-                        strokeWidth="2.6"
-                        strokeLinecap="round"
-                        className="fz-atelier-ink-path"
-                      />
-                      <g className="fz-atelier-nib">
-                        <circle cx="48" cy="16" r="3.4" fill="#D97706" />
-                        <circle cx="48" cy="16" r="6.5" fill="#F59E0B" opacity="0.22" />
-                      </g>
-                    </svg>
+              <div className="rounded-2xl bg-[#F7F3E9] border border-[#EAE2D2] px-4 py-3.5 sm:py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 relative overflow-hidden">
+                <div className="flex items-center justify-between sm:justify-start gap-3 min-w-0">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-14 h-11 sm:w-16 sm:h-12 rounded-xl bg-white/90 border border-[#E6DFD1] shadow-2xs flex items-center justify-center shrink-0 relative">
+                      <svg viewBox="0 0 80 44" className="w-12 h-8 sm:w-14 sm:h-9 overflow-visible" aria-hidden="true">
+                        <line x1="6" y1="35" x2="74" y2="35" stroke="#D6CEC0" strokeWidth="1.2" strokeDasharray="3 3" />
+                        <path
+                          d="M 8 32 C 20 8, 34 36, 48 16 C 56 6, 65 24, 72 15"
+                          fill="none"
+                          stroke="#DCFCE7"
+                          strokeWidth="6"
+                          strokeLinecap="round"
+                        />
+                        <path
+                          d="M 8 32 C 20 8, 34 36, 48 16 C 56 6, 65 24, 72 15"
+                          fill="none"
+                          stroke="#15803D"
+                          strokeWidth="2.6"
+                          strokeLinecap="round"
+                          className="fz-atelier-ink-path"
+                        />
+                        <g className="fz-atelier-nib">
+                          <circle cx="48" cy="16" r="3.4" fill="#D97706" />
+                          <circle cx="48" cy="16" r="6.5" fill="#F59E0B" opacity="0.22" />
+                        </g>
+                      </svg>
+                    </div>
+                    <span className="sm:hidden inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#DCFCE7] text-[#14532D] text-[10px] font-extrabold tracking-wide uppercase">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#16A34A] animate-pulse" />
+                      <span>{persona.name}</span>
+                    </span>
                   </div>
-                  <div className="text-left min-w-0">
+
+                  {/* Mobile Equalizer aligned cleanly on top row */}
+                  <div className="flex sm:hidden items-end gap-1 h-7 px-2.5 py-1.5 rounded-xl bg-white/85 border border-[#E6DFD1] shrink-0" aria-hidden="true">
+                    <span className="w-1 h-4 rounded-full bg-[#15803D] fz-atelier-wave-bar" />
+                    <span className="w-1 h-5 rounded-full bg-[#16A34A] fz-atelier-wave-bar fz-atelier-wave-bar-2" />
+                    <span className="w-1 h-3.5 rounded-full bg-[#22C55E] fz-atelier-wave-bar fz-atelier-wave-bar-3" />
+                    <span className="w-1 h-5 rounded-full bg-[#16A34A] fz-atelier-wave-bar fz-atelier-wave-bar-4" />
+                    <span className="w-1 h-3 rounded-full bg-[#D97706] fz-atelier-wave-bar fz-atelier-wave-bar-5" />
+                  </div>
+
+                  <div className="hidden sm:block text-left min-w-0">
                     <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#DCFCE7] text-[#14532D] text-[10px] font-extrabold tracking-wide uppercase mb-1">
                       <span className="w-1.5 h-1.5 rounded-full bg-[#16A34A] animate-pulse" />
                       <span>{persona.name}</span>
                     </span>
-                    <h3 className="text-sm sm:text-[15px] font-extrabold text-[#1C1611] leading-snug">
+                    <h3 className="text-[15px] font-extrabold text-[#1C1611] leading-snug">
                       {wbT(
                         locale,
                         'Fiezel is preparing your explanation',
@@ -6495,8 +6559,18 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                   </div>
                 </div>
 
-                {/* Live Acoustic Calibrator Equalizer */}
-                <div className="flex items-end gap-1 h-7 px-2.5 py-1.5 rounded-xl bg-white/85 border border-[#E6DFD1] shrink-0" aria-hidden="true">
+                {/* Mobile Full-Width Headline (Zero 5-line skinny squeeze) */}
+                <h3 className="sm:hidden text-left text-[15px] font-extrabold text-[#1C1611] leading-snug">
+                  {wbT(
+                    locale,
+                    'Fiezel is preparing your explanation',
+                    'Fiezel sedang menyiapkan penjelasan untukmu',
+                    'Fiezel กำลังเตรียมคำอธิบายให้คุณ'
+                  )}
+                </h3>
+
+                {/* Desktop Live Acoustic Calibrator Equalizer */}
+                <div className="hidden sm:flex items-end gap-1 h-7 px-2.5 py-1.5 rounded-xl bg-white/85 border border-[#E6DFD1] shrink-0" aria-hidden="true">
                   <span className="w-1 h-4 rounded-full bg-[#15803D] fz-atelier-wave-bar" />
                   <span className="w-1 h-5 rounded-full bg-[#16A34A] fz-atelier-wave-bar fz-atelier-wave-bar-2" />
                   <span className="w-1 h-3.5 rounded-full bg-[#22C55E] fz-atelier-wave-bar fz-atelier-wave-bar-3" />
@@ -6765,7 +6839,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
               {(needsAudioUnlock || isUnlockLaunching) && isWritingPlaying && !isGeneratingTopic && (
                 <div
                   data-testid="wb-audio-launch-overlay"
-                  className={`fz-studio-launch-veil absolute inset-0 z-40 flex items-center justify-center p-5 bg-[#FAFBF9]/64 backdrop-blur-[5px] ${
+                  className={`fz-studio-launch-veil absolute inset-0 z-40 flex items-center justify-center p-5 bg-[#FAFBF9]/92 sm:bg-[#FAFBF9]/68 sm:backdrop-blur-[5px] ${
                     isUnlockLaunching ? 'is-launching' : ''
                   }`}
                 >
@@ -7014,6 +7088,11 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
               )}
 
             {/* KANVAS UTAMA SPIDOL HIDUP DOT-GRID */}
+                  <WhiteboardErrorBoundary
+                    locale={effectiveBoardLocale}
+                    onClose={onClose}
+                    onRetry={() => setReplayNonce((n) => n + 1)}
+                  >
                   <LiveWhiteboardCanvas
                     plan={whiteboardPlan}
                     targetLang={targetLang}
@@ -7076,6 +7155,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                       setSeekNonce((n) => n + 1);
                     }}
                   />
+                  </WhiteboardErrorBoundary>
                 </div>
 
                 {/* BOTTOM FLOATING BAR ALA SOLVELY (AVATAR + SUBTITLE + PEN TOOL + INPUT + MIC) */}
