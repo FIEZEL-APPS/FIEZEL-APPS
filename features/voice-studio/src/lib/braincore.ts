@@ -20,6 +20,8 @@ import {
   type SpeechAlignmentResult,
 } from './speechAlignment.ts';
 import { ensureSharedAnonSession } from './liveCallHelper.ts';
+import { VS_BC_COMPETENCY_LABELS, VS_BC_MISCONCEPTION_LABELS } from './generated9LocPack.ts';
+import { wbPick } from './i18n.ts';
 
 /**
  * Canonical client Braincore BKT + IRT parameters ("Satu Otak, Satu Penggaris"):
@@ -449,16 +451,17 @@ const MISCONCEPTION_HUMAN_LABELS: Record<
 };
 
 export function humanizeMisconceptionId(
-  misconceptionId: string,
+  misconceptionId: string | null | undefined,
   locale: LearnerLocale = 'id',
   conceptHint?: string
 ): { label: string; fix: string } {
   const cleanKey = String(misconceptionId || '').trim();
   const known = MISCONCEPTION_HUMAN_LABELS[cleanKey];
-  if (known) {
+  const ov = VS_BC_MISCONCEPTION_LABELS[locale]?.[cleanKey] || (locale !== 'id' ? VS_BC_MISCONCEPTION_LABELS.en?.[cleanKey] : undefined);
+  if (known || ov) {
     return {
-      label: locale === 'th' ? known.th : known.id,
-      fix: known.fix,
+      label: locale === 'id' ? (known?.id || ov?.label || cleanKey) : locale === 'th' ? (known?.th || ov?.label || cleanKey) : (ov?.label || known?.id || cleanKey),
+      fix: locale === 'id' ? (known?.fix || ov?.tip || '') : (ov?.tip || known?.fix || ''),
     };
   }
   const readable = cleanKey
@@ -473,7 +476,7 @@ export function humanizeMisconceptionId(
     : '';
   const prefix = conceptClean ? `[${conceptClean}] ` : '';
   return {
-    label: `${prefix}${readable || 'pola tata bahasa kurang tepat'}`,
+    label: `${prefix}${readable || wbPick('inaccurate grammar pattern', 'pola tata bahasa kurang tepat', undefined, locale)}`,
     fix: '',
   };
 }
@@ -482,9 +485,12 @@ export function humanizeCompetencyId(
   competencyId: string,
   locale: LearnerLocale = 'id'
 ): string {
+  const ov = VS_BC_COMPETENCY_LABELS[locale]?.[competencyId] || (locale !== 'id' ? VS_BC_COMPETENCY_LABELS.en?.[competencyId] : undefined);
   const known = COMPETENCY_HUMAN_LABELS[competencyId];
-  if (known) {
-    return locale === 'th' ? known.th : known.id;
+  if (known || ov) {
+    if (locale === 'id') return known?.id || ov || competencyId;
+    if (locale === 'th') return known?.th || ov || competencyId;
+    return ov || known?.id || competencyId;
   }
   return String(competencyId || '')
     .replace(/^(lesson|grammar|vocab|speak|kaiwa)[_:-]+/i, '')
@@ -2341,7 +2347,7 @@ export function buildBraincoreCognitiveDossier(
   const learnerName =
     mem.userBrain.learnerName ||
     hostSnap.learnerName ||
-    (locale === 'th' ? 'นักเรียน (ยังไม่ได้ระบุชื่อ)' : 'Murid FIEZEL');
+    wbPick('Student', 'Murid FIEZEL', 'นักเรียน', locale);
   const activeLevel =
     hostSnap.hostLevel ||
     mem.userBrain.activeCourseLevel ||

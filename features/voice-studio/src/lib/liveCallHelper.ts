@@ -30,6 +30,8 @@ export interface LiveTranslationResult {
   translationTh: string;
   translationJa?: string;
   translationZh?: string;
+  translationEn?: string;
+  translationLocale?: string;
   furiganaHtml?: string;
 }
 
@@ -1540,6 +1542,15 @@ export async function fetchLiveTranslation(
   if (loc === 'th' && /[\u0E00-\u0E7F]{3,}/.test(clean)) {
     return clean;
   }
+  if (loc === 'km' && /[\u1780-\u17FF]{3,}/.test(clean)) {
+    return clean;
+  }
+  if (loc === 'ru' && /[\u0400-\u04FF]{3,}/.test(clean)) {
+    return clean;
+  }
+  if (loc === 'ja' && /[\u3040-\u30FF]{3,}/.test(clean)) {
+    return clean;
+  }
   const cacheKey = `${loc}:${clean}`;
   if (liveTranslationCache.has(cacheKey)) {
     const cachedMem = sanitizeTranslationOutput(liveTranslationCache.get(cacheKey)!, loc);
@@ -1852,6 +1863,8 @@ export function translateAndPhoneticizeLiveText(
   const cachedTh = liveTranslationCache.get(`th:${clean}`);
   const cachedJa = liveTranslationCache.get(`ja:${clean}`);
   const cachedZh = liveTranslationCache.get(`zh:${clean}`);
+  const cachedLoc = liveTranslationCache.get(`${activeLocale}:${clean}`);
+  const cachedEn = liveTranslationCache.get(`en:${clean}`);
   if (typeof window !== 'undefined' && isCompleteSentence) {
     if (activeLocale === 'th') {
       if (!cachedTh && !explicitTranslationTh && !/[\u0E00-\u0E7F]{3,}/.test(clean)) {
@@ -1865,10 +1878,22 @@ export function translateAndPhoneticizeLiveText(
       if (!cachedZh && !/[\u4e00-\u9fff]/.test(clean)) {
         void fetchLiveTranslation(clean, 'zh').catch(() => {});
       }
-    } else if (!cachedId && !explicitTranslationId && !isAlreadyId) {
-      void fetchLiveTranslation(clean, 'id').catch(() => {});
+    } else if (activeLocale === 'id') {
+      if (!cachedId && !explicitTranslationId && !isAlreadyId) {
+        void fetchLiveTranslation(clean, 'id').catch(() => {});
+      }
+    } else {
+      const sameTarget = activeLocale === targetLang;
+      if (!cachedLoc && !sameTarget) {
+        void fetchLiveTranslation(clean, activeLocale).catch(() => {});
+      }
     }
   }
+
+  const resolvedLocTrans =
+    cachedLoc ? sanitizeTranslationOutput(cachedLoc, activeLocale) : undefined;
+  const resolvedEnTrans =
+    activeLocale === 'en' ? resolvedLocTrans : (cachedEn ? sanitizeTranslationOutput(cachedEn, 'en') : undefined);
 
   if (targetLang === 'zh') {
     const idTrans = explicitTranslationId || cachedId || (isAlreadyId ? clean : approximateMandarinToIndonesian(clean));
@@ -1881,6 +1906,8 @@ export function translateAndPhoneticizeLiveText(
       translationTh: sanitizeTranslationOutput(thTrans, 'th'),
       translationJa: cachedJa ? sanitizeTranslationOutput(cachedJa, 'ja') : undefined,
       translationZh: clean,
+      translationEn: resolvedEnTrans,
+      translationLocale: resolvedLocTrans,
       furiganaHtml,
     };
   }
@@ -1896,6 +1923,8 @@ export function translateAndPhoneticizeLiveText(
       translationTh: sanitizeTranslationOutput(thTrans, 'th'),
       translationJa: clean,
       translationZh: cachedZh ? sanitizeTranslationOutput(cachedZh, 'zh') : undefined,
+      translationEn: resolvedEnTrans,
+      translationLocale: resolvedLocTrans,
       furiganaHtml,
     };
   }
@@ -1910,6 +1939,8 @@ export function translateAndPhoneticizeLiveText(
     translationTh: sanitizeTranslationOutput(thTrans, 'th'),
     translationJa: cachedJa ? sanitizeTranslationOutput(cachedJa, 'ja') : undefined,
     translationZh: cachedZh ? sanitizeTranslationOutput(cachedZh, 'zh') : undefined,
+    translationEn: resolvedEnTrans,
+    translationLocale: resolvedLocTrans,
   };
 }
 

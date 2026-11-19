@@ -779,8 +779,18 @@
     } catch (_) { return true; }
   }
 
-  function jlptPick(en, id) {
-    return jlptIsId() ? id : en;
+  function jlptPick(en, id, vars) {
+    try {
+      var g = (typeof self !== 'undefined' ? self : (typeof window !== 'undefined' ? window : this));
+      if (g && typeof g.FiezelLocPick === 'function') return g.FiezelLocPick(en, id, null, vars);
+    } catch (_) {}
+    var out = jlptIsId() ? id : en;
+    if (vars && typeof vars === 'object') {
+      out = String(out || '').replace(/\{([a-zA-Z0-9_]+)\}/g, function (m, k) {
+        return Object.prototype.hasOwnProperty.call(vars, k) ? String(vars[k]) : m;
+      });
+    }
+    return out;
   }
 
   function jlptEnEntry(q) {
@@ -2144,7 +2154,7 @@
     var distractorNote = resolveWhyFails(q, chosenOpt, selectedChoice, correctOptId);
     var distractorHtml = (distractorNote && selectedChoice !== correctOptId) ? (
       '<div class="jlpt-explain-distractor-card" style="margin-top:10px;background:#FFF1F2;border:1px solid #FECDD3;border-radius:10px;padding:9px 12px;font-size:12px;color:#9F1239;line-height:1.45;">' +
-        '<b>' + escapeHtml(jlptPick('⚠️ Choice ' + selectedChoice + ' Analysis:', '⚠️ Analisis Pilihan ' + selectedChoice + ':')) + '</b> ' + escapeHtml(distractorNote) +
+        '<b>' + escapeHtml(jlptPick('⚠️ Choice {choice} Analysis:', '⚠️ Analisis Pilihan {choice}:', { choice: selectedChoice })) + '</b> ' + escapeHtml(distractorNote) +
       '</div>'
     ) : '';
 

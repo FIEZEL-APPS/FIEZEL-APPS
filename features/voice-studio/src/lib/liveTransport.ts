@@ -28,6 +28,7 @@ import {
   buildSswContextualReplyCards,
 } from './sswSenseiEngine.ts';
 import { buildSswTurnDossierForHttp } from './sswSenseiTeacher.ts';
+import { wbPick, wbFmt } from './i18n.ts';
 
 export type LiveTransportMode = 'ws-duplex' | 'turn-by-turn-fallback';
 
@@ -1494,21 +1495,20 @@ export function buildCambridgeModelAnswerFallback(
     }
   }
 
-  const isIdLoc = locale === 'id';
   const badgeLevel = isHigherLevel
     ? 'Band 9.0 · Advanced'
     : isB2
     ? 'Level B2 · PTE 58'
     : isA1
-    ? isIdLoc ? 'Level A1 · Pemula Dasar' : 'Level A1 · Beginner'
+    ? wbPick('Level A1 · Beginner', 'Level A1 · Pemula Dasar', undefined, locale)
     : isA2
-    ? isIdLoc ? 'Level A2 · Percakapan Simpel' : 'Level A2 · Everyday Conversation'
+    ? wbPick('Level A2 · Everyday Conversation', 'Level A2 · Percakapan Simpel', undefined, locale)
     : 'Level B1 · Target PTE 42';
 
   const card: BeginnerReplyCard = {
     id: `cambridge_model_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
     tier: 'cambridge_model',
-    badgeId: isIdLoc ? `🎯 Jawaban Terbaik (${badgeLevel})` : `🎯 Best Answer (${badgeLevel})`,
+    badgeId: wbFmt('🎯 Best Answer ({level})', '🎯 Jawaban Terbaik ({level})', '🎯 คำตอบแนะนำ ({level})', { level: badgeLevel }, locale),
     badgeTh: `🎯 คำตอบแนะนำ (${badgeLevel})`,
     tierLabelId: `${badgeLevel} Model Answer`,
     tierLabelTh: `${badgeLevel} Model Answer`,
@@ -3044,9 +3044,9 @@ export function buildContextualFallbackCards(params: {
     badgeTh: string;
     row: CardRow;
   }> = [
-    { tier: 'easy', badgeId: isIdLoc ? 'Singkat & Mudah' : 'Short & Easy', badgeTh: 'สั้นและง่าย', row: tpl.easy },
-    { tier: 'mission', badgeId: isIdLoc ? 'Alami & Kontekstual' : 'Natural & Contextual', badgeTh: 'เป็นธรรมชาติ', row: tpl.mission },
-    { tier: 'rescue', badgeId: isIdLoc ? 'Jawab + Tanya Balik' : 'Reply + Follow-up', badgeTh: 'ตอบและถามกลับ', row: tpl.rescue },
+    { tier: 'easy', badgeId: wbPick('Short & Easy', 'Singkat & Mudah', 'สั้นและง่าย', locale), badgeTh: 'สั้นและง่าย', row: tpl.easy },
+    { tier: 'mission', badgeId: wbPick('Natural & Contextual', 'Alami & Kontekstual', 'เป็นธรรมชาติ', locale), badgeTh: 'เป็นธรรมชาติ', row: tpl.mission },
+    { tier: 'rescue', badgeId: wbPick('Reply + Follow-up', 'Jawab + Tanya Balik', 'ตอบและถามกลับ', locale), badgeTh: 'ตอบและถามกลับ', row: tpl.rescue },
   ];
 
   const stamp = Date.now();
@@ -3115,9 +3115,9 @@ function normalizeServerCopilotCards(
   if (!Array.isArray(rawList)) return [];
   const isIdLoc = locale === 'id';
   const defaultMeta: Array<{ tier: 'easy' | 'mission' | 'rescue'; badgeId: string; badgeTh: string }> = [
-    { tier: 'easy', badgeId: isIdLoc ? 'Singkat & Mudah' : 'Short & Easy', badgeTh: 'สั้นและง่าย' },
-    { tier: 'mission', badgeId: isIdLoc ? 'Alami & Kontekstual' : 'Natural & Contextual', badgeTh: 'เป็นธรรมชาติ' },
-    { tier: 'rescue', badgeId: isIdLoc ? 'Jawab + Tanya Balik' : 'Reply + Follow-up', badgeTh: 'ตอบและถามกลับ' },
+    { tier: 'easy', badgeId: wbPick('Short & Easy', 'Singkat & Mudah', 'สั้นและง่าย', locale), badgeTh: 'สั้นและง่าย' },
+    { tier: 'mission', badgeId: wbPick('Natural & Contextual', 'Alami & Kontekstual', 'เป็นธรรมชาติ', locale), badgeTh: 'เป็นธรรมชาติ' },
+    { tier: 'rescue', badgeId: wbPick('Reply + Follow-up', 'Jawab + Tanya Balik', 'ตอบและถามกลับ', locale), badgeTh: 'ตอบและถามกลับ' },
   ];
   const out: BeginnerReplyCard[] = [];
   for (let i = 0; i < rawList.length && out.length < 3; i++) {
@@ -3138,6 +3138,7 @@ function normalizeServerCopilotCards(
     ).trim();
 
     const sanitizeHint = (h: string) => {
+      if (locale === 'ja' || locale === 'zh') return h;
       return h
         .replace(/["'“‘「『]([\u4e00-\u9fff\u3040-\u30ff]+)["'”’」』]/g, (_m, inner) => {
           if (targetLang === 'zh') return `"${toPhoneticPinyin(inner)}"`;
@@ -3278,7 +3279,17 @@ export async function requestRealtimeCopilotAssist(params: {
         : params.targetLang === 'zh'
           ? 'Mandarin Chinese (HSK1-HSK3, Simplified Chinese characters, NO emojis; tone-marked Pinyin in pronunciation)'
           : `English (Level ${cefrLevel}, accessible natural spoken English, NO emojis; readable phonetic guide in pronunciation)`;
-      const learnerLangName = params.locale === 'th' ? 'Thai' : 'Indonesian';
+      const learnerLangName = ({
+        id: 'Indonesian',
+        th: 'Thai',
+        en: 'English',
+        ms: 'Bahasa Melayu (Malay)',
+        vi: 'Vietnamese',
+        fil: 'Filipino (Tagalog)',
+        ja: 'Japanese',
+        km: 'Khmer',
+        ru: 'Russian',
+      } as Record<string, string>)[String(params.locale || 'id').toLowerCase()] || 'English';
       const hist = (params.history || []).slice(-6).map((h) => `- ${h.speaker === 'user' ? 'Learner' : 'Partner'}: "${h.text}"`).join('\n');
       const screenPopupCtx = params.activePopupTargetText
         ? `Visible Learning Popup on Learner Screen (mode=${params.activePopupMode || 'popup'}): "${params.activePopupTargetText}".`
@@ -3349,7 +3360,7 @@ export async function requestRealtimeCopilotAssist(params: {
           ? cards.slice(0, 1).map((c) => ({
               ...c,
               tier: 'cambridge_model' as any,
-              badgeId: c.badgeId || (params.locale === 'id' ? `🎯 Jawaban Terbaik (Level ${cefrLevel})` : `🎯 Best Answer (Level ${cefrLevel})`),
+              badgeId: c.badgeId || wbFmt('🎯 Best Answer (Level {level})', '🎯 Jawaban Terbaik (Level {level})', '🎯 คำตอบแนะนำ (Level {level})', { level: cefrLevel }, params.locale),
               badgeTh: c.badgeTh || `🎯 คำตอบแนะนำ (Level ${cefrLevel})`,
               tierLabelId: `Level ${cefrLevel} Model Answer`,
               tierLabelTh: `Level ${cefrLevel} Model Answer`,
@@ -3429,7 +3440,7 @@ export async function requestRealtimeCopilotAssist(params: {
           ? cards.slice(0, 1).map((c) => ({
               ...c,
               tier: 'cambridge_model' as any,
-              badgeId: c.badgeId || (params.locale === 'id' ? `🎯 Jawaban Terbaik (Level ${cefrLevel})` : `🎯 Best Answer (Level ${cefrLevel})`),
+              badgeId: c.badgeId || wbFmt('🎯 Best Answer (Level {level})', '🎯 Jawaban Terbaik (Level {level})', '🎯 คำตอบแนะนำ (Level {level})', { level: cefrLevel }, params.locale),
               badgeTh: c.badgeTh || `🎯 คำตอบแนะนำ (Level ${cefrLevel})`,
               tierLabelId: `Level ${cefrLevel} Model Answer`,
               tierLabelTh: `Level ${cefrLevel} Model Answer`,
@@ -3943,20 +3954,30 @@ export function sanitizeHallucinatedTranscript(
       targetLang === 'ja'
         ? locCode === 'th'
           ? /[A-Za-zÀ-ÖØ-öø-ÿ\u1E00-\u1EFF\u3040-\u30FF\u4E00-\u9FAF\u0E00-\u0E7F]/g
-          : locCode === 'ru'
-            ? /[A-Za-zÀ-ÖØ-öø-ÿ\u1E00-\u1EFF\u0400-\u04FF\u3040-\u30FF\u4E00-\u9FAF]/g
-            : /[A-Za-zÀ-ÖØ-öø-ÿ\u1E00-\u1EFF\u3040-\u30FF\u4E00-\u9FAF]/g
+          : locCode === 'km'
+            ? /[A-Za-zÀ-ÖØ-öø-ÿ\u1E00-\u1EFF\u1780-\u17FF\u3040-\u30FF\u4E00-\u9FAF]/g
+            : locCode === 'ru'
+              ? /[A-Za-zÀ-ÖØ-öø-ÿ\u1E00-\u1EFF\u0400-\u04FF\u3040-\u30FF\u4E00-\u9FAF]/g
+              : /[A-Za-zÀ-ÖØ-öø-ÿ\u1E00-\u1EFF\u3040-\u30FF\u4E00-\u9FAF]/g
         : targetLang === 'zh'
           ? locCode === 'th'
             ? /[A-Za-zÀ-ÖØ-öø-ÿ\u1E00-\u1EFF\u4E00-\u9FFF\u0E00-\u0E7F]/g
-            : locCode === 'ru'
-              ? /[A-Za-zÀ-ÖØ-öø-ÿ\u1E00-\u1EFF\u0400-\u04FF\u4E00-\u9FFF]/g
-              : /[A-Za-zÀ-ÖØ-öø-ÿ\u1E00-\u1EFF\u4E00-\u9FFF]/g
+            : locCode === 'km'
+              ? /[A-Za-zÀ-ÖØ-öø-ÿ\u1E00-\u1EFF\u1780-\u17FF\u4E00-\u9FFF]/g
+              : locCode === 'ja'
+                ? /[A-Za-zÀ-ÖØ-öø-ÿ\u1E00-\u1EFF\u3040-\u30FF\u4E00-\u9FFF]/g
+                : locCode === 'ru'
+                  ? /[A-Za-zÀ-ÖØ-öø-ÿ\u1E00-\u1EFF\u0400-\u04FF\u4E00-\u9FFF]/g
+                  : /[A-Za-zÀ-ÖØ-öø-ÿ\u1E00-\u1EFF\u4E00-\u9FFF]/g
           : locCode === 'th'
             ? /[A-Za-zÀ-ÖØ-öø-ÿ\u1E00-\u1EFF\u0E00-\u0E7F]/g
-            : locCode === 'ru'
-              ? /[A-Za-zÀ-ÖØ-öø-ÿ\u1E00-\u1EFF\u0400-\u04FF]/g
-              : /[A-Za-zÀ-ÖØ-öø-ÿ\u1E00-\u1EFF]/g;
+            : locCode === 'km'
+              ? /[A-Za-zÀ-ÖØ-öø-ÿ\u1E00-\u1EFF\u1780-\u17FF]/g
+              : locCode === 'ja'
+                ? /[A-Za-zÀ-ÖØ-öø-ÿ\u1E00-\u1EFF\u3040-\u30FF\u4E00-\u9FAF]/g
+                : locCode === 'ru'
+                  ? /[A-Za-zÀ-ÖØ-öø-ÿ\u1E00-\u1EFF\u0400-\u04FF]/g
+                  : /[A-Za-zÀ-ÖØ-öø-ÿ\u1E00-\u1EFF]/g;
     const validMatches = stripped.match(validScriptRegex) || [];
     if (validMatches.length < 2 || forbiddenCount >= validMatches.length) {
       return '';
@@ -5032,7 +5053,7 @@ export async function requestAiPartnerReply(params: {
           schema: AI_TASK_REQUEST_SCHEMA,
           task: 'conversation_turn',
           input: buildInput(withMode, withRole),
-          locale: params.locale === 'th' ? 'th' : 'id',
+          locale: params.locale || 'id',
         }),
         credentials: 'include',
         mode: 'cors',
@@ -5157,7 +5178,7 @@ export async function requestNeuralUtteranceDiagnosis(params: {
           mode: 'call',
           ...(history.length ? { history } : {}),
         },
-        locale: params.locale === 'th' ? 'th' : 'id',
+        locale: params.locale || 'id',
       }),
       credentials: 'include',
       mode: 'cors',
@@ -5800,9 +5821,9 @@ export async function resolveAiReply(
     const cleanPartnerTrans = stripEmojisAndEmotWords(partner.translation);
     const transId = hasStrictReadAloudFailure
       ? localResult.aiReplyTranslationId
-      : params.locale === 'th'
-        ? ''
-        : cleanPartnerTrans;
+      : params.locale === 'id'
+        ? cleanPartnerTrans
+        : '';
     const transTh = hasStrictReadAloudFailure
       ? localResult.aiReplyTranslationTh
       : params.locale === 'th'
@@ -6147,19 +6168,22 @@ export async function synthesizeViaGeminiLiveWav(params: {
       cleanText
     );
   const isThSpeech = rawLang === 'th' || /[\u0E00-\u0E7F]{2,}/.test(cleanText);
+  const isKmSpeech = rawLang === 'km' || /[\u1780-\u17FF]{2,}/.test(cleanText);
   const isRuSpeech = rawLang === 'ru' || /[\u0400-\u04FF]{3,}/.test(cleanText);
   const isViSpeech = rawLang === 'vi' || /[\u1EA0-\u1EF9]{2,}/.test(cleanText);
   const effectiveLang = isThSpeech
     ? 'th'
-    : isRuSpeech
-      ? 'ru'
-      : isViSpeech
-        ? 'vi'
-        : isIdSpeech
-          ? 'id'
-          : ['ja', 'zh', 'en', 'ko', 'ms', 'es', 'fr', 'de'].includes(rawLang)
-            ? rawLang
-            : 'en';
+    : isKmSpeech
+      ? 'km'
+      : isRuSpeech
+        ? 'ru'
+        : isViSpeech
+          ? 'vi'
+          : isIdSpeech
+            ? 'id'
+            : ['ja', 'zh', 'en', 'ko', 'ms', 'fil', 'es', 'fr', 'de'].includes(rawLang)
+              ? rawLang
+              : 'en';
 
   const voiceName =
     params.persona?.geminiVoice ||
@@ -6169,19 +6193,23 @@ export async function synthesizeViaGeminiLiveWav(params: {
       ? 'natural conversational Bahasa Indonesia'
       : effectiveLang === 'th'
         ? 'natural conversational Thai'
-        : effectiveLang === 'vi'
-          ? 'natural conversational Vietnamese'
-          : effectiveLang === 'ru'
-            ? 'natural conversational Russian'
-            : effectiveLang === 'ms'
-              ? 'natural conversational Malay'
-              : effectiveLang === 'ko'
-                ? 'natural conversational Korean'
-                : effectiveLang === 'ja'
-                  ? 'natural Japanese'
-                  : effectiveLang === 'zh'
-                    ? 'natural Putonghua Mandarin Chinese'
-                    : 'natural English';
+        : effectiveLang === 'km'
+          ? 'natural conversational Khmer'
+          : effectiveLang === 'vi'
+            ? 'natural conversational Vietnamese'
+            : effectiveLang === 'fil'
+              ? 'natural conversational Filipino / Tagalog'
+              : effectiveLang === 'ru'
+                ? 'natural conversational Russian'
+                : effectiveLang === 'ms'
+                  ? 'natural conversational Malay'
+                  : effectiveLang === 'ko'
+                    ? 'natural conversational Korean'
+                    : effectiveLang === 'ja'
+                      ? 'natural Japanese'
+                      : effectiveLang === 'zh'
+                        ? 'natural Putonghua Mandarin Chinese'
+                        : 'natural English';
   const personaBaseStyle =
     params.persona?.ttsStylePrompt || params.persona?.speakingStyle || '';
   const isAcademicBritishOrPte =
@@ -6256,7 +6284,7 @@ export async function synthesizeViaGeminiLiveWav(params: {
     ws.onopen = () => {
       try {
         const hasMixedBilingualText =
-          ['id', 'th', 'vi', 'ms', 'ko'].includes(effectiveLang) &&
+          ['id', 'th', 'vi', 'ms', 'fil', 'km', 'ko'].includes(effectiveLang) &&
           (/[A-Za-z]{2,}/.test(cleanText) || /[\u3040-\u30ff\u4e00-\u9fff]/.test(cleanText));
         const shouldUseLangCodeLock = !hasMixedBilingualText && effectiveLang !== 'id';
         const speechLangCode =
@@ -6266,17 +6294,21 @@ export async function synthesizeViaGeminiLiveWav(params: {
               ? 'cmn-CN'
               : effectiveLang === 'th'
                 ? 'th-TH'
-                : effectiveLang === 'vi'
-                  ? 'vi-VN'
-                  : effectiveLang === 'ru'
-                    ? 'ru-RU'
-                    : effectiveLang === 'ko'
-                      ? 'ko-KR'
-                      : effectiveLang === 'ms'
-                        ? 'ms-MY'
-                        : effectiveLang === 'id'
-                          ? 'id-ID'
-                          : 'en-US';
+                : effectiveLang === 'km'
+                  ? 'km-KH'
+                  : effectiveLang === 'fil'
+                    ? 'fil-PH'
+                    : effectiveLang === 'vi'
+                      ? 'vi-VN'
+                      : effectiveLang === 'ru'
+                        ? 'ru-RU'
+                        : effectiveLang === 'ko'
+                          ? 'ko-KR'
+                          : effectiveLang === 'ms'
+                            ? 'ms-MY'
+                            : effectiveLang === 'id'
+                              ? 'id-ID'
+                              : 'en-US';
         const speechConfigPayload: Record<string, unknown> = {
           voiceConfig: {
             prebuiltVoiceConfig: {

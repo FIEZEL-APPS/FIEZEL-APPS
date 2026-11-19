@@ -1054,7 +1054,9 @@
       }
       const note=this.domain==='speaking'
         ? (cakupan?(cakupan+' — '+T('speaking.cakupan-penjelasan')):T('speaking.cakupan-penjelasan'))
-        : (I18N && I18N.getLocale() === 'th' ? ('คะแนน ' + result.score + '%.') : ('Skor ' + result.score + '%.'));
+        : (typeof global.FiezelLocPick === 'function'
+            ? global.FiezelLocPick('Score {score}%.', 'Skor {score}%.', 'คะแนน {score}%.', { score: result.score })
+            : (I18N && I18N.getLocale() === 'th' ? ('คะแนน ' + result.score + '%.') : ('Skor ' + result.score + '%.')));
       const fb=this.root.querySelector('[data-feedback]');if(fb)fb.innerHTML=`${prefix}<div class="fsl-feedback ${result.passed?'is-passed':'is-failed'}"><strong>${label}</strong>${this.domain==='speaking'?`<b class="fsl-coverage-label">${esc(T('speaking.cakupan-judul'))}</b>`:''}<span>${esc(note)}</span>${this.domain==='listening'?`<p class="fsl-script-text"><b>${esc(T('fsl.script-label'))}</b> ${esc(item.script)}</p><div data-translation hidden></div>`:`<p><b>${T('fsl.sample-response', 'Contoh respons:')}</b> ${esc(item.sampleAnswer||item.targetText||'')}</p>`}<div class="fsl-actions"><button class="fsl-primary" data-next>${T('fsl.next-btn', 'Lanjut')}</button></div></div>`;
       /* R2-4: kabar benar/salah untuk maskot dikirim lewat kait host, BUKAN langsung ke
          FiezelPaw - host yang memegang gerbang reduced-motion/preferensi animasi

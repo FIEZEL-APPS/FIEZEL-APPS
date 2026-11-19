@@ -1390,6 +1390,17 @@ function vocabForLocale(list){
   const loc=self.FiezelI18n?.getLocale?.()||'id';
   const tl=activeTargetLang();
   if(loc==='id')return list;
+  const enD=self.FiezelEnData;
+  if(tl==='ja'&&enD?.ja?.vocab){
+    return list.map(v=>{const x=enD.ja.vocab[String(v?.id||'')];if(!x)return v;
+      return Object.assign({},v,x.meaning?{meaning:x.meaning}:{},x.exampleTranslation!==undefined?{exampleTranslation:x.exampleTranslation}:{})});
+  }
+  if(tl==='zh'&&enD?.mandarin){
+    const vm=enD.mandarin.vocabMeanings,ve=enD.mandarin.vocabExamples;
+    return list.map(v=>{const k=String(v?.id||'');const m=vm?.[k];const ex=ve?.[k];
+      if(!m&&ex===undefined)return v;
+      return Object.assign({},v,m?{meaning:m}:{},ex!==undefined?{exampleTranslation:ex}:{})});
+  }
   if(loc==='th'){
     const th=self.FiezelThData?.vocab?.entries;
     if(tl==='en'&&th){
@@ -1398,18 +1409,7 @@ function vocabForLocale(list){
     }
     return list;
   }
-  const enD=self.FiezelEnData;
   if(!enD)return list;
-  if(tl==='ja'&&enD.ja?.vocab){
-    return list.map(v=>{const x=enD.ja.vocab[String(v?.id||'')];if(!x)return v;
-      return Object.assign({},v,x.meaning?{meaning:x.meaning}:{},x.exampleTranslation!==undefined?{exampleTranslation:x.exampleTranslation}:{})});
-  }
-  if(tl==='zh'&&enD.mandarin){
-    const vm=enD.mandarin.vocabMeanings,ve=enD.mandarin.vocabExamples;
-    return list.map(v=>{const k=String(v?.id||'');const m=vm?.[k];const ex=ve?.[k];
-      if(!m&&ex===undefined)return v;
-      return Object.assign({},v,m?{meaning:m}:{},ex!==undefined?{exampleTranslation:ex}:{})});
-  }
   const en=enD.vocab?.entries;
   if(!en)return list;
   return list.map(v=>{const x=en[String(v?.id||'')];
@@ -1422,58 +1422,72 @@ function applyContentLocale(){
   const loc=self.FiezelI18n?.getLocale?.()||'id';
   const tl=activeTargetLang();
   const thReady=loc==='th'?self.FiezelThData:null;
+  const thEnSide=loc==='th'?self.FiezelEnData:null;
   const enReady=(loc!=='id'&&loc!=='th')?self.FiezelEnData:null;
   const gTh=thReady?.grammar?.templates||null;
-  const zhGMap=(tl==='zh')?enReady?.mandarin?.zhCourseGrammar:null;
-  if(((loc==='id'||loc==='th')&&!gTh)||!CONTENT_BASE.items.length){GRAMMAR_ITEMS=CONTENT_BASE.items;G=CONTENT_BASE.g}
+  const zhGMap=(tl==='zh')?(enReady||thEnSide)?.mandarin?.zhCourseGrammar:(enReady?.grammarExplanations?.templates||null);
+  if(loc==='id'||(loc==='th'&&!gTh)||!CONTENT_BASE.items.length){GRAMMAR_ITEMS=CONTENT_BASE.items;G=CONTENT_BASE.g}
   else if(loc==='th'){GRAMMAR_ITEMS=CONTENT_BASE.items.map(e=>Object.assign({},e,{item:grammarItemForTh(e.item,gTh)}));const buckets={};for(const e of GRAMMAR_ITEMS)(buckets[e.skill]??=[]).push(e.item);G=buckets}
   else{GRAMMAR_ITEMS=CONTENT_BASE.items.map(e=>Object.assign({},e,{item:grammarItemForEn(e.item,zhGMap)}));const buckets={};for(const e of GRAMMAR_ITEMS)(buckets[e.skill]??=[]).push(e.item);G=buckets}
   V=vocabForLocale(CONTENT_BASE.v);
-  if(thReady?.writing && WRITING_BANK){
+  if(loc==='th'&&(thReady?.writing||thEnSide?.writingRubric)&&WRITING_BANK){
     if(!WRITING_BANK._orig) WRITING_BANK._orig = JSON.parse(JSON.stringify(WRITING_BANK));
-    if(thReady.writing.honesty) WRITING_BANK.honesty = thReady.writing.honesty;
-    if(thReady.writing.rubric?.criteria && WRITING_BANK.rubric){
-      WRITING_BANK.rubric.criteria = (WRITING_BANK._orig.rubric?.criteria||[]).map(c=>{
-        const thC = thReady.writing.rubric.criteria[c.id];
+    const thW = thReady?.writing;
+    const thSideW = thEnSide?.writingRubric;
+    if(thW?.honesty) WRITING_BANK.honesty = thW.honesty;
+    else if(thSideW?.honesty) WRITING_BANK.honesty = thSideW.honesty;
+    if(WRITING_BANK.rubric && Array.isArray(WRITING_BANK._orig.rubric?.criteria)){
+      if(thSideW?.rubric?.note) WRITING_BANK.rubric.note = thSideW.rubric.note;
+      WRITING_BANK.rubric.criteria = WRITING_BANK._orig.rubric.criteria.map(c=>{
+        const thC = thW?.rubric?.criteria?.[c.id] || thSideW?.rubric?.criteria?.[c.id];
         return thC ? Object.assign({}, c, thC) : c;
       });
     }
-    // m025-308: prompt + catatan tugas ujian. Terjemahannya sudah ikut terunduh sejak
-    // writing-prompts-th.json dibuat, lalu MENGANGGUR karena overlay hanya menyalin honesty
-    // dan rubrik - 45 petunjuk dan 5 catatan ujian sampai ke murid Thai dalam bahasa Indonesia.
-    //
-    // `hint` th ditulis ke slot `id_hint`, nama bidang WARISAN yang dibaca penyaji
-    // (app.js writingView). Menamainya ulang jadi `hint` akan memutus jalur `id` yang
-    // byte-identik, jadi yang berpindah adalah ISInya, bukan nama slotnya.
-    if(thReady.writing.prompts && Array.isArray(WRITING_BANK._orig.prompts)){
+    if(Array.isArray(WRITING_BANK._orig.prompts)){
       WRITING_BANK.prompts = WRITING_BANK._orig.prompts.map(p=>{
-        const t = thReady.writing.prompts[String(p?.id||'')];
-        if(!t) return p;
+        const pid = String(p?.id||'');
+        const t = thW?.prompts?.[pid];
+        const ts = thSideW?.prompts?.[pid];
+        const jw = tl==='ja' ? thEnSide?.ja?.writing?.prompts?.[pid] : null;
+        const zw = tl==='zh' ? thEnSide?.mandarin?.zhCourseWriting?.[pid] : null;
         const out = Object.assign({}, p);
-        if(t.hint) out.id_hint = t.hint;
-        if(t.focus) out.focus = t.focus;
+        if(t?.hint || ts?.hint) out.id_hint = t?.hint || ts?.hint;
+        if(jw?.focus || t?.focus || ts?.focus) out.focus = jw?.focus || t?.focus || ts?.focus;
+        if(ts?.sourceNote) out.sourceNote = ts.sourceNote;
+        if(zw?.title) out.title = zw.title;
         return out;
       });
     }
-    // examTasks: HANYA `note` yang diterjemahkan. `label` adalah nama ujian (IELTS/TOEFL),
-    // dan `minWords`/`minutes` adalah kontrak penilaian - satu angka bergeser dan murid
-    // dinilai atas target yang berbeda dari ujian aslinya. Jadi bidangnya disebut satu per
-    // satu, bukan Object.assign yang menelan apa pun yang kelak muncul di sidecar.
-    if(thReady.writing.examTasks && WRITING_BANK._orig.examTasks){
+    if((thW?.examTasks || thSideW?.examTasks) && WRITING_BANK._orig.examTasks){
       const src = WRITING_BANK._orig.examTasks, out = {};
       for(const k of Object.keys(src)){
-        const t = thReady.writing.examTasks[k];
+        const t = thW?.examTasks?.[k] || thSideW?.examTasks?.[k];
         out[k] = t?.note ? Object.assign({}, src[k], {note:t.note}) : src[k];
       }
       WRITING_BANK.examTasks = out;
     }
+    if(tl==='ja'&&thEnSide?.ja?.writing){
+      const jw=thEnSide.ja.writing;
+      if(jw.honesty)WRITING_BANK.honesty=jw.honesty;
+      if(jw.rubric?.note&&WRITING_BANK.rubric)WRITING_BANK.rubric.note=jw.rubric.note;
+      if(jw.rubric?.criteria&&WRITING_BANK.rubric&&Array.isArray(WRITING_BANK._orig.rubric?.criteria)){
+        WRITING_BANK.rubric.criteria=WRITING_BANK._orig.rubric.criteria.map(c=>{
+          const jc=jw.rubric.criteria[c.id];
+          return jc?Object.assign({},c,jc):c;
+        });
+      }
+    }
   } else if(loc!=='id'&&loc!=='th'&&WRITING_BANK){
     if(!WRITING_BANK._orig) WRITING_BANK._orig = JSON.parse(JSON.stringify(WRITING_BANK));
+    const wSide = enReady?.writingRubric;
     const hNote = self.FiezelI18n?.t?.('tulis.honesty-note');
-    WRITING_BANK.honesty = (hNote && hNote !== 'tulis.honesty-note') ? hNote : WRITING_BANK._orig.honesty;
+    WRITING_BANK.honesty = wSide?.honesty || ((hNote && hNote !== 'tulis.honesty-note') ? hNote : WRITING_BANK._orig.honesty);
     if(WRITING_BANK.rubric && Array.isArray(WRITING_BANK._orig.rubric?.criteria)){
-      if(WRITING_BANK._orig.rubric.noteEn) WRITING_BANK.rubric.note = WRITING_BANK._orig.rubric.noteEn;
+      if(wSide?.rubric?.note) WRITING_BANK.rubric.note = wSide.rubric.note;
+      else if(WRITING_BANK._orig.rubric.noteEn) WRITING_BANK.rubric.note = WRITING_BANK._orig.rubric.noteEn;
       WRITING_BANK.rubric.criteria = WRITING_BANK._orig.rubric.criteria.map(c=>{
+        const wc = wSide?.rubric?.criteria?.[c.id];
+        if(wc) return Object.assign({}, c, wc);
         const lbl = self.FiezelI18n?.t?.('writing.rubric-'+c.id);
         const ask = self.FiezelI18n?.t?.('writing.asks-'+c.id);
         return Object.assign({}, c, {
@@ -1485,15 +1499,21 @@ function applyContentLocale(){
     }
     if(Array.isArray(WRITING_BANK._orig.prompts)){
       WRITING_BANK.prompts = WRITING_BANK._orig.prompts.map(p=>{
+        const wsP = wSide?.prompts?.[p.id];
+        const out = Object.assign({}, p, {
+          focus: wsP?.focus || p.focusEn || p.focus
+        });
+        if(wsP?.hint) out.id_hint = wsP.hint;
+        if(wsP?.sourceNote) out.sourceNote = wsP.sourceNote;
         if(tl==='ja'&&enReady?.ja?.writing?.prompts?.[p.id]){
           const jp=enReady.ja.writing.prompts[p.id];
-          return Object.assign({},p,{focus:jp.focus||p.focus});
+          if(jp.focus) out.focus = jp.focus;
         }
         if(tl==='zh'&&enReady?.mandarin?.zhCourseWriting?.[p.id]){
           const zw=enReady.mandarin.zhCourseWriting[p.id];
-          return Object.assign({},p,zw.title?{title:zw.title}:{});
+          if(zw.title) out.title = zw.title;
         }
-        return Object.assign({},p,{focus:p.focusEn||p.focus});
+        return out;
       });
     }
     if(tl==='ja'&&enReady?.ja?.writing){
@@ -1510,8 +1530,11 @@ function applyContentLocale(){
     if(WRITING_BANK._orig.examTasks){
       const nextTasks = JSON.parse(JSON.stringify(WRITING_BANK._orig.examTasks));
       for(const k of Object.keys(nextTasks)){
-        if(nextTasks[k].labelEn) nextTasks[k].label = nextTasks[k].labelEn;
-        if(nextTasks[k].noteEn) nextTasks[k].note = nextTasks[k].noteEn;
+        const wt = wSide?.examTasks?.[k];
+        if(wt?.label) nextTasks[k].label = wt.label;
+        else if(nextTasks[k].labelEn) nextTasks[k].label = nextTasks[k].labelEn;
+        if(wt?.note) nextTasks[k].note = wt.note;
+        else if(nextTasks[k].noteEn) nextTasks[k].note = nextTasks[k].noteEn;
       }
       WRITING_BANK.examTasks = nextTasks;
     }
@@ -1553,7 +1576,7 @@ function applyContentLocale(){
     if(READING_EXAM.examFormats) READING_EXAM.examFormats = JSON.parse(JSON.stringify(READING_EXAM._orig.examFormats));
     if(Array.isArray(READING_EXAM._orig.passages)) READING_EXAM.passages = READING_EXAM._orig.passages;
   }
-  const readingBankOv = thReady?.readingBank || (enReady ? (tl==='ja'?enReady.ja?.reading:(tl==='zh'?enReady.mandarin?.zhCourseReading:enReady.readingBank)) : null);
+  const readingBankOv = (loc==='th' && tl==='ja' ? thEnSide?.ja?.reading : loc==='th' && tl==='zh' ? thEnSide?.mandarin?.zhCourseReading : null) || thReady?.readingBank || (enReady ? (tl==='ja'?enReady.ja?.reading:(tl==='zh'?enReady.mandarin?.zhCourseReading:enReady.readingBank)) : null);
   if(readingBankOv && Array.isArray(CONTENT_BASE.r)){
     const rOv=readingBankOv;
     R=CONTENT_BASE.r.map(p=>{
@@ -1586,8 +1609,8 @@ function applyContentLocale(){
     for(const k of Object.keys(src))out[k]=thD[k]||src[k];
     GRAMMAR_MISCONCEPTION_ID=out;
   } else if(loc!=='id'&&loc!=='th'&&GRAMMAR_MISCONCEPTION_BASE){
-    const src=GRAMMAR_MISCONCEPTION_BASE,out=Object.create(null);
-    for(const k of Object.keys(src))out[k]=grammarCapFirst(k);
+    const src=GRAMMAR_MISCONCEPTION_BASE,sideD=enReady?.misconception?.diagnoses||null,out=Object.create(null);
+    for(const k of Object.keys(src))out[k]=(sideD&&sideD[k])||grammarCapFirst(k);
     GRAMMAR_MISCONCEPTION_ID=out;
   } else if(GRAMMAR_MISCONCEPTION_BASE) GRAMMAR_MISCONCEPTION_ID=GRAMMAR_MISCONCEPTION_BASE;
   __fzSyncShellElements();
@@ -12354,22 +12377,21 @@ function todayHomeMarkup(){
   } catch(_) {}
 
   if (!dailyFiveWords.length) {
-    const _loc = typeof FiezelI18n !== 'undefined' ? FiezelI18n.getLocale() : 'id';
-    const isId = _loc === 'id';
+    const _lp = typeof self.FiezelLocPick === 'function' ? self.FiezelLocPick : (en, id, th) => ((typeof FiezelI18n !== 'undefined' && FiezelI18n.getLocale() === 'id') ? id : en);
     dailyFiveWords = jaCourseOn()
       ? [
-          { word: '頑張る', phonetic: 'がんばる (ganbaru)', meaning: isTh ? 'พยายามอย่างเต็มที่, มุ่งมั่นไม่ยอมแพ้' : isId ? 'Berusaha keras, bersemangat pantang menyerah.' : 'To persevere and do your best.', example: '毎日少しずつ頑張りましょう。', exampleTranslation: isTh ? 'มาพยายามไปด้วยกันนะ' : isId ? 'Mari berusaha setiap hari sedikit demi sedikit.' : "Let's try our best little by little every day." },
-          { word: '約束', phonetic: 'やくそく (yakusoku)', meaning: isTh ? 'สัญญา' : isId ? 'Janji atau kesepakatan.' : 'A promise or appointment.', example: '約束を守ります。', exampleTranslation: isId ? 'Menepati janji.' : 'I will keep my promise.' },
-          { word: '大切', phonetic: 'たいせつ (taisetsu)', meaning: isTh ? 'สำคัญ' : isId ? 'Penting atau sangat berharga.' : 'Important, precious, or valuable.', example: '時間を大切にする。', exampleTranslation: isId ? 'Menghargai waktu.' : 'Value your time.' },
-          { word: '準備', phonetic: 'じゅんび (junbi)', meaning: isTh ? 'เตรียมตัว' : isId ? 'Persiapan atau bersiap-siap.' : 'Preparation or getting ready.', example: '試験の準備をする。', exampleTranslation: isId ? 'Mempersiapkan ujian.' : 'Prepare for the exam.' },
-          { word: '感謝', phonetic: 'かんしゃ (kansha)', meaning: isTh ? 'ขอบคุณ' : isId ? 'Rasa syukur atau terima kasih.' : 'Gratitude or appreciation.', example: 'いつも感謝しています。', exampleTranslation: isId ? 'Selalu bersyukur.' : 'I am always grateful.' }
+          { word: '頑張る', phonetic: 'がんばる (ganbaru)', meaning: _lp('To persevere and do your best.', 'Berusaha keras, bersemangat pantang menyerah.', 'พยายามอย่างเต็มที่, มุ่งมั่นไม่ยอมแพ้'), example: '毎日少しずつ頑張りましょう。', exampleTranslation: _lp("Let's try our best little by little every day.", 'Mari berusaha setiap hari sedikit demi sedikit.', 'มาพยายามไปด้วยกันทีละนิดทุกวันนะ') },
+          { word: '約束', phonetic: 'やくそく (yakusoku)', meaning: _lp('A promise or appointment.', 'Janji atau kesepakatan.', 'สัญญาหรือข้อตกลง'), example: '約束を守ります。', exampleTranslation: _lp('I will keep my promise.', 'Menepati janji.', 'ฉันจะรักษาสัญญา') },
+          { word: '大切', phonetic: 'たいせつ (taisetsu)', meaning: _lp('Important, precious, or valuable.', 'Penting atau sangat berharga.', 'สำคัญหรือมีค่ายิ่ง'), example: '時間を大切にする。', exampleTranslation: _lp('Value your time.', 'Menghargai waktu.', 'เห็นคุณค่าของเวลา') },
+          { word: '準備', phonetic: 'じゅんび (junbi)', meaning: _lp('Preparation or getting ready.', 'Persiapan atau bersiap-siap.', 'การเตรียมตัวให้พร้อม'), example: '試験の準備をする。', exampleTranslation: _lp('Prepare for the exam.', 'Mempersiapkan ujian.', 'เตรียมตัวสอบ') },
+          { word: '感謝', phonetic: 'かんしゃ (kansha)', meaning: _lp('Gratitude or appreciation.', 'Rasa syukur atau terima kasih.', 'ความซาบซึ้งและการขอบคุณ'), example: 'いつも感謝しています。', exampleTranslation: _lp('I am always grateful.', 'Selalu bersyukur.', 'รู้สึกขอบคุณอยู่เสมอ') }
         ]
       : [
-          { word: 'Accomplish', phonetic: '/əˈkʌm.plɪʃ/ • Verb', meaning: isTh ? 'ทำสำเร็จ, บรรลุเป้าหมายที่ตั้งไว้' : isId ? 'Meraih, menuntaskan, atau berhasil mencapai target.' : 'To succeed in completing or achieving a goal.', example: 'You can accomplish anything with consistent practice.', exampleTranslation: isTh ? 'คุณสามารถทำทุกสิ่งให้สำเร็จได้' : isId ? 'Kamu bisa meraih apa saja dengan latihan konsisten.' : 'You can achieve anything with consistent practice.' },
-          { word: 'Consistent', phonetic: '/kənˈsɪs.tənt/ • Adj', meaning: isTh ? 'สม่ำเสมอ' : isId ? 'Konsisten dan berkelanjutan.' : 'Acting or done in the same steady way over time.', example: 'Consistent effort brings great results.', exampleTranslation: isId ? 'Usaha yang konsisten membawa hasil besar.' : 'Steady effort brings great results.' },
-          { word: 'Opportunity', phonetic: '/ˌɒp.əˈtjuː.nə.ti/ • Noun', meaning: isTh ? 'โอกาส' : isId ? 'Peluang emas atau kesempatan baru.' : 'A favorable time or chance to do something.', example: 'Every challenge is a new opportunity.', exampleTranslation: isId ? 'Setiap tantangan adalah peluang baru.' : 'Every challenge is a new opportunity.' },
-          { word: 'Persistent', phonetic: '/pəˈzɪs.tənt/ • Adj', meaning: isTh ? 'ไม่ย่อท้อ' : isId ? 'Gigih, tekun, dan pantang menyerah.' : 'Continuing firmly despite difficulty or obstacles.', example: 'Be persistent in pursuing your goals.', exampleTranslation: isId ? 'Gigihlah dalam mengejar impianmu.' : 'Stay determined in pursuing your goals.' },
-          { word: 'Enhance', phonetic: '/ɪnˈhɑːns/ • Verb', meaning: isTh ? 'เพิ่มพูน' : isId ? 'Meningkatkan mutu, nilai, atau kemampuan.' : 'To improve the quality, value, or strength of something.', example: 'Reading helps enhance your vocabulary.', exampleTranslation: isId ? 'Membaca membantu meningkatkan kosakatamu.' : 'Reading helps expand your vocabulary.' }
+          { word: 'Accomplish', phonetic: '/əˈkʌm.plɪʃ/ • Verb', meaning: _lp('To succeed in completing or achieving a goal.', 'Meraih, menuntaskan, atau berhasil mencapai target.', 'ทำสำเร็จ, บรรลุเป้าหมายที่ตั้งไว้'), example: 'You can accomplish anything with consistent practice.', exampleTranslation: _lp('You can achieve anything with consistent practice.', 'Kamu bisa meraih apa saja dengan latihan konsisten.', 'คุณสามารถทำทุกสิ่งให้สำเร็จได้ด้วยการฝึกฝนอย่างสม่ำเสมอ') },
+          { word: 'Consistent', phonetic: '/kənˈsɪs.tənt/ • Adj', meaning: _lp('Acting or done in the same steady way over time.', 'Konsisten dan berkelanjutan.', 'สม่ำเสมอและต่อเนื่อง'), example: 'Consistent effort brings great results.', exampleTranslation: _lp('Steady effort brings great results.', 'Usaha yang konsisten membawa hasil besar.', 'ความพยายามที่สม่ำเสมอนำไปสู่ผลลัพธ์ที่ยิ่งใหญ่') },
+          { word: 'Opportunity', phonetic: '/ˌɒp.əˈtjuː.nə.ti/ • Noun', meaning: _lp('A favorable time or chance to do something.', 'Peluang emas atau kesempatan baru.', 'โอกาสที่ดีหรือจังหวะเหมาะสม'), example: 'Every challenge is a new opportunity.', exampleTranslation: _lp('Every challenge is a new opportunity.', 'Setiap tantangan adalah peluang baru.', 'ทุกความท้าทายคือโอกาสใหม่เสมอ') },
+          { word: 'Persistent', phonetic: '/pəˈzɪs.tənt/ • Adj', meaning: _lp('Continuing firmly despite difficulty or obstacles.', 'Gigih, tekun, dan pantang menyerah.', 'มุ่งมั่นไม่ย่อท้อแม้มีอุปสรรค'), example: 'Be persistent in pursuing your goals.', exampleTranslation: _lp('Stay determined in pursuing your goals.', 'Gigihlah dalam mengejar impianmu.', 'จงมุ่งมั่นไล่ตามเป้าหมายของคุณต่อไป') },
+          { word: 'Enhance', phonetic: '/ɪnˈhɑːns/ • Verb', meaning: _lp('To improve the quality, value, or strength of something.', 'Meningkatkan mutu, nilai, atau kemampuan.', 'เพิ่มพูนคุณภาพหรือความสามารถ'), example: 'Reading helps enhance your vocabulary.', exampleTranslation: _lp('Reading helps expand your vocabulary.', 'Membaca membantu meningkatkan kosakatamu.', 'การอ่านช่วยเพิ่มพูนคลังคำศัพท์ของคุณ') }
         ];
   }
 
@@ -15245,7 +15267,7 @@ ${(()=>{/* 2026-08-31: Writing memakai PANGGUNG maskot, bukan cap bundar .quiz-m
   <span class="skill-badge">${FiezelI18n.t('tulis.badge-topik',{level:esc(displayLevel(prompt.level)),done:done,goal:WRITING_WEEKLY_TARGET})}</span>
   ${exam?`<p class="writing-exam"><b>${esc(exam.label)}</b><span>${FiezelI18n.t('tulis.meta-ujian',{kata:exam.minWords,menit:exam.minutes})}</span><small>${esc(exam.note)}</small></p>`:''}
   <b>${esc(prompt.en||prompt.prompt||prompt.title||'')}</b>
-  ${(FiezelI18n.getLocale()==='id'||FiezelI18n.getLocale()==='th')&&prompt.id_hint?`<p class="muted">${esc(prompt.id_hint)}</p>`:''}
+  ${FiezelI18n.getLocale()!=='en'&&prompt.id_hint?`<p class="muted">${esc(prompt.id_hint)}</p>`:''}
   ${prompt.focus?`<p class="writing-focus">${FiezelI18n.t('tulis.fokus',{fokus:esc(prompt.focus)})}</p>`:''}
   <textarea id="writingBox" placeholder="${jaCourseOn() ? 'ここに入力してください…' : esc(FiezelI18n.t('tulis.placeholder'))}" aria-label="${FiezelI18n.t('tulis.aria-kotak')}">${esc(draft)}</textarea>
   <div class="writing-meta"><span id="writingCount">${FiezelI18n.t('tulis.nol-kata')}</span><span>${exam?FiezelI18n.t('tulis.min-kata',{kata:target}):FiezelI18n.t('tulis.target-kata',{kata:target})}</span></div>
@@ -16480,8 +16502,12 @@ function makeGrammarTokenOrderQuestion(skill, item, idx, level){
      Thai dulu membaca "แปลเป็นภาษาอังกฤษ:" disusul "Kemarin aku nemu foto lama..." - soal yang
      tidak bisa ia baca. Selama terjemahan Thai belum ada, locale th memakai mode "Lengkapi &
      Susun Kata" dengan kerangka kalimat Inggrisnya (petunjuk dan labelnya sudah dua bahasa). */
-  let localeTh=false;try{localeTh=FiezelI18n.getLocale()==='th'}catch(_){}
-  const idTranslation=(!localeTh&&self.FiezelGrammarTranslations&&self.FiezelGrammarTranslations[templateId])?self.FiezelGrammarTranslations[templateId]:null;
+  let locNow='id';try{locNow=FiezelI18n.getLocale()||'id'}catch(_){}
+  const idTranslation = locNow==='id'
+    ? ((self.FiezelGrammarTranslations&&self.FiezelGrammarTranslations[templateId])||null)
+    : locNow==='en'
+      ? null
+      : ((self.FiezelEnData&&self.FiezelEnData.grammarSentences&&self.FiezelEnData.grammarSentences.items&&self.FiezelEnData.grammarSentences.items[templateId])||null);
   const tokenInstruction=idTranslation
     ? FiezelI18n.t('grammar.token-order-translate-instruction','Terjemahkan ke Bahasa Inggris:')
     : FiezelI18n.t('grammar.token-order-panduan-label','Lengkapi & Susun Kata:');

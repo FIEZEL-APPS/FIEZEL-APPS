@@ -288,11 +288,11 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
                     ? (activeCard?.badgeTh || t(locale, 'ui.bestAnswer'))
                     : locale === 'id'
                       ? (activeCard?.badgeId || t(locale, 'ui.bestAnswer'))
-                      : t(locale, 'ui.bestAnswer')}
+                      : (activeCard?.badgeId && !/Jawaban/i.test(activeCard.badgeId) ? wbPick(activeCard.badgeId, activeCard.badgeId, activeCard.badgeTh, locale) : t(locale, 'ui.bestAnswer'))}
                 </span>
               </span>
               <span className="hidden sm:inline-block text-[10.5px] font-semibold text-[#8C7760] truncate">
-                {locale === 'id' ? (activeCard?.tierLabelId || (scenario.id.startsWith('scen_pte') ? 'Pearson PTE Academic' : 'Cambridge IELTS Academic')) : (scenario.id.startsWith('scen_pte') ? 'Pearson PTE Academic' : 'Cambridge IELTS Academic')}
+                {scenario.id.startsWith('scen_pte') ? 'Pearson PTE Academic' : 'Cambridge IELTS Academic'}
               </span>
             </div>
           ) : (
@@ -381,14 +381,14 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
               </p>
             )}
 
-            {/* Terjemahan Bahasa Indonesia / Thai yang JELAS & TEGAS */}
+            {/* Terjemahan Bahasa User */}
             {(() => {
               const resolvedCardHint = sanitizeMotherTongueHint(
                 locale === 'th'
                   ? activeCard.hintTh || (activeCard as any).hintEn || ''
                   : locale === 'id'
                     ? activeCard.hintId
-                    : (activeCard as any).hintEn || ''
+                    : (activeCard as any).hintLocale || (activeCard as any).hintEn || ''
               );
               if (!resolvedCardHint) return null;
               return (
@@ -398,7 +398,7 @@ export const BeginnerAnswerAssistant: React.FC<BeginnerAnswerAssistantProps> = (
                 >
                   {isSswMode ? (
                     <span className="font-bold text-[#8C2233] mr-1">
-                      {locale === 'id' ? '[Arah Belajar]:' : '[Study Focus]:'}
+                      {wbPick('[Study Focus]:', '[Arah Belajar]:', undefined, locale)}
                     </span>
                   ) : (
                     <>💡 {isCambridgeMode && <span className="font-bold text-[#92400E] mr-1">[{t(locale, 'ui.modelTranslationLabel')}]:</span>}</>

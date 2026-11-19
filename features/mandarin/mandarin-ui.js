@@ -43,6 +43,10 @@
   }
 
   function pickM(en, id, th) {
+    try {
+      var g = (typeof self !== 'undefined' ? self : (typeof globalThis !== 'undefined' ? globalThis : this));
+      if (g && typeof g.FiezelLocPick === 'function') return g.FiezelLocPick(en, id, th);
+    } catch (_) {}
     var l = curLoc();
     if (l === 'id') return id;
     if (l === 'th' && th) return th;

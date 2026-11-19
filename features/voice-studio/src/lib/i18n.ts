@@ -1,4 +1,11 @@
-import { LearnerLocale, MasteryStateName } from '../types/voiceCall';
+import { CallScenario, LearnerLocale, MasteryStateName, VocabPrerequisiteItem, VoicePersona } from '../types/voiceCall';
+import {
+  VS_EXTRA_MULTI_UI,
+  VS_PERSONA_TRANS,
+  VS_SCENARIO_TRANS,
+  VS_VOCAB_TRANS,
+  VS_WB_TRANSLATIONS,
+} from './generated9LocPack';
 
 const COPY: Partial<Record<LearnerLocale, Record<string, string>>> = {
   id: {
@@ -435,6 +442,7 @@ const MULTI_UI: Record<string, Record<string, string>> = {
     'ui.rateNormal': '1.0x - Normal Native',
     'ui.tapInterrupt': 'Ketuk untuk menyela Mochi',
     'ui.prereqUnlockedToast': 'Kosakata prasyarat berhasil dikuasai!',
+    'ui.sswUnlockedHint': 'Coba sekarang',
     'ui.ideaBtn': 'Ide Bicara',
     'ui.modelAnswerBtn': 'Model Answer',
     'ui.refreshIdeas': 'Minta ide jawaban baru',
@@ -596,6 +604,7 @@ const MULTI_UI: Record<string, Record<string, string>> = {
     'ui.rateNormal': '1.0x - ความเร็วปกติ',
     'ui.tapInterrupt': 'แตะเพื่อแทรก Mochi',
     'ui.prereqUnlockedToast': 'ปลดล็อกคำศัพท์พื้นฐานเรียบร้อยแล้ว!',
+    'ui.sswUnlockedHint': 'ลองเลย',
     'ui.ideaBtn': 'ตัวช่วยตอบ',
     'ui.modelAnswerBtn': 'คำตอบ Band 9.0',
     'ui.refreshIdeas': 'ขอไอเดียคำตอบใหม่',
@@ -1154,6 +1163,8 @@ export function vocabMeaningForLocale(
   v: { id: string; term: string; meaningId: string; meaningTh?: string; exampleSentence?: string }
 ): string {
   if (locale === 'id') return v.meaningId;
+  const packMeaning = VS_VOCAB_TRANS[locale]?.[v.id] || VS_VOCAB_TRANS[locale]?.[v.meaningId];
+  if (packMeaning) return packMeaning;
   if (locale === 'th') return v.meaningTh && v.meaningTh !== v.meaningId ? v.meaningTh : (VOCAB_PREREQ_EN[v.id] || v.meaningId);
   if (VOCAB_PREREQ_EN[v.id]) return VOCAB_PREREQ_EN[v.id];
   // Structured JA/ZH items often look like "atatameru - menghangatkan": strip Indonesian half so non-ID gets clean reading
@@ -1198,6 +1209,30 @@ export function scenarioMetaForLocale(
       missionGoals: scen.missionGoalsId || [],
     };
   }
+  const packScen = VS_SCENARIO_TRANS[locale]?.[scen.id];
+  if (packScen) {
+    const isLife = scen.id.startsWith('scen_ja_fiezel-life_');
+    const lifeTopic = isLife ? scen.titleId.replace(/^FIEZEL Japanese Life [^:]+:\s*/i, '') : '';
+    const lifeComp = isLife ? scen.competencyNameId.replace(/^Komunikasi Nyata:\s*/i, '') : '';
+    return {
+      title: packScen.title || SCENARIO_EN_META[scen.id]?.title || scen.titleId,
+      situation: packScen.situation || SCENARIO_EN_META[scen.id]?.situation || (isLife
+        ? wbFmt('FIEZEL Japanese Life conversation ({level}): {topic}', 'Percakapan FIEZEL Japanese Life ({level}): {topic}', 'บทสนทนา FIEZEL Japanese Life ({level}): {topic}', { level: scen.level || 'A1', topic: lifeTopic }, locale)
+        : scen.situationId),
+      competency: packScen.competency || SCENARIO_EN_META[scen.id]?.competency || (isLife
+        ? wbFmt('Real-Life Communication: {topic}', 'Komunikasi Nyata: {topic}', 'การสื่อสารจริง: {topic}', { topic: lifeComp }, locale)
+        : scen.competencyNameId),
+      openingTranslation: packScen.openingTranslation ?? SCENARIO_EN_META[scen.id]?.openingTranslation ?? '',
+      missionGoals: (packScen.missionGoals && packScen.missionGoals.length > 0)
+        ? packScen.missionGoals
+        : (isLife
+          ? [
+              wbPick('Use the situational Japanese sentence pattern naturally.', 'Gunakan pola kalimat situasional bahasa Jepang secara alami.', 'ใช้โครงสร้างประโยคภาษาญี่ปุ่นตามสถานการณ์อย่างเป็นธรรมชาติ', locale),
+              wbPick('Deliver clear pronunciation and polite phrasing smoothly.', 'Pastikan pelafalan jelas dan ungkapan sopan terdengar lancar.', 'ออกเสียงชัดเจนและใช้ถ้อยคำสุภาพอย่างลื่นไหล', locale),
+            ]
+          : (SCENARIO_EN_META[scen.id]?.missionGoals || [])),
+    };
+  }
   if (locale === 'th') {
     return {
       title: scen.titleTh && scen.titleTh !== scen.titleId ? scen.titleTh : (SCENARIO_EN_META[scen.id]?.title || scen.titleId),
@@ -1221,27 +1256,69 @@ export function scenarioMetaForLocale(
   }
   if (scen.id.startsWith('scen_ielts_cue_')) {
     const topic = scen.titleId.replace(/^IELTS Speaking:\s*/i, '');
+    const compTopic = scen.competencyNameId.replace(/^IELTS Speaking:\s*/i, '');
     return {
-      title: scen.titleId,
-      situation: `Official Cambridge IELTS Speaking simulation (Part 2 Cue Card & Part 3 Discussion): ${topic}`,
-      competency: scen.competencyNameId,
-      openingTranslation: scen.openingLine || '',
+      title: wbFmt('IELTS Speaking: {topic}', 'IELTS Speaking: {topic}', 'การพูด IELTS: {topic}', { topic }, locale),
+      situation: wbFmt(
+        'Official Cambridge IELTS Speaking simulation (Part 2 Cue Card & Part 3 Discussion): {topic}',
+        'Simulasi Ujian Resmi Cambridge IELTS Speaking Part 2 & 3. Kamu diberikan waktu 1 menit menyusun catatan untuk kartu: {topic}',
+        'จำลองการสอบ Cambridge IELTS Speaking Part 2 และ 3 คุณมีเวลา 1 นาทีในการเตรียมโน้ตสำหรับหัวข้อ: {topic}',
+        { topic },
+        locale
+      ),
+      competency: wbFmt('IELTS Speaking: {topic}', 'IELTS Speaking: {topic}', 'การพูด IELTS: {topic}', { topic: compTopic }, locale),
+      openingTranslation: locale === 'en'
+        ? (scen.openingLine || '')
+        : wbFmt(
+          'Now, in Part 2, I am going to give you a topic. You have one minute to think about what you are going to say: {topic}',
+          'Sekarang, pada Part 2, saya akan memberikan sebuah topik. Anda memiliki waktu satu menit untuk memikirkan apa yang akan Anda sampaikan: {topic}',
+          'ใน Part 2 นี้ ผมจะให้หัวข้อแก่คุณ คุณมีเวลา 1 นาทีในการคิดและจดบันทึก หัวข้อของคุณคือ: {topic}',
+          { topic },
+          locale
+        ),
       missionGoals: [
-        'Speak coherently for 1–2 minutes covering every cue card point.',
-        'Use academic discourse markers cleanly and naturally.',
+        wbPick(
+          'Speak coherently for 1–2 minutes covering every cue card point.',
+          'Bicaralah secara runtut selama 1 hingga 2 menit mencakup seluruh poin kartu.',
+          'พูดต่อเนื่อง 1-2 นาทีโดยครอบคลุมหัวข้อย่อยทั้งหมด',
+          locale
+        ),
+        wbPick(
+          'Use academic discourse markers cleanly and naturally.',
+          'Gunakan penanda wacana (discourse markers: Furthermore, In addition, Consequently).',
+          'ใช้คำเชื่อมประโยคระดับวิชาการ (Furthermore, In addition, Consequently)',
+          locale
+        ),
       ],
     };
   }
   if (scen.id.startsWith('scen_ja_fiezel-life_')) {
     const topic = scen.titleId.replace(/^FIEZEL Japanese Life [^:]+:\s*/i, '');
+    const compTopic = scen.competencyNameId.replace(/^Komunikasi Nyata:\s*/i, '');
     return {
       title: scen.titleId,
-      situation: `FIEZEL Japanese Life conversation (${scen.level || 'A1'}): ${topic}`,
-      competency: scen.competencyNameId.replace(/^Komunikasi Nyata:\s*/i, 'Real-Life Communication: '),
+      situation: wbFmt(
+        'FIEZEL Japanese Life conversation ({level}): {topic}',
+        'Percakapan FIEZEL Japanese Life ({level}): {topic}',
+        'บทสนทนา FIEZEL Japanese Life ({level}): {topic}',
+        { level: scen.level || 'A1', topic },
+        locale
+      ),
+      competency: wbFmt('Real-Life Communication: {topic}', 'Komunikasi Nyata: {topic}', 'การสื่อสารจริง: {topic}', { topic: compTopic }, locale),
       openingTranslation: '',
       missionGoals: [
-        'Use the situational Japanese sentence pattern naturally.',
-        'Deliver clear pronunciation and polite phrasing smoothly.',
+        wbPick(
+          'Use the situational Japanese sentence pattern naturally.',
+          'Gunakan pola kalimat situasional bahasa Jepang secara alami.',
+          'ใช้โครงสร้างประโยคภาษาญี่ปุ่นตามสถานการณ์อย่างเป็นธรรมชาติ',
+          locale
+        ),
+        wbPick(
+          'Deliver clear pronunciation and polite phrasing smoothly.',
+          'Pastikan pelafalan jelas dan ungkapan sopan terdengar lancar.',
+          'ออกเสียงชัดเจนและใช้ถ้อยคำสุภาพอย่างลื่นไหล',
+          locale
+        ),
       ],
     };
   }
@@ -1256,7 +1333,7 @@ export function scenarioMetaForLocale(
 
 export function t(locale: LearnerLocale, key: string): string {
   if (locale === 'id') return COPY.id?.[key] ?? COPY.en?.[key] ?? key;
-  return COPY[locale]?.[key] ?? COPY.en?.[key] ?? COPY.id?.[key] ?? key;
+  return VS_EXTRA_MULTI_UI[locale]?.[key] ?? COPY[locale]?.[key] ?? COPY.en?.[key] ?? COPY.id?.[key] ?? key;
 }
 
 export function resolveRuntimeVoiceLocale(locale?: LearnerLocale | string): LearnerLocale {
@@ -1295,8 +1372,67 @@ export function resolveRuntimeVoiceLocale(locale?: LearnerLocale | string): Lear
 export function wbPick<T>(en: T, id: T, th?: T, locale?: LearnerLocale | string): T {
   const loc = resolveRuntimeVoiceLocale(locale);
   if (loc === 'id') return id;
+  if (typeof en === 'string' && loc !== 'en') {
+    const tr = VS_WB_TRANSLATIONS[loc]?.[en];
+    if (tr) return tr as unknown as T;
+  }
   if (loc === 'th' && th !== undefined) return th;
   return en;
+}
+
+export function wbFmt(
+  enTpl: string,
+  idTpl: string,
+  thTpl?: string,
+  vars?: Record<string, string | number>,
+  locale?: LearnerLocale | string
+): string {
+  let out = wbPick(enTpl, idTpl, thTpl, locale);
+  if (vars) {
+    for (const [k, v] of Object.entries(vars)) {
+      out = out.split(`{${k}}`).join(String(v));
+    }
+  }
+  return out;
+}
+
+export function personaMetaForLocale(
+  locale: LearnerLocale | string,
+  persona: VoicePersona
+): {
+  role: string;
+  personalityTag: string;
+  roastStyle: string;
+  openingGreetingTranslation: string;
+  levelRange: string;
+} {
+  const loc = resolveRuntimeVoiceLocale(locale);
+  if (loc === 'id') {
+    return {
+      role: persona.roleId,
+      personalityTag: persona.personalityTagId || persona.roleId,
+      roastStyle: persona.roastStyleId || persona.speakingStyle,
+      openingGreetingTranslation: persona.openingGreetingTranslationId || '',
+      levelRange: persona.levelRange,
+    };
+  }
+  const ov = VS_PERSONA_TRANS[loc]?.[persona.id] || VS_PERSONA_TRANS.en?.[persona.id];
+  if (loc === 'th') {
+    return {
+      role: persona.roleTh || ov?.role || persona.roleId,
+      personalityTag: persona.personalityTagTh || ov?.personalityTag || persona.roleTh || persona.accentLabel,
+      roastStyle: persona.roastStyleTh || ov?.roastStyle || persona.speakingStyle,
+      openingGreetingTranslation: persona.openingGreetingTranslationTh || ov?.openingGreetingTranslation || persona.openingGreetingTranslationEn || '',
+      levelRange: ov?.levelRange || persona.levelRange,
+    };
+  }
+  return {
+    role: ov?.role || persona.accentLabel || persona.name,
+    personalityTag: ov?.personalityTag || persona.accentLabel || persona.name,
+    roastStyle: ov?.roastStyle || persona.speakingStyle,
+    openingGreetingTranslation: ov?.openingGreetingTranslation || persona.openingGreetingTranslationEn || '',
+    levelRange: ov?.levelRange || persona.levelRange,
+  };
 }
 
 export function tMasteryState(locale: LearnerLocale, state: MasteryStateName): string {

@@ -20,7 +20,7 @@ import {
   extractBeginnerGlossaryForText,
   parseSswPageLessonSteps,
 } from '../lib/sswSenseiTeacher.ts';
-import { wbPick } from '../lib/i18n';
+import { wbPick, wbFmt } from '../lib/i18n';
 
 export type SswWorkbenchTab = 'roadmap' | 'pdf_kotoba' | 'quiz';
 export type SswQuizDrawMode = 'cbt' | 'math' | 'trap' | 'kotoba_drill' | 'mixed';
@@ -262,7 +262,7 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
                 }}
                 className="px-2.5 py-1 rounded-lg bg-[#8C2233] hover:bg-[#741A29] text-white text-[11px] font-extrabold transition cursor-pointer"
               >
-                Lihat Langkah Ini
+                {wbPick('View This Step', 'Lihat Langkah Ini')}
               </button>
             )}
             {onAskSensei && (
@@ -277,7 +277,7 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
                 }
                 className="px-2.5 py-1 rounded-lg border border-[#8C2233] text-[#8C2233] hover:bg-[#8C2233]/10 text-[11px] font-extrabold transition cursor-pointer"
               >
-                Minta Sensei Jelaskan
+                {wbPick('Ask Sensei to Explain', 'Minta Sensei Jelaskan')}
               </button>
             )}
           </div>
@@ -296,7 +296,7 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
               : 'border-transparent text-[#6B5A48] hover:text-[#1C1611]'
           }`}
         >
-          1. Alur Belajar ({state.completedStageIds.length}/{SSW_MASTER_KB.roadmapStages.length})
+          1. {wbPick('Study Roadmap', 'Alur Belajar')} ({state.completedStageIds.length}/{SSW_MASTER_KB.roadmapStages.length})
         </button>
         <button
           type="button"
@@ -308,7 +308,7 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
               : 'border-transparent text-[#6B5A48] hover:text-[#1C1611]'
           }`}
         >
-          2. Materi (Hal. {clampedPage}/{totalPages})
+          2. {wbPick('Study Guide', 'Materi')} ({wbPick('p.', 'Hal.')} {clampedPage}/{totalPages})
         </button>
         <button
           type="button"
@@ -320,7 +320,7 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
               : 'border-transparent text-[#6B5A48] hover:text-[#1C1611]'
           }`}
         >
-          3. Latihan Soal
+          3. {wbPick('Practice Quiz', 'Latihan Soal')}
         </button>
       </div>
 
@@ -334,14 +334,14 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
               <div className="space-y-1.5 min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="px-2.5 py-0.5 rounded-full text-[11px] font-black bg-[#8C2233] text-white">
-                    {progress.isZeroProgress ? 'MULAI DARI SINI (PEMULA NOL)' : 'TAHAP AKTIF SEKARANG'}
+                    {progress.isZeroProgress ? wbPick('START HERE (ZERO BEGINNER)', 'MULAI DARI SINI (PEMULA NOL)') : wbPick('CURRENT ACTIVE STAGE', 'TAHAP AKTIF SEKARANG')}
                   </span>
                   <span className="text-xs font-bold text-[#8C2233]">
                     {progress.recommendedStage.pdfPages}
                   </span>
                 </div>
                 <p className="text-[15px] font-black text-[#1C1611]">
-                  Tahap {progress.recommendedStage.stage}: {progress.recommendedStage.title}
+                  {wbPick('Stage', 'Tahap')} {progress.recommendedStage.stage}: {progress.recommendedStage.title}
                 </p>
                 <p className="text-[13px] text-[#3F3326] leading-relaxed">
                   {progress.recommendedStage.goal}
@@ -358,7 +358,7 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
                   }}
                   className="px-4 py-2 rounded-xl bg-[#8C2233] hover:bg-[#741A29] text-white text-xs sm:text-[13px] font-extrabold shadow-sm transition cursor-pointer"
                 >
-                  Buka Hal. {parseStartPage(progress.recommendedStage.pdfPages)} &amp; Mulai
+                  {wbFmt('Open p. {page} & Start', 'Buka Hal. {page} & Mulai', undefined, undefined, { page: parseStartPage(progress.recommendedStage.pdfPages) })}
                 </button>
                 {onAskSensei && (
                   <button
@@ -370,7 +370,7 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
                     }
                     className="px-3.5 py-2 rounded-xl border border-[#8C2233] bg-white text-[#8C2233] hover:bg-[#8C2233]/10 text-xs sm:text-[13px] font-extrabold transition cursor-pointer"
                   >
-                    Tanya Sensei
+                    {wbPick('Ask Sensei', 'Tanya Sensei')}
                   </button>
                 )}
               </div>
@@ -380,7 +380,7 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
             {state.weakTopics.length > 0 && (
               <div className="rounded-xl border border-rose-200 bg-rose-50/70 p-3.5">
                 <p className="text-xs font-black text-rose-800 mb-2">
-                  Topik yang Masih Perlu Diulang (Klik untuk Latihan Soal):
+                  {wbPick('Topics That Still Need Review (Click for Practice Quiz):', 'Topik yang Masih Perlu Diulang (Klik untuk Latihan Soal):')}
                 </p>
                 <div className="flex flex-wrap gap-1.5">
                   {state.weakTopics.map((topic) => (
@@ -560,7 +560,7 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
                 onClick={() => setHideFurigana((v) => !v)}
                 className="px-3 py-2 rounded-xl border border-[#D8CAB3] bg-white hover:bg-[#FAF4E8] text-xs font-extrabold text-[#4E4032] cursor-pointer"
               >
-                {hideFurigana ? 'Tampilkan Cara Baca (Furigana)' : 'Sembunyikan Cara Baca (Furigana)'}
+                {hideFurigana ? wbPick('Show Reading Guide (Furigana)', 'Tampilkan Cara Baca (Furigana)') : wbPick('Hide Reading Guide (Furigana)', 'Sembunyikan Cara Baca (Furigana)')}
               </button>
             </div>
 
@@ -569,14 +569,14 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
               <div className="rounded-xl border border-amber-300 bg-amber-50/70 p-3.5 space-y-2.5">
                 <div className="flex items-center justify-between">
                   <p className="text-xs font-black text-amber-900">
-                    Hasil Pencarian &quot;{searchQuery}&quot; ({searchResult.totalMatches} temuan)
+                    {wbFmt('Search Results "{query}" ({count} matches)', 'Hasil Pencarian "{query}" ({count} temuan)', undefined, undefined, { query: searchQuery, count: searchResult.totalMatches })}
                   </p>
                   <button
                     type="button"
                     onClick={() => setSearchQuery('')}
                     className="text-xs font-bold text-[#8C2233] cursor-pointer"
                   >
-                    Tutup Hasil
+                    {wbPick('Close Results', 'Tutup Hasil')}
                   </button>
                 </div>
                 {searchResult.matchedPages.length > 0 && (
@@ -591,7 +591,7 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
                         }}
                         className="px-3 py-1.5 rounded-lg bg-white border border-amber-300 hover:border-[#8C2233] text-xs font-bold text-[#1C1611] cursor-pointer"
                       >
-                        Hal. {mp.page}: {cleanSpacedJapanese(mp.title)}
+                        {wbPick('p.', 'Hal.')} {mp.page}: {cleanSpacedJapanese(mp.title)}
                       </button>
                     ))}
                   </div>
@@ -600,7 +600,7 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
                   <div className="space-y-1.5 pt-1">
                     {searchResult.matchedTraps.map((t) => (
                       <div key={t.id} className="rounded-lg bg-white border border-rose-200 p-2.5 text-xs">
-                        <span className="font-black text-[#8C2233]">Jebakan (Hal. {t.pdfPage}): {t.title} - </span>
+                        <span className="font-black text-[#8C2233]">{wbPick('Trap', 'Jebakan')} ({wbPick('p.', 'Hal.')} {t.pdfPage}): {t.title} - </span>
                         <span className="text-[#3C3024]">{t.detail}</span>
                       </div>
                     ))}
@@ -869,9 +869,9 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
                                 className="px-3.5 py-1.5 rounded-xl bg-[#8C2233] hover:bg-[#741A29] text-white text-xs font-extrabold shadow-xs transition cursor-pointer"
                               >
                                 {step.stepNumber < pageSteps.length
-                                  ? wbPick(`Got it, Next Step ${step.stepNumber + 1} ->`, `Paham, Lanjut ke Langkah ${step.stepNumber + 1} ->`)
+                                  ? wbFmt('Got it, Next Step {step} ->', 'Paham, Lanjut ke Langkah {step} ->', undefined, { step: step.stepNumber + 1 })
                                   : clampedPage < totalPages
-                                  ? wbPick(`Finish Page ${clampedPage}, Open Page ${clampedPage + 1} ->`, `Selesai Hal. ${clampedPage}, Buka Hal. ${clampedPage + 1} ->`)
+                                  ? wbFmt('Finish Page {page}, Open Page {nextPage} ->', 'Selesai Hal. {page}, Buka Hal. {nextPage} ->', undefined, { page: clampedPage, nextPage: clampedPage + 1 })
                                   : wbPick('Complete Final Step ✓', 'Tandai Langkah Terakhir Selesai ✓')}
                               </button>
                             )}
@@ -907,7 +907,7 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
                 {pageDetail.videosOnPage && pageDetail.videosOnPage.length > 0 && (
                   <div className="rounded-xl border border-[#DFD2BC] bg-[#FAF4E8] p-3.5 space-y-2">
                     <p className="text-xs font-black text-[#1C1611]">
-                      {wbPick(`Video Notes for Page ${clampedPage}:`, `Catatan Video Pembahasan Halaman ${clampedPage}:`)}
+                      {wbFmt('Video Notes for Page {page}:', 'Catatan Video Pembahasan Halaman {page}:', undefined, { page: clampedPage })}
                     </p>
                     {pageDetail.videosOnPage.map((vid) => (
                       <div key={vid.videoId} className="rounded-lg bg-white border border-[#E6DAC5] p-2.5 text-xs space-y-1">
@@ -930,10 +930,12 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
             <div className="space-y-2.5">
               <h5 className="text-xs font-black uppercase tracking-wider text-[#6B5A48]">
                 {searchResult && searchResult.mode === 'search' && searchResult.matchedKotoba.length > 0
-                  ? wbPick(`Matching Vocabulary (${searchResult.matchedKotoba.length})`, `Kosakata Cocok Pencarian (${searchResult.matchedKotoba.length})`)
-                  : wbPick(
-                      `Key Vocabulary on Page ${clampedPage} (${pageDetail.mode === 'exact_page' ? pageDetail.kotobaOnPage.length : 0})`,
-                      `Kosakata Penting di Halaman ${clampedPage} (${pageDetail.mode === 'exact_page' ? pageDetail.kotobaOnPage.length : 0})`
+                  ? wbFmt('Matching Vocabulary ({count})', 'Kosakata Cocok Pencarian ({count})', undefined, { count: searchResult.matchedKotoba.length })
+                  : wbFmt(
+                      'Key Vocabulary on Page {page} ({count})',
+                      'Kosakata Penting di Halaman {page} ({count})',
+                      undefined,
+                      { page: clampedPage, count: pageDetail.mode === 'exact_page' ? pageDetail.kotobaOnPage.length : 0 }
                     )}
               </h5>
 
@@ -975,7 +977,7 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
                             </p>
                             <p className="text-[13px] font-semibold text-[#2F261D]">{k.meaningId}</p>
                             <span className="inline-block text-[10.5px] font-bold px-2 py-0.5 rounded bg-[#F5EDE0] text-[#5B4B3A]">
-                              {k.category} | Hal. {k.pdfPage}
+                              {k.category} | {wbPick('p.', 'Hal.')} {k.pdfPage}
                             </span>
                           </div>
                           <button
@@ -987,7 +989,7 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
                                 : 'bg-[#FAF4E8] border-[#D8CAB3] text-[#4E4032] hover:bg-[#EFE6D5]'
                             }`}
                           >
-                            {isMastered ? 'Hafal ✓' : 'Tandai Hafal'}
+                            {isMastered ? wbPick('Mastered ✓', 'Hafal ✓') : wbPick('Mark Mastered', 'Tandai Hafal')}
                           </button>
                         </div>
                       );
@@ -1010,7 +1012,7 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
                 onClick={() => onDrawQuiz('cbt')}
                 className="px-3.5 py-2 rounded-xl bg-[#8C2233] hover:bg-[#741A29] text-white text-xs font-extrabold shadow-sm cursor-pointer"
               >
-                Soal Cerita Ujian
+                {wbPick('Exam Case Quiz', 'Soal Cerita Ujian')}
               </button>
               <button
                 type="button"
@@ -1018,7 +1020,7 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
                 onClick={() => onDrawQuiz('math')}
                 className="px-3.5 py-2 rounded-xl bg-[#1C1611] hover:bg-[#332920] text-white text-xs font-extrabold cursor-pointer"
               >
-                Latihan Hitungan
+                {wbPick('Calculation Drill', 'Latihan Hitungan')}
               </button>
               <button
                 type="button"
@@ -1026,7 +1028,7 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
                 onClick={() => onDrawQuiz('trap')}
                 className="px-3.5 py-2 rounded-xl border border-[#8C2233] text-[#8C2233] hover:bg-[#8C2233]/10 text-xs font-extrabold cursor-pointer"
               >
-                Soal Jebakan Ujian
+                {wbPick('Exam Trap Quiz', 'Soal Jebakan Ujian')}
               </button>
               <button
                 type="button"
@@ -1060,7 +1062,7 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
                         }}
                         className="text-xs font-bold text-[#8C2233] hover:underline cursor-pointer"
                       >
-                        Hal. {mf.pdfPage}
+                        {wbPick('p.', 'Hal.')} {mf.pdfPage}
                       </button>
                     </div>
                     <p className="text-xs font-mono font-bold text-[#8C2233]">{mf.formula}</p>
@@ -1079,14 +1081,14 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="px-2.5 py-0.5 rounded-full bg-[#8C2233] text-white text-[11px] font-black">
-                      Soal #{drawnQuiz.n} ({drawnQuiz.quizId})
+                      {wbPick('Question', 'Soal')} #{drawnQuiz.n} ({drawnQuiz.quizId})
                     </span>
                     <span className="px-2.5 py-0.5 rounded-full bg-[#EFE6D5] text-[#4E4032] text-[11px] font-extrabold">
                       {drawnQuiz.tag}
                     </span>
                   </div>
                   <span className="text-xs font-bold text-[#6B5A48]">
-                    Tryout Hal. {drawnQuiz.tryoutPdfPage} | Pembahasan Hal. {drawnQuiz.discussionPdfPage}
+                    {wbPick('Tryout p.', 'Tryout Hal.')} {drawnQuiz.tryoutPdfPage} | {wbPick('Review p.', 'Pembahasan Hal.')} {drawnQuiz.discussionPdfPage}
                   </span>
                 </div>
 
@@ -1203,14 +1205,14 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
                         }}
                         className="px-3.5 py-2 rounded-xl bg-[#1C1611] hover:bg-[#332920] text-white text-xs font-extrabold cursor-pointer"
                       >
-                        Lihat Penjelasan di Hal. {latestGrade.discussionPdfPage}
+                        {wbFmt('View Explanation on p. {page}', 'Lihat Penjelasan di Hal. {page}', undefined, undefined, { page: latestGrade.discussionPdfPage })}
                       </button>
                       <button
                         type="button"
                         onClick={() => onDrawQuiz((drawnQuiz.mode as SswQuizDrawMode) || 'mixed')}
                         className="px-3.5 py-2 rounded-xl bg-[#8C2233] hover:bg-[#741A29] text-white text-xs font-extrabold cursor-pointer"
                       >
-                        Soal Berikutnya -&gt;
+                        {wbPick('Next Question ->', 'Soal Berikutnya ->')}
                       </button>
                     </div>
                   </div>
@@ -1219,17 +1221,17 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
             ) : (
               <div className="rounded-2xl border border-dashed border-[#D8CAB3] bg-white p-6 text-center space-y-3">
                 <p className="text-[15px] font-black text-[#1C1611]">
-                  Siap Coba Latihan Soal SSW Pengolahan Makanan?
+                  {wbPick('Ready to Try SSW Food Processing Practice Quiz?', 'Siap Coba Latihan Soal SSW Pengolahan Makanan?')}
                 </p>
                 <p className="text-[13px] text-[#6B5A48] max-w-lg mx-auto leading-relaxed">
-                  Pilih jenis latihan di atas atau minta Sensei lewat suara. Setiap soal dilengkapi pembahasan sederhana dan halaman materi terkait.
+                  {wbPick('Choose a practice type above or ask Sensei by voice. Every question includes a clear explanation and study page reference.', 'Pilih jenis latihan di atas atau minta Sensei lewat suara. Setiap soal dilengkapi pembahasan sederhana dan halaman materi terkait.')}
                 </p>
                 <button
                   type="button"
                   onClick={() => onDrawQuiz('mixed')}
                   className="px-4 py-2.5 rounded-xl bg-[#8C2233] text-white text-xs sm:text-[13px] font-extrabold cursor-pointer"
                 >
-                  Mulai 1 Soal Sekarang
+                  {wbPick('Start 1 Question Now', 'Mulai 1 Soal Sekarang')}
                 </button>
               </div>
             )}

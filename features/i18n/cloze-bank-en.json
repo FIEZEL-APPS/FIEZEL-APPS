@@ -2483,7 +2483,7 @@
       "distractors": {
         "drinks always": {
           "whyFails": "English rejects an adverb of frequency between the verb and its object; 'drinks always tea' mirrors 'minum selalu teh', not English order.",
-          "misconception": "moves the adverb between the verb and its object, copying Indonesian word order"
+          "misconception": "moves the adverb between the verb and its direct object, splitting the verb from its object"
         },
         "always drink": {
           "whyFails": "The subject 'my sister' is third-person singular, so the verb must be 'drinks'; the bare form drops obligatory agreement.",
@@ -2498,14 +2498,14 @@
     "A1-020-cz0": {
       "explain": {
         "why": "The possessive mark attaches to the owner's name: “Sinta's bag” means the bag belongs to Sinta.",
-        "rule": "In English, expressing possession CANNOT be done by simply joining two words like in Indonesian (incorrect: <i>Sinta bag</i> ❌ or <i>Sinta her bag</i> ❌).<br>If the owner is singular: Add an apostrophe and s (<b>'s</b>) to the owner's name before the item owned. Example: <b>Sinta's bag</b>, <b>my father's car</b>.<br>If the owner is plural and already ends in -s: Simply add an apostrophe at the very end (<b>s'</b>). Example: <b>the students' books</b>.<br><br>💡 <b>QUICK RULE</b>:<br>Singular owner ➡️ Add <b>'s</b> to the owner's name (e.g., <i>Budi's phone</i>).<br>Plural owner ending in -s ➡️ Just add an apostrophe at the end <b>-s'</b> (e.g., <i>the teachers' room</i>).<br>Prohibited ➡️ Do not attach names directly (<i>Budi phone</i> ❌) or double up pronouns (<i>Budi his phone</i> ❌).",
+        "rule": "In English, expressing possession CANNOT be done by simply placing two nouns side by side or doubling up with a possessive pronoun (incorrect: <i>Sinta bag</i> ❌ or <i>Sinta her bag</i> ❌).<br>If the owner is singular: Add an apostrophe and s (<b>'s</b>) to the owner's name before the item owned. Example: <b>Sinta's bag</b>, <b>my father's car</b>.<br>If the owner is plural and already ends in -s: Simply add an apostrophe at the very end (<b>s'</b>). Example: <b>the students' books</b>.<br><br>💡 <b>QUICK RULE</b>:<br>Singular owner ➡️ Add <b>'s</b> to the owner's name (e.g., <i>Budi's phone</i>).<br>Plural owner ending in -s ➡️ Just add an apostrophe at the end <b>-s'</b> (e.g., <i>the teachers' room</i>).<br>Prohibited ➡️ Do not attach names directly (<i>Budi phone</i> ❌) or double up pronouns (<i>Budi his phone</i> ❌).",
         "memory": "Owner + apostrophe s + item: “Sinta's bag”.",
         "avoid": "Ask who the owner is, add an apostrophe + s to that name, and remove any extra pronouns."
       },
       "distractors": {
         "Sinta": {
           "whyFails": "'Sinta bag' lines up a name and a noun with nothing to signal ownership; English needs 's on the owner.",
-          "misconception": "drops the marker of ownership entirely, lining up two nouns as Indonesian does"
+          "misconception": "drops the possessive marker entirely, placing two nouns side by side without 's"
         },
         "Sintas": {
           "whyFails": "Without the apostrophe, 'Sintas' reads as a plural of Sinta rather than something that belongs to her.",
@@ -2549,7 +2549,7 @@
       "distractors": {
         "hates get": {
           "whyFails": "'Hates get' chains two verbs with no connector, mirroring 'benci bangun'; after 'hates' the activity needs -ing.",
-          "misconception": "following the feeling verb with a bare infinitive, chaining verbs directly as Indonesian does"
+          "misconception": "following the feeling verb with a bare infinitive, chaining two verbs directly without a gerund or 'to'"
         },
         "hates to getting": {
           "whyFails": "'To getting' welds two different patterns together and belongs to neither; pick 'to get' or 'getting', never both.",
@@ -3446,7 +3446,7 @@
         "why": "“Coffee” here is a substance that is not counted individually. The comparative form for such items is “less”: drink less coffee.",
         "rule": "“Less” + uncountable nouns, like “less coffee” or “less time”. “Fewer” + countable plural nouns, like “fewer cups”. Do not mix them up.",
         "memory": "Observe the object: use the 'less' marker for uncountable objects, and the separate marker for countable plural objects.",
-        "avoid": "Test the noun: can you say \"satu kopi, dua kopi\" in this sense? For a liquid substance, you cannot, so use \"less\"."
+        "avoid": "Test the noun: can you say \"one coffee, two coffees\" in this sense? For a liquid substance, you cannot, so use \"less\"."
       },
       "distractors": {
         "fewer": {
@@ -3631,7 +3631,7 @@
         },
         "for": {
           "whyFails": "English does not allow 'for + bare verb' for purpose; 'for' takes a noun or gerund, and the infinitive slot here belongs to 'in order to' or plain 'to'.",
-          "misconception": "puts 'for' directly before a bare verb to express purpose, transferring Indonesian 'untuk'"
+          "misconception": "puts 'for' directly before a bare verb to express purpose instead of using 'to' + base verb"
         },
         "in order that": {
           "whyFails": "'In order that' is the formal clause version and needs a subject plus verb after it ('in order that he could...'); before the bare 'catch' it collapses.",
@@ -4137,7 +4137,7 @@
         },
         "with careful": {
           "whyFails": "'With careful' puts a bare adjective after 'with'; English needs the adverb 'carefully' in this slot, because 'with' can only take a noun after it.",
-          "misconception": "builds the manner phrase as 'with' plus a bare adjective, copying Indonesian 'dengan hati-hati'"
+          "misconception": "builds the manner phrase as 'with' plus a bare adjective instead of an -ly adverb"
         },
         "more careful": {
           "whyFails": "'More careful' is a comparative adjective, but the sentence compares nothing and the slot after 'carry' needs a manner adverb.",
@@ -4295,7 +4295,7 @@
         },
         "will stop": {
           "whyFails": "'Wish' does not combine with 'will': English uses 'hope + will' for realistic expectations and 'wish + would' for complaints, so 'wish he will stop' is not a valid frame.",
-          "misconception": "puts future 'will' after 'wish', calquing Indonesian 'akan'"
+          "misconception": "puts future 'will' after 'wish' instead of using the past tense or 'would' form required in wish clauses"
         }
       }
     },
@@ -4375,7 +4375,7 @@
       "distractors": {
         "repairs": {
           "whyFails": "'It's high time the council repairs' uses the real present, but this idiom requires the unreal past simple even though the meaning is about now.",
-          "misconception": "keeps a present-tense verb after 'it's high time', calquing 'sudah waktunya' plus a present verb"
+          "misconception": "keeps a present-tense verb after 'it's high time', calquing 'it's already time' plus a present verb"
         },
         "will repair": {
           "whyFails": "'It's high time the council will repair' adds a future marker the idiom never allows; the overdue-now meaning is carried by the past form 'repaired'.",
@@ -4533,7 +4533,7 @@
         },
         "not dare": {
           "whyFails": "English negation needs a finite operator: modal 'daren't' or do-support in 'doesn't dare'. 'She not dare tell' has neither, so the clause has no working verb form.",
-          "misconception": "negates 'dare' with bare 'not' and no operator, copying Indonesian 'tidak berani'"
+          "misconception": "negates 'dare' with bare 'not' and no auxiliary operator instead of using 'do/does/did not dare' or modal 'dare not'"
         },
         "isn't dare": {
           "whyFails": "'Dare' is a verb, not an adjective, so 'be' cannot negate it; the grammatical negatives are 'daren't tell' or 'doesn't dare (to) tell'.",
@@ -4621,7 +4621,7 @@
         },
         "No wanting": {
           "whyFails": "'No' negates nouns ('no time', 'no money'); a participle clause is negated with 'not', so 'No wanting' is ungrammatical.",
-          "misconception": "translates Indonesian 'tidak' as 'no' to negate a participle"
+          "misconception": "uses 'no' instead of 'not' to negate a participle"
         },
         "Didn't want": {
           "whyFails": "'Didn't want' is a finite verb that needs its own subject and cannot hang in front of the main clause; the adjunct slot only accepts a participle like 'Not wanting'.",
@@ -4764,14 +4764,14 @@
     "A1-207-cz0": {
       "explain": {
         "why": "The car belongs to one person, my father, so the owner gets an 's: my father's car.",
-        "rule": "In English, expressing possession CANNOT be done by simply joining two words like in Indonesian (incorrect: <i>Sinta bag</i> ❌ or <i>Sinta her bag</i> ❌).<br>If the owner is singular: Add an apostrophe and s (<b>'s</b>) to the owner's name before the item owned. Example: <b>Sinta's bag</b>, <b>my father's car</b>.<br>If the owner is plural and already ends in -s: Simply add an apostrophe at the very end (<b>s'</b>). Example: <b>the students' books</b>.<br><br>💡 <b>QUICK RULE</b>:<br>Singular owner ➡️ Add <b>'s</b> to the owner's name (e.g., <i>Budi's phone</i>).<br>Plural owner ending in -s ➡️ Just add an apostrophe at the end <b>-s'</b> (e.g., <i>the teachers' room</i>).<br>Prohibited ➡️ Do not attach names directly (<i>Budi phone</i> ❌) or double up pronouns (<i>Budi his phone</i> ❌).",
+        "rule": "In English, expressing possession CANNOT be done by simply placing two nouns side by side or doubling up with a possessive pronoun (incorrect: <i>Sinta bag</i> ❌ or <i>Sinta her bag</i> ❌).<br>If the owner is singular: Add an apostrophe and s (<b>'s</b>) to the owner's name before the item owned. Example: <b>Sinta's bag</b>, <b>my father's car</b>.<br>If the owner is plural and already ends in -s: Simply add an apostrophe at the very end (<b>s'</b>). Example: <b>the students' books</b>.<br><br>💡 <b>QUICK RULE</b>:<br>Singular owner ➡️ Add <b>'s</b> to the owner's name (e.g., <i>Budi's phone</i>).<br>Plural owner ending in -s ➡️ Just add an apostrophe at the end <b>-s'</b> (e.g., <i>the teachers' room</i>).<br>Prohibited ➡️ Do not attach names directly (<i>Budi phone</i> ❌) or double up pronouns (<i>Budi his phone</i> ❌).",
         "memory": "Note personal possession: state the name of the owner followed by the possessive marker before the name of the object owned.",
         "avoid": "Who is the owner? Put 's directly after that person, then the item."
       },
       "distractors": {
         "father": {
           "whyFails": "'My father car' puts two nouns side by side with no sign of ownership.",
-          "misconception": "drops the marker of ownership entirely, lining up two nouns as Indonesian does"
+          "misconception": "drops the possessive marker entirely, placing two nouns side by side without 's"
         },
         "fathers": {
           "whyFails": "'Fathers' means more than one father; ownership needs the apostrophe: father's.",
@@ -4815,7 +4815,7 @@
       "distractors": {
         "listen": {
           "whyFails": "Two verbs cannot sit side by side; after 'enjoy' the second verb needs -ing.",
-          "misconception": "following the feeling verb with a bare infinitive, chaining verbs directly as Indonesian does"
+          "misconception": "following the feeling verb with a bare infinitive, chaining two verbs directly without a gerund or 'to'"
         },
         "to listen": {
           "whyFails": "'Enjoy' never takes 'to'; it is always followed by -ing.",
@@ -5879,7 +5879,7 @@
         },
         "will turn": {
           "whyFails": "'Will' never follows 'wish'; the form is 'would'.",
-          "misconception": "puts future 'will' after 'wish', calquing Indonesian 'akan'"
+          "misconception": "puts future 'will' after 'wish' instead of using the past tense or 'would' form required in wish clauses"
         }
       }
     },
@@ -5959,7 +5959,7 @@
       "distractors": {
         "go": {
           "whyFails": "After 'it's time + subject', the verb takes the unreal past, not the present.",
-          "misconception": "keeps a present-tense verb after 'it's high time', calquing 'sudah waktunya' plus a present verb"
+          "misconception": "keeps a present-tense verb after 'it's high time', calquing 'it's already time' plus a present verb"
         },
         "will go": {
           "whyFails": "'Will' does not follow 'it's time we'; the fixed form is past simple.",
@@ -7279,7 +7279,7 @@
       "distractors": {
         "brush always": {
           "whyFails": "It puts always after the verb, but it belongs before it.",
-          "misconception": "moves the adverb between the verb and its object, copying Indonesian word order"
+          "misconception": "moves the adverb between the verb and its direct object, splitting the verb from its object"
         },
         "always brushes": {
           "whyFails": "It adds -s, but 'I' never takes -s.",
@@ -7323,7 +7323,7 @@
       "distractors": {
         "does never": {
           "whyFails": "It puts never after the verb, but it belongs before it.",
-          "misconception": "moves the adverb between the verb and its object, copying Indonesian word order"
+          "misconception": "moves the adverb between the verb and its direct object, splitting the verb from its object"
         },
         "never do": {
           "whyFails": "It forgets -s, but Budi is he.",
@@ -7360,14 +7360,14 @@
     "A2-309-cz0": {
       "explain": {
         "why": "The bowl belongs to the cat, a single owner, so \"cat\" takes 's.",
-        "rule": "In English, expressing possession CANNOT be done by simply joining two words like in Indonesian (incorrect: <i>Sinta bag</i> ❌ or <i>Sinta her bag</i> ❌).<br>If the owner is singular: Add an apostrophe and s (<b>'s</b>) to the owner's name before the item owned. Example: <b>Sinta's bag</b>, <b>my father's car</b>.<br>If the owner is plural and already ends in -s: Simply add an apostrophe at the very end (<b>s'</b>). Example: <b>the students' books</b>.<br><br>💡 <b>QUICK RULE</b>:<br>Singular owner ➡️ Add <b>'s</b> to the owner's name (e.g., <i>Budi's phone</i>).<br>Plural owner ending in -s ➡️ Just add an apostrophe at the end <b>-s'</b> (e.g., <i>the teachers' room</i>).<br>Prohibited ➡️ Do not attach names directly (<i>Budi phone</i> ❌) or double up pronouns (<i>Budi his phone</i> ❌).",
+        "rule": "In English, expressing possession CANNOT be done by simply placing two nouns side by side or doubling up with a possessive pronoun (incorrect: <i>Sinta bag</i> ❌ or <i>Sinta her bag</i> ❌).<br>If the owner is singular: Add an apostrophe and s (<b>'s</b>) to the owner's name before the item owned. Example: <b>Sinta's bag</b>, <b>my father's car</b>.<br>If the owner is plural and already ends in -s: Simply add an apostrophe at the very end (<b>s'</b>). Example: <b>the students' books</b>.<br><br>💡 <b>QUICK RULE</b>:<br>Singular owner ➡️ Add <b>'s</b> to the owner's name (e.g., <i>Budi's phone</i>).<br>Plural owner ending in -s ➡️ Just add an apostrophe at the end <b>-s'</b> (e.g., <i>the teachers' room</i>).<br>Prohibited ➡️ Do not attach names directly (<i>Budi phone</i> ❌) or double up pronouns (<i>Budi his phone</i> ❌).",
         "memory": "Pay attention to the owner: attach the possession marker to the owner's name before mentioning the item they own.",
         "avoid": "Find the owner first. Single owner? Add 's. More than one and ending in s? Simply add an apostrophe."
       },
       "distractors": {
         "cat": {
           "whyFails": "It has no owner marker, so it reads like two nouns stuck together.",
-          "misconception": "drops the marker of ownership entirely, lining up two nouns as Indonesian does"
+          "misconception": "drops the possessive marker entirely, placing two nouns side by side without 's"
         },
         "cats": {
           "whyFails": "Without an apostrophe it looks like 'many cats', not the owner.",
@@ -7382,7 +7382,7 @@
     "A2-310-cz0": {
       "explain": {
         "why": "\"Two brothers\" is plural and already ends in s, so simply add an apostrophe after the letter s.",
-        "rule": "In English, expressing possession CANNOT be done by simply joining two words like in Indonesian (incorrect: <i>Sinta bag</i> ❌ or <i>Sinta her bag</i> ❌).<br>If the owner is singular: Add an apostrophe and s (<b>'s</b>) to the owner's name before the item owned. Example: <b>Sinta's bag</b>, <b>my father's car</b>.<br>If the owner is plural and already ends in -s: Simply add an apostrophe at the very end (<b>s'</b>). Example: <b>the students' books</b>.<br><br>💡 <b>QUICK RULE</b>:<br>Singular owner ➡️ Add <b>'s</b> to the owner's name (e.g., <i>Budi's phone</i>).<br>Plural owner ending in -s ➡️ Just add an apostrophe at the end <b>-s'</b> (e.g., <i>the teachers' room</i>).<br>Prohibited ➡️ Do not attach names directly (<i>Budi phone</i> ❌) or double up pronouns (<i>Budi his phone</i> ❌).",
+        "rule": "In English, expressing possession CANNOT be done by simply placing two nouns side by side or doubling up with a possessive pronoun (incorrect: <i>Sinta bag</i> ❌ or <i>Sinta her bag</i> ❌).<br>If the owner is singular: Add an apostrophe and s (<b>'s</b>) to the owner's name before the item owned. Example: <b>Sinta's bag</b>, <b>my father's car</b>.<br>If the owner is plural and already ends in -s: Simply add an apostrophe at the very end (<b>s'</b>). Example: <b>the students' books</b>.<br><br>💡 <b>QUICK RULE</b>:<br>Singular owner ➡️ Add <b>'s</b> to the owner's name (e.g., <i>Budi's phone</i>).<br>Plural owner ending in -s ➡️ Just add an apostrophe at the end <b>-s'</b> (e.g., <i>the teachers' room</i>).<br>Prohibited ➡️ Do not attach names directly (<i>Budi phone</i> ❌) or double up pronouns (<i>Budi his phone</i> ❌).",
         "memory": "Plural owners ending in s only need an apostrophe added.",
         "avoid": "Find the owner first. Single owner? Add 's. More than one and ending in s? Simply add an apostrophe."
       },
@@ -7393,7 +7393,7 @@
         },
         "brother": {
           "whyFails": "It has no plural -s and no apostrophe, so it doesn't show two owners.",
-          "misconception": "drops the marker of ownership entirely, lining up two nouns as Indonesian does"
+          "misconception": "drops the possessive marker entirely, placing two nouns side by side without 's"
         },
         "brothers's": {
           "whyFails": "It adds another s; after a plural s, the apostrophe alone is enough.",
@@ -7404,7 +7404,7 @@
     "A2-311-cz0": {
       "explain": {
         "why": "\"Children\" is already plural but does not end in s, so it still takes 's.",
-        "rule": "In English, expressing possession CANNOT be done by simply joining two words like in Indonesian (incorrect: <i>Sinta bag</i> ❌ or <i>Sinta her bag</i> ❌).<br>If the owner is singular: Add an apostrophe and s (<b>'s</b>) to the owner's name before the item owned. Example: <b>Sinta's bag</b>, <b>my father's car</b>.<br>If the owner is plural and already ends in -s: Simply add an apostrophe at the very end (<b>s'</b>). Example: <b>the students' books</b>.<br><br>💡 <b>QUICK RULE</b>:<br>Singular owner ➡️ Add <b>'s</b> to the owner's name (e.g., <i>Budi's phone</i>).<br>Plural owner ending in -s ➡️ Just add an apostrophe at the end <b>-s'</b> (e.g., <i>the teachers' room</i>).<br>Prohibited ➡️ Do not attach names directly (<i>Budi phone</i> ❌) or double up pronouns (<i>Budi his phone</i> ❌).",
+        "rule": "In English, expressing possession CANNOT be done by simply placing two nouns side by side or doubling up with a possessive pronoun (incorrect: <i>Sinta bag</i> ❌ or <i>Sinta her bag</i> ❌).<br>If the owner is singular: Add an apostrophe and s (<b>'s</b>) to the owner's name before the item owned. Example: <b>Sinta's bag</b>, <b>my father's car</b>.<br>If the owner is plural and already ends in -s: Simply add an apostrophe at the very end (<b>s'</b>). Example: <b>the students' books</b>.<br><br>💡 <b>QUICK RULE</b>:<br>Singular owner ➡️ Add <b>'s</b> to the owner's name (e.g., <i>Budi's phone</i>).<br>Plural owner ending in -s ➡️ Just add an apostrophe at the end <b>-s'</b> (e.g., <i>the teachers' room</i>).<br>Prohibited ➡️ Do not attach names directly (<i>Budi phone</i> ❌) or double up pronouns (<i>Budi his phone</i> ❌).",
         "memory": "Pay attention to the owner: attach the possession marker to the owner's name before mentioning the item they own.",
         "avoid": "Find the owner first. Single owner? Add 's. More than one and ending in s? Simply add an apostrophe."
       },
@@ -7415,7 +7415,7 @@
         },
         "children": {
           "whyFails": "It has no owner marker, so we cannot tell whose toys they are.",
-          "misconception": "drops the marker of ownership entirely, lining up two nouns as Indonesian does"
+          "misconception": "drops the possessive marker entirely, placing two nouns side by side without 's"
         },
         "childs'": {
           "whyFails": "It is not a real word; the plural of child is children.",
@@ -7426,7 +7426,7 @@
     "A2-312-cz0": {
       "explain": {
         "why": "The answer mentions the owner, Maya, so her name takes 's even though there is no noun after it.",
-        "rule": "In English, expressing possession CANNOT be done by simply joining two words like in Indonesian (incorrect: <i>Sinta bag</i> ❌ or <i>Sinta her bag</i> ❌).<br>If the owner is singular: Add an apostrophe and s (<b>'s</b>) to the owner's name before the item owned. Example: <b>Sinta's bag</b>, <b>my father's car</b>.<br>If the owner is plural and already ends in -s: Simply add an apostrophe at the very end (<b>s'</b>). Example: <b>the students' books</b>.<br><br>💡 <b>QUICK RULE</b>:<br>Singular owner ➡️ Add <b>'s</b> to the owner's name (e.g., <i>Budi's phone</i>).<br>Plural owner ending in -s ➡️ Just add an apostrophe at the end <b>-s'</b> (e.g., <i>the teachers' room</i>).<br>Prohibited ➡️ Do not attach names directly (<i>Budi phone</i> ❌) or double up pronouns (<i>Budi his phone</i> ❌).",
+        "rule": "In English, expressing possession CANNOT be done by simply placing two nouns side by side or doubling up with a possessive pronoun (incorrect: <i>Sinta bag</i> ❌ or <i>Sinta her bag</i> ❌).<br>If the owner is singular: Add an apostrophe and s (<b>'s</b>) to the owner's name before the item owned. Example: <b>Sinta's bag</b>, <b>my father's car</b>.<br>If the owner is plural and already ends in -s: Simply add an apostrophe at the very end (<b>s'</b>). Example: <b>the students' books</b>.<br><br>💡 <b>QUICK RULE</b>:<br>Singular owner ➡️ Add <b>'s</b> to the owner's name (e.g., <i>Budi's phone</i>).<br>Plural owner ending in -s ➡️ Just add an apostrophe at the end <b>-s'</b> (e.g., <i>the teachers' room</i>).<br>Prohibited ➡️ Do not attach names directly (<i>Budi phone</i> ❌) or double up pronouns (<i>Budi his phone</i> ❌).",
         "memory": "Pay attention to people's name possession markers: add the possession mark to the person's name before mentioning their belongings.",
         "avoid": "Find the owner first. Single owner? Add 's. More than one and ending in s? Simply add an apostrophe."
       },
@@ -7543,7 +7543,7 @@
       "distractors": {
         "swim": {
           "whyFails": "It has no -ing, but after loves the verb needs it.",
-          "misconception": "following the feeling verb with a bare infinitive, chaining verbs directly as Indonesian does"
+          "misconception": "following the feeling verb with a bare infinitive, chaining two verbs directly without a gerund or 'to'"
         },
         "swiming": {
           "whyFails": "It forgets to double the m before -ing.",
@@ -7565,7 +7565,7 @@
       "distractors": {
         "wait": {
           "whyFails": "It has no -ing, but after hates the verb needs it.",
-          "misconception": "following the feeling verb with a bare infinitive, chaining verbs directly as Indonesian does"
+          "misconception": "following the feeling verb with a bare infinitive, chaining two verbs directly without a gerund or 'to'"
         },
         "waits": {
           "whyFails": "It adds -s, but hates already has the -s and the second verb needs -ing.",
@@ -7591,7 +7591,7 @@
         },
         "dance": {
           "whyFails": "It has no -ing, but after loves the verb needs it.",
-          "misconception": "following the feeling verb with a bare infinitive, chaining verbs directly as Indonesian does"
+          "misconception": "following the feeling verb with a bare infinitive, chaining two verbs directly without a gerund or 'to'"
         },
         "to dancing": {
           "whyFails": "It mixes to with -ing in one form.",
@@ -7609,7 +7609,7 @@
       "distractors": {
         "do": {
           "whyFails": "It has no -ing, but after enjoy the verb needs it.",
-          "misconception": "following the feeling verb with a bare infinitive, chaining verbs directly as Indonesian does"
+          "misconception": "following the feeling verb with a bare infinitive, chaining two verbs directly without a gerund or 'to'"
         },
         "to do": {
           "whyFails": "It uses to, but enjoy is never followed by to.",
@@ -8250,7 +8250,7 @@
           "misconception": "mixes the equality frame 'as ... as' with comparative 'than'"
         },
         "as fast like": {
-          "whyFails": "It closes the frame with like (seperti), but as … as must close with as.",
+          "whyFails": "It closes the frame with like, but as … as must close with as.",
           "misconception": "like used to close an as ... as comparison"
         },
         "faster as": {
@@ -8444,7 +8444,7 @@
       },
       "distractors": {
         "the same with": {
-          "whyFails": "It copies 'sama dengan'; after same, English uses as.",
+          "whyFails": "It pairs 'same' with the wrong preposition; after 'same', English uses 'as'.",
           "misconception": "same followed by with instead of as"
         },
         "same as": {
@@ -9222,8 +9222,8 @@
           "misconception": "noun used where an adverb is needed"
         },
         "with beautiful": {
-          "whyFails": "It copies 'dengan indah'; English uses one word with -ly.",
-          "misconception": "builds the manner phrase as 'with' plus a bare adjective, copying Indonesian 'dengan hati-hati'"
+          "whyFails": "It uses 'with' plus an adjective instead of a manner adverb; English uses one word with -ly.",
+          "misconception": "builds the manner phrase as 'with' plus a bare adjective instead of an -ly adverb"
         }
       }
     },

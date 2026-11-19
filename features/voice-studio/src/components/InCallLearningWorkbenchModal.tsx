@@ -54,6 +54,7 @@ import {
   subscribeKanjiVgUpdates,
 } from '../data/kakijunStrokeBank';
 import { sanitizeSpokenTextForClassicTts, synthesizeFlexibleTts } from '../lib/liveTransport';
+import { wbPick, wbFmt } from '../lib/i18n';
 import {
   alignWordsToSpeech,
   locateWordAt,
@@ -338,18 +339,17 @@ export interface WorkbenchPracticeCheckResult {
 }
 
 /** Helper lokalisasi, tokenisasi CJK & antarmuka papan belajar dari main. */
-function normalizeWbLocale(locale?: LearnerLocale): 'th' | 'ja' | 'zh' | 'id' | 'en' {
+function normalizeWbLocale(locale?: LearnerLocale): string {
   const code = String(locale || 'id').toLowerCase().split(/[-_]/)[0];
-  if (code === 'th' || code === 'ja' || code === 'zh' || code === 'id') return code;
+  if (code === 'id' || code === 'th' || code === 'en' || code === 'ja' || code === 'zh' || code === 'ms' || code === 'vi' || code === 'fil' || code === 'km' || code === 'ru') return code;
   return 'en';
 }
 
 function wbT(locale: LearnerLocale | undefined, en: string, id: string, th?: string, ja?: string): string {
   const loc = normalizeWbLocale(locale);
   if (loc === 'id') return id;
-  if (loc === 'th' && th) return th;
   if (loc === 'ja' && ja) return ja;
-  return en;
+  return wbPick(en, id, th, loc);
 }
 
 function isTargetSentenceForRuby(text: string, targetLang: TargetLang): boolean {
@@ -657,8 +657,13 @@ export function deriveContextualPedagogicalBoard(
 ): DynamicBoardState {
   const query = (action?.topicTitle || rawQuery || '').trim();
   const lowerQ = query.toLowerCase();
-  const ui = getWorkbenchUiStrings(locale);
+  const rawUi = getWorkbenchUiStrings(locale);
   const loc = normalizeWbLocale(locale);
+  const ui = ['id', 'th', 'ja', 'zh', 'en'].includes(loc)
+    ? rawUi
+    : Object.fromEntries(
+        Object.entries(rawUi).map(([k, v]) => [k, typeof v === 'string' ? wbPick(v, v, v, loc) : v])
+      ) as typeof rawUi;
   const combinedHintText = `${query} ${action?.sampleTarget || ''} ${action?.wrongWord || ''} ${action?.rightWord || ''} ${action?.patternFormula || ''}`;
   const effectiveLang: TargetLang =
     targetLang === 'ja' || /[\u3040-\u30ff]/.test(combinedHintText)
@@ -671,7 +676,7 @@ export function deriveContextualPedagogicalBoard(
     if (loc === 'th') return thText;
     if (loc === 'ja' && jaText) return jaText;
     if (loc === 'zh' && zhText) return zhText;
-    return enText || thText;
+    return wbPick(enText || thText, idText, thText, loc);
   };
   const isId = loc === 'id';
 
@@ -688,15 +693,19 @@ export function deriveContextualPedagogicalBoard(
       ? Math.max(1, Math.min(SSW_MASTER_KB.meta.totalPdfPages || 91, parseInt(pageMatch[1], 10)))
       : cursor.page || 1;
     const plan = getStructuredPagePlan(targetPageNum);
-    const pageTitle = plan.pageObj?.title || (isId ? `Halaman ${plan.targetPage}` : `Page ${plan.targetPage}`);
+    const pageTitle = plan.pageObj?.title || wbFmt('Page {page}', 'Halaman {page}', undefined, { page: plan.targetPage }, loc);
 
     return {
       contextMode: 'ssw_tactical_board',
       focusType: 'ssw_tactical_board',
-      topicTitle: `${isId ? 'Hal.' : 'Page'} ${plan.targetPage}: ${pageTitle}`,
-      patternFormula: isId
-        ? `Hal. ${plan.targetPage} · Langkah ${plan.activeStepIndex} dari ${plan.steps.length}`
-        : `Page ${plan.targetPage} · Step ${plan.activeStepIndex} of ${plan.steps.length}`,
+      topicTitle: `${wbPick('Page', 'Hal.', undefined, loc)} ${plan.targetPage}: ${pageTitle}`,
+      patternFormula: wbFmt(
+        'Page {page} · Step {step} of {total}',
+        'Hal. {page} · Langkah {step} dari {total}',
+        undefined,
+        { page: plan.targetPage, step: plan.activeStepIndex, total: plan.steps.length },
+        loc
+      ),
       coachExplanation: '',
       sswTacticalData: {
         pageNumber: plan.targetPage,
@@ -704,13 +713,13 @@ export function deriveContextualPedagogicalBoard(
         requestedQuery: query,
       },
       quiz: {
-        prompt: isId ? 'Latihan cepat SSW tersedia di panel Papan Taktis di atas.' : 'Quick SSW practice is available in the Tactical Board panel above.',
+        prompt: wbPick('Quick SSW practice is available in the Tactical Board panel above.', 'Latihan cepat SSW tersedia di panel Papan Taktis di atas.', undefined, loc),
         options: [
-          { id: 'opt_1', text: isId ? 'Siap lanjut memahami materi' : 'Ready to continue lesson', isCorrect: true, feedback: isId ? 'Bagus!' : 'Great!' },
-          { id: 'opt_2', text: isId ? 'Perlu penjelasan tambahan' : 'Need extra explanation', isCorrect: false, feedback: isId ? 'Pilih langkah aktif di atas.' : 'Select an active step above.' },
+          { id: 'opt_1', text: wbPick('Ready to continue lesson', 'Siap lanjut memahami materi', undefined, loc), isCorrect: true, feedback: wbPick('Great!', 'Bagus!', undefined, loc) },
+          { id: 'opt_2', text: wbPick('Need extra explanation', 'Perlu penjelasan tambahan', undefined, loc), isCorrect: false, feedback: wbPick('Select an active step above.', 'Pilih langkah aktif di atas.', undefined, loc) },
         ],
         cloze: { prefix: '', blankWord: 'SSW', suffix: '', chips: ['SSW'], feedback: '' },
-        blocks: { correctOrder: ['SSW'], pool: ['SSW'], meaningId: isId ? 'SSW Pengolahan Makanan' : 'SSW Food Manufacturing', feedback: '' },
+        blocks: { correctOrder: ['SSW'], pool: ['SSW'], meaningId: wbPick('SSW Food Manufacturing', 'SSW Pengolahan Makanan', undefined, loc), feedback: '' },
       },
     };
   }
@@ -771,30 +780,33 @@ export function deriveContextualPedagogicalBoard(
       contextMode: 'pte_describe_image',
       topicTitle: pteChart.title,
       patternFormula: 'Universal Formula: Intro → Key Elements → Maximum → Minimum → Conclusion',
-      coachExplanation: isId
-        ? 'Kunci Describe Image adalah KELANCARAN MUTLAK. Jangan berhenti lebih dari 3 detik! Gunakan 5 kalimat sakti Fiezel tanpa ragu, biarkan intonasi terus mengalir santai tapi tegas.'
-        : 'The key to Describe Image is STEADY FLUENCY. Never pause longer than 3 seconds! Deliver the 5 structured Fiezel sentences smoothly with steady, confident intonation.',
+      coachExplanation: wbPick(
+        'The key to Describe Image is STEADY FLUENCY. Never pause longer than 3 seconds! Deliver the 5 structured Fiezel sentences smoothly with steady, confident intonation.',
+        'Kunci Describe Image adalah KELANCARAN MUTLAK. Jangan berhenti lebih dari 3 detik! Gunakan 5 kalimat sakti Fiezel tanpa ragu, biarkan intonasi terus mengalir santai tapi tegas.',
+        undefined,
+        loc
+      ),
       pteChartData: pteChart,
       quiz: {
-        prompt: isId ? `Pilih kalimat pembuka (Introduction) yang BENAR untuk ${targetQ.title}:` : `Choose the CORRECT opening sentence for ${targetQ.title}:`,
+        prompt: wbFmt('Choose the CORRECT opening sentence for {title}:', 'Pilih kalimat pembuka (Introduction) yang BENAR untuk {title}:', undefined, { title: targetQ.title }, loc),
         options: [
           {
             id: 'opt_1',
             text: targetQ.universalTemplate.intro,
             isCorrect: true,
-            feedback: isId ? 'Sempurna! Formula pembuka standar Pearson yang menjamin poin Fluency & Content.' : 'Perfect! A standard high-scoring opening structure covering Fluency and Content.',
+            feedback: wbPick('Perfect! A standard high-scoring opening structure covering Fluency and Content.', 'Sempurna! Formula pembuka standar Pearson yang menjamin poin Fluency & Content.', undefined, loc),
           },
           {
             id: 'opt_2',
             text: 'I see many colorful bars with numbers in this picture.',
             isCorrect: false,
-            feedback: isId ? 'Hindari bahasa kasual seperti "I see"! Gunakan kalimat akademik standar.' : 'Avoid casual phrasing like "I see"! Use standard academic register.',
+            feedback: wbPick('Avoid casual phrasing like "I see"! Use standard academic register.', 'Hindari bahasa kasual seperti "I see"! Gunakan kalimat akademik standar.', undefined, loc),
           },
           {
             id: 'opt_3',
             text: 'This image is talking about renewable energy maybe.',
             isCorrect: false,
-            feedback: isId ? 'Hindari kata ragu "maybe". Bersikaplah tegas dan percaya diri.' : 'Avoid hedging words like "maybe". Speak decisively and clearly.',
+            feedback: wbPick('Avoid hedging words like "maybe". Speak decisively and clearly.', 'Hindari kata ragu "maybe". Bersikaplah tegas dan percaya diri.', undefined, loc),
           },
         ],
         cloze: {
@@ -802,13 +814,13 @@ export function deriveContextualPedagogicalBoard(
           blankWord: 'maximum',
           suffix: 'figure can be clearly observed in this informative visual.',
           chips: ['maximum', 'huge', 'big', 'taller'],
-          feedback: isId ? 'Tepat! "maximum figure" adalah kolokasi akademik baku yang sangat disukai Pearson AI scorer.' : 'Spot on! "maximum figure" is an academic collocation valued in Pearson scoring.',
+          feedback: wbPick('Spot on! "maximum figure" is an academic collocation valued in Pearson scoring.', 'Tepat! "maximum figure" adalah kolokasi akademik baku yang sangat disukai Pearson AI scorer.', undefined, loc),
         },
         blocks: {
           correctOrder: ['The', 'given', 'image', 'provides', 'key', 'information', 'about', 'the', 'visual.'],
           pool: ['about', 'given', 'The', 'visual.', 'information', 'provides', 'key', 'image', 'the'],
-          meaningId: isId ? 'Susun kalimat pengantar standar Pearson Describe Image:' : 'Arrange the standard Pearson Describe Image opening sentence:',
-          feedback: isId ? 'Susunan kalimat pembuka tepat sempurna!' : 'Opening sentence ordered accurately!',
+          meaningId: wbPick('Arrange the standard Pearson Describe Image opening sentence:', 'Susun kalimat pengantar standar Pearson Describe Image:', undefined, loc),
+          feedback: wbPick('Opening sentence ordered accurately!', 'Susunan kalimat pembuka tepat sempurna!', undefined, loc),
         },
       },
     };
@@ -934,20 +946,23 @@ export function deriveContextualPedagogicalBoard(
         phoneticFocus: (cleanTokens.length > 0 ? cleanTokens : [passage]).slice(0, 3).map((word) => ({
           word,
           ipa: resolveUnifiedPronunciation(word, effectiveLang, undefined, loc) || word,
-          tip: lt('Baca utuh dengan artikulasi jelas sesuai teks.', 'อ่านให้ครบทุกพยางค์และออกเสียงให้ชัดเจนตามข้อความ'),
+          tip: lt('Baca utuh dengan artikulasi jelas sesuai teks.', 'อ่านให้ครบทุกพยางค์และออกเสียงให้ชัดเจนตามข้อความ', undefined, undefined, 'Read aloud smoothly with clear articulation.'),
         })),
         questionId: 'custom_live_ra',
         category: effectiveLang,
-        examFrequency: lt('Baca Nyaring Aktif', 'ฝึกอ่านออกเสียง'),
+        examFrequency: lt('Baca Nyaring Aktif', 'ฝึกอ่านออกเสียง', undefined, undefined, 'Active Read Aloud'),
         sourceOrigin: 'FIEZEL Live Coach',
         examinerTips:
           action?.explanationText ||
           lt(
             'Baca teks berikut dengan lantang kata demi kata. AI akan memeriksa pelafalan & ketepatan setiap kata yang kamu ucapkan.',
-            'อ่านออกเสียงข้อความด้านล่างให้ชัดเจนทีละคำ AI จะตรวจความถูกต้องของคำและเสียงทันที'
+            'อ่านออกเสียงข้อความด้านล่างให้ชัดเจนทีละคำ AI จะตรวจความถูกต้องของคำและเสียงทันที',
+            undefined,
+            undefined,
+            'Read the passage below aloud word by word. AI checks pronunciation and word accuracy live.'
           ),
         oneSentenceHack:
-          transText || lt('Fokus pada jeda napas alami dan jangan melewatkan kata akhir.', 'เน้นจังหวะหายใจที่เป็นธรรมชาติและไม่ข้ามคำท้าย'),
+          transText || lt('Fokus pada jeda napas alami dan jangan melewatkan kata akhir.', 'เน้นจังหวะหายใจที่เป็นธรรมชาติและไม่ข้ามคำท้าย', undefined, undefined, 'Focus on natural breath pauses and articulate final syllables clearly.'),
         isGeneralReadAloud: true,
         targetLang: effectiveLang,
         translationText: transText,
@@ -958,11 +973,11 @@ export function deriveContextualPedagogicalBoard(
         contextMode: 'read_aloud',
         topicTitle: readAloudData.title,
         patternFormula:
-          readingGuide || lt('Baca kata demi kata persis seperti di layar', 'อ่านตามข้อความบนหน้าจอให้ครบทุกคำ'),
+          readingGuide || lt('Baca kata demi kata persis seperti di layar', 'อ่านตามข้อความบนหน้าจอให้ครบทุกคำ', undefined, undefined, 'Read word by word exactly as shown on screen'),
         coachExplanation: readAloudData.examinerTips || '',
         pteReadAloudData: readAloudData,
         quiz: {
-          prompt: lt('Baca kalimat target berikut dengan jelas kata demi kata:', 'อ่านออกเสียงประโยคต่อไปนี้ให้ชัดเจนทีละคำ:'),
+          prompt: lt('Baca kalimat target berikut dengan jelas kata demi kata:', 'อ่านออกเสียงประโยคต่อไปนี้ให้ชัดเจนทีละคำ:', undefined, undefined, 'Read the target sentence aloud clearly word by word:'),
           options: [
             { id: 'opt_1', text: passage, isCorrect: true, feedback: ui.correctFeedback },
             { id: 'opt_2', text: passage, isCorrect: false, feedback: ui.wrongFeedback },
@@ -1017,16 +1032,22 @@ export function deriveContextualPedagogicalBoard(
               .map((word) => ({
                 word,
                 ipa: resolveUnifiedPronunciation(word, effectiveLang, undefined, loc) || word,
-                tip: isId ? 'Ucapkan suku kata akhir dengan artikulasi jelas.' : 'Articulate the final syllable clearly.',
+                tip: wbPick('Articulate the final syllable clearly.', 'Ucapkan suku kata akhir dengan artikulasi jelas.', undefined, loc),
               })),
-            oneSentenceHack: isId
-              ? 'Jaga intonasi stabil di tiap klausa dan berhenti sejenak (0.3d) di setiap tanda jeda //.'
-              : 'Keep steady pitch across each clause and pause briefly (0.3s) at every // boundary.',
+            oneSentenceHack: wbPick(
+              'Keep steady pitch across each clause and pause briefly (0.3s) at every // boundary.',
+              'Jaga intonasi stabil di tiap klausa dan berhenti sejenak (0.3d) di setiap tanda jeda //.',
+              undefined,
+              loc
+            ),
             examinerTips:
               action?.explanationText ||
-              (isId
-                ? 'Baca kalimat persis sesuai teks di layar dengan pelafalan konsonan akhir yang jelas.'
-                : 'Read the sentence accurately with crisp final consonant articulation.'),
+              wbPick(
+                'Read the sentence accurately with crisp final consonant articulation.',
+                'Baca kalimat persis sesuai teks di layar dengan pelafalan konsonan akhir yang jelas.',
+                undefined,
+                loc
+              ),
           }
         : getRandomPteRaQuestion(prefCat));
 
@@ -1052,38 +1073,53 @@ export function deriveContextualPedagogicalBoard(
       patternFormula: 'Read Aloud Technique: Syntax Chunking (//) + 130 WPM Balanced Pacing',
       coachExplanation:
         targetRa.examinerTips ||
-        (isId
-          ? 'Pearson tidak menilai kecepatan balap, melainkan KONSISTENSI IRAMA. Tarik nafas hanya pada tanda jeda //, jangan berhenti di tengah kata frasa!'
-          : 'Pearson scores STEADY RHYTHM rather than speed. Pause briefly only at // phrase breaks—never stop mid-phrase!'),
+        wbPick(
+          'Pearson scores STEADY RHYTHM rather than speed. Pause briefly only at // phrase breaks—never stop mid-phrase!',
+          'Pearson tidak menilai kecepatan balap, melainkan KONSISTENSI IRAMA. Tarik nafas hanya pada tanda jeda //, jangan berhenti di tengah kata frasa!',
+          undefined,
+          loc
+        ),
       pteReadAloudData: readAloudData,
       quiz: {
-        prompt: isId
-          ? 'Di manakah jeda nafas (chunking) yang BENAR pada kalimat ini?'
-          : 'Where is the NATURAL breath pause (chunking) in this sentence?',
+        prompt: wbPick(
+          'Where is the NATURAL breath pause (chunking) in this sentence?',
+          'Di manakah jeda nafas (chunking) yang BENAR pada kalimat ini?',
+          undefined,
+          loc
+        ),
         options: [
           {
             id: 'opt_1',
             text: 'The proliferation of renewable technologies // has transformed power grids.',
             isCorrect: true,
-            feedback: isId
-              ? 'Tepat! Pemenggalan dilakukan di antara Subjek Frasa Kompleks dan Kata Kerja Utama.'
-              : 'Exact! Pause cleanly between the complex noun subject and the main verb.',
+            feedback: wbPick(
+              'Exact! Pause cleanly between the complex noun subject and the main verb.',
+              'Tepat! Pemenggalan dilakukan di antara Subjek Frasa Kompleks dan Kata Kerja Utama.',
+              undefined,
+              loc
+            ),
           },
           {
             id: 'opt_2',
             text: 'The proliferation // of renewable // technologies has // transformed grids.',
             isCorrect: false,
-            feedback: isId
-              ? 'Terlalu banyak jeda patah-patah! Ini akan merusak skor Oral Fluency.'
-              : 'Too many choppy breaks! Choppy pausing lowers Oral Fluency.',
+            feedback: wbPick(
+              'Too many choppy breaks! Choppy pausing lowers Oral Fluency.',
+              'Terlalu banyak jeda patah-patah! Ini akan merusak skor Oral Fluency.',
+              undefined,
+              loc
+            ),
           },
           {
             id: 'opt_3',
             text: 'The proliferation of renewable technologies has transformed power grids without breathing.',
             isCorrect: false,
-            feedback: isId
-              ? 'Membaca tanpa jeda sama sekali akan membuat suara kehabisan nafas di akhir.'
-              : 'Reading with zero pauses makes the final words lose clarity and breath support.',
+            feedback: wbPick(
+              'Reading with zero pauses makes the final words lose clarity and breath support.',
+              'Membaca tanpa jeda sama sekali akan membuat suara kehabisan nafas di akhir.',
+              undefined,
+              loc
+            ),
           },
         ],
         cloze: {
@@ -1091,19 +1127,28 @@ export function deriveContextualPedagogicalBoard(
           blankWord: 'demonstrate',
           suffix: 'that battery storage provides stable output.',
           chips: ['demonstrate', 'demonstrates', 'demonstrated'],
-          feedback: isId
-            ? 'Benar! Subjek "studies" berbentuk jamak, jadi gunakan kata kerja dasar "demonstrate".'
-            : 'Correct! Plural subject "studies" takes the base verb "demonstrate".',
+          feedback: wbPick(
+            'Correct! Plural subject "studies" takes the base verb "demonstrate".',
+            'Benar! Subjek "studies" berbentuk jamak, jadi gunakan kata kerja dasar "demonstrate".',
+            undefined,
+            loc
+          ),
         },
         blocks: {
           correctOrder: ['Recent', 'empirical', 'studies', 'demonstrate', 'clean', 'energy', 'growth.'],
           pool: ['growth.', 'demonstrate', 'Recent', 'energy', 'studies', 'empirical', 'clean'],
-          meaningId: isId
-            ? 'Susun kalimat akademik Read Aloud dengan urutan yang tepat:'
-            : 'Order this academic Read Aloud sentence accurately:',
-          feedback: isId
-            ? 'Sempurna! Frasa terangkai dengan sintaksis akademik yang baik.'
-            : 'Perfect! Clean academic phrase grouping.',
+          meaningId: wbPick(
+            'Order this academic Read Aloud sentence accurately:',
+            'Susun kalimat akademik Read Aloud dengan urutan yang tepat:',
+            undefined,
+            loc
+          ),
+          feedback: wbPick(
+            'Perfect! Clean academic phrase grouping.',
+            'Sempurna! Frasa terangkai dengan sintaksis akademik yang baik.',
+            undefined,
+            loc
+          ),
         },
       },
     };
@@ -1130,24 +1175,33 @@ export function deriveContextualPedagogicalBoard(
 
     const hasTiming = Boolean(diag && diag.durationSec > 0);
     const dynamicNotes = diag
-      ? isId
-        ? `Laju tutur terukur ${diag.wpm} WPM (${diag.pacingQuality === 'optimal' ? 'zona optimal 115-152 WPM' : diag.pacingQuality === 'rushed' ? 'terlalu cepat' : 'kurang cepat'}) dalam durasi ${diag.durationSec}d` +
-          (typeof diag.activeSpeechSec === 'number'
-            ? ` (vokal aktif ${diag.activeSpeechSec}d, fonasi ${Math.round((diag.phonationRatio || 0) * 100)}%). `
-            : '. ') +
-          (diag.fluencyReasons && diag.fluencyReasons.length > 0
-            ? diag.fluencyReasons.slice(0, 2).join('; ') + '.'
-            : 'Irama tutur konsisten.')
-        : `Measured speech pace ${diag.wpm} WPM (${diag.pacingQuality === 'optimal' ? 'optimal zone 115-152 WPM' : diag.pacingQuality === 'rushed' ? 'too fast' : 'too slow'}) over ${diag.durationSec}s` +
-          (typeof diag.activeSpeechSec === 'number'
-            ? ` (active vocalization ${diag.activeSpeechSec}s, phonation ${Math.round((diag.phonationRatio || 0) * 100)}%). `
-            : '. ') +
-          (diag.fluencyReasons && diag.fluencyReasons.length > 0
-            ? diag.fluencyReasons.slice(0, 2).join('; ') + '.'
-            : 'Steady speech rhythm.')
-      : isId
-        ? 'Belum ada sampel ucapan PTE pada sesi ini. Mulai bicara ke mikrofon agar Oral Fluency (WPM, jeda, disfluensi, & irama burst) terukur secara langsung.'
-        : 'No PTE speech sample recorded in this session yet. Speak into the mic to measure Oral Fluency (WPM, pauses, disfluency, & burst rhythm) live.';
+      ? wbFmt(
+          'Measured speech pace {wpm} WPM ({pace}) over {sec}s{vocal}{reasons}',
+          'Laju tutur terukur {wpm} WPM ({pace}) dalam durasi {sec}d{vocal}{reasons}',
+          undefined,
+          {
+            wpm: diag.wpm,
+            pace: diag.pacingQuality === 'optimal'
+              ? wbPick('optimal zone 115-152 WPM', 'zona optimal 115-152 WPM', undefined, loc)
+              : diag.pacingQuality === 'rushed'
+                ? wbPick('too fast', 'terlalu cepat', undefined, loc)
+                : wbPick('too slow', 'kurang cepat', undefined, loc),
+            sec: diag.durationSec,
+            vocal: typeof diag.activeSpeechSec === 'number'
+              ? wbFmt(' (active vocalization {asec}s, phonation {pct}%). ', ' (vokal aktif {asec}d, fonasi {pct}%). ', undefined, { asec: diag.activeSpeechSec, pct: Math.round((diag.phonationRatio || 0) * 100) }, loc)
+              : '. ',
+            reasons: diag.fluencyReasons && diag.fluencyReasons.length > 0
+              ? diag.fluencyReasons.slice(0, 2).join('; ') + '.'
+              : wbPick('Steady speech rhythm.', 'Irama tutur konsisten.', undefined, loc),
+          },
+          loc
+        )
+      : wbPick(
+          'No PTE speech sample recorded in this session yet. Speak into the mic to measure Oral Fluency (WPM, pauses, disfluency, & burst rhythm) live.',
+          'Belum ada sampel ucapan PTE pada sesi ini. Mulai bicara ke mikrofon agar Oral Fluency (WPM, jeda, disfluensi, & irama burst) terukur secara langsung.',
+          undefined,
+          loc
+        );
 
     const scorecardData: PteScorecardData = diag
       ? {
@@ -1184,34 +1238,28 @@ export function deriveContextualPedagogicalBoard(
 
     return {
       contextMode: 'pte_scorecard',
-      topicTitle: isId ? 'Rapor Ujian Resmi Pearson PTE' : 'Pearson PTE Official Scorecard',
+      topicTitle: wbPick('Pearson PTE Official Scorecard', 'Rapor Ujian Resmi Pearson PTE', undefined, loc),
       patternFormula: 'Pearson Metric: Fluency (5.0) + Pronunciation (5.0) + Content (3.0)',
       coachExplanation: diag
         ? hasTiming && diag.scores.passedTarget
-          ? isId
-            ? `Hasil evaluasi objektif dari sampel ucapan terakhir (${diag.measurementSource || 'measured'}). Kamu memenuhi target PTE 58+.`
-            : `Objective evaluation from your latest sample (${diag.measurementSource || 'measured'}). You meet the PTE 58+ target.`
-          : isId
-            ? `Hasil evaluasi objektif dari sampel ucapan terakhir (${diag.measurementSource || 'measured'}). Fokus pada kelancaran jeda dan kejelasan vokal akhir.`
-            : `Objective evaluation from your latest sample (${diag.measurementSource || 'measured'}). Focus on smooth phrasing and clear final consonants.`
-        : isId
-          ? 'Rekam jawabanmu terlebih dahulu untuk melihat skor Pearson Concordance (/90), laju WPM, rasio fonasi aktif, dan rincian jeda nyata.'
-          : 'Record a speech sample first to see your Pearson Concordance (/90), WPM pace, active phonation ratio, and pause telemetry.',
+          ? wbFmt('Objective evaluation from your latest sample ({src}). You meet the PTE 58+ target.', 'Hasil evaluasi objektif dari sampel ucapan terakhir ({src}). Kamu memenuhi target PTE 58+.', undefined, { src: diag.measurementSource || 'measured' }, loc)
+          : wbFmt('Objective evaluation from your latest sample ({src}). Focus on smooth phrasing and clear final consonants.', 'Hasil evaluasi objektif dari sampel ucapan terakhir ({src}). Fokus pada kelancaran jeda dan kejelasan vokal akhir.', undefined, { src: diag.measurementSource || 'measured' }, loc)
+        : wbPick('Record a speech sample first to see your Pearson Concordance (/90), WPM pace, active phonation ratio, and pause telemetry.', 'Rekam jawabanmu terlebih dahulu untuk melihat skor Pearson Concordance (/90), laju WPM, rasio fonasi aktif, dan rincian jeda nyata.', undefined, loc),
       pteScorecardData: scorecardData,
       quiz: {
-        prompt: isId ? 'Bagaimana pelafalan kata "fluctuations" yang benar?' : 'How is "fluctuations" pronounced naturally?',
+        prompt: wbPick('How is "fluctuations" pronounced naturally?', 'Bagaimana pelafalan kata "fluctuations" yang benar?', undefined, loc),
         options: [
           {
             id: 'opt_1',
-            text: isId ? '/ˌflʌk.tʃuˈeɪ.ʃənz/ (dengan bunyi sh pada -tion)' : '/ˌflʌk.tʃuˈeɪ.ʃənz/ (with crisp /ʃ/ in -tion)',
+            text: wbPick('/ˌflʌk.tʃuˈeɪ.ʃənz/ (with crisp /ʃ/ in -tion)', '/ˌflʌk.tʃuˈeɪ.ʃənz/ (dengan bunyi sh pada -tion)', undefined, loc),
             isCorrect: true,
-            feedback: isId ? 'Tepat sekali! Akhiran -tion dibaca /ʃənz/.' : 'Exact! The -tion ending is pronounced /ʃənz/.',
+            feedback: wbPick('Exact! The -tion ending is pronounced /ʃənz/.', 'Tepat sekali! Akhiran -tion dibaca /ʃənz/.', undefined, loc),
           },
           {
             id: 'opt_2',
-            text: isId ? '/fluk-tu-a-si-on/ (pelafalan harfiah)' : '/fluk-tu-a-si-on/ (letter-by-letter reading)',
+            text: wbPick('/fluk-tu-a-si-on/ (letter-by-letter reading)', '/fluk-tu-a-si-on/ (pelafalan harfiah)', undefined, loc),
             isCorrect: false,
-            feedback: isId ? 'Kurang tepat. Jangan melafalkan huruf demi huruf secara harfiah.' : 'Not natural—avoid spelling-based syllable stress.',
+            feedback: wbPick('Not natural—avoid spelling-based syllable stress.', 'Kurang tepat. Jangan melafalkan huruf demi huruf secara harfiah.', undefined, loc),
           },
         ],
         cloze: {
@@ -1219,13 +1267,13 @@ export function deriveContextualPedagogicalBoard(
           blankWord: 'fluency',
           suffix: 'throughout the speech.',
           chips: ['fluency', 'fluent', 'fluently'],
-          feedback: isId ? 'Tepat! Kata benda "fluency" yang dibutuhkan.' : 'Right! The noun "fluency" fits after steady.',
+          feedback: wbPick('Right! The noun "fluency" fits after steady.', 'Tepat! Kata benda "fluency" yang dibutuhkan.', undefined, loc),
         },
         blocks: {
           correctOrder: ['Fluency', 'is', 'the', 'key', 'to', 'high', 'scores.'],
           pool: ['scores.', 'key', 'Fluency', 'to', 'high', 'is', 'the'],
-          meaningId: isId ? 'Susun kalimat prinsip kelancaran PTE:' : 'Order the core PTE fluency principle:',
-          feedback: isId ? 'Tepat! Fluency is the key to high scores.' : 'Exact! Fluency is the key to high scores.',
+          meaningId: wbPick('Order the core PTE fluency principle:', 'Susun kalimat prinsip kelancaran PTE:', undefined, loc),
+          feedback: wbPick('Exact! Fluency is the key to high scores.', 'Tepat! Fluency is the key to high scores.', undefined, loc),
         },
       },
     };
@@ -3108,7 +3156,7 @@ export const SswTacticalBoardCanvas: React.FC<{
                         onClick={() => onSpeakPreview(cleanSpacedJapanese(k.jp), 'ja')}
                         className="px-2 py-1 rounded-lg bg-[#FAF4E8] hover:bg-[#F3EBE0] text-[10px] font-bold text-[#5C4A38] shrink-0 cursor-pointer"
                       >
-                        Dengar
+                        {wbPick('Listen', 'Dengar', undefined, locale)}
                       </button>
                     )}
                   </div>
@@ -3263,7 +3311,13 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
   onWhiteboardBraincoreEventRef.current = onWhiteboardBraincoreEvent;
   const reportedQuizKeysRef = useRef<Set<string>>(new Set());
   const reportedBoardDoneKeysRef = useRef<Set<string>>(new Set());
-  const ui = getWorkbenchUiStrings(locale);
+  const rawComponentUi = getWorkbenchUiStrings(locale);
+  const compLoc = normalizeWbLocale(locale);
+  const ui = ['id', 'th', 'ja', 'zh', 'en'].includes(compLoc)
+    ? rawComponentUi
+    : Object.fromEntries(
+        Object.entries(rawComponentUi).map(([k, v]) => [k, typeof v === 'string' ? wbPick(v, v, v, compLoc) : v])
+      ) as typeof rawComponentUi;
 
   // Solvely-Parity Interactive Whiteboard Studio Controls
   const [playbackSpeed, setPlaybackSpeed] = useState<0.75 | 1 | 1.25 | 1.5>(1);
@@ -5637,7 +5691,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
 
               <div className="text-left space-y-1.5 px-0.5">
                 <div className="text-[11px] font-bold text-[#8C6D1F] uppercase tracking-wider truncate">
-                  {topicTitle || (normalizeWbLocale(locale) === 'id' ? scenario.titleId : (scenario.titleTh && normalizeWbLocale(locale) === 'th' ? scenario.titleTh : topicTitle || 'Learning Session'))}
+                  {topicTitle || (normalizeWbLocale(locale) === 'id' ? scenario.titleId : (scenario.titleTh && normalizeWbLocale(locale) === 'th' ? scenario.titleTh : wbPick('Learning Session', 'Sesi Belajar', 'บทเรียน', locale)))}
                 </div>
                 <p className="text-xs text-[#57534E] leading-relaxed">
                   {!isReady

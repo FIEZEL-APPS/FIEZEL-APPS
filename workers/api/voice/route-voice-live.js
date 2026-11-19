@@ -1460,8 +1460,21 @@ export async function routeVoiceCopilotAssist(ctx) {
   const readRes = (await readJsonFromCtx(ctx).catch(() => null)) || {};
   const body = readRes?.value || {};
   const targetLang = body.targetLang === 'ja' ? 'ja' : body.targetLang === 'zh' ? 'zh' : 'en';
-  const locale = body.locale === 'th' ? 'th' : 'id';
-  const targetLocaleName = locale === 'th' ? 'Thai' : 'Indonesian';
+  const rawCopilotLoc = String(body.locale || 'id').toLowerCase().trim().split(/[-_]/)[0];
+  const locale = ['id', 'th', 'en', 'ms', 'vi', 'fil', 'ja', 'zh', 'km', 'ru'].includes(rawCopilotLoc) ? rawCopilotLoc : 'id';
+  const LOCALE_DISPLAY_MAP = {
+    id: 'Indonesian',
+    th: 'Thai',
+    en: 'English',
+    ms: 'Malay (Bahasa Melayu)',
+    vi: 'Vietnamese',
+    fil: 'Filipino / Tagalog',
+    ja: 'Japanese',
+    zh: 'Mandarin Chinese',
+    km: 'Khmer',
+    ru: 'Russian',
+  };
+  const targetLocaleName = LOCALE_DISPLAY_MAP[locale] || 'Indonesian';
   const aiText = cleanSpokenText(body.aiText || body.aiQuestionText || '').slice(0, 500);
   if (!aiText) {
     return badRequest('empty_ai_text');
@@ -2076,18 +2089,21 @@ async function executePartnerTurnCore(ctx, streamHooks = null) {
     : (await readJsonFromCtx(ctx).catch(() => null)) || {};
   const body = readRes?.value || {};
   const targetLang = body.targetLang === 'ja' ? 'ja' : body.targetLang === 'zh' ? 'zh' : 'en';
-  const rawLocale = String(body.locale || 'id').toLowerCase().trim();
-  const locale = ['id', 'th', 'ja', 'zh', 'en'].includes(rawLocale) ? rawLocale : 'id';
-  const targetLocaleName =
-    locale === 'th'
-      ? 'Thai'
-      : locale === 'ja'
-        ? 'Japanese'
-        : locale === 'zh'
-          ? 'Mandarin Chinese'
-          : locale === 'en'
-            ? 'English'
-            : 'Indonesian';
+  const rawLocale = String(body.locale || 'id').toLowerCase().trim().split(/[-_]/)[0];
+  const locale = ['id', 'th', 'ja', 'zh', 'en', 'ms', 'vi', 'fil', 'km', 'ru'].includes(rawLocale) ? rawLocale : 'id';
+  const TARGET_LOCALE_NAME_MAP = {
+    id: 'Indonesian',
+    th: 'Thai',
+    ja: 'Japanese',
+    zh: 'Mandarin Chinese',
+    en: 'English',
+    ms: 'Malay (Bahasa Melayu)',
+    vi: 'Vietnamese',
+    fil: 'Filipino / Tagalog',
+    km: 'Khmer',
+    ru: 'Russian',
+  };
+  const targetLocaleName = TARGET_LOCALE_NAME_MAP[locale] || 'Indonesian';
   const rawUserInput = cleanSpokenText(body.text || body.userText || '').slice(0, 400);
   if (!rawUserInput) {
     return {
@@ -2395,10 +2411,10 @@ async function executePartnerTurnCore(ctx, streamHooks = null) {
         isExplanationTurn
           ? `1) "aiReply": Give a warm, unhurried beginner explanation (4-6 clear sentences, zero filler, zero rushed tone) in 100% ${targetLocaleName} matching your "coachSpokenScript" (NEVER open with English slang like "Yo hold up fam"). Put a concise summary in "aiReplyTranslation".`
           : isSswSensei
-          ? `1) "aiReply": Reply as SSW SENSEI in warm, natural, flowing conversational Bahasa Indonesia (4-7 complete spoken sentences, roughly 70-125 words, no emojis, zero em-dash/en-dash, zero dry textbook bullet lists!). FOCUS STRICTLY on the ONE activeStep inside the dossier: unpack every unfamiliar acronym/Japanese term in everyday Indonesian with a real analogy, give a concrete example, and end with 1 light check-in question before moving to the next step! Provide clean concise "aiReplyTranslation" summarizing key Japanese terms in Indonesian.`
+          ? `1) "aiReply": Reply as SSW SENSEI in warm, natural, flowing conversational ${targetLocaleName} (4-7 complete spoken sentences, roughly 70-125 words, no emojis, zero em-dash/en-dash, zero dry textbook bullet lists!). FOCUS STRICTLY on the ONE activeStep inside the dossier: unpack every unfamiliar acronym/Japanese term in everyday ${targetLocaleName} with a real analogy, give a concrete example, and end with 1 light check-in question before moving to the next step! Provide clean concise "aiReplyTranslation" summarizing key Japanese terms in ${targetLocaleName}.`
           : `1) "aiReply": Reply as ${personaName} in 2-4 punchy spoken sentences (max 48 words, no emojis) 100% in ${targetLang === 'zh' ? 'Simplified Chinese Hanzi' : targetLang === 'ja' ? 'Japanese Kanji+Kana' : 'English'}. Translate into clean aiReplyTranslation (${targetLocaleName}) with ZERO raw Hanzi/Kanji/Kana.`,
         isSswSensei && !isExplanationTurn
-          ? `2) "replies": 3 direct beginner candidate replies in Bahasa Indonesia directly answering or asking about the ACTIVE step in aiReply (plus "Saya belum paham istilah ...", "Kebayang Sensei, lanjut langkah berikutnya!", or a concrete check question), with "hint" in ${targetLocaleName} and clean Latin "pronunciation".`
+          ? `2) "replies": 3 direct beginner candidate replies in ${targetLocaleName} directly answering or asking about the ACTIVE step in aiReply (plus asking for clarification on an unfamiliar term, saying they understand and want the next step, or asking a concrete check question), with "hint" in ${targetLocaleName} and clean Latin "pronunciation".`
           : `2) "replies": 3 spontaneous spoken replies directly answering your aiReply in ${targetLang === 'zh' ? 'Simplified Chinese Hanzi' : targetLang === 'ja' ? 'Japanese Kanji+Kana' : 'English'}, with ${targetLocaleName} "hint" and clean Romanized "pronunciation".`,
         isExplanationTurn
           ? `JSON only (choose diverse, topic-matched diagram for whiteboardSteps[2] and fill ALL its child fields completely — NEVER omit shapes/graphNodes (if rough_scene)/blocks/timelineEvents/branches/leftPanel+rightPanel/termA+termB!): {"aiReply":"...","aiReplyTranslation":"...","replies":[{"tier":"easy","text":"...","pronunciation":"...","hint":"..."},{"tier":"mission","text":"...","pronunciation":"...","hint":"..."},{"tier":"rescue","text":"...","pronunciation":"...","hint":"..."}],"uiAction":{"actionType":"open_learning_popup","topicTitle":"...","focusType":"grammar","coachSpokenScript":"...","explanationText":"...","patternFormula":"...","sampleTarget":"...","trapWrongSentence":"...","trapWrongReason":"...","drillMeaningPrompt":"...","drillTargetSentence":"...","drillTrapSentence":"...","phaseLabels":["0 Mulai","1 Logika","2 Visual","3 Contoh","4 Latihan"],"whiteboardSteps":[{"kind":"heading","column":"left","phaseIndex":0,"title":"...","text":"...","spokenNarration":"..."},{"kind":"note","column":"left","phaseIndex":1,"title":"Logika Dasar Dari Nol","bullets":["...","...","...","..."],"highlightTerms":["..."],"spokenNarration":"..."},{"kind":"formula_blocks | timeline_track | mind_map | contrast_scale | syntax_flow | metaphor_scene | kanji_grid | rough_scene","sceneTheme":"camera_vs_video | battery_meter | bridge_timeline | stage_spotlight | key_and_lock","column":"left","phaseIndex":2,"title":"...","analogy":"...","metaphorCenterLabel":"...","termA":"...","descA":"...","termB":"...","descB":"...","rightText":"...","wrongText":"...","highlightTerms":["..."],"leftPanel":{"badge":"...","title":"...","subtitle":"...","example":"...","icon":"..."},"rightPanel":{"badge":"...","title":"...","subtitle":"...","example":"...","icon":"..."},"branches":[{"label":"...","sublabel":"...","example":"...","icon":"star","color":"#0EA5E9"}],"timelineEvents":[{"timeLabel":"...","title":"...","example":"...","icon":"clock","isActive":false,"color":"#0EA5E9"}],"blocks":[{"role":"...","token":"...","note":"...","color":"#0EA5E9"}],"nodes":[{"role":"...","word":"...","color":"#DBEAFE"}],"graphDirection":"LR","graphNodes":[{"id":"n1","label":"...","sublabel":"...","fill":"#DBEAFE","stroke":"#1D4ED8"}],"graphEdges":[{"from":"n1","to":"n2","label":"..."}],"width":560,"height":240,"caption":"...","shapes":[{"op":"rect","x":20,"y":36,"w":152,"h":76,"fill":"#DBEAFE","stroke":"#1D4ED8","label":"...","sublabel":"..."},{"op":"arrow","x1":176,"y1":74,"x2":204,"y2":74,"stroke":"#1E293B"},{"op":"rect","x":208,"y":36,"w":152,"h":76,"fill":"#DCFCE7","stroke":"#15803D","label":"...","sublabel":"..."},{"op":"text","x":28,"y":170,"text":"...","stroke":"#0F172A","size":"sm"}],"spokenNarration":"..."},{"kind":"table","column":"right","phaseIndex":3,"title":"Contoh Penggunaan Nyata","tableHeaders":["...","...","..."],"tableRows":[["...","...","..."]],"spokenNarration":"..."},{"kind":"trap_vs_fix","column":"right","phaseIndex":3,"title":"Kesalahan Umum vs Bentuk Tepat","wrongText":"...","rightText":"...","reason":"...","highlightTerms":["..."],"spokenNarration":"..."},{"kind":"highlight_callout","column":"right","phaseIndex":4,"title":"Rumus Anti-Lupa","highlightPhrase":"...","spokenNarration":"..."}]}}`
@@ -3861,6 +3877,9 @@ const LOCALE_LANG_NAMES = {
   en: 'natural conversational English',
   vi: 'natural conversational Vietnamese',
   ms: 'natural conversational Malay',
+  fil: 'natural conversational Filipino / Tagalog',
+  km: 'natural conversational Khmer',
+  ru: 'natural conversational Russian',
   ko: 'natural conversational Korean',
   es: 'natural conversational Spanish',
   fr: 'natural conversational French',
@@ -3949,6 +3968,12 @@ export async function routeVoiceTranslate(ctx) {
       model: 'same-locale-bypass',
     });
   }
+  if (targetLocale === 'km' && /[\u1780-\u17FF]{3,}/.test(rawText)) {
+    return jsonResponse({ ok: true, translatedText: rawText, locale: targetLocale, model: 'same-locale-bypass' });
+  }
+  if (targetLocale === 'ru' && /[\u0400-\u04FF]{3,}/.test(rawText)) {
+    return jsonResponse({ ok: true, translatedText: rawText, locale: targetLocale, model: 'same-locale-bypass' });
+  }
 
   const cacheKey = `${targetLocale}::${rawText}`;
   if (_serverTranslationCache.has(cacheKey)) {
@@ -3969,7 +3994,7 @@ export async function routeVoiceTranslate(ctx) {
     const s = String(cand || '').trim();
     if (!s) return false;
     if (isNonCjkTarget) {
-      const nonCjkLetters = (s.match(/[A-Za-zÀ-ÖØ-öø-ÿ\u0E00-\u0E7F]/g) || []).length;
+      const nonCjkLetters = (s.match(/[A-Za-z\u00C0-\u024F\u1E00-\u1EFF\u0E00-\u0E7F\u1780-\u17FF\u0400-\u04FF]/g) || []).length;
       const cjkChars = (s.match(/[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]/g) || []).length;
       if (nonCjkLetters < 2) return false;
       if (cjkChars > nonCjkLetters) return false;

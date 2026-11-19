@@ -468,7 +468,9 @@
     } catch (_) {}
     if (fallbackCandidate) return fallbackCandidate;
     var loc = getLocale();
-    return loc === 'th' ? 'เพื่อน' : (loc === 'id' ? 'Teman' : 'Friend');
+    return (typeof root.FiezelLocPick === 'function')
+      ? root.FiezelLocPick('Friend', 'Teman', 'เพื่อน')
+      : (loc === 'th' ? 'เพื่อน' : (loc === 'id' ? 'Teman' : 'Friend'));
   }
 
   function t(key, fallback, vars) {
@@ -486,10 +488,12 @@
           if (I2 && typeof I2.getLocale === 'function') loc = I2.getLocale();
         }
       } catch (_) {}
-      var map = loc === 'th'
-        ? (typeof COPY_TH !== 'undefined' ? COPY_TH : {})
-        : (loc === 'id' ? (typeof COPY_ID !== 'undefined' ? COPY_ID : {}) : (typeof COPY_EN !== 'undefined' ? COPY_EN : {}));
-      s = map[key] || (fallback == null ? key : fallback);
+      var mapId = (typeof COPY_ID !== 'undefined' ? COPY_ID : {});
+      var mapEn = (typeof COPY_EN !== 'undefined' ? COPY_EN : {});
+      if (loc === 'id') s = mapId[key] || (fallback == null ? key : fallback);
+      else if (loc === 'th') s = (typeof COPY_TH !== 'undefined' ? COPY_TH[key] : '') || (typeof root.FiezelLocPick === 'function' && mapEn[key] ? root.FiezelLocPick(mapEn[key], mapId[key] || fallback, null, vars) : '') || mapEn[key] || (fallback == null ? key : fallback);
+      else if (loc === 'en') s = mapEn[key] || (fallback == null ? key : fallback);
+      else s = (typeof root.FiezelLocPick === 'function' && mapEn[key] ? root.FiezelLocPick(mapEn[key], mapId[key] || fallback, null, vars) : '') || mapEn[key] || (fallback == null ? key : fallback);
     }
     if (vars && typeof vars === 'object') {
       s = String(s).replace(/\{(\w+)\}/g, function (m, n) {
@@ -1984,11 +1988,28 @@
     };
   }
 
+  function mochiLangDisplayName(loc) {
+    var map = {
+      id: 'Indonesian (Bahasa Indonesia)',
+      th: 'Thai (ภาษาไทย)',
+      en: 'English',
+      ms: 'Malay (Bahasa Melayu)',
+      vi: 'Vietnamese (Tiếng Việt)',
+      fil: 'Filipino / Tagalog',
+      ja: 'Japanese (日本語)',
+      km: 'Khmer (ភាសាខ្មែរ)',
+      ru: 'Russian (Русский)'
+    };
+    return map[loc] || 'Indonesian (Bahasa Indonesia)';
+  }
+
   function buildMochiSystemPrompt(q, locale, ctx) {
     var s = buildQuizContextSnapshot(q, ctx);
     var bc = evaluateBraincoreStruggleState(q);
     var learnerName = getRegisteredLearnerName();
-    var lang = locale === 'th' ? 'Thailand' : 'Indonesia';
+    var loc = locale || 'id';
+    var lang = loc === 'th' ? 'Thailand' : loc === 'id' ? 'Indonesia' : mochiLangDisplayName(loc);
+    var isIdLocale = loc === 'id';
     var target = s.targetLang === 'ja' ? 'Bahasa Jepang (JLPT)' : 'Bahasa Inggris (CEFR)';
     var kindLabel = {
       grammar: 'Tata bahasa (Grammar)', listening: 'Menyimak (Listening/Chokai)', vocab: 'Vocabulary (Tango)',
@@ -1998,7 +2019,7 @@
 
     var lines = [
       'Kamu adalah Mochi, maskot Daifuku bulat putih berpipi merah muda dari FIEZEL. Kamu kakak mentor Sokratik yang ramah dan membimbing peserta bernama "' + learnerName + '" supaya BERPIKIR SENDIRI sepanjang sesi.',
-      'GAYA BICARA SETARA ANAK SMP (JERNIH, SEDERHANA, & MUDAH DIMENGERTI): Berbicaralah HANYA dalam Bahasa ' + lang + ' dengan gaya seperti kakak kelas / mentor yang ngobrol santai bersama anak SMP: kalimat pendek, hangat, logis, membumi, dan pakai perumpamaan sehari-hari yang langsung kebayang. Maksimal 2-3 kalimat singkat (20-35 kata) per giliran bicara.',
+      'GAYA BICARA SETARA ANAK SMP (JERNIH, SEDERHANA, & MUDAH DIMENGERTI): Berbicaralah HANYA dalam ' + (isIdLocale ? 'Bahasa Indonesia' : mochiLangDisplayName(loc)) + ' dengan gaya seperti kakak kelas / mentor yang ngobrol santai bersama anak SMP: kalimat pendek, hangat, logis, membumi, dan pakai perumpamaan sehari-hari yang langsung kebayang. Maksimal 2-3 kalimat singkat (20-35 kata) per giliran bicara.',
       'PANTANGAN ISTILAH RUMIT: DILARANG KERAS memakai istilah linguistik/akademik rumit seperti "klausa subordinatif", "morfologi", "predikat transitif", "konjugasi afirmatif", "anteseden", atau "nomina abstrak". Ganti semua istilah teknis dengan logika sederhana anak SMP!',
       'Identitas peserta yang sedang kamu bimbing: "' + learnerName + '". Panggil namanya secara natural.',
       '',
@@ -3580,7 +3601,8 @@
         if (!_speechRecActive || !_activeCall || !_activeCall.active) return;
         try {
           var rec = new SpeechRec();
-          rec.lang = getLocale() === 'th' ? 'th-TH' : 'id-ID';
+          var asrMap = { id: 'id-ID', th: 'th-TH', en: 'en-US', ms: 'ms-MY', vi: 'vi-VN', fil: 'fil-PH', ja: 'ja-JP', km: 'km-KH', ru: 'ru-RU' };
+          rec.lang = asrMap[getLocale()] || 'id-ID';
           rec.interimResults = true;
           var isAndroid = typeof navigator !== 'undefined' && /Android/i.test(navigator.userAgent || '');
           rec.continuous = !isAndroid;
@@ -4112,14 +4134,20 @@
           (snap.distractor ? '- Jebakan Pengecoh: ' + snap.distractor + '\n' : '');
 
         var openingInstruction;
-        if (getLocale() === 'th') {
+        var curLocM = getLocale();
+        var langNameM = mochiLangDisplayName(curLocM);
+        if (curLocM === 'th') {
           openingInstruction = playedInstant
             ? '[ระบบ: คุณเพิ่งทักทาย "' + learnerName + '" ไปแล้ว อธิบายภาพรวมของโจทย์บนหน้าจอ ("' + snap.stem + '") ด้วยภาษาง่ายๆ ระดับมัธยมต้น 1 ประโยคสั้นๆ โดยห้ามชี้คำใบ้แคบๆ หรือเฉลยคำตอบ เพื่อให้ "' + learnerName + '" ลองอ่านและคิดด้วยตัวเองก่อน!\n' + detailsBlock + ']'
             : '[ระบบ: นักเรียนชื่อ "' + learnerName + '" เพิ่งเข้าสู่รอบฝึกซ้อม ทักทาย "' + learnerName + '" ทันทีด้วยเสียงอบอุ่นเป็นกันเอง แล้วชวนดูภาพรวมของโจทย์บนหน้าจอ ("' + snap.stem + '") ด้วยภาษาง่ายๆ ระดับมัธยมต้น โดยห้ามชี้คำใบ้แคบๆ หรือเฉลยคำตอบ เพื่อให้ "' + learnerName + '" ลองคิดเองก่อน!\n' + detailsBlock + ']';
-        } else {
+        } else if (curLocM === 'id') {
           openingInstruction = playedInstant
             ? '[SISTEM: Kamu baru saja menyapa "' + learnerName + '" melalui audio pembuka. Langsung ajak "' + learnerName + '" memperhatikan maksud umum butir di layar ("' + snap.stem + '") dengan bahasa anak SMP yang santai dan mudah dimengerti. JANGAN langsung menunjuk kata/kalimat kunci atau memberikan hint sempit yang membuat opsi mudah ditebak agar "' + learnerName + '" membaca dan mencoba berpikir sendiri dulu! DILARANG mengulang sapaan "Halo" dan DILARANG KERAS membocorkan kunci!\n' + detailsBlock + ']'
             : '[SISTEM: Peserta bernama "' + learnerName + '" baru saja masuk. Awali dengan menyapa hangat ("Halo ' + learnerName + '!") dalam 1 kalimat singkat yang ramah, lalu dengan bahasa anak SMP yang santai ajak "' + learnerName + '" memperhatikan maksud umum butir di layar ("' + snap.stem + '"). JANGAN langsung menunjuk kata/kalimat kunci atau memberikan hint sempit di awal agar "' + learnerName + '" membaca dan mencoba berpikir sendiri dulu! DILARANG KERAS membocorkan kunci!\n' + detailsBlock + ']';
+        } else {
+          openingInstruction = playedInstant
+            ? '[SYSTEM: You just greeted "' + learnerName + '" with an opening audio. Immediately invite "' + learnerName + '" in warm, clear ' + langNameM + ' (middle-school level simplicity) to understand the overall point on screen ("' + snap.stem + '"). Do NOT give away narrow clue words or the answer — let "' + learnerName + '" read and think first! Reply 100% in ' + langNameM + '.\n' + detailsBlock + ']'
+            : '[SYSTEM: Learner "' + learnerName + '" just joined. Greet "' + learnerName + '" warmly in 1 brief friendly sentence in ' + langNameM + ', then ask them in clear, simple ' + langNameM + ' to read the question on screen ("' + snap.stem + '") and think through what it asks. NEVER leak the answer key! Speak 100% in ' + langNameM + '.\n' + detailsBlock + ']';
         }
         try {
           _ws.send(JSON.stringify({
@@ -4441,9 +4469,14 @@
       }, 4500);
       var learnerName = getRegisteredLearnerName();
       var fallbackHint = t('mochi-sos.silence-prompt', 'Silakan bicara jika ingin bantuan dari aku');
-      var promptText = (getLocale() === 'th')
+      var curLocS = getLocale();
+      var promptText = curLocS === 'th'
         ? ('รีบเปิดไมค์พูดออกมาเลยนะ ' + learnerName + '!')
-        : ('Segera buka suaramu, ' + learnerName + '!');
+        : curLocS === 'id'
+          ? ('Segera buka suaramu, ' + learnerName + '!')
+          : (typeof root.FiezelLocPick === 'function'
+              ? root.FiezelLocPick('Go ahead and speak into your mic, {name}!', 'Segera buka suaramu, {name}!', 'รีบเปิดไมค์พูดออกมาเลยนะ {name}!', { name: learnerName })
+              : ('Go ahead and speak into your mic, ' + learnerName + '!'));
       _lastSilencePromptText = promptText;
       if (_activeCall) _activeCall.lastSilencePrompt = promptText;
       try {
@@ -4452,7 +4485,9 @@
             turns: [{
               role: 'user',
               parts: [{
-                text: '[SISTEM: Peserta bernama "' + learnerName + '" tidak terdeteksi bersuara selama 2 detik setelah kamu bertanya. Ucapkan persis kalimat ini dengan suara seperti manusia asli yang hangat dan menyemangati: "' + promptText + '" (' + fallbackHint + ')]'
+                text: curLocS === 'id'
+                  ? '[SISTEM: Peserta bernama "' + learnerName + '" tidak terdeteksi bersuara selama 2 detik setelah kamu bertanya. Ucapkan persis kalimat ini dengan suara seperti manusia asli yang hangat dan menyemangati: "' + promptText + '" (' + fallbackHint + ')]'
+                  : '[SYSTEM: Learner "' + learnerName + '" has been quiet for 2 seconds. Encourage them warmly in 1 short sentence in ' + mochiLangDisplayName(curLocS) + ': "' + promptText + '" (' + fallbackHint + ')]'
               }]
             }],
             turnComplete: true
@@ -4479,7 +4514,8 @@
       if (!guidance) return;
 
       var loc = getLocale();
-      var speaker = loc === 'th' ? 'premwadee' : 'gadis';
+      var speakerMap = { id: 'gadis', th: 'premwadee', en: 'aria', ms: 'yasmin', vi: 'hoaimy', fil: 'blessica', ja: 'nanami', km: 'sreymom', ru: 'svetlana' };
+      var speaker = speakerMap[loc] || 'aria';
       var endpoints = [];
       if (isLocalEnv()) {
         endpoints.push('/api/tts/line');
@@ -4502,7 +4538,7 @@
         fetch(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text: guidance, speaker: speaker, lang: loc === 'th' ? 'th' : 'id' }),
+          body: JSON.stringify({ text: guidance, speaker: speaker, lang: loc }),
           signal: ctrl ? ctrl.signal : undefined
         }).then(function (res) {
           if (timer) clearTimeout(timer);

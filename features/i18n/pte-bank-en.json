@@ -1,0 +1,1107 @@
+{
+  "schema": "fiezel-pte-en-v1",
+  "status": "APPROVED-EN-SIDECAR",
+  "files": {
+    "pte-listening-fib": {
+      "lfib-001": {
+        "0": {
+          "spellingTip": "C-O-R-R-I-D-O-R-S (Double R, not double L)."
+        },
+        "1": {
+          "spellingTip": "M-I-G-R-A-T-E (Base verb after 'to allow wildlife to...')."
+        }
+      },
+      "lf-002": {
+        "0": {
+          "spellingTip": "Note the -ence suffix (not -ance): a-d-h-e-r-e-n-c-e."
+        },
+        "2": {
+          "spellingTip": "Noun with the -tion suffix: c-o-n-t-a-m-i-n-a-t-i-o-n."
+        }
+      },
+      "lf-003": {
+        "1": {
+          "spellingTip": "Base adjective: c-o-n-s-t-a-n-t."
+        },
+        "2": {
+          "spellingTip": "The un- prefix with a double 'ff': u-n-a-f-f-e-c-t-e-d (not uninfected/ineffective)."
+        }
+      },
+      "lf-004": {
+        "1": {
+          "spellingTip": "Adjective form of symbiosis: s-y-m-b-i-o-t-i-c."
+        }
+      },
+      "lf-005": {},
+      "lfib-006": {
+        "0": {
+          "spellingTip": "P-R-O-L-I-F-E-R-A-T-I-O-N (-tion suffix, single F, not double F)."
+        },
+        "2": {
+          "spellingTip": "C-O-M-P-L-I-A-N-C-E (Note the -ance suffix, not -ence)."
+        }
+      },
+      "lfib-007": {
+        "0": {
+          "spellingTip": "A-N-A-L-Y-T-I-C-A-L (Letter Y after L, -ical suffix)."
+        },
+        "1": {
+          "spellingTip": "A-N-T-I-C-I-P-A-T-E (Base verb after 'to anticipate')."
+        }
+      },
+      "lfib-008": {
+        "0": {
+          "spellingTip": "I-N-D-I-S-P-E-N-S-A-B-L-E (Note the -able suffix, not -ible)."
+        }
+      },
+      "lfib-009": {
+        "2": {
+          "spellingTip": "S-T-A-B-I-L-I-T-Y (Noun form of stable)."
+        }
+      },
+      "lfib-010": {
+        "0": {
+          "spellingTip": "M-I-C-R-O-G-R-I-D-S (A single compound word, plural -s)."
+        }
+      },
+      "lfib-011": {
+        "0": {
+          "spellingTip": "C-O-L-O-N-I-E-S (Plural form of colony: y changes to -ies)."
+        }
+      },
+      "lfib-012": {},
+      "lfib-013": {
+        "0": {
+          "spellingTip": "D-E-P-L-E-T-E-D (Past participle functioning as an adjective)."
+        },
+        "1": {
+          "spellingTip": "S-Y-M-B-I-O-T-I-C (Letter Y after S, -tic suffix)."
+        },
+        "2": {
+          "spellingTip": "R-E-T-E-N-T-I-O-N (-tion suffix, not -sion)."
+        }
+      },
+      "lfib-014": {},
+      "lfib-015": {},
+      "lfib-016": {}
+    },
+    "pte-reading-drag-drop": {
+      "r-dd-001": {
+        "deepFeedback": {
+          "blank_1": {
+            "grammarFormula": "Infinitive rule: 'struggle to' + bare infinitive (base form). The correct base verb to form a protective shell is 'build'.",
+            "collocation": "build protective structures (= to build/form protective structures)",
+            "distractorTip": "'Destructive' is an adjective, 'carefully' is an adverb, and 'destroy' contradicts the logic."
+          },
+          "blank_2": {
+            "grammarFormula": "Noun phrase rule: After the adjective 'irreversible', we need a noun.",
+            "collocation": "cause irreversible damage to (= to cause irreversible damage to)",
+            "distractorTip": "'Damage' functions as an uncountable noun in this context. 'Destructive' is incorrect due to being an adjective."
+          },
+          "blank_3": {
+            "grammarFormula": "Infinitive of purpose rule: 'models to' + bare infinitive. Preposition pattern: 'protect [something] from [danger]'.",
+            "collocation": "protect ecosystems from collapse (= to protect ecosystems from collapse)",
+            "distractorTip": "'Destroy' means to damage (incompatible with conservation goals)."
+          }
+        }
+      },
+      "r-dd-002": {
+        "deepFeedback": {
+          "blank_1": {
+            "grammarFormula": "Modal rule: After the modal verb 'must' (and the adverb 'therefore'), the verb MUST be in the bare infinitive form.",
+            "collocation": "create compelling narratives (= to create compelling narratives)",
+            "distractorTip": "'Creation' is a noun, 'effectively' is an adverb, and 'ignore' contradicts the context."
+          },
+          "blank_2": {
+            "grammarFormula": "Linking verb rule: 'prove / have proven' + Adverb of Degree ('highly') + Adjective.",
+            "collocation": "prove highly effective in (+ V-ing) (= to prove highly effective in)",
+            "distractorTip": "'Effectively' is an adverb (it cannot follow the linking verb 'have proven' to describe the subject). 'Failure' is a noun."
+          }
+        }
+      },
+      "r-dd-003": {
+        "deepFeedback": {
+          "blank_1": {
+            "grammarFormula": "Present plural rule: The subject 'Microorganisms' is plural, requiring the bare infinitive 'convert' which collocates with the preposition 'into'.",
+            "collocation": "convert sugars into acids (= to convert sugars into acids)",
+            "distractorTip": "'Destroy' is biochemically incorrect; 'harmful' is an adjective."
+          },
+          "blank_2": {
+            "grammarFormula": "Parallel verb rule: The subject 'This biochemical transformation' is singular, making it parallel with 'extends', thus requiring a singular verb ending in -s ('enhances').",
+            "collocation": "enhances nutritional bioavailability (= to enhance nutritional bioavailability)",
+            "distractorTip": "'Enhances' is singular; 'convert' and 'create' are base forms."
+          },
+          "blank_3": {
+            "grammarFormula": "Infinitive of purpose rule: 'to' + bare infinitive to express the purpose of creating new flavors.",
+            "collocation": "create distinctive flavor profiles (= to create distinctive flavor profiles)",
+            "distractorTip": "'Carelessly' is an adverb that ruins the professional culinary meaning."
+          }
+        }
+      },
+      "r-dd-004": {
+        "deepFeedback": {
+          "blank_1": {
+            "grammarFormula": "Passive voice rule: 'are' + Past Participle (Verb 3) explaining forest clearing.",
+            "collocation": "cleared for agricultural expansion (= cleared for agricultural expansion)",
+            "distractorTip": "'Safe' is an adjective; 'protect' contradicts the context of deforestation."
+          },
+          "blank_2": {
+            "grammarFormula": "Predicative adjective rule: 'leaving remaining woodlands increasingly' + Adjective that collocates with the preposition 'to'.",
+            "collocation": "vulnerable to wildfires (= vulnerable to wildfires)",
+            "distractorTip": "'Heavily' is an adverb; 'vulnerable' officially collocates with 'to'."
+          },
+          "blank_3": {
+            "grammarFormula": "Modal auxiliary rule: 'could' + bare infinitive (base form) meaning to trigger or cause.",
+            "collocation": "trigger irreversible degradation (= to trigger irreversible degradation)",
+            "distractorTip": "'Trigger' is a causative verb."
+          }
+        }
+      },
+      "r-dd-005": {
+        "deepFeedback": {
+          "blank_1": {
+            "grammarFormula": "Standard collocation rule: 'to meet standards' = to meet official regulatory standards.",
+            "collocation": "meet environmental standards (= to meet environmental standards)",
+            "distractorTip": "'Ignore' violates flight compliance commitments."
+          },
+          "blank_2": {
+            "grammarFormula": "Noun phrase rule: After the adjective 'atmospheric', a noun is needed that suits high-altitude flight physics.",
+            "collocation": "withstand extreme atmospheric pressures (= to withstand extreme atmospheric pressures)",
+            "distractorTip": "'Violently' is an adverb; 'pressures' is a physical noun."
+          },
+          "blank_3": {
+            "grammarFormula": "Financial collocation rule: 'minimizing operating costs' is a standard business phrase in airline management.",
+            "collocation": "minimizing operating costs (= minimizing operating costs)",
+            "distractorTip": "'Costs' completes the phrase 'operating costs'."
+          }
+        }
+      },
+      "r-dd-006": {
+        "deepFeedback": {
+          "blank_1": {
+            "grammarFormula": "Infinitive Rule: 'abilities to' + base Verb 1, paired with the preposition 'between'.",
+            "collocation": "switch between tasks",
+            "distractorTip": "'Forget' has the opposite cognitive meaning; 'slowly' is an adverb."
+          },
+          "blank_2": {
+            "grammarFormula": "Infinitive Rule: 'appears to' + base Verb 1, used to describe delaying or hindering cognitive decline.",
+            "collocation": "delay the onset of cognitive decline",
+            "distractorTip": "'Weak' is an adjective; 'delay' is an active protective verb."
+          },
+          "blank_3": {
+            "grammarFormula": "Noun Phrase Rule: 'early language acquisition' is the standard linguistic term for acquiring language from an early age.",
+            "collocation": "early language acquisition",
+            "distractorTip": "'Acquisition' functions as the final noun in the noun phrase."
+          }
+        }
+      },
+      "r-dd-007": {
+        "deepFeedback": {
+          "blank_1": {
+            "grammarFormula": "Adverb of Frequency Rule: The verb 'sanitize surfaces' is modified by an adverb (-ly) indicating temporal regularity.",
+            "collocation": "sanitize regularly",
+            "distractorTip": "'Carelessly' has the opposite meaning (recklessly), while 'regular' is an adjective."
+          },
+          "blank_2": {
+            "grammarFormula": "Adjective Complement Rule: The pattern is 'kept completely [adjective] from'. The separating adjective is 'separate'.",
+            "collocation": "kept separate from",
+            "distractorTip": "'Separation' is a noun, whereas the position after 'kept + adverb' requires an adjective."
+          },
+          "blank_3": {
+            "grammarFormula": "Infinitive Rule: 'vital to' + base Verb 1. The preventive verb is 'prevent'.",
+            "collocation": "prevent bacterial spores from germinating",
+            "distractorTip": "'Prevention' is a noun, not a base verb."
+          }
+        }
+      },
+      "r-dd-008": {
+        "deepFeedback": {
+          "blank_1": {
+            "grammarFormula": "Noun Phrase Rule: After the attributive noun 'customer', we need the head noun 'loyalty'.",
+            "collocation": "foster customer loyalty",
+            "distractorTip": "'Disloyalty' has the opposite meaning; 'loyal' is an adjective."
+          },
+          "blank_2": {
+            "grammarFormula": "Adverb of Manner Rule: The verb 'anticipate needs' is modified by an adverb of manner (-ly).",
+            "collocation": "anticipate needs effectively",
+            "distractorTip": "'Effective' is an adjective and cannot modify a transitive verb."
+          },
+          "blank_3": {
+            "grammarFormula": "Infinitive of Purpose Rule: 'to' + base Verb 1. The verb for restoring satisfaction is 'restore'.",
+            "collocation": "restore customer satisfaction",
+            "distractorTip": "'Restoration' is a noun."
+          }
+        }
+      },
+      "r-dd-009": {
+        "deepFeedback": {
+          "blank_1": {
+            "grammarFormula": "Noun Phrase Rule: After the adjective 'stable', a noun ('mixture') is required.",
+            "collocation": "stable mixture",
+            "distractorTip": "'Mixed' is an adjective/verb, not a noun."
+          },
+          "blank_2": {
+            "grammarFormula": "Infinitive of Purpose Rule: 'to' + base Verb 1 (reduce).",
+            "collocation": "reduce surface tension",
+            "distractorTip": "'Reduction' is a noun."
+          },
+          "blank_3": {
+            "grammarFormula": "Modal Future Rule: After the modal auxiliary 'will', the verb MUST be in the BASE VERB 1 form.",
+            "collocation": "emulsion will split",
+            "distractorTip": "'Splitting' is a participle and requires a 'to be' verb."
+          }
+        }
+      },
+      "r-dd-010": {
+        "deepFeedback": {
+          "blank_1": {
+            "grammarFormula": "Compound Noun Rule: The technical term for energy conversion efficiency is 'conversion efficiency'.",
+            "collocation": "conversion efficiency",
+            "distractorTip": "'Efficient' is an adjective; a noun is required as the object of the preposition 'in'."
+          },
+          "blank_2": {
+            "grammarFormula": "Infinitive Rule: 'to' + Verb 1 (maintain).",
+            "collocation": "maintain consistent supply",
+            "distractorTip": "'Maintenance' is a noun."
+          },
+          "blank_3": {
+            "grammarFormula": "Infinitive Rule: 'to' + Verb 1 (distribute).",
+            "collocation": "distribute clean energy",
+            "distractorTip": "'Distribution' is a noun."
+          }
+        }
+      },
+      "r-dd-011": {
+        "deepFeedback": {
+          "blank_1": {
+            "grammarFormula": "Prepositional Object Rule: After the preposition 'with', we need the NOUN 'precision'.",
+            "collocation": "with extreme precision",
+            "distractorTip": "'Precise' is an adjective."
+          },
+          "blank_2": {
+            "grammarFormula": "Noun Phrase Rule: After the adjective 'evaporative', we need the plural noun 'losses'.",
+            "collocation": "evaporative losses",
+            "distractorTip": "'Losing' is a participle/gerund."
+          },
+          "blank_3": {
+            "grammarFormula": "Infinitive Rule: 'to' + Verb 1 (maximize).",
+            "collocation": "maximize crop yields",
+            "distractorTip": "'Maximum' is an adjective/noun."
+          }
+        }
+      },
+      "r-dd-012": {
+        "deepFeedback": {
+          "blank_1": {
+            "grammarFormula": "Subject-Verb Agreement Rule: The plural subject 'proteolytic enzymes' requires the PLURAL VERB 1 'degrade'.",
+            "collocation": "degrade muscle fibers",
+            "distractorTip": "'Degradation' is a noun."
+          },
+          "blank_2": {
+            "grammarFormula": "Adverb of Manner Rule: The verb 'proceed' is modified by the -ly adverb 'safely'.",
+            "collocation": "proceed safely",
+            "distractorTip": "'Safe' is an adjective."
+          },
+          "blank_3": {
+            "grammarFormula": "Adverb of Degree Rule: Modifying the verb 'tightening' with the adverb 'excessively'.",
+            "collocation": "tighten excessively (= to tighten or harden excessively)",
+            "distractorTip": "'Excessive' is an adjective."
+          }
+        }
+      },
+      "r-dd-013": {
+        "deepFeedback": {
+          "blank_1": {
+            "grammarFormula": "Noun Phrase Rule: After the adjective 'inaccurate patron', the noun/gerund 'forecasting' is required.",
+            "collocation": "patron forecasting (= predicting or forecasting the number of guests)",
+            "distractorTip": "'Forecast' is the base verb form or singular present."
+          },
+          "blank_2": {
+            "grammarFormula": "Infinitive Rule: 'enables hotels to' + base verb (donate).",
+            "collocation": "donate unserved meals (= to donate meals that have not been served)",
+            "distractorTip": "'Donation' is a noun."
+          },
+          "blank_3": {
+            "grammarFormula": "Fixed Collocation Rule: 'corporate social responsibility' (CSR) is a standard global business term.",
+            "collocation": "corporate social responsibility (= the social responsibility of a corporation)",
+            "distractorTip": "'Responsible' is an adjective."
+          }
+        }
+      },
+      "r-dd-014": {
+        "deepFeedback": {
+          "blank_1": {
+            "grammarFormula": "Baking Terminology Rule: The standard term for the sudden rise of bread dough when it first enters the oven is 'oven spring'.",
+            "collocation": "oven spring (= the expansion of dough in the oven)",
+            "distractorTip": "'Springing' is a participle form."
+          },
+          "blank_2": {
+            "grammarFormula": "Adjective + Enough Rule: The pattern is '[adjective] + enough'. The adjective for elastic is 'elastic'.",
+            "collocation": "elastic enough to entrap gas (= sufficiently elastic to trap gas)",
+            "distractorTip": "'Elasticity' is a noun."
+          },
+          "blank_3": {
+            "grammarFormula": "Noun Phrase Rule: After the adjectives 'crisp outer', the noun 'crust' is required.",
+            "collocation": "crisp outer crust (= a crunchy outer layer)",
+            "distractorTip": "'Crusty' is an adjective."
+          }
+        }
+      },
+      "r-dd-015": {
+        "deepFeedback": {
+          "blank_1": {
+            "grammarFormula": "Noun Phrase Rule: After the adjective 'constant', the noun 'temperature' is required.",
+            "collocation": "constant temperature (= a steady temperature)",
+            "distractorTip": "'Hot' is an adjective."
+          },
+          "blank_2": {
+            "grammarFormula": "Adverb of Manner Rule: Describing the heating process 'reach temperatures' with the adverb 'evenly'.",
+            "collocation": "heat evenly (= to heat up uniformly)",
+            "distractorTip": "'Eventual' is an adjective."
+          },
+          "blank_3": {
+            "grammarFormula": "Culinary Chemistry Rule: The browning and aroma-producing reaction in cooking is called the 'Maillard reaction'.",
+            "collocation": "Maillard reaction (= the Maillard reaction)",
+            "distractorTip": "'React' is a verb."
+          }
+        }
+      },
+      "r-dd-016": {
+        "deepFeedback": {
+          "blank_1": {
+            "grammarFormula": "Compound Noun Rule: 'transportation infrastructure' is a standard economic noun phrase.",
+            "collocation": "transportation infrastructure (= the framework of transport systems)",
+            "distractorTip": "'Structural' is an adjective."
+          },
+          "blank_2": {
+            "grammarFormula": "Infinitive Rule: 'to' + base verb (stimulate).",
+            "collocation": "stimulate visitor interest (= to encourage or increase visitor interest)",
+            "distractorTip": "'Stimulation' is a noun."
+          },
+          "blank_3": {
+            "grammarFormula": "Noun Phrase Rule: After 'employment', the plural noun 'opportunities' is required.",
+            "collocation": "employment opportunities (= job openings or prospects)",
+            "distractorTip": "'Opportunistic' is an adjective."
+          }
+        }
+      }
+    },
+    "pte-reading-fib": {
+      "rw-fib-001": {
+        "0": {
+          "deepFeedback": {
+            "formula": "Fixed Collocation: 'play a vital/crucial/important role in' is a standard academic English phrase.",
+            "grammarRule": "After the adjective 'vital', a noun is required that idiomatically collocates with the verb 'play'.",
+            "collocation": "play a vital role in (= to have a significant part in)",
+            "distractorAnalysis": "'Part' is typically used in 'play a part in', but 'play a vital role' is a high-weight formal academic collocation in the Oxford Collocations Dictionary. 'Work' and 'function' are not used with the verb 'play' in this context.",
+            "translation": "Diet plays a vital role in determining life expectancy."
+          }
+        },
+        "1": {
+          "deepFeedback": {
+            "formula": "Verb + Preposition Pair: The verbs 'rely' and 'depend' ALWAYS pair with the preposition 'on' (or 'upon').",
+            "grammarRule": "Dependent preposition: rely + on + noun/pronoun.",
+            "collocation": "rely on (= to depend on or trust in)",
+            "distractorAnalysis": "'In', 'with', and 'at' cannot follow the verb 'rely'. Using other prepositions is considered a basic grammatical error in Pearson.",
+            "translation": "Individuals should rely on nutrient-dense whole foods rather than processed foods."
+          }
+        },
+        "2": {
+          "deepFeedback": {
+            "formula": "Linking Words Map (Cause-Effect / Result): The previous sentence explains scientific evidence, so this sentence conveys the logical consequence or follow-up action.",
+            "grammarRule": "A linking adverb followed by a comma at the beginning of an independent sentence ('Consequently, ...').",
+            "distractorAnalysis": "'However' is incorrect because this sentence does not contradict the previous one. 'Although' and 'Despite' are subordinating conjunctions that require a dependent clause and cannot stand alone before a comma.",
+            "translation": "Consequently, public health organizations continue to advocate for comprehensive lifestyle interventions."
+          }
+        }
+      },
+      "rw-fib-002": {
+        "0": {
+          "deepFeedback": {
+            "formula": "Modal / Infinitive Rule: After the particle 'to' (infinitive of purpose), the verb MUST be in its base form (Verb 1).",
+            "grammarRule": "to + base verb (without -ed, -ing, or the noun suffix -ment).",
+            "collocation": "curtail emissions (= to reduce or cut exhaust emissions)",
+            "distractorAnalysis": "'Curtailed' is the past form (V2/V3), 'curtailing' is a gerund/participle, and 'curtailment' is a noun. All three violate the 'to + V1' infinitive rule.",
+            "translation": "The government has implemented strict regulations to curtail greenhouse gas emissions."
+          }
+        },
+        "1": {
+          "deepFeedback": {
+            "formula": "Infinitive Rule: After 'to', the verb must be in its base form (Verb 1).",
+            "grammarRule": "to + base verb.",
+            "collocation": "accommodate power generation (= to facilitate/accommodate power supply)",
+            "distractorAnalysis": "'Accommodates' has an -s suffix (only for present singular subjects), 'accommodation' is a noun, and 'accommodated' is the past tense. Only 'accommodate' is in the V1 form.",
+            "translation": "The power grid must be modernized to accommodate intermittent power generation."
+          }
+        },
+        "2": {
+          "deepFeedback": {
+            "formula": "Linking Words Map (Contrast): The previous sentence praises the progress of solar/wind energy (+), but this sentence indicates that fossil fuels remain dominant (-).",
+            "grammarRule": "Conjunctive adverb followed by a comma: 'Nevertheless, ...'",
+            "distractorAnalysis": "'Furthermore' (adding a similar idea) and 'Therefore' (cause-effect) are logically incorrect. 'Because' cannot stand alone before a comma preceding a complete clause.",
+            "translation": "Nevertheless, fossil fuels remain a key component of global baseload electricity."
+          }
+        }
+      },
+      "rw-fib-003": {
+        "0": {
+          "deepFeedback": {
+            "formula": "Standard Collocation Pair: 'place emphasis on' is a fixed academic collocation.",
+            "grammarRule": "place / put emphasis + on + noun/gerund.",
+            "collocation": "place tremendous emphasis on (= to place tremendous emphasis on)",
+            "distractorAnalysis": "'In', 'for', and 'with' are never used with 'place emphasis'. Ignoring the standard preposition 'on' is a fatal error in PTE Reading.",
+            "translation": "Business establishments must place tremendous emphasis on customer service and atmosphere."
+          }
+        },
+        "1": {
+          "deepFeedback": {
+            "formula": "Infinitive Rule: After 'trained to', the verb must be in the base Verb 1 form.",
+            "grammarRule": "be trained to + Verb 1.",
+            "collocation": "deliver exceptional attention / service (= to provide exceptional attention/service)",
+            "distractorAnalysis": "'Delivering' (-ing), 'delivered' (-ed), and 'delivery' (noun) violate the infinitive rule.",
+            "translation": "Front-line staff are routinely trained to deliver exceptional attention to guest preferences."
+          }
+        },
+        "2": {
+          "deepFeedback": {
+            "formula": "Linking Words Map (Logical Result): Practicing excellent service (cause) leads to competitive advantage and guest satisfaction (result).",
+            "grammarRule": "Transitional phrase followed by a comma at the beginning of a sentence: 'As a result, ...'",
+            "distractorAnalysis": "'On the other hand' and 'Conversely' are used for opposition/contrast (logically incorrect). 'Despite' is a preposition that requires a noun phrase, not a full sentence.",
+            "translation": "As a result, leading hotels and restaurants that invest in guest experience consistently outperform their competitors."
+          }
+        }
+      },
+      "rw-fib-004": {
+        "0": {
+          "deepFeedback": {
+            "formula": "Adjective + Standard Preposition Pair: 'capable' ALWAYS pairs with 'of' + gerund (-ing).",
+            "grammarRule": "capable + of + V-ing.",
+            "collocation": "capable of analyzing (= able to analyze)",
+            "distractorAnalysis": "'Capable to' is a common error among non-native speakers. The word that uses 'to' is 'able' (able to analyze), whereas 'capable' must use 'of' (capable of analyzing).",
+            "translation": "Advanced natural language processing models are now capable of analyzing thousands of scientific articles in seconds."
+          }
+        },
+        "1": {
+          "deepFeedback": {
+            "formula": "Present Perfect Rule: After the auxiliary 'have' / 'has' / 'had', the verb MUST be in the VERB 3 (past participle) form.",
+            "grammarRule": "have + Verb 3 (acknowledged).",
+            "collocation": "researchers have acknowledged that (= researchers have acknowledged that)",
+            "distractorAnalysis": "'Acknowledge' is V1, 'acknowledging' is V-ing, and 'acknowledgment' is a noun. Only 'acknowledged' (V3) can pair with 'have'.",
+            "translation": "Many researchers have acknowledged that machine learning tools accelerate data synthesis."
+          }
+        },
+        "2": {
+          "deepFeedback": {
+            "formula": "Linking Words Map (Clear Contrast): The previous sentence praises the speed of AI (+), whereas this sentence highlights ethical concerns and citation hallucinations (-).",
+            "grammarRule": "Contrast adverb with a comma: 'However, ...'",
+            "distractorAnalysis": "'Furthermore' and 'In addition' are incorrect because the meaning shifts from positive to negative. 'Therefore' is incorrect because ethical concerns are not a result of analysis speed.",
+            "translation": "However, ethical concerns surrounding citation hallucinations and intellectual property continue to spark intense institutional debate."
+          }
+        }
+      },
+      "rw-fib-005": {
+        "0": {
+          "deepFeedback": {
+            "formula": "Noun Phrase Structure: After the article 'a' and the adjective 'serious', we MUST use a NOUN.",
+            "grammarRule": "a + adjective + singular noun.",
+            "collocation": "pose a serious threat to (= to pose a serious threat to)",
+            "distractorAnalysis": "'Threaten' is a verb (Verb 1), 'threatening' is a participle/adjective, and 'threatened' is a past verb/adjective. Only 'threat' has the status of a singular noun.",
+            "translation": "Metropolitan governments realize that sprawling suburbs pose a serious threat to city budgets."
+          }
+        },
+        "1": {
+          "deepFeedback": {
+            "formula": "Standard Collocation Pair (E2Language & Nakul): 'take measures / take steps / take action' is a standard academic idiom.",
+            "grammarRule": "take decisive measures (= to take decisive action/steps).",
+            "collocation": "take decisive measures to (+ V1)",
+            "distractorAnalysis": "'Measuring' (-ing) and 'measurement' (physical measurement of a tool) are incorrect in meaning. 'Measure' in the plural form 'measures' is defined as official actions/policies.",
+            "translation": "The city council is taking decisive measures to promote high-density housing."
+          }
+        },
+        "2": {
+          "deepFeedback": {
+            "formula": "Subject-Verb Agreement Rule: The subject 'carbon footprints' is PLURAL (ends in -s).",
+            "grammarRule": "Plural subject + Verb 1 without an -s suffix in the present tense.",
+            "collocation": "carbon footprints decrease substantially (= carbon footprints decrease substantially)",
+            "distractorAnalysis": "'Decreases' with an -s suffix is only for singular subjects. 'Decreased' is the past tense (whereas the sentence uses the conditional 'when ... are ...' present tense). 'Decreasing' requires a 'to be' verb.",
+            "translation": "When residential areas are carefully integrated, carbon footprints decrease substantially."
+          }
+        }
+      },
+      "rw-fib-006": {
+        "0": {
+          "deepFeedback": {
+            "formula": "Historical Consequence Pattern: The subject 'trade in spices' requires a past tense verb (Verb 2) that means to change the shape of history ('reshaped').",
+            "grammarRule": "Past tense form is parallel to the clause 'transformed'.",
+            "collocation": "reshape the trajectory of (= to reshape the trajectory of)",
+            "distractorAnalysis": "'Confused' is incorrect in meaning, 'abandoned' is contradictory, and 'repaired' is not common for historical trajectories.",
+            "translation": "The historic spice trade reshaped the trajectory of global commerce."
+          }
+        },
+        "1": {
+          "deepFeedback": {
+            "formula": "Collocation of Courage: 'brave perils/dangers' is a high-level collocation meaning to face dangers for a purpose.",
+            "grammarRule": "Past transitive verb that takes the direct object 'unprecedented perils'.",
+            "collocation": "brave perils (= to face/brave dangers)",
+            "distractorAnalysis": "'Avoided' is the opposite of the context of merchants who were willing to sail long distances.",
+            "translation": "Medieval European merchants braved unprecedented perils."
+          }
+        },
+        "2": {
+          "deepFeedback": {
+            "formula": "Infinitive Pattern: 'continue to' + base form verb, meaning 'to be an essential part of'.",
+            "grammarRule": "After 'to', the base form of the verb is required to express the continuity of a role.",
+            "collocation": "constitute an indispensable component (= constitute an indispensable component)",
+            "distractorAnalysis": "'Demolish' and 'distort' carry destructive meanings.",
+            "translation": "In contemporary gastronomy, international spices continue to constitute an indispensable component."
+          }
+        }
+      },
+      "rw-fib-007": {
+        "0": {
+          "deepFeedback": {
+            "formula": "Scientific Passive Voice: 'are' + Verb 3 (Past Participle) describing the absorption of gas by seawater.",
+            "grammarRule": "Present passive form: 'are absorbed by'.",
+            "collocation": "absorbed by the oceans (= absorbed by the oceans)",
+            "distractorAnalysis": "'Radiated' is incorrect because the ocean absorbs CO2, it does not emit it.",
+            "translation": "A significant portion of carbon dioxide is absorbed by the world's oceans."
+          }
+        },
+        "1": {
+          "deepFeedback": {
+            "formula": "Patent Risk Collocation: 'pose a threat / pose a danger' is a standard Pearson collocation formula.",
+            "grammarRule": "The subject relative clause 'which' refers to 'ocean acidification' (singular), so the verb must end in -s ('poses').",
+            "collocation": "pose a grave danger to (= present a serious threat to)",
+            "distractorAnalysis": "'Cures' and 'relieves' carry meanings related to healing or alleviating.",
+            "translation": "This biochemical reaction poses a grave danger to shelled organisms."
+          }
+        },
+        "2": {
+          "deepFeedback": {
+            "formula": "Adjective Modifier: Before the noun 'damage', an adjective is needed to describe permanent, irreparable harm.",
+            "grammarRule": "The adjective modifies the noun 'damage'.",
+            "collocation": "suffer irreversible damage (= endure permanent, irreparable harm)",
+            "distractorAnalysis": "'Beneficial' is the complete opposite of the scientific warning tone.",
+            "translation": "Coral reefs may suffer irreversible damage within a few decades."
+          }
+        }
+      },
+      "rw-fib-008": {
+        "0": {
+          "deepFeedback": {
+            "formula": "Patent Preposition Collocation: 'hinge on' = 'depend on'.",
+            "grammarRule": "The singular subject 'Academic perseverance' requires the singular present verb 'hinges'.",
+            "collocation": "hinges on intrinsic motivation (= hinges on intrinsic motivation)",
+            "distractorAnalysis": "'Blame' is usually paired with 'for', not 'on', in the context of academic dependency.",
+            "translation": "Academic perseverance often hinges on intrinsic motivation."
+          }
+        },
+        "1": {
+          "deepFeedback": {
+            "formula": "Infinitive Pattern: 'inclined to' + base form verb, meaning to cultivate or develop positive habits.",
+            "grammarRule": "Base form of the verb for habits.",
+            "collocation": "cultivate study habits (= develop and build regular study routines)",
+            "distractorAnalysis": "'Deteriorate' and 'evade' are contrary to positive encouragement.",
+            "translation": "They are more inclined to cultivate disciplined study habits."
+          }
+        },
+        "2": {
+          "deepFeedback": {
+            "formula": "Participle Reduction Pattern: 'when confronted with' (= when faced with/encountering difficulties).",
+            "grammarRule": "Passive participle form paired with the preposition 'with'.",
+            "collocation": "confronted with unexpected difficulties (= confronted with unexpected difficulties)",
+            "distractorAnalysis": "'Delighted' does not make sense when paired with academic difficulties.",
+            "translation": "When confronted with unexpected academic difficulties."
+          }
+        }
+      },
+      "rw-fib-009": {
+        "0": {
+          "deepFeedback": {
+            "formula": "3-Second Rule: After the infinitive particle 'to', use the base form (VERB 1).",
+            "grammarRule": "to + base verb without suffixes.",
+            "collocation": "mitigate hazards (= reduce or lessen dangers)",
+            "distractorAnalysis": "'Mitigation' is a noun, 'mitigated' is past tense (V2/V3), and 'mitigating' is a participle (-ing). Only 'mitigate' satisfies the 'to + V1' infinitive rule.",
+            "translation": "The HACCP system is designed to mitigate biological, chemical, and physical food safety hazards."
+          }
+        },
+        "1": {
+          "deepFeedback": {
+            "formula": "3-Second Rule: The purpose phrase 'to + V1' requires a base verb meaning 'to inhibit'.",
+            "grammarRule": "Infinitive of purpose: to + V1.",
+            "collocation": "inhibit microbial growth (= slow down or prevent microbial growth)",
+            "distractorAnalysis": "'Inhabits' and 'inhabitant' derive from 'inhabit', which is semantically incorrect. 'Inhibiting' has an -ing suffix, violating the 'to + V1' rule.",
+            "translation": "High-risk foods must be cooled below five degrees Celsius to inhibit microbial growth."
+          }
+        },
+        "2": {
+          "deepFeedback": {
+            "formula": "Linking Words Map (Addition / Reinforcement): This sentence adds a legal consequence that reinforces the warning of danger in the previous sentence.",
+            "grammarRule": "Conjunctive adverb followed by a comma at the beginning of an independent clause.",
+            "distractorAnalysis": "'However' is incorrect because there is no contradiction. 'Although' and 'Despite' require a dependent clause and cannot stand alone before a comma.",
+            "translation": "Furthermore, failure to comply with official hygiene protocols may result in severe legal sanctions."
+          }
+        }
+      },
+      "rw-fib-010": {
+        "0": {
+          "deepFeedback": {
+            "formula": "3-Second Rule: The relative pronoun 'which' refers to the plural noun 'organic acids or alcohols', so the verb must be a PLURAL VERB 1 (without -s).",
+            "grammarRule": "Subject-Verb Agreement: Plural antecedent -> Plural verb (impart).",
+            "collocation": "impart a distinctive flavor (= give a unique, recognizable taste)",
+            "distractorAnalysis": "'Imparts' is singular (for he/she/it). 'Imparting' is an -ing form without an auxiliary verb, and 'impartation' is a noun.",
+            "translation": "Enzymes break down complex carbohydrates into organic acids or alcohols, which impart a distinctive acidic flavor profile."
+          }
+        },
+        "1": {
+          "deepFeedback": {
+            "formula": "Patent Collocation Rule: In thermal science, temperature ranges are expressed with the phrase 'temperature ranges'.",
+            "grammarRule": "Noun phrase collocation: temperature + ranges.",
+            "collocation": "temperature ranges (= spans of temperature values)",
+            "distractorAnalysis": "'Distances' refers to spatial distance (meters/km). 'Intervals' refers to time gaps or periodic points. 'Durations' refers to time length, not temperature degrees.",
+            "translation": "Fermented foods must be incubated within strictly controlled temperature ranges."
+          }
+        },
+        "2": {
+          "deepFeedback": {
+            "formula": "Linking Words Map (Contrast / Concession): The previous sentence discusses the benefits of controlled fermentation, while this sentence warns of the risk of pathogen contamination if handled incorrectly.",
+            "grammarRule": "Adversative conjunctive adverb: Indicates contrast or a warning of opposition.",
+            "distractorAnalysis": "'Consequently' and 'Therefore' signal a unidirectional cause-effect relationship, not contrast. 'Because' is a subordinating conjunction that cannot stand alone before a comma.",
+            "translation": "Nevertheless, improper handling can introduce pathogenic microbes that spoil the entire dough."
+          }
+        }
+      },
+      "rw-fib-011": {
+        "0": {
+          "deepFeedback": {
+            "formula": "Academic Collocation Formula (ACL): The phrase for 'mencapai keseimbangan' is 'strike a balance'.",
+            "grammarRule": "Infinitive structure: strive to + Verb 1 (strike).",
+            "collocation": "strike an optimal balance (= to achieve/find an optimal balance)",
+            "distractorAnalysis": "'Strikes' (singular), 'striking' (-ing), and 'stricken' (past participle) violate the 'strive to + V1' rule.",
+            "translation": "Conservation authorities strive to strike an optimal balance between welcoming tourism revenue and preserving fragile marine ecosystems."
+          }
+        },
+        "1": {
+          "deepFeedback": {
+            "formula": "Auxiliary Modal Formula: After the negative auxiliary verb 'do not', the verb MUST be in the VERB 1 BASE FORM.",
+            "grammarRule": "do not + pure Verb 1.",
+            "collocation": "disturb native wildlife (= to disrupt native wildlife)",
+            "distractorAnalysis": "'Disturbed' is the past form, 'disturbance' is a noun, and 'disturbingly' is an adverb. Only 'disturb' is a Verb 1.",
+            "translation": "Tour operators are required to undergo strict accreditation to ensure their activities do not disturb native wildlife."
+          }
+        },
+        "2": {
+          "deepFeedback": {
+            "formula": "Linking Words Map (Positive Addition): Adds a supporting positive fact about how tourist levies directly fund conservation.",
+            "grammarRule": "Conjunctive adverb followed by a comma at the beginning of a new sentence.",
+            "distractorAnalysis": "'Whereas' and 'Unless' are subordinating conjunctions that require a dependent clause. 'Despite' requires a noun phrase, not a complete sentence followed by a comma.",
+            "translation": "Moreover, environmental levies paid by tourists are allocated directly to habitat restoration."
+          }
+        }
+      },
+      "rw-fib-012": {
+        "0": {
+          "deepFeedback": {
+            "formula": "Modal Verb Formula: After the modal auxiliary 'can', the verb MUST be in the VERB 1 BASE FORM.",
+            "grammarRule": "Modal (can/could/may/must/should) + Verb 1.",
+            "collocation": "adjust room rates (= to modify room rates)",
+            "distractorAnalysis": "'Adjustment' is a noun, 'adjusted' is a past form, 'adjusting' is a present participle. Only 'adjust' is the base form.",
+            "translation": "By continuously analyzing historical reservation data, hotels can adjust room rates in real time."
+          }
+        },
+        "1": {
+          "deepFeedback": {
+            "formula": "Verb-Noun Phrase Formula: The transitive verb 'stimulate' requires an object in the form of a noun.",
+            "grammarRule": "Transitive verb + Noun object: stimulate demand.",
+            "collocation": "stimulate demand (= to encourage market demand)",
+            "distractorAnalysis": "'Demanding' is an adjective (difficult/challenging), 'demanded' is a past verb. 'Demand' (uncountable noun) is the correct choice for the economic concept of market demand.",
+            "translation": "Promotional discounts are introduced during off-peak periods to stimulate demand."
+          }
+        },
+        "2": {
+          "deepFeedback": {
+            "formula": "Linking Words Map (Warning / Contrast): The previous sentence outlined the benefits of dynamic pricing, whereas this sentence warns of the negative impact of excessive price volatility.",
+            "grammarRule": "Adversative transition followed by comma.",
+            "distractorAnalysis": "'Therefore' signals a positive logical consequence, 'In addition' adds a point in the same direction, whereas this sentence presents an opposing risk.",
+            "translation": "However, excessive price volatility can alienate loyal corporate clients and damage long-term brand reputation."
+          }
+        }
+      },
+      "rw-fib-013": {
+        "0": {
+          "deepFeedback": {
+            "formula": "3-Second Rule: After 'to' (infinitive of purpose), use the base verb VERB 1. Note that the verb form of 'thick' is 'thicken'.",
+            "grammarRule": "to + pure Verb 1 (thicken).",
+            "collocation": "thicken aqueous solutions (= to make water-based solutions thicker)",
+            "distractorAnalysis": "'Thickness' is a noun, 'thickened' is a past participle/adjective, and 'thickly' is an adverb. The base verb is 'thicken'.",
+            "translation": "Hydrocolloids like xanthan gum are widely used in modern gastronomy to thicken aqueous solutions without altering their flavor quality."
+          }
+        },
+        "1": {
+          "deepFeedback": {
+            "formula": "Verb Modification Formula: The intransitive verb 'increases' is modified by an ADVERB (adverb of degree) ending in -ly.",
+            "grammarRule": "Verb + Adverb of manner/degree: increases substantially.",
+            "collocation": "increase substantially (= to increase significantly)",
+            "distractorAnalysis": "'Substantial' is an adjective, 'substance' is a noun, and 'substantiate' is a verb. Only 'substantially' is an adverb.",
+            "translation": "When food exhibits a pleasant consistency, consumer acceptance increases substantially."
+          }
+        },
+        "2": {
+          "deepFeedback": {
+            "formula": "Linking Words Map (Direct Opposite): Compares two contrasting conditions (pleasant texture vs. overly thick/slimy texture).",
+            "grammarRule": "Contrastive sentence linker: Conversely.",
+            "distractorAnalysis": "'Consequently' signals cause-effect, 'Furthermore' signals addition, and 'Namely' is used to mention specific examples.",
+            "translation": "Conversely, a texture that is too thick or slimy can immediately trigger sensory aversion."
+          }
+        }
+      },
+      "rw-fib-014": {
+        "0": {
+          "deepFeedback": {
+            "formula": "Passive Voice Adverbial Formula: Between the passive auxiliary 'are' and the participle 'enforced', insert an ADVERB (-ly) to describe the manner of enforcement.",
+            "grammarRule": "be + Adverb (-ly) + Past Participle: are rigorously enforced.",
+            "collocation": "rigorously enforced (= strictly/disciplined enforced)",
+            "distractorAnalysis": "'Rigorous' is an adjective, while 'rigor' and 'rigorousness' are nouns. The position before a past participle requires an adverb.",
+            "translation": "Authorities set annual catch limits that are rigorously enforced."
+          }
+        },
+        "1": {
+          "deepFeedback": {
+            "formula": "Verb of Causation/Permission Formula: The pattern is 'permit + object + to + Verb 1'.",
+            "grammarRule": "permit [someone/something] to + Verb 1 base form.",
+            "collocation": "permit juvenile lobsters to escape (= to allow young lobsters to get away)",
+            "distractorAnalysis": "'Escaped' is V2/V3, 'escaping' is a gerund, 'escapes' is singular present. After 'to', the Verb 1 'escape' is mandatory.",
+            "translation": "Vessels must use escape gaps on traps so that juvenile lobsters can escape safely."
+          }
+        },
+        "2": {
+          "deepFeedback": {
+            "formula": "Linking Words Map (Conclusion / Final Result): Summarizes the final outcome of all ecological regulations discussed previously.",
+            "grammarRule": "Concluding sentence adverb followed by comma.",
+            "distractorAnalysis": "'Instead' is used when there is an alternative replacement that is cancelled. 'Although' and 'Whereas' are comparative conjunctions that require two connected clauses.",
+            "translation": "Ultimately, these strict ecological measures ensure stable export earnings while protecting marine biodiversity."
+          }
+        }
+      },
+      "rw-fib-015": {
+        "0": {
+          "deepFeedback": {
+            "formula": "Infinitive Formula: After the phrase 'legal duty of care to', the verb must be in the BASE VERB 1 form.",
+            "grammarRule": "duty of care to + Verb 1 base form.",
+            "collocation": "disclose allergens (= to reveal/list allergen ingredients)",
+            "distractorAnalysis": "'Disclosure' is a noun, 'disclosed' is the past form, and 'disclosing' is the present participle. Only 'disclose' is the base Verb 1.",
+            "translation": "Commercial dining establishments have a legal obligation to accurately disclose all major allergens present in their dishes."
+          }
+        },
+        "1": {
+          "deepFeedback": {
+            "formula": "Linking Word Map (Simultaneous / Parallel Action): Connects kitchen preparation with waitstaff training, which must occur side-by-side.",
+            "grammarRule": "Sentence-level temporal adverb followed by comma.",
+            "distractorAnalysis": "'Otherwise' indicates a negative conditional state ('if not'). 'Despite' requires a noun phrase, and 'Unless' is a conditional conjunction.",
+            "translation": "Simultaneously, front-of-house staff must be thoroughly trained to transparently communicate ingredient specifications to guests."
+          }
+        }
+      },
+      "rw-fib-016": {
+        "0": {
+          "deepFeedback": {
+            "formula": "Predicative Adjective Formula: The pattern 'are often [adjective] in [nutrient]'. The adjective pair for a lack of a substance is 'deficient in'.",
+            "grammarRule": "be + Adjective + in + noun: deficient in.",
+            "collocation": "deficient in amino acids (= lacking amino acids)",
+            "distractorAnalysis": "'Deficiency' and 'deficit' are nouns. 'Deficiently' is an adverb. After the 'to be' verb 'are', the adjective 'deficient' is required.",
+            "translation": "Individual plant-based sources are often deficient in specific amino acids such as methionine or lysine."
+          }
+        },
+        "1": {
+          "deepFeedback": {
+            "formula": "Subject-Verb Agreement Formula: The subject 'food manufacturers' is plural; therefore, the Simple Present verb must be plural (VERB 1 WITHOUT -S).",
+            "grammarRule": "Plural subject (manufacturers) -> Plural verb (blend).",
+            "collocation": "blend complementary proteins (= to mix/combine complementary proteins)",
+            "distractorAnalysis": "'Blends' is the singular form. 'Blended' is the past tense. 'Blending' requires an auxiliary 'to be' verb.",
+            "translation": "Food manufacturers blend complementary proteins to achieve a complete protein profile."
+          }
+        },
+        "2": {
+          "deepFeedback": {
+            "formula": "Linking Word Map (Adding Benefits): Adds another technological advancement that complements the success of protein combinations.",
+            "grammarRule": "Additive linking adverb followed by comma.",
+            "distractorAnalysis": "'Conversely' and 'In contrast' are incorrect because they indicate opposition or a reverse idea. 'Although' requires a dependent clause.",
+            "translation": "Furthermore, modern processing techniques have enhanced the bioavailability of plant-derived minerals."
+          }
+        }
+      },
+      "rw-fib-017": {
+        "0": {
+          "deepFeedback": {
+            "formula": "Relative Clause Subject-Verb Agreement Formula: The antecedent 'competency-based assessments' is plural; therefore, the verb following 'that ...' must be a PLURAL VERB 1.",
+            "grammarRule": "Plural antecedent -> Verb 1 base form (prioritize).",
+            "collocation": "prioritize direct application (= to prioritize direct application)",
+            "distractorAnalysis": "'Prioritizes' is the singular form (-s). 'Priority' is a noun. 'Prioritizing' is a gerund/participle.",
+            "translation": "Vocational programs emphasize competency-based assessments that prioritize direct workplace application."
+          }
+        },
+        "1": {
+          "deepFeedback": {
+            "formula": "Linking Word Map (Result / Logical Impact): The previous sentence explains direct professional guidance; this sentence concludes the positive result of increased graduate employability.",
+            "grammarRule": "Transitional phrase denoting logical consequence followed by comma.",
+            "distractorAnalysis": "'On the contrary' and 'Nevertheless' indicate a contrast of ideas, not a logical continuation.",
+            "translation": "Consequently, graduates enter the workforce with proven technical competencies that substantially enhance their employability."
+          }
+        }
+      },
+      "rw-fib-018": {
+        "0": {
+          "deepFeedback": {
+            "formula": "Infinitive of Result Formula: The pattern 'interact to + Verb 1'.",
+            "grammarRule": "to + pure Verb 1 (generate).",
+            "collocation": "generate aromatic compounds (= to produce aromatic compounds)",
+            "distractorAnalysis": "'Generation' is a noun, 'generated' is the past tense, and 'generating' is the -ing form. Only 'generate' is the Verb 1.",
+            "translation": "Reducing sugars and amino acids interact to generate hundreds of volatile aromatic compounds."
+          }
+        },
+        "1": {
+          "deepFeedback": {
+            "formula": "Linking Word Map (Risk Contrast): Compares perfect roasting with the risk of failure if heat is not managed correctly.",
+            "grammarRule": "Adversative discourse marker: Conversely (= On the contrary).",
+            "distractorAnalysis": "'Furthermore' and 'Therefore' indicate a unidirectional continuation, not a comparison of mishandled conditions.",
+            "translation": "Conversely, improper heat application can destroy delicate fruity aromas and leave an unpleasant astringent taste."
+          }
+        }
+      },
+      "rw-fib-019": {
+        "0": {
+          "deepFeedback": {
+            "formula": "Noun Phrase Formula: After the adjective 'enzymatic', a NOUN is required.",
+            "grammarRule": "Adjective + Noun: enzymatic breakdown.",
+            "collocation": "enzymatic breakdown (= enzymatic decomposition)",
+            "distractorAnalysis": "'Break' is the base verb, 'breaking' is the present participle, and 'broken' is the past participle. 'Breakdown' is the standard noun for the biochemical decomposition process.",
+            "translation": "Temperature-controlled transport units must prevent temperature spikes that could accelerate enzymatic breakdown."
+          }
+        },
+        "1": {
+          "deepFeedback": {
+            "formula": "Linking Word Map (Emphasis / Reality): Reinforces the importance of the cold chain by detailing the fatal dangers of refrigeration failure.",
+            "grammarRule": "Emphatic adverbial connector followed by comma: Indeed (= In fact / Truly).",
+            "distractorAnalysis": "'Although' and 'Unless' are subordinating conjunctions. 'Despite' is a preposition.",
+            "translation": "Indeed, any failure in the refrigeration system during transit can jeopardize consumer safety and result in significant financial losses."
+          }
+        }
+      },
+      "rw-fib-020": {
+        "0": {
+          "deepFeedback": {
+            "formula": "Relative Subject-Verb Agreement Formula: The antecedent 'neurotransmitters' is plural; therefore, the following verb must be a PLURAL VERB 1 (without -s).",
+            "grammarRule": "Plural noun + which + Verb 1: influence.",
+            "collocation": "influence mood regulation (= to affect mood regulation)",
+            "distractorAnalysis": "'Influences' is the singular form. 'Influential' is an adjective. 'Influencing' is a participle.",
+            "translation": "Gut bacteria produce neurotransmitters such as serotonin that influence mood regulation and cognitive function."
+          }
+        },
+        "1": {
+          "deepFeedback": {
+            "formula": "Linking Word Map (Logical Conclusion): Concludes that based on the scientific evidence, the modulation of gut flora represents a new breakthrough in mental health.",
+            "grammarRule": "Sentence adverb of result followed by comma.",
+            "distractorAnalysis": "'However' and 'In contrast' are incorrect because they express opposing ideas, whereas this sentence is a consistent summary conclusion.",
+            "translation": "Therefore, therapeutic modulation of gut flora represents an innovative frontier in preventive mental healthcare."
+          }
+        }
+      }
+    },
+    "pte-reorder-paragraphs": {
+      "ro-001": {
+        "deepFeedback": {
+          "pairingClues": [
+            "Pair 1 (B ➔ D): Sentence B introduces Fleming's return/research, followed by D, which explains his specific actions ('Returning from a vacation, he inspected his lab benches').",
+            "Pair 2 (D ➔ A): After inspecting the lab bench (D), Fleming noticed a mold contaminating the petri dish ('Upon closer examination, he noticed a green mold' in A).",
+            "Pair 3 (A ➔ C): The bacteria-inhibiting mold in sentence A is referred to by the demonstrative phrase 'This life-saving substance' in sentence C as the conclusion of naming penicillin."
+          ],
+          "independentSentence": "Sentence B is an 'Independent Sentence'. It introduces the time ('In 1928'), the person's full name ('Alexander Fleming'), and the general topic ('accidental discovery'). There are no pronouns (he, it, this)."
+        }
+      },
+      "ro-002": {
+        "deepFeedback": {
+          "pairingClues": [
+            "Pair 1 (C ➔ A): The shift to online shopping (C) created initial problems for postal networks (A: 'Initially, traditional postal networks struggled...').",
+            "Pair 2 (A ➔ D): The shipping congestion issues in A are directly referred to by sentence D ('To address these logistical bottlenecks, corporations invested...').",
+            "Pair 3 (D ➔ B): The investment in automated warehouses in D resulted in 24-hour express delivery in sentence B ('As a result, modern consumers now receive orders within 24 hours')."
+          ],
+          "independentSentence": "Sentence C is a standalone opening sentence that introduces the broad topic of the shift from physical stores to e-commerce."
+        }
+      },
+      "ro-003": {
+        "deepFeedback": {
+          "pairingClues": [
+            "Pair 1 (C ➔ A): Sentence C describes Cook's voyage along the reef coast, followed by A which explains the sudden accident ('the vessel struck a sharp underwater reef').",
+            "Pair 2 (A ➔ D): The damage to the ship's hull in sentence A triggered Cook's emergency actions in sentence D ('To lighten the damaged ship... Cook ordered his men to heave cannons overboard').",
+            "Pair 3 (D ➔ B): The jettisoning of cargo in D is referred to anaphorically by the phrase 'This desperate salvage operation' in sentence B as the result of successfully refloating the ship."
+          ],
+          "independentSentence": "Sentence C is an Independent Sentence: It mentions a specific time ('In June 1770'), the full names of the ship and captain ('Captain James Cook', 'HMS Endeavour'), and a geographic region without ambiguous pronouns."
+        }
+      },
+      "ro-004": {
+        "deepFeedback": {
+          "pairingClues": [
+            "Pair 1 (B ➔ D): Sentence B introduces early competition, contrasted by the transition 'However' in D which explains the fall in petroleum prices.",
+            "Pair 2 (D ➔ A): The economic advantage in D is combined ('Coupled with...') with the invention of the self-starter in A, which locked in the dominance of the gasoline engine.",
+            "Pair 3 (A ➔ C): The century-long dominance in A is contrasted with the modern resurgence in C ('Today... zero-emission alternatives')."
+          ],
+          "independentSentence": "Sentence B is an Independent Sentence: It opens a historical chronology ('At the beginning of the twentieth century') and a general topic about early electric cars without transition markers."
+        }
+      },
+      "ro-005": {
+        "deepFeedback": {
+          "pairingClues": [
+            "Pair 1 (D ➔ B): From Ethiopia in D, the timeline moves to the 15th century in B ('By the fifteenth century, cultivation had crossed the Red Sea into Yemen').",
+            "Pair 2 (B ➔ C): The Yemeni region in B is referred to geographically by 'From these Arabian ports' in sentence C.",
+            "Pair 3 (C ➔ A): The arrival of coffee beans in Europe in C triggered the establishment of coffeehouses in A ('The establishment of dedicated coffeehouses across London and Paris...')."
+          ],
+          "independentSentence": "Sentence D is an Independent Sentence: It starts with the original geographic origins of the coffee plant ('Wild coffee plants originated in... Ethiopia') with a complete subject and no pronouns."
+        }
+      },
+      "ro-006": {
+        "deepFeedback": {
+          "pairingClues": [
+            "Pair 1: The drought problem ('droughts') triggered a government response ('To mitigate this impending water deficit...').",
+            "Pair 2: The initiative was realized through the construction of a plant ('The Kwinana Desalination Plant was consequently commissioned...').",
+            "Pair 3: The concluding sentence summarizes the current status ('Today, this facility alongside...')."
+          ],
+          "independentSentence": "The first sentence is one that mentions the background time and the problem ('In the early 2000s, prolonged southwestern droughts...') without demonstrative pronouns or consequence conjunctions."
+        }
+      },
+      "ro-007": {
+        "deepFeedback": {
+          "pairingClues": [
+            "Pair 1: 'living starter culture' is referred to as 'these microorganisms' in the second sentence.",
+            "Pair 2: 'break down cereal starches into sugars' is followed by 'The yeasts convert these sugars...'.",
+            "Pair 3: 'Simultaneously' explains the parallel action of lactic acid bacteria that complements the work of the yeast."
+          ],
+          "independentSentence": "The opening sentence introduces a general subject: sourdough starter ('Traditional sourdough bread relies on...')."
+        }
+      },
+      "ro-008": {
+        "deepFeedback": {
+          "pairingClues": [
+            "Pair 1: The transportation requirement is linked to conventional diesel trains ('Heavy-haul diesel trains have traditionally transported...').",
+            "Pair 2: The contrastive conjunction 'However' introduces the problem of operator fatigue.",
+            "Pair 3: 'To eliminate these operational hazards' refers directly to the fatigue and isolation problems in the previous sentence."
+          ],
+          "independentSentence": "The opening sentence defines a general logistical requirement ('Extracting iron ore... requires transporting vast tonnages...')."
+        }
+      }
+    },
+    "pte-summarize-written-text": {
+      "swt-001": {
+        "deepFeedback": {
+          "grammarPurity": "Uses a compound-complex formula: 1 independent clause connected by the conjunction 'and', then closed with the subordination 'although'. There is only 1 capital letter at the beginning and 1 period at the end."
+        },
+        "idealWordCount": "35-45 words",
+        "rules": "Exactly ONE sentence, ending with ONE period.",
+        "formulaScaffold": "[Independent Clause 1: Food waste squanders natural resources], and [Independent Clause 2: decomposing organic matter accelerates global warming], although [Dependent Clause 3: targeted investments and public education can mitigate this challenge]."
+      },
+      "swt-002": {
+        "deepFeedback": {
+          "grammarFormula": "1 Compound Sentence Formula: [Contrast Clause: While + Problem Subject + Problem Verb], [Main Clause: Solution Subject + Solution Verb + Benefit Goal].",
+          "collocationPaten": "curb greenhouse emissions, digital inventory tracking",
+          "linkingWords": "'While' at the beginning of the sentence connects the reality of food waste with modern hotel technology initiatives without creating a comma splice.",
+          "translation": "Although commercial hospitality kitchens generate substantial food waste due to overproduction and aesthetic standards, modern companies are implementing digital inventory systems and charitable partnerships to curb greenhouse emissions and reduce procurement costs."
+        },
+        "idealWordCount": "35-45 words",
+        "rules": "Exactly 1 sentence, 5-75 words, end with one period (.), use a subordinating conjunction.",
+        "formulaScaffold": "While commercial kitchens generate substantial organic waste due to overproduction and rigid presentation standards, innovative hospitality operators are adopting digital inventory tracking and charitable redistribution to mitigate greenhouse emissions and reduce procurement costs."
+      },
+      "swt-003": {
+        "deepFeedback": {
+          "grammarFormula": "Subordinative Formula: [Although + AI Advantage], [Main Clause: Medical authority insists on human complementation].",
+          "collocationPaten": "clinical radiology, decision-support tool",
+          "linkingWords": "'Although' bridges technological imaging progress with medical ethical boundaries.",
+          "translation": "Although artificial intelligence algorithms significantly improve diagnostic accuracy and patient triage in clinical radiology, medical authorities insist that software must accompany rather than replace licensed doctors due to ethical and accountability considerations."
+        },
+        "idealWordCount": "35-45 words",
+        "rules": "Exactly 1 sentence, 5-75 words, end with one period (.).",
+        "formulaScaffold": "Although machine learning algorithms significantly enhance diagnostic accuracy and emergency triage in radiology, medical experts insist that algorithmic decision-support must complement rather than replace licensed human clinicians due to ethical and accountability concerns."
+      },
+      "swt-004": {
+        "deepFeedback": {
+          "grammarFormula": "Pearson Syntactic Pattern: While [Challenging Urban Condition], [Green Infrastructure + Dual Benefits].",
+          "collocationPaten": "urban heat island effects, ecological resilience",
+          "linkingWords": "'While' provides a sharp contrast between the dangers of concrete heat and urban park restoration.",
+          "translation": "While urban concrete landscapes generate heat island effects that increase health risks, city planning investments in green infrastructure actively lower citizen stress levels and increase ecological resilience against urban flooding."
+        },
+        "idealWordCount": "35-45 words",
+        "rules": "Exactly 1 sentence, 5-75 words, end with one period (.).",
+        "formulaScaffold": "While dense metropolitan developments generate oppressive heat islands that endanger public health, investments in urban green infrastructure provide psychological restoration for citizens and mitigate urban flooding through permeable vegetation."
+      },
+      "swt-005": {
+        "deepFeedback": {
+          "grammarFormula": "Pearson Compound Sentence Structure: Although [Desalination Solution], [Environmental Challenge + Renewable Solution].",
+          "collocationPaten": "reverse osmosis desalination, hypersaline brine discharges",
+          "linkingWords": "'Although' ensures the sentence remains a single grammatical unit without splitting into two separate sentences.",
+          "translation": "Although reverse osmosis desalination provides essential drinking water security for arid coastal nations, researchers must overcome high energy requirements and toxic concentrated brine discharge through the integration of renewable energy and mineral recovery technology."
+        },
+        "idealWordCount": "35-45 words",
+        "rules": "Exactly 1 sentence, 5-75 words, end with one period (.).",
+        "formulaScaffold": "Although reverse osmosis desalination provides critical potable water security for arid coastal nations, engineers must resolve substantial energy consumption and marine brine discharge through renewable power and advanced mineral extraction."
+      },
+      "swt-006": {
+        "deepFeedback": {
+          "ruleCheck": "Meets the Pearson 5-75 word limit (34 words) and is formatted as exactly 1 sentence with 1 period at the end."
+        },
+        "formulaScaffold": "1 SWT Sentence Formula: [Opening Clause / Main Subject] + [Main Verb] + [Coordinating / Subordinating Conjunction] + [Conclusion / Main Impact]."
+      },
+      "swt-007": {
+        "deepFeedback": {
+          "ruleCheck": "1 complete sentence, 32 words, elegant compound-complex structure."
+        },
+        "formulaScaffold": "1 SWT Sentence Formula: While [groundwater crisis condition], [solar desalination solution] + [economic and ecological benefits]."
+      },
+      "swt-008": {
+        "deepFeedback": {
+          "ruleCheck": "1 complete sentence, 31 words, meets Pearson SWT requirements."
+        },
+        "formulaScaffold": "SWT 1-Sentence Formula: By [passive architectural method], [designing subject] + [energy efficiency result]."
+      },
+      "swt-009": {
+        "deepFeedback": {
+          "ruleCheck": "1 complete sentence, 34 words, passes Pearson validation."
+        },
+        "formulaScaffold": "SWT 1-Sentence Formula: In order to [waste reduction goal], [industry player] + [recycling process] + [benefit]."
+      },
+      "swt-010": {
+        "deepFeedback": {
+          "ruleCheck": "1 complete sentence, 33 words, 100% valid."
+        },
+        "formulaScaffold": "SWT 1-Sentence Formula: By replacing [conventional method], [autonomous drone] + [speed and safety benefits]."
+      },
+      "swt-011": {
+        "deepFeedback": {
+          "ruleCheck": "1 sentence, 32 words, compound-complex structure."
+        },
+        "formulaScaffold": "1-Sentence Formula: Although [uniform traditional method], [satellite precision farming] + [efficiency and sustainability results]."
+      },
+      "swt-012": {
+        "deepFeedback": {
+          "ruleCheck": "1 sentence, 33 words, meets Pearson SWT rules."
+        },
+        "formulaScaffold": "1-Sentence Formula: By replacing [heat-absorbing dark asphalt], [reflective surfaces and gardens] + [temperature reduction and energy savings]."
+      },
+      "swt-013": {
+        "deepFeedback": {
+          "ruleCheck": "1 sentence, 31 words, 1 period at the end."
+        },
+        "formulaScaffold": "1-Sentence Formula: To prevent [harmful bacteria], [commercial kitchen protocol] + [sanitation and tool separation methods]."
+      },
+      "swt-014": {
+        "deepFeedback": {
+          "ruleCheck": "1 sentence, 32 words, passes SWT audit."
+        },
+        "formulaScaffold": "1-Sentence Formula: Leveraging [WA solar and wind conditions], [electrolysis facility] + [clean energy export to Asia]."
+      },
+      "swt-015": {
+        "deepFeedback": {
+          "ruleCheck": "1 sentence, 35 words, perfect."
+        },
+        "formulaScaffold": "1-Sentence Formula: Although [limited number of radiologists], [deep learning AI] + [rapid detection benefits as a clinical assistant]."
+      }
+    }
+  }
+}

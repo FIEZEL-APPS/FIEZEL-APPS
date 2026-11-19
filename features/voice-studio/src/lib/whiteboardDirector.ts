@@ -17,7 +17,7 @@ import {
 } from '../data/kakijunStrokeBank';
 import { resolveVoiceApiCandidateBases } from './liveTransport';
 import { layoutGraphToShapes } from './dagreLayout';
-import { wbPick } from './i18n';
+import { wbPick, wbFmt } from './i18n';
 
 export interface BoardDynamicDataSubset {
   contextMode: string;
@@ -825,15 +825,27 @@ function deriveStepSpokenNarration(
       const rp = step.rightPanel;
       const an = cleanBoardDisplayText(step.analogy || '');
       const leftCue = lp
-        ? wbPick(
-            `First on the left, ${lp.title}: ${lp.subtitle || 'focus on the core rule'}${lp.example ? `. Example: ${lp.example}` : ''}`,
-            `Pertama di sisi kiri, ${lp.title}: ${lp.subtitle || 'perhatikan aturan utamanya'}${lp.example ? `. Contohnya kalimat ${lp.example}` : ''}`
+        ? wbFmt(
+            'First on the left, {title}: {subtitle}{ex}',
+            'Pertama di sisi kiri, {title}: {subtitle}{ex}',
+            undefined,
+            {
+              title: lp.title,
+              subtitle: lp.subtitle || wbPick('focus on the core rule', 'perhatikan aturan utamanya'),
+              ex: lp.example ? wbFmt('. Example: {example}', '. Contohnya kalimat {example}', undefined, { example: lp.example }) : '',
+            }
           )
         : '';
       const rightCue = rp
-        ? wbPick(
-            `Second on the right, ${rp.title}: ${rp.subtitle || 'compare with this form'}${rp.example ? `. Example: ${rp.example}` : ''}`,
-            `Kedua di sisi kanan, ${rp.title}: ${rp.subtitle || 'ini perbandingannya'}${rp.example ? `. Contohnya kalimat ${rp.example}` : ''}`
+        ? wbFmt(
+            'Second on the right, {title}: {subtitle}{ex}',
+            'Kedua di sisi kanan, {title}: {subtitle}{ex}',
+            undefined,
+            {
+              title: rp.title,
+              subtitle: rp.subtitle || wbPick('compare with this form', 'ini perbandingannya'),
+              ex: rp.example ? wbFmt('. Example: {example}', '. Contohnya kalimat {example}', undefined, { example: rp.example }) : '',
+            }
           )
         : '';
       return `${leftCue ? `${leftCue}. ` : ''}${rightCue ? `${rightCue}. ` : ''}${an && !/^visualisasi/i.test(an) ? `${wbPick('Key idea', 'Kuncinya')}: ${an}.` : ''}`.replace(/\.{2,}/g, '.').trim();
@@ -842,39 +854,62 @@ function deriveStepSpokenNarration(
       if (existingWords >= 14) return /[.!?。！？]$/.test(existing) ? existing : `${existing}.`;
       const items = (step.branches || [])
         .slice(0, 4)
-        .map((b, bIdx) => wbPick(
-          `Branch ${bIdx + 1}, ${b.label}${b.sublabel ? `, meaning ${b.sublabel}` : ''}${b.example ? `, for example ${b.example}` : ''}`,
-          `Cabang ${bIdx + 1}, ${b.label}${b.sublabel ? `, yaitu ${b.sublabel}` : ''}${b.example ? `, contohnya ${b.example}` : ''}`
+        .map((b, bIdx) => wbFmt(
+          'Branch {num}, {label}{sub}{ex}',
+          'Cabang {num}, {label}{sub}{ex}',
+          undefined,
+          {
+            num: bIdx + 1,
+            label: b.label,
+            sub: b.sublabel ? wbFmt(', meaning {sublabel}', ', yaitu {sublabel}', undefined, { sublabel: b.sublabel }) : '',
+            ex: b.example ? wbFmt(', for example {example}', ', contohnya {example}', undefined, { example: b.example }) : '',
+          }
         ))
         .join('. ');
-      return wbPick(
-        `Let's walk through the concept map for ${cleanBoardDisplayText(step.metaphorCenterLabel || step.title || topicTitle)} one by one. ${items || cleanBoardDisplayText(step.title || topicTitle)}.`,
-        `Mari kita baca peta konsep ${cleanBoardDisplayText(step.metaphorCenterLabel || step.title || topicTitle)} satu per satu. ${items || cleanBoardDisplayText(step.title || topicTitle)}.`
+      return wbFmt(
+        "Let's walk through the concept map for {topic} one by one. {detail}.",
+        'Mari kita baca peta konsep {topic} satu per satu. {detail}.',
+        undefined,
+        {
+          topic: cleanBoardDisplayText(step.metaphorCenterLabel || step.title || topicTitle),
+          detail: items || cleanBoardDisplayText(step.title || topicTitle),
+        }
       ).replace(/\.{2,}/g, '.').trim();
     }
     case 'timeline_track': {
       if (existingWords >= 14) return /[.!?。！？]$/.test(existing) ? existing : `${existing}.`;
       const stops = (step.timelineEvents || [])
         .slice(0, 4)
-        .map((ev) => `${ev.timeLabel}: ${ev.title}${ev.example ? wbPick(`, e.g. ${ev.example}`, `, contohnya ${ev.example}`) : ''}`)
+        .map((ev) => `${ev.timeLabel}: ${ev.title}${ev.example ? wbFmt(', e.g. {example}', ', contohnya {example}', undefined, { example: ev.example }) : ''}`)
         .join(wbPick('. Then ', '. Kemudian '));
-      return wbPick(
-        `Follow the timeline from left to right. ${stops || cleanBoardDisplayText(step.title || topicTitle)}.`,
-        `Ikuti garis waktu dari kiri ke kanan. ${stops || cleanBoardDisplayText(step.title || topicTitle)}.`
+      return wbFmt(
+        'Follow the timeline from left to right. {stops}.',
+        'Ikuti garis waktu dari kiri ke kanan. {stops}.',
+        undefined,
+        { stops: stops || cleanBoardDisplayText(step.title || topicTitle) }
       ).replace(/\.{2,}/g, '.').trim();
     }
     case 'formula_blocks': {
       if (existingWords >= 14) return /[.!?。！？]$/.test(existing) ? existing : `${existing}.`;
       const pieceDesc = (step.blocks || [])
         .slice(0, 5)
-        .map((bl, bIdx) => wbPick(
-          `Block ${bIdx + 1}, ${bl.role}, contains ${bl.token}${bl.note ? `, used for ${bl.note}` : ''}`,
-          `Blok ${bIdx + 1}, ${bl.role}, berisi ${bl.token}${bl.note ? `, digunakan untuk ${bl.note}` : ''}`
+        .map((bl, bIdx) => wbFmt(
+          'Block {num}, {role}, contains {token}{note}',
+          'Blok {num}, {role}, berisi {token}{note}',
+          undefined,
+          {
+            num: bIdx + 1,
+            role: bl.role,
+            token: bl.token,
+            note: bl.note ? wbFmt(', used for {note}', ', digunakan untuk {note}', undefined, { note: bl.note }) : '',
+          }
         ))
         .join('. ');
-      return wbPick(
-        `Notice the pattern blocks from left to right. ${pieceDesc || cleanBoardDisplayText(step.title || topicTitle)}.`,
-        `Perhatikan susunan blok polanya dari kiri ke kanan. ${pieceDesc || cleanBoardDisplayText(step.title || topicTitle)}.`
+      return wbFmt(
+        'Notice the pattern blocks from left to right. {detail}.',
+        'Perhatikan susunan blok polanya dari kiri ke kanan. {detail}.',
+        undefined,
+        { detail: pieceDesc || cleanBoardDisplayText(step.title || topicTitle) }
       ).replace(/\.{2,}/g, '.').trim();
     }
     case 'rough_scene': {
@@ -887,11 +922,13 @@ function deriveStepSpokenNarration(
         })
         .filter((s) => s && s.length <= 80)
         .slice(0, 4);
-      const visualCue = partsDesc.length ? wbPick(` Starting from ${partsDesc.join(', then ')}.`, ` Mulai dari ${partsDesc.join(', lalu ')}.`) : '';
+      const visualCue = partsDesc.length ? wbFmt(' Starting from {parts}.', ' Mulai dari {parts}.', undefined, { parts: partsDesc.join(wbPick(', then ', ', lalu ')) }) : '';
       const cap = step.caption ? ` ${cleanBoardDisplayText(step.caption)}.` : '';
-      return wbPick(
-        `Look closely at the ${cleanBoardDisplayText(step.title || topicTitle)} diagram on the board.${cap}${visualCue}`,
-        `Perhatikan skema ${cleanBoardDisplayText(step.title || topicTitle)} di papan.${cap}${visualCue}`
+      return wbFmt(
+        'Look closely at the {topic} diagram on the board.{cap}{visualCue}',
+        'Perhatikan skema {topic} di papan.{cap}{visualCue}',
+        undefined,
+        { topic: cleanBoardDisplayText(step.title || topicTitle), cap, visualCue }
       ).trim();
     }
     case 'contrast_scale': {
@@ -901,9 +938,15 @@ function deriveStepSpokenNarration(
       const b = cleanBoardDisplayText(step.termB || wbPick('Comparison form', 'Bentuk pembanding'));
       const dB = cleanBoardDisplayText(step.descB || '');
       const an = cleanBoardDisplayText(step.analogy || '');
-      return wbPick(
-        `Compare both sides: ${a}${dA ? ` (${dA})` : ''} versus ${b}${dB ? ` (${dB})` : ''}.${an ? ` Key insight: ${an}.` : ''}`,
-        `Bandingkan sisi kiri dan kanan: ${a}${dA ? ` (${dA})` : ''}, versus ${b}${dB ? ` (${dB})` : ''}.${an ? ` Kuncinya: ${an}.` : ''}`
+      return wbFmt(
+        'Compare both sides: {sideA} versus {sideB}.{insight}',
+        'Bandingkan sisi kiri dan kanan: {sideA}, versus {sideB}.{insight}',
+        undefined,
+        {
+          sideA: `${a}${dA ? ` (${dA})` : ''}`,
+          sideB: `${b}${dB ? ` (${dB})` : ''}`,
+          insight: an ? wbFmt(' Key insight: {insight}.', ' Kuncinya: {insight}.', undefined, { insight: an }) : '',
+        }
       ).trim();
     }
     case 'syntax_flow': {
@@ -912,21 +955,28 @@ function deriveStepSpokenNarration(
         .map((n) => {
           const r = cleanBoardDisplayText(n.role);
           const w = cleanBoardDisplayText(n.word);
-          return r && w ? wbPick(`${r}: ${w}`, `${r} diisi ${w}`) : w || r;
+          return r && w ? wbFmt('{role}: {word}', '{role} diisi {word}', undefined, { role: r, word: w }) : w || r;
         })
         .filter(Boolean)
         .join(wbPick(', followed by ', ', lalu '));
       const extraExplain = cleanBoardDisplayText(step.reason || _coachExplanation || '');
       if (chain) {
-        return wbPick(
-          `Follow the sentence blocks from left to right: ${chain}.${extraExplain ? ` ${extraExplain.split(/(?<=[.!?])\s+/)[0]}` : ''}`,
-          `Perhatikan urutan blok kalimat yang tepat dari kiri ke kanan: ${chain}.${extraExplain ? ` ${extraExplain.split(/(?<=[.!?])\s+/)[0]}` : ''}`
+        return wbFmt(
+          'Follow the sentence blocks from left to right: {chain}.{extra}',
+          'Perhatikan urutan blok kalimat yang tepat dari kiri ke kanan: {chain}.{extra}',
+          undefined,
+          { chain, extra: extraExplain ? ` ${extraExplain.split(/(?<=[.!?])\s+/)[0]}` : '' }
         ).replace(/\.{2,}/g, '.').trim();
       }
       const formulaHint = cleanBoardDisplayText(step.rightText || step.text || '');
-      return wbPick(
-        `Examine the sentence structure for ${cleanBoardDisplayText(step.title || topicTitle)}: ${formulaHint || extraExplain || 'place each clause element in its proper slot'}.`,
-        `Perhatikan susunan struktur kalimat untuk ${cleanBoardDisplayText(step.title || topicTitle)}: ${formulaHint || extraExplain || 'letakkan setiap unsur kalimat tepat pada posisinya agar tidak bertabrakan'}.`
+      return wbFmt(
+        'Examine the sentence structure for {topic}: {detail}.',
+        'Perhatikan susunan struktur kalimat untuk {topic}: {detail}.',
+        undefined,
+        {
+          topic: cleanBoardDisplayText(step.title || topicTitle),
+          detail: formulaHint || extraExplain || wbPick('place each clause element in its proper slot', 'letakkan setiap unsur kalimat tepat pada posisinya agar tidak bertabrakan'),
+        }
       ).replace(/\.{2,}/g, '.').trim();
     }
     case 'table': {
@@ -950,23 +1000,29 @@ function deriveStepSpokenNarration(
         return /[.!?。！？]$/.test(existing) ? existing : `${existing}.`;
       }
       const why = step.reason ? ` ${wbPick('Reason:', 'Alasannya:')} ${cleanBoardDisplayText(step.reason)}.` : '';
-      return wbPick(
-        `Avoid forms like ${wrongClean || 'the common mistake'}. Use ${rightClean}.${why}`,
-        `Hindari kesalahan seperti ${wrongClean || 'bentuk yang keliru'}. Yang benar adalah ${rightClean}.${why}`
+      return wbFmt(
+        'Avoid forms like {wrong}. Use {right}.{why}',
+        'Hindari kesalahan seperti {wrong}. Yang benar adalah {right}.{why}',
+        undefined,
+        { wrong: wrongClean || wbPick('the common mistake', 'bentuk yang keliru'), right: rightClean, why }
       ).replace(/\.{2,}/g, '.').trim();
     }
     case 'highlight_callout':
       if (existingWords >= 6) return /[.!?。！？]$/.test(existing) ? existing : `${existing}.`;
       return `${wbPick('Remember this key point:', 'Ingat kuncinya:')} ${cleanBoardDisplayText(step.highlightPhrase || step.text || step.title || topicTitle)}.`.trim();
     case 'tone_wave':
-      return wbPick(
-        `Watch the pitch contour for ${cleanBoardDisplayText(step.text || step.title)} and trace the blue curve as you pronounce ${cleanBoardDisplayText(step.reading || '')}.`,
-        `Amati gelombang nada untuk ${cleanBoardDisplayText(step.text || step.title)} dan ikuti naik turunnya garis biru saat membaca ${cleanBoardDisplayText(step.reading || '')}.`
+      return wbFmt(
+        'Watch the pitch contour for {word} and trace the blue curve as you pronounce {reading}.',
+        'Amati gelombang nada untuk {word} dan ikuti naik turunnya garis biru saat membaca {reading}.',
+        undefined,
+        { word: cleanBoardDisplayText(step.text || step.title), reading: cleanBoardDisplayText(step.reading || '') }
       ).trim();
     case 'checkpoint':
-      return wbPick(
-        `Now try this quick check: ${cleanBoardDisplayText(step.text || 'choose the accurate sentence form')}.`,
-        `Sekarang coba jawab latihan singkat ini: ${cleanBoardDisplayText(step.text || 'pilih bentuk kalimat yang benar')}.`
+      return wbFmt(
+        'Now try this quick check: {prompt}.',
+        'Sekarang coba jawab latihan singkat ini: {prompt}.',
+        undefined,
+        { prompt: cleanBoardDisplayText(step.text || wbPick('choose the accurate sentence form', 'pilih bentuk kalimat yang benar')) }
       ).trim();
     default:
       return existing || `${cleanBoardDisplayText(step.title || topicTitle)}. ${cleanBoardDisplayText(step.text || step.reason || '')}`.trim();

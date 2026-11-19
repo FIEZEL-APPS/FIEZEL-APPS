@@ -9,7 +9,7 @@ import {
   Tooltip,
 } from 'recharts';
 import { LearnerLocale, SpeakingSessionMetric } from '../types/voiceCall';
-import { t } from '../lib/i18n';
+import { t, wbFmt, wbPick } from '../lib/i18n';
 import { FiezelCornerOrnament, FiezelPawStamp } from './FiezelOrnaments';
 
 interface BraincoreTrendChartProps {
@@ -23,10 +23,7 @@ function formatSpeakingDuration(totalSeconds: number, locale: LearnerLocale): st
   const sec = Math.max(0, Math.round(totalSeconds));
   const mins = Math.floor(sec / 60);
   const remSec = sec % 60;
-  if (locale === 'th') {
-    return `${mins}น. ${String(remSec).padStart(2, '0')}ว.`;
-  }
-  return `${mins}m ${String(remSec).padStart(2, '0')}d`;
+  return wbFmt('{m}m {s}s', '{m}m {s}d', '{m}น. {s}ว.', { m: mins, s: String(remSec).padStart(2, '0') }, locale);
 }
 
 export const BraincoreTrendChart: React.FC<BraincoreTrendChartProps> = ({
@@ -66,14 +63,21 @@ export const BraincoreTrendChart: React.FC<BraincoreTrendChartProps> = ({
             <span>BRAINCORE TELEMETRY</span>
           </span>
           <h2 className="text-base font-bold text-[#241A11] mt-1.5">
-            {locale === 'th'
-              ? 'แนวโน้มความคล่องแคล่วและความแม่นยำไวยากรณ์'
-              : 'Tren Kelancaran & Akurasi Tata Bahasa'}
+            {wbPick(
+              'Fluency & Grammar Accuracy Trend',
+              'Tren Kelancaran & Akurasi Tata Bahasa',
+              'แนวโน้มความคล่องแคล่วและความแม่นยำไวยากรณ์',
+              locale
+            )}
           </h2>
           <p className="text-xs text-[#6E5E47] mt-0.5">
-            {locale === 'th'
-              ? `บันทึกจาก ${metrics.totalTurns} รอบการสนทนา`
-              : `Berdasarkan ${metrics.totalTurns} giliran bicara terverifikasi`}
+            {wbFmt(
+              'Based on {turns} verified speaking turns',
+              'Berdasarkan {turns} giliran bicara terverifikasi',
+              'บันทึกจาก {turns} รอบการสนทนา',
+              { turns: metrics.totalTurns },
+              locale
+            )}
           </p>
         </div>
 

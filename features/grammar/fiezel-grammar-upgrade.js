@@ -758,8 +758,7 @@
       const lower = text.toLowerCase().replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, '');
       const fromQ = (q.gloss && (q.gloss[text] || q.gloss[lower])) || '';
       if (fromQ) return String(fromQ);
-      const isThai = (self.FiezelI18n?.getLocale?.() === 'th');
-      const loc = isThai ? 'th' : 'id';
+      const loc = (self.FiezelI18n && typeof self.FiezelI18n.getLocale === 'function' && self.FiezelI18n.getLocale()) || 'id';
       const key = 'grammar.gloss.' + lower;
       try {
         if (typeof FiezelI18n.hasCopy === 'function' && FiezelI18n.hasCopy(loc, key)) return FiezelI18n.t(key);

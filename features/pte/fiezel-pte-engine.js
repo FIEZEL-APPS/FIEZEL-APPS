@@ -311,13 +311,14 @@
       : (ex.measurementSource || (typeof ex.activeSpeechSec === 'number' ? 'acoustic_vad' : 'timer_measured'));
     var isEst = Boolean(ex.isEstimatedTiming || ex.isManual);
 
-    function pteIsId() {
+    function ptePick(en, id) {
       try {
-        var i = (typeof self !== 'undefined' ? self : globalThis).FiezelI18n;
-        return !i || typeof i.getLocale !== 'function' || i.getLocale() === 'id';
-      } catch (_) { return true; }
+        var g = (typeof self !== 'undefined' ? self : globalThis);
+        if (g && typeof g.FiezelLocPick === 'function') return g.FiezelLocPick(en, id);
+        var i = g.FiezelI18n;
+        return (!i || typeof i.getLocale !== 'function' || i.getLocale() === 'id') ? id : en;
+      } catch (_) { return id; }
     }
-    var _isId = pteIsId();
 
     if (count === 0) {
       return {
@@ -326,7 +327,7 @@
         fluency90: 10,
         wpm: 0,
         articulationWpm: 0,
-        label: 'No speech detected',
+        label: ptePick('No speech detected', 'Tidak ada suara terdeteksi'),
         disfluencyCount: disfluencies,
         selfCorrectionCount: selfCorrections,
         pausesCount: 0,
@@ -340,7 +341,7 @@
         rhythmScore: 0,
         measurementSource: measSource,
         isEstimatedTiming: isEst,
-        reasons: [_isId ? 'Tidak ada kata yang terdeteksi' : 'No words detected']
+        reasons: [ptePick('No words detected', 'Tidak ada kata yang terdeteksi')]
       };
     }
 

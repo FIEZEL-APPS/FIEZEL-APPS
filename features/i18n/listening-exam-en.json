@@ -31,10 +31,10 @@
   },
   "sets": {
     "lx-ielts-s1": {
-      "title": "Mendaftar program renang",
+      "title": "Registering for a swimming program",
       "questions": {
         "lx-s1-1": {
-          "explain": "Dieja langsung olehnya: M-A-R-S-H."
+          "explain": "Spelled out directly by him: M-A-R-S-H."
         },
         "lx-s1-2": {
           "explain": "\"Forty-two Bridgeway Road.\" In the actual exam, numbers are written as digits."
@@ -66,7 +66,7 @@
       }
     },
     "lx-ielts-s2": {
-      "title": "Pengarahan relawan kebun raya",
+      "title": "Botanical garden volunteer briefing",
       "questions": {
         "lx-s2-1": {
           "explain": "\"The large building on the western edge.\" The Rose Garden is on the eastern side."
@@ -78,7 +78,7 @@
           "explain": "\"On your left as you're walking up\" - and he is walking north, so left = northwest. The toilets are in the same building."
         },
         "lx-s2-4": {
-          "explain": "Ada batas beban, dan aturannya maksimal lima belas anak sekaligus."
+          "explain": "There is a weight limit, and the rule is a maximum of fifteen children at a time."
         },
         "lx-s2-5": {
           "explain": "The reason is stated directly: there is no lighting."
@@ -95,7 +95,7 @@
           "explain": "Initially they thought it was the effect of the trees - but the difference remained at three in the morning, so it was not shade."
         },
         "lx-s3-2": {
-          "explain": "Priya membuang, Tom mempertahankan sambil menandai - jangan tertukar."
+          "explain": "Priya discards items, while Tom keeps and marks them - don't mix them up."
         },
         "lx-s3-3": {
           "explain": "Two reasons, and both must be captured - the number of sensors AND the fact that the data values are of different types."
@@ -104,7 +104,7 @@
           "explain": "\"The failure mode here isn't dropping data or keeping it. It's doing either quietly.\""
         },
         "lx-s3-5": {
-          "explain": "Tiga meter versus dua meter, dan selisihnya terukur terutama di atas permukaan beraspal."
+          "explain": "Three meters versus two meters, and the difference was measured primarily over paved surfaces."
         },
         "lx-s3-6": {
           "explain": "\"A wide honest interval is worth more than a narrow invented one.\""
@@ -190,7 +190,7 @@
       }
     },
     "lx-ielts-s2-v2": {
-      "title": "Pengarahan anggota baru museum kota",
+      "title": "City museum new member orientation",
       "questions": {
         "lx-s2v2-1": {
           "explain": "\"You can bring two guests with you each month at half price.\" Not free - half price."
@@ -199,7 +199,7 @@
           "explain": "\"At the back of the building, behind the stairs\" - the only room where items can actually be touched."
         },
         "lx-s2v2-3": {
-          "explain": "Lantai dua khusus staf - jangan naik; minta di meja depan dan viewing diatur sekitar dua minggu."
+          "explain": "The second floor is staff-only - do not go up; ask at the front desk, and a viewing is arranged in about two weeks."
         },
         "lx-s2v2-4": {
           "explain": "\"Beside the cloakroom, on the right as you come in.\" The coin is returned when the locker is opened again."
@@ -225,7 +225,7 @@
           "explain": "\"The turning point came in eighteen sixty-five.\" On the answer sheet, write 1865."
         },
         "lx-s4v2-4": {
-          "explain": "Inggris menolak benihnya - \"one savours the irony\" - lalu Ledger menjualnya murah ke Belanda."
+          "explain": "England rejected the seeds—\"one savours the irony\"—so Ledger sold them cheaply to the Netherlands."
         },
         "lx-s4v2-5": {
           "explain": "The digression shows that the Quechua name from the Andes crossed over along with the tree - \"languages, like bark, preserve things\"."
@@ -234,7 +234,7 @@
           "explain": "\"Roughly ninety percent\" - ninety percent of the world's supply from the highlands of one island."
         },
         "lx-s4v2-7": {
-          "explain": "\"Synthetic substitutes had been developed and manufactured at scale\" - dan monopoli kuinin tamat permanen."
+          "explain": "\"Synthetic substitutes had been developed and manufactured at scale\" — permanently ending the quinine monopoly."
         },
         "lx-s4v2-8": {
           "explain": "\"Carry the shape of the argument\" - concentration looks like strength until the day it becomes the mechanism of its own collapse."

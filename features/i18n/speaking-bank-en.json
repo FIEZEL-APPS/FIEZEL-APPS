@@ -120,7 +120,7 @@
       "instruction": "Part 2. You have one minute to make notes, then speak for one to two minutes. Describe a skill you learned that took a long time to get right. You must touch upon all four bullet points on the card."
     },
     "speakx_0004": {
-      "instruction": "Part 2. Satu menit menyiapkan catatan, lalu bicara satu sampai dua menit. Describe a decision you made that other people disagreed with. Keempat butir wajib disentuh, termasuk butir terakhir."
+      "instruction": "Part 2. You have one minute to make notes, then speak for one to two minutes. Describe a decision you made that other people disagreed with. All four bullet points must be addressed, including the final bullet point."
     },
     "speakx_0005": {
       "instruction": "Part 3. Follow-up discussion on the topic of skills. Answer these three questions, four to six sentences each: Why do some people give up on a skill halfway? Should schools teach practical skills as well as academic subjects? Is it easier to learn new skills as an adult than it used to be?"
@@ -142,12 +142,12 @@
     "speakx_0010": {
       "instruction": "Task 3. Read the definition, read the lecture, then 30 seconds to prepare and 60 seconds to speak. Explain the term USING examples from the lecture, not the textbook definition.",
       "sourceText": "READING - Sunk Cost Fallacy: the tendency to continue an endeavor based on what has ALREADY been invested (money, time, effort), rather than on the benefits that can still be gained. Sunk costs cannot be recovered, so logically they are irrelevant to subsequent decisions.\n\nLECTURE (written): \"Let me give you two examples. A software company I consulted for had spent four years on a platform. The engineers said plainly that the architecture would not scale. Management approved two more years of funding, and the argument in the meeting was, word for word, 'we've already put four years into this'. That is the fallacy, stated out loud.\n\nA smaller one, from my own life: I once sat through ninety minutes of a terrible film because I had paid for the ticket. The ticket money was gone either way. All I did was add ninety minutes to the loss.\"",
-      "sourceNote": "ADAPTASI: kuliah aslinya berupa audio; di sini disajikan tertulis."
+      "sourceNote": "ADAPTATION: the original lecture was in audio form; here it is presented in writing."
     },
     "speakx_0011": {
-      "instruction": "Task 4. Baca kuliahnya, lalu 20 detik menyiapkan dan 60 detik bicara. Ringkas DUA poin utama beserta contohnya masing-masing.",
-      "sourceText": "KULIAH (tertulis): \"Animals facing a cold season have broadly two options, and they cost different things.\n\nThe first is migration - leaving before conditions get severe. The Arctic tern is the extreme case: it flies between the Arctic and the Antarctic every year, so it spends most of its life in summer. But look at the price. That is an enormous amount of energy spent on travel alone.\n\nThe second option is dormancy - staying, but slowing down. The ground squirrel drops its body temperature close to freezing and its heart rate to a few beats a minute, for months. That saves a remarkable amount of energy. The cost is that it cannot feed at all during that time, so everything depends on what it stored beforehand.\"",
-      "sourceNote": "ADAPTASI: kuliah aslinya berupa audio; di sini disajikan tertulis."
+      "instruction": "Task 4. Read the lecture, then take 20 seconds to prepare and 60 seconds to speak. Summarize TWO main points along with their respective examples.",
+      "sourceText": "LECTURE (written): \"Animals facing a cold season have broadly two options, and they cost different things.\n\nThe first is migration - leaving before conditions get severe. The Arctic tern is the extreme case: it flies between the Arctic and the Antarctic every year, so it spends most of its life in summer. But look at the price. That is an enormous amount of energy spent on travel alone.\n\nThe second option is dormancy - staying, but slowing down. The ground squirrel drops its body temperature close to freezing and its heart rate to a few beats a minute, for months. That saves a remarkable amount of energy. The cost is that it cannot feed at all during that time, so everything depends on what it stored beforehand.\"",
+      "sourceNote": "ADAPTATION: the original lecture was in audio form; here it is presented in writing."
     },
     "speakx_0012": {
       "instruction": "Part 1. Answer these four questions one by one, one to two sentences each: How many people are there in your family? What do you usually eat for breakfast? What time do you get up in the morning? What do you do after school or work?"
@@ -159,15 +159,15 @@
       "instruction": "Part 2. You have one minute to make notes, then speak for one to two minutes. Describe a journey you took that you remember well. You must touch upon all four bullet points on the card, including the last one."
     },
     "speakx_0015": {
-      "instruction": "Part 2. Satu menit menyiapkan catatan, lalu bicara satu sampai dua menit. Describe an assumption you once held that you have since abandoned. Keempat butir wajib disentuh, termasuk butir terakhir."
+      "instruction": "Part 2. You have one minute to make notes, then speak for one to two minutes. Describe an assumption you once held that you have since abandoned. All four bullet points must be addressed, including the final bullet point."
     },
     "speakx_0016": {
       "instruction": "Part 3. Follow-up discussion on the topic of beliefs and assumptions. Answer these three questions, two to three sentences each: Should governments try to change what citizens believe, or only how they behave? If a comforting false belief does no obvious harm, should anyone challenge it? Which beliefs that are common today do you think future generations will reject?"
     },
     "speakx_0017": {
-      "instruction": "Task 4. Baca kuliahnya, lalu 20 detik menyiapkan dan 60 detik bicara. Ringkas DUA mekanisme utama beserta contohnya masing-masing.",
-      "sourceText": "KULIAH (tertulis): \"We like to imagine memory as a recording, but it behaves more like a story that is rewritten each time it is told. Let me describe two mechanisms of distortion.\n\nThe first is post-event information. What we encounter after an event can be written back into the memory of the event itself. In a classic type of experiment, people watch a short film of a minor car accident. Those later asked how fast the cars were going when they 'smashed' into each other do not just give higher speed estimates than those asked about cars that 'hit' each other - a week later, they are also more likely to remember broken glass that was never in the film. The question has quietly edited the memory.\n\nThe second mechanism is imagination inflation. The act of imagining an event leaves a trace that can later be mistaken for the trace of a real experience. In one study, adults who spent a few minutes vividly imagining a childhood incident - breaking a window with their hand - became measurably more confident, weeks later, that it had actually happened to them. Nothing was presented as true; imagining it was enough.\"",
-      "sourceNote": "ADAPTASI: kuliah aslinya berupa audio; di sini disajikan tertulis."
+      "instruction": "Task 4. Read the lecture, then take 20 seconds to prepare and 60 seconds to speak. Summarize TWO main mechanisms along with their respective examples.",
+      "sourceText": "LECTURE (written): \"We like to imagine memory as a recording, but it behaves more like a story that is rewritten each time it is told. Let me describe two mechanisms of distortion.\n\nThe first is post-event information. What we encounter after an event can be written back into the memory of the event itself. In a classic type of experiment, people watch a short film of a minor car accident. Those later asked how fast the cars were going when they 'smashed' into each other do not just give higher speed estimates than those asked about cars that 'hit' each other - a week later, they are also more likely to remember broken glass that was never in the film. The question has quietly edited the memory.\n\nThe second mechanism is imagination inflation. The act of imagining an event leaves a trace that can later be mistaken for the trace of a real experience. In one study, adults who spent a few minutes vividly imagining a childhood incident - breaking a window with their hand - became measurably more confident, weeks later, that it had actually happened to them. Nothing was presented as true; imagining it was enough.\"",
+      "sourceNote": "ADAPTATION: the original lecture was in audio form; here it is presented in writing."
     }
   }
 }

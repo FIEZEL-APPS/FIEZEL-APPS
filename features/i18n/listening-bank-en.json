@@ -20,22 +20,22 @@
     "listen_sc_a1_detail_001": {
       "question": "Where is Fajar's umbrella now?",
       "options": [
-        "Di toko dekat rumahnya",
-        "Di rumah, di atas meja dapur",
+        "At the shop near their house",
+        "At home, on the kitchen table",
         "Inside his bag at the school gate",
-        "Dibawa temannya"
+        "Brought by their friend"
       ],
-      "explain": "This detail is stated directly in the audio: “Di rumah, di atas meja dapur”."
+      "explain": "This detail is stated directly in the audio: “At home, on the kitchen table”."
     },
     "listen_sc_a1_inference_001": {
       "question": "What is Fajar likely to do next?",
       "options": [
-        "Berlari pulang sendirian menembus hujan",
-        "Duduk di gerbang sampai hujan berhenti",
-        "Berjalan bersama temannya di bawah satu payung",
-        "Membeli payung baru di sekolah"
+        "Running home alone through the rain",
+        "Sitting at the gate until the rain stops",
+        "Walking with their friend under one umbrella",
+        "Buying a new umbrella at school"
       ],
-      "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “Berjalan bersama temannya di bawah satu payung”."
+      "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “Walking with their friend under one umbrella”."
     },
     "listen_sc_a1_attitude_001": {
       "question": "How does Fajar feel?",
@@ -74,9 +74,9 @@
     "listen_sc_a1_detail_002": {
       "question": "What time does her younger brother leave for school?",
       "options": [
-        "Jam enam",
-        "Jam lima",
-        "Malam hari",
+        "Six o'clock",
+        "Five o'clock",
+        "At night",
         "After lunch"
       ],
       "explain": "This detail is stated directly in the audio: “Jam enam”."
@@ -84,7 +84,7 @@
     "listen_sc_a1_inference_002": {
       "question": "Why is Dewi cooking instead of her mother?",
       "options": [
-        "Ibunya berangkat ke sekolah jam enam",
+        "Her mother leaves for school at six o'clock",
         "Her mother is tired after working the night shift",
         "Her mother cannot cook rice for the family",
         "Her younger brother asks her to cook every day"
@@ -95,9 +95,9 @@
       "question": "How does Dewi feel about this chore?",
       "options": [
         "She is sad because she has to wake up early",
-        "Ia marah kepada adik laki-lakinya",
-        "Ia senang bisa membantu keluarganya",
-        "Ia merasa pekerjaannya terlalu terburu-buru"
+        "They are angry at their younger brother",
+        "They are happy to be able to help their family",
+        "They feel their work is too rushed"
       ],
       "explain": "Dewi's word choice and tone in the audio show: “Ia senang bisa membantu keluarganya”."
     },
@@ -118,30 +118,30 @@
     "listen_sc_a1_gist_003": {
       "question": "What is Bayu mainly talking about?",
       "options": [
-        "Halte baru di dekat rumahnya",
+        "The new bus stop near their house",
         "The best time to take the bus",
         "The late bus on a hot day",
-        "Jalan kaki jauh sepanjang dua puluh km"
+        "Walking a long distance of twenty km"
       ],
       "explain": "Throughout the audio, Bayu is mainly talking about this, so the correct answer is: “The late bus on a hot day”."
     },
     "listen_sc_a1_detail_003": {
       "question": "How late is the bus?",
       "options": [
-        "Dua menit",
-        "Satu jam",
-        "Dua puluh km",
-        "Dua puluh menit"
+        "Two minutes",
+        "One hour",
+        "Twenty km",
+        "Twenty minutes"
       ],
-      "explain": "This detail is stated directly in the audio: “Dua puluh menit”."
+      "explain": "This detail is stated directly in the audio: “Twenty minutes”."
     },
     "listen_sc_a1_inference_003": {
       "question": "What is Bayu likely to do?",
       "options": [
         "Walk home",
-        "Menunggu satu jam lagi",
+        "Waiting for another hour",
         "Take another bus",
-        "Kembali ke toko"
+        "Returning to the shop"
       ],
       "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “Walk home”."
     },
@@ -150,7 +150,7 @@
       "options": [
         "He is sad to have to walk home",
         "He has stopped waiting for it",
-        "Ia senang bus itu terlambat",
+        "They are happy the bus was late",
         "He is afraid of the bus"
       ],
       "explain": "Bayu's word choice and tone in the audio show: “He has stopped waiting for it”."
@@ -182,9 +182,9 @@
     "listen_sc_a1_detail_004": {
       "question": "Where has Gita looked so far?",
       "options": [
-        "Di meja tempat pustakawan duduk",
-        "Di ruangan sebelah perpustakaan",
-        "Di rak dan di meja",
+        "On the desk where the librarian sits",
+        "In the room next to the library",
+        "On the shelves and on the table",
         "Only inside her bag under the chair"
       ],
       "explain": "This detail is stated directly in the audio: “Di rak dan di meja”."
@@ -192,9 +192,9 @@
     "listen_sc_a1_inference_004": {
       "question": "What will Gita do next?",
       "options": [
-        "Membeli buku itu",
-        "Membawa pulang buku lain",
-        "Membersihkan meja",
+        "Buying that book",
+        "Taking home another book",
+        "Cleaning the table",
         "Talk to the librarian"
       ],
       "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “Talk to the librarian”."
@@ -202,9 +202,9 @@
     "listen_sc_a1_attitude_004": {
       "question": "What is Gita's view of the librarian?",
       "options": [
-        "Ia memercayainya",
-        "Ia takut kepadanya",
-        "Ia menganggapnya lamban",
+        "They trust them",
+        "They are afraid of them",
+        "They consider them slow",
         "She does not know her"
       ],
       "explain": "Gita's word choice and tone in the audio show: “Ia memercayainya”."
@@ -228,7 +228,7 @@
       "options": [
         "Shoes that have become too small for his feet",
         "The football match he won on Saturday",
-        "Lari sejauh sepuluh km bersama kakaknya",
+        "Running ten km with their older sibling",
         "The shop selling secondhand football boots"
       ],
       "explain": "Throughout the audio, Indra is mainly talking about this, so the correct answer is: “Shoes that have become too small for his feet”."
@@ -236,20 +236,20 @@
     "listen_sc_a1_detail_005": {
       "question": "How long did Indra run?",
       "options": [
-        "Sampai kakaknya berhenti",
-        "Sepuluh menit",
-        "Sepuluh jam",
-        "Sepanjang hari Sabtu"
+        "Until her older sibling stops",
+        "Ten minutes",
+        "Ten hours",
+        "All day Saturday"
       ],
-      "explain": "This detail is stated directly in the audio: “Sepuluh menit”."
+      "explain": "This detail is stated directly in the audio: “Ten minutes”."
     },
     "listen_sc_a1_inference_005": {
       "question": "What is Indra likely to do?",
       "options": [
-        "Membeli sepatu baru hari ini",
-        "Berlari tanpa sepatu",
-        "Mencoba sepatu kakaknya",
-        "Berhenti bermain sepak bola"
+        "Buying new shoes today",
+        "Running without shoes",
+        "Trying on their older sibling's shoes",
+        "Stopping playing soccer"
       ],
       "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “Mencoba sepatu kakaknya”."
     },
@@ -290,10 +290,10 @@
     "listen_sc_a1_detail_006": {
       "question": "What did Hana draw on her card?",
       "options": [
-        "Bunga",
-        "Sebuah hadiah",
-        "Wajah ibunya",
-        "Kue ulang tahun"
+        "Flowers",
+        "A gift",
+        "Their mother's face",
+        "A birthday cake"
       ],
       "explain": "This detail is stated directly in the audio: “Bunga”."
     },
@@ -302,16 +302,16 @@
       "options": [
         "The card is only for tomorrow",
         "She cannot afford to buy a gift",
-        "Ia suka menggambar bunga di sekolah",
-        "Ibunya meminta sebuah kartu"
+        "They like drawing flowers at school",
+        "Their mother asked for a card"
       ],
       "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “She cannot afford to buy a gift”."
     },
     "listen_sc_a1_attitude_006": {
       "question": "How does Hana feel about her card?",
       "options": [
-        "Ia sedih memikirkan ibunya",
-        "Ia marah soal uang",
+        "They are sad thinking about their mother",
+        "They are angry about money",
         "She hopes her mother will like it",
         "She feels her card is not good"
       ],
@@ -364,9 +364,9 @@
     "listen_sc_a1_attitude_007": {
       "question": "How was her mother's reaction?",
       "options": [
-        "Ia menertawakan harganya",
-        "Ia tetap tenang",
-        "Ia memarahi anaknya",
+        "They laughed at the price",
+        "They remained calm",
+        "They scolded their child",
         "She is afraid of the seller"
       ],
       "explain": "Joko's word choice and tone in the audio show: “Ia tetap tenang”."
@@ -387,17 +387,17 @@
         "The window she broke in class",
         "The cold room and the open window",
         "The jacket she bought at school",
-        "Guru baru di kelasnya"
+        "The new teacher in their class"
       ],
       "explain": "Throughout the audio, Lina is mainly talking about this, so the correct answer is: “The cold room and the open window”."
     },
     "listen_sc_a1_detail_008": {
       "question": "Who closed the window?",
       "options": [
-        "Teman di dekat jendela",
+        "A friend near the window",
         "No one",
-        "Gurunya",
-        "Ia sendiri"
+        "Their teacher",
+        "By themselves"
       ],
       "explain": "This detail is stated directly in the audio: “Gurunya”."
     },
@@ -407,7 +407,7 @@
         "She did not have a pen",
         "Her teacher was talking",
         "The window was already closed",
-        "Tangannya kedinginan"
+        "Their hands are cold"
       ],
       "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “Tangannya kedinginan”."
     },
@@ -415,9 +415,9 @@
       "question": "How does Lina feel about her teacher?",
       "options": [
         "She is very grateful",
-        "Ia merasa takut",
-        "Ia merasa bosan",
-        "Ia kaget dan marah"
+        "They feel afraid",
+        "They feel bored",
+        "They are shocked and angry"
       ],
       "explain": "Lina's word choice and tone in the audio show: “She is very grateful”."
     },
@@ -438,19 +438,19 @@
     "listen_sc_a1_gist_009": {
       "question": "What is Maya mainly talking about?",
       "options": [
-        "Mengerjakan PR sementara kucingnya tidur di atasnya",
+        "Doing homework while their cat sleeps on it",
         "The cat that ran away from home",
         "The English lesson she attended after school",
-        "Lantai baru di rumahnya"
+        "The new floor in their house"
       ],
-      "explain": "Throughout the audio, Maya is mainly talking about this, so the correct answer is: “Mengerjakan PR sementara kucingnya tidur di atasnya”."
+      "explain": "Throughout the audio, Maya is mainly talking about this, so the correct answer is: “Doing homework while her cat sleeps on it”."
     },
     "listen_sc_a1_detail_009": {
       "question": "Where did Maya do her English homework?",
       "options": [
         "At school before the lesson",
-        "Di lantai",
-        "Di meja, di bawah kucingnya",
+        "On the floor",
+        "On the table, under their cat",
         "Inside her English book"
       ],
       "explain": "This detail is stated directly in the audio: “Di lantai”."
@@ -468,9 +468,9 @@
     "listen_sc_a1_attitude_009": {
       "question": "How does Maya feel about her cat?",
       "options": [
-        "Ia marah kepadanya",
-        "Ia takut kepadanya",
-        "Ia ingin menjualnya",
+        "They are angry at them",
+        "They are afraid of them",
+        "They want to sell it",
         "She loves it very much"
       ],
       "explain": "Maya's word choice and tone in the audio show: “She loves it very much”."
@@ -500,11 +500,11 @@
       "explain": "Throughout the audio, Nando is mainly talking about this, so the correct answer is: “His first small success in the water”."
     },
     "listen_sc_a1_detail_010": {
-      "question": "Seberapa jauh Nando berenang sendiri?",
+      "question": "How far did Nando swim on his own?",
       "options": [
-        "Dua meter",
-        "Sepuluh meter",
-        "Dua km",
+        "Two meters",
+        "Ten meters",
+        "Two km",
         "He never let go of his father"
       ],
       "explain": "This detail is stated directly in the audio: “Dua meter”."
@@ -512,12 +512,12 @@
     "listen_sc_a1_inference_010": {
       "question": "What will Nando likely do next Sunday?",
       "options": [
-        "Mengajari anak laki-laki lain",
-        "Berlatih lagi bersama ayahnya",
-        "Berhenti pergi ke kolam renang",
-        "Berenang sendiri menyeberangi kolam"
+        "Teaching other boys",
+        "Practicing again with his father",
+        "Stopping going to the swimming pool",
+        "Swimming alone across the pool"
       ],
-      "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “Berlatih lagi bersama ayahnya”."
+      "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “Practicing again with their father”."
     },
     "listen_sc_a1_attitude_010": {
       "question": "What is his father doing?",
@@ -556,20 +556,20 @@
     "listen_sc_a1_detail_011": {
       "question": "What did Okta buy?",
       "options": [
-        "Pisang",
+        "Banana",
         "A drink from the canteen",
         "Did not buy anything",
-        "Roti"
+        "Bread"
       ],
       "explain": "This detail is stated directly in the audio: “Roti”."
     },
     "listen_sc_a1_inference_011": {
       "question": "What can we understand about Sari?",
       "options": [
-        "Ia baik kepada temannya",
+        "He is kind to his friend",
         "She did not bring a lunch box today",
-        "Ia bekerja di kantin",
-        "Ia tinggal dekat rumah temannya"
+        "He works in the canteen",
+        "He lives near his friend's house"
       ],
       "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “Ia baik kepada temannya”."
     },
@@ -579,7 +579,7 @@
         "Afraid of the canteen",
         "Better than before",
         "Still very hungry",
-        "Marah kepada temannya"
+        "Being angry with his friend"
       ],
       "explain": "Okta's word choice and tone in the audio show: “Better than before”."
     },
@@ -601,7 +601,7 @@
       "question": "What is Putra mainly talking about?",
       "options": [
         "The person selling bicycle tires",
-        "Membawa sepedanya ke bengkel",
+        "Taking his bicycle to the repair shop",
         "The new bicycle he wants to buy",
         "The road that is one km long"
       ],
@@ -610,7 +610,7 @@
     "listen_sc_a1_detail_012": {
       "question": "How did Putra get to the repair shop?",
       "options": [
-        "Ia naik angkutan ke bengkel",
+        "They took public transport to the repair shop",
         "Temannya membawakan rodanya",
         "Ia mendorong sepedanya",
         "Ia mengayuh sepedanya pelan-pelan"
@@ -620,12 +620,12 @@
     "listen_sc_a1_inference_012": {
       "question": "What will Putra do while waiting?",
       "options": [
-        "Pulang dulu dan kembali besok",
-        "Membeli sepeda kedua",
-        "Menambal bannya sendiri",
-        "Tetap berada di dekat bengkel selama sepuluh menit"
+        "Going home first and returning tomorrow",
+        "Buying a second bicycle",
+        "Patching his own tire",
+        "Staying near the repair shop for ten minutes"
       ],
-      "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “Tetap berada di dekat bengkel selama sepuluh menit”."
+      "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “Staying near the repair shop for ten minutes”."
     },
     "listen_sc_a1_attitude_012": {
       "question": "What is Putra's opinion of the repairman?",
@@ -654,40 +654,40 @@
     "listen_sc_a1_gist_013": {
       "question": "What is Ratna mainly talking about?",
       "options": [
-        "Membantu neneknya menanam bibit cabai",
+        "Helping his grandmother plant chili seeds",
         "The garden she waters every Sunday afternoon",
         "The sun that is too hot for her",
         "The water she brought to school in a bottle"
       ],
-      "explain": "Throughout the audio, Ratna is mainly talking about this, so the correct answer is: “Membantu neneknya menanam bibit cabai”."
+      "explain": "Throughout the audio, Ratna is mainly talking about this, so the correct answer is: “Helping her grandmother plant chili seedlings”."
     },
     "listen_sc_a1_detail_013": {
       "question": "When should Ratna water her plants?",
       "options": [
         "Before sleeping",
-        "Pagi hari",
-        "Tengah hari",
+        "In the morning",
+        "At noon",
         "Only on Sundays"
       ],
-      "explain": "This detail is stated directly in the audio: “Pagi hari”."
+      "explain": "This detail is stated directly in the audio: “In the morning”."
     },
     "listen_sc_a1_inference_013": {
       "question": "Why is midday not a good time?",
       "options": [
         "Her grandmother is sleeping",
         "There is no water at midday",
-        "Panasnya bisa merusak tanaman",
-        "Kebunnya tutup"
+        "The heat can damage the plants",
+        "The garden is closed"
       ],
       "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “Panasnya bisa merusak tanaman”."
     },
     "listen_sc_a1_attitude_013": {
       "question": "What is Ratna's attitude toward her grandmother?",
       "options": [
-        "Ia menganggap nasihat itu keliru",
+        "He considers the advice incorrect",
         "She is bored with the garden",
         "She is afraid of the plants",
-        "Ia mengikuti nasihatnya"
+        "He follows her advice"
       ],
       "explain": "Ratna's word choice and tone in the audio show: “Ia mengikuti nasihatnya”."
     },
@@ -710,17 +710,17 @@
       "options": [
         "The test she failed to complete in class",
         "The song she sang for her friend",
-        "Lima belas teman baru di kelasnya",
-        "Pelajaran bahasa Inggris lewat sebuah lagu"
+        "Fifteen new friends in his class",
+        "English lessons through a song"
       ],
-      "explain": "Throughout the audio, Sinta is mainly talking about this, so the correct answer is: “Pelajaran bahasa Inggris lewat sebuah lagu”."
+      "explain": "Throughout the audio, Sinta is mainly talking about this, so the correct answer is: “An English lesson through a song”."
     },
     "listen_sc_a1_detail_014": {
       "question": "How many words did Sinta manage to write correctly?",
       "options": [
-        "Dua belas",
-        "Lima belas",
-        "Dua puluh",
+        "Twelve",
+        "Fifteen",
+        "Twenty",
         "She did not mention it"
       ],
       "explain": "This detail is stated directly in the audio: “Dua belas”."
@@ -738,10 +738,10 @@
     "listen_sc_a1_attitude_014": {
       "question": "How does Sinta usually feel about tests?",
       "options": [
-        "Ia menganggap ulangan menyenangkan",
+        "She finds tests enjoyable",
         "She never takes them",
         "She does not like them",
-        "Ia merasa ulangan itu mudah"
+        "She feels the test is easy"
       ],
       "explain": "Sinta's word choice and tone in the audio show: “She does not like them”."
     },
@@ -772,10 +772,10 @@
     "listen_sc_a1_detail_015": {
       "question": "At which platform did the train stop?",
       "options": [
-        "Peron lima",
-        "Peron satu",
-        "Peron paling ujung",
-        "Peron tiga"
+        "Platform five",
+        "Platform one",
+        "The very end platform",
+        "Platform three"
       ],
       "explain": "This detail is stated directly in the audio: “Peron tiga”."
     },
@@ -783,9 +783,9 @@
       "question": "Why is Tari holding a photo?",
       "options": [
         "She might have forgotten her cousin's face",
-        "Stasiunnya gelap",
-        "Sepupunya meminta foto itu",
-        "Ia ingin memamerkannya kepada teman-teman"
+        "The station is dark",
+        "Her cousin asked for the photo",
+        "She wants to show it off to her friends"
       ],
       "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “She might have forgotten her cousin's face”."
     },
@@ -793,7 +793,7 @@
       "question": "How does Tari feel about meeting her cousin?",
       "options": [
         "She is afraid of the train",
-        "Ia menantikannya",
+        "She is looking forward to it",
         "She does not want to meet him",
         "She is annoyed because her cousin is late"
       ],
@@ -817,11 +817,11 @@
       "question": "What is Umar mainly talking about?",
       "options": [
         "The food he cooked alone for the young men",
-        "Kerja bakti membersihkan balai warga bersama pemuda kampungnya",
+        "Participating in a community service event to clean the neighborhood hall with the local youth",
         "The chairs he bought for the community hall",
         "The Saturday night village party with food"
       ],
-      "explain": "Throughout the audio, Umar is mainly talking about this, so the correct answer is: “Kerja bakti membersihkan balai warga bersama pemuda kampungnya”."
+      "explain": "Throughout the audio, Umar is mainly talking about this, so the correct answer is: “A community cleanup of the community hall with young people from his neighborhood”."
     },
     "listen_sc_a1_detail_016": {
       "question": "What did they do with the chairs?",
@@ -839,7 +839,7 @@
         "The residents do not talk to each other",
         "The hall is always dirty",
         "Only one person cleans the hall",
-        "Warganya saling membantu"
+        "The residents help each other"
       ],
       "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “Warganya saling membantu”."
     },
@@ -847,8 +847,8 @@
       "question": "How does Umar feel about the work?",
       "options": [
         "Tiring but worth it",
-        "Mudah dan sebentar",
-        "Membosankan dan sia-sia",
+        "Easy and brief",
+        "Boring and pointless",
         "He does not want to participate"
       ],
       "explain": "Umar's word choice and tone in the audio show: “Tiring but worth it”."
@@ -871,7 +871,7 @@
       "question": "What is Vina mainly talking about?",
       "options": [
         "Making a new color when the paint ran out",
-        "Lukisan hari hujan di sekolahnya",
+        "A painting of a rainy day at her school",
         "The teacher who painted the sea for her class",
         "The white paint she bought at the art room"
       ],
@@ -880,10 +880,10 @@
     "listen_sc_a1_detail_017": {
       "question": "What did the teacher give to Vina?",
       "options": [
-        "Sebuah kuas",
-        "Cat putih",
-        "Cat biru",
-        "Gambar baru"
+        "A paintbrush",
+        "White paint",
+        "Blue paint",
+        "A new drawing"
       ],
       "explain": "This detail is stated directly in the audio: “Cat putih”."
     },
@@ -892,7 +892,7 @@
       "options": [
         "The sea is not blue",
         "She has to buy more paint",
-        "Mencampur warna bisa menolongnya",
+        "Mixing colors can help him",
         "White paint is better than blue paint"
       ],
       "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “Mencampur warna bisa menolongnya”."
@@ -900,9 +900,9 @@
     "listen_sc_a1_attitude_017": {
       "question": "How does Vina feel about her new color?",
       "options": [
-        "Ia merasa warnanya salah",
-        "Ia ingin warna lamanya kembali",
-        "Ia marah kepada gurunya",
+        "He feels the color is wrong",
+        "He wants his old color back",
+        "He is angry with his teacher",
         "She likes it better"
       ],
       "explain": "Vina's word choice and tone in the audio show: “She likes it better”."
@@ -934,9 +934,9 @@
     "listen_sc_a1_detail_018": {
       "question": "How many boxes did they find behind the door?",
       "options": [
-        "Sepuluh",
-        "Delapan puluh",
-        "Sembilan puluh",
+        "Ten",
+        "Eighty",
+        "Ninety",
         "There were no extra boxes"
       ],
       "explain": "This detail is stated directly in the audio: “Sepuluh”."
@@ -946,7 +946,7 @@
       "options": [
         "His father could not count alone",
         "The total did not match the book records",
-        "Tokonya tutup terlalu cepat malam itu",
+        "The shop closed too early that night",
         "The soap boxes were old and wet"
       ],
       "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “The total did not match the book records”."
@@ -957,7 +957,7 @@
         "It makes his father angry",
         "It is just his father's job",
         "It is the right step",
-        "Itu membuang-buang waktu"
+        "It is a waste of time"
       ],
       "explain": "Wawan's word choice and tone in the audio show: “It is the right step”."
     },
@@ -980,38 +980,38 @@
       "options": [
         "The birthday party he held for his dog",
         "The race he lost to a faster runner",
-        "Lari hari Minggu di taman bersama anjingnya",
+        "Sunday run in the park with his dog",
         "The large tree he planted near the park gate"
       ],
-      "explain": "Throughout the audio, Yoga is mainly talking about this, so the correct answer is: “Lari hari Minggu di taman bersama anjingnya”."
+      "explain": "Throughout the audio, Yoga is mainly talking about this, so the correct answer is: “A Sunday run in the park with his dog”."
     },
     "listen_sc_a1_detail_019": {
       "question": "Where is the dog waiting?",
       "options": [
-        "Di gerbang taman",
-        "Di rumahnya",
-        "Di dekat jalan",
-        "Di pohon besar"
+        "At the park gate",
+        "At his house",
+        "Near the road",
+        "By the big tree"
       ],
-      "explain": "This detail is stated directly in the audio: “Di pohon besar”."
+      "explain": "This detail is stated directly in the audio: “At the big tree”."
     },
     "listen_sc_a1_inference_019": {
       "question": "Why are they running more today?",
       "options": [
-        "Hari ini hari istimewa baginya",
+        "Today is a special day for him/her",
         "The dog is not tired yet after one lap",
         "The park closes later on Sundays",
-        "Anjingnya berlari terlalu pelan di awal"
+        "His/her dog ran too slowly at the beginning"
       ],
-      "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “Hari ini hari istimewa baginya”."
+      "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “Today is a special day for them”."
     },
     "listen_sc_a1_attitude_019": {
       "question": "What is Yoga's view of his dog?",
       "options": [
         "He never runs with it",
-        "Ia bangga padanya",
+        "He/she is proud of him/her",
         "He wants a calmer dog",
-        "Ia takut padanya"
+        "He/she is afraid of him/her"
       ],
       "explain": "Yoga's word choice and tone in the audio show: “Ia bangga padanya”."
     },
@@ -1042,18 +1042,18 @@
     "listen_sc_a1_detail_020": {
       "question": "When can her friend go home?",
       "options": [
-        "Bulan depan",
+        "Next month",
         "When they can walk",
-        "Hari Jumat",
-        "Malam ini"
+        "Friday",
+        "Tonight"
       ],
-      "explain": "This detail is stated directly in the audio: “Hari Jumat”."
+      "explain": "This detail is stated directly in the audio: “Friday”."
     },
     "listen_sc_a1_inference_020": {
       "question": "Why did Zahra bring school notes?",
       "options": [
-        "Temannya meminta jeruk",
-        "Dokternya menginginkannya",
+        "His/her friend asked for an orange",
+        "His/her doctor wants him/her",
         "Her bag could not fit them anymore",
         "So her friend does not fall behind in lessons"
       ],
@@ -1065,7 +1065,7 @@
         "Attentively",
         "With anger",
         "With fear",
-        "Tanpa peduli"
+        "Without caring"
       ],
       "explain": "Zahra's word choice and tone in the audio show: “Attentively”."
     },
@@ -1093,9 +1093,9 @@
       "question": "How many pages came out before the machine stopped?",
       "options": [
         "Only the first page",
-        "Dua halaman",
-        "Sepuluh halaman",
-        "Seluruh laporan"
+        "Two pages",
+        "Ten pages",
+        "The entire report"
       ],
       "explain": "This detail is stated directly in the audio: “Dua halaman”."
     },
@@ -1103,9 +1103,9 @@
       "question": "What will Aldo be able to do next time?",
       "options": [
         "Write a shorter report",
-        "Mencetak di rumah",
+        "Printing at home",
         "Fix the same problem by himself",
-        "Meminta mesin cetak baru"
+        "Asking for a new printer"
       ],
       "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “Fix the same problem by himself”."
     },
@@ -1139,16 +1139,16 @@
         "The school performance she cannot join",
         "The dance group she formed on Wednesday",
         "One hour wasted during practice",
-        "Berlatih gerakan sulit sampai ia bisa"
+        "Practicing difficult moves until he/she can do them"
       ],
-      "explain": "Throughout the audio, Bella is mainly talking about this, so the correct answer is: “Berlatih gerakan sulit sampai ia bisa”."
+      "explain": "Throughout the audio, Bella is mainly talking about this, so the correct answer is: “Practicing a difficult move until she can do it”."
     },
     "listen_sc_a1_detail_022": {
       "question": "Which movement is difficult?",
       "options": [
-        "Gerakan ketiga",
-        "Gerakan pertama",
-        "Gerakan terakhir",
+        "The third move",
+        "The first move",
+        "The last move",
         "All movements"
       ],
       "explain": "This detail is stated directly in the audio: “Gerakan ketiga”."
@@ -1156,10 +1156,10 @@
     "listen_sc_a1_inference_022": {
       "question": "Why can Bella do the movement now?",
       "options": [
-        "Pentasnya dipindahkan",
+        "The performance was moved",
         "She practiced longer",
         "The movement became easier",
-        "Kelompoknya mengganti tariannya"
+        "His/her group changed the dance"
       ],
       "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “She practiced longer”."
     },
@@ -1168,7 +1168,7 @@
       "options": [
         "She does not like the performance",
         "She wants to quit the group",
-        "Ia pantang menyerah",
+        "He/she refuses to give up",
         "She dances better than the others"
       ],
       "explain": "Bella's word choice and tone in the audio show: “Ia pantang menyerah”."
@@ -1203,7 +1203,7 @@
         "All the shells on the beach",
         "One shell each",
         "None at all",
-        "Sepuluh kerang terbaik"
+        "The ten best shells"
       ],
       "explain": "This detail is stated directly in the audio: “Sepuluh kerang terbaik”."
     },
@@ -1211,19 +1211,19 @@
       "question": "Why couldn't they bring them all?",
       "options": [
         "There was not enough space",
-        "Kerangnya terlalu berat",
-        "Adiknya kelelahan",
-        "Pantainya segera tutup"
+        "The shells are too heavy",
+        "His/her younger sibling is exhausted",
+        "The beach is closing soon"
       ],
       "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “There was not enough space”."
     },
     "listen_sc_a1_attitude_023": {
       "question": "How does Citra deal with her younger sibling?",
       "options": [
-        "Ia meninggalkannya di pantai",
-        "Ia membantunya memilih",
-        "Ia merebut tasnya",
-        "Ia memarahinya"
+        "He left it at the beach",
+        "He/she helped him/her choose",
+        "He/she grabbed his/her bag",
+        "He/she scolded him/her"
       ],
       "explain": "Citra's word choice and tone in the audio show: “Ia membantunya memilih”."
     },
@@ -1255,9 +1255,9 @@
       "question": "What did the chicken do?",
       "options": [
         "It ate too much",
-        "Ia mengikuti tuannya",
-        "Ia duduk menyendiri",
-        "Ia lari menjauh"
+        "He/she followed his/her master",
+        "He/she sat alone",
+        "He/she ran away"
       ],
       "explain": "This detail is stated directly in the audio: “Ia duduk menyendiri”."
     },
@@ -1265,9 +1265,9 @@
       "question": "Why must the chicken be separated?",
       "options": [
         "The chicken was eating the others' portions",
-        "Ayam itu paling besar",
-        "Ayam itu milik pamannya",
-        "Ayam itu mungkin sakit"
+        "That chicken is the biggest",
+        "That chicken belongs to his/her uncle",
+        "That chicken might be sick"
       ],
       "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “Ayam itu mungkin sakit”."
     },
@@ -1275,9 +1275,9 @@
       "question": "Why did Doni tell his uncle?",
       "options": [
         "He realized something was wrong",
-        "Ia ingin berhenti bekerja",
+        "He wants to quit working",
         "He is afraid of chickens",
-        "Ia ingin peternakan baru"
+        "He/she wants a new farm"
       ],
       "explain": "Doni's word choice and tone in the audio show: “He realized something was wrong”."
     },
@@ -1308,9 +1308,9 @@
     "listen_sc_a1_detail_025": {
       "question": "How many guitar chords has Elsa mastered?",
       "options": [
-        "Semuanya",
-        "Dua",
-        "Sepuluh",
+        "Everything",
+        "Two",
+        "Ten",
         "None yet"
       ],
       "explain": "This detail is stated directly in the audio: “Dua”."
@@ -1328,10 +1328,10 @@
     "listen_sc_a1_attitude_025": {
       "question": "What is Elsa's attitude toward her pain?",
       "options": [
-        "Ia menganggapnya berbahaya",
-        "Ia ingin berhenti hari ini juga",
+        "He/she considers it dangerous",
+        "He wants to quit today as well",
         "She does not feel it",
-        "Ia menerimanya"
+        "He/she accepts it"
       ],
       "explain": "Elsa's word choice and tone in the audio show: “Ia menerimanya”."
     },
@@ -1362,9 +1362,9 @@
     "listen_sc_a1_detail_026": {
       "question": "What happened to the plant inside the box?",
       "options": [
-        "Menjadi kuning dan kurus",
+        "Turning yellow and thin",
         "It grew taller than the other",
-        "Tetap hijau dan kuat",
+        "Staying green and strong",
         "It died after two days"
       ],
       "explain": "This detail is stated directly in the audio: “Menjadi kuning dan kurus”."
@@ -1383,7 +1383,7 @@
       "question": "How does Farel feel about his teacher's question?",
       "options": [
         "He does not understand it",
-        "Ia menganggap percobaannya keliru",
+        "He/she considers the experiment flawed",
         "He is confident in his answer",
         "He is afraid of his teacher"
       ],
@@ -1416,18 +1416,18 @@
     "listen_sc_a1_detail_027": {
       "question": "How many people were queuing in front of Galih?",
       "options": [
-        "Satu orang",
-        "Sepuluh orang",
+        "One person",
+        "Ten people",
         "None at all",
-        "Lima orang"
+        "Five people"
       ],
-      "explain": "This detail is stated directly in the audio: “Lima orang”."
+      "explain": "This detail is stated directly in the audio: “Five people”."
     },
     "listen_sc_a1_inference_027": {
       "question": "Why did Galih not leave?",
       "options": [
-        "Sesi fotonya besok",
-        "Tukang pangkasnya temannya",
+        "The photo session is tomorrow",
+        "The barber is his/her friend",
         "His shop closes very late",
         "He has no other activities"
       ],
@@ -1436,7 +1436,7 @@
     "listen_sc_a1_attitude_027": {
       "question": "How did Galih feel when his turn arrived?",
       "options": [
-        "Takut rambutnya terlalu pendek",
+        "Afraid his/her hair will be too short",
         "Relieved after waiting a long time",
         "Annoyed at the busy barber",
         "Sad about the school photo"
@@ -1470,19 +1470,19 @@
     "listen_sc_a1_detail_028": {
       "question": "How long does a regular letter take to arrive?",
       "options": [
-        "Satu minggu dua hari",
-        "Enam jam",
-        "Enam hari",
-        "Dua hari"
+        "One week and two days",
+        "Six hours",
+        "Six days",
+        "Two days"
       ],
-      "explain": "This detail is stated directly in the audio: “Enam hari”."
+      "explain": "This detail is stated directly in the audio: “Six days”."
     },
     "listen_sc_a1_inference_028": {
       "question": "Why did Ika pay extra?",
       "options": [
-        "Loketnya segera tutup",
+        "The ticket window is closing soon",
         "Her sister requested a faster letter",
-        "Surat biasa sering hilang di jalan",
+        "Regular mail often gets lost on the way",
         "Her letter must arrive before a special day"
       ],
       "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “Her letter must arrive before a special day”."
@@ -1491,7 +1491,7 @@
       "question": "What does this show about Ika?",
       "options": [
         "Her sister means a lot to her",
-        "Ia suka menghambur-hamburkan uang",
+        "He/she likes to waste money",
         "She does not trust the post office",
         "She writes letters every week"
       ],
@@ -1514,35 +1514,35 @@
     "listen_sc_a1_gist_029": {
       "question": "What is Jamal mainly talking about?",
       "options": [
-        "Terlalu lelah menyelesaikan matematika di malam hari",
+        "Too tired to finish math at night",
         "Two pages of math he wrote at school",
         "The father who accompanies him studying every night",
         "The numbers he cannot read in his book"
       ],
-      "explain": "Throughout the audio, Jamal is mainly talking about this, so the correct answer is: “Terlalu lelah menyelesaikan matematika di malam hari”."
+      "explain": "Throughout the audio, Jamal is mainly talking about this, so the correct answer is: “Being too tired to finish his math at night”."
     },
     "listen_sc_a1_detail_029": {
       "question": "How much of Jamal's homework is left?",
       "options": [
         "Seluruh PR-nya",
-        "Dua halaman matematika",
-        "Sepuluh halaman matematika",
-        "Satu halaman matematika"
+        "Two pages of math",
+        "Ten pages of math",
+        "One page of math"
       ],
-      "explain": "This detail is stated directly in the audio: “Dua halaman matematika”."
+      "explain": "This detail is stated directly in the audio: “Two pages of math”."
     },
     "listen_sc_a1_inference_029": {
       "question": "What is Jamal likely to do?",
       "options": [
         "Ask his father for the answers",
         "Leave his homework unfinished",
-        "Tidur dan melanjutkan pagi hari",
+        "Sleep and continue in the morning",
         "Finish everything before eleven o'clock"
       ],
-      "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “Tidur dan melanjutkan pagi hari”."
+      "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “Going to sleep and continuing in the morning”."
     },
     "listen_sc_a1_attitude_029": {
-      "question": "Apa dasar nasihat ayahnya?",
+      "question": "What is the basis of his father's advice?",
       "options": [
         "Math is not important right now",
         "His teacher will not check it",
@@ -1569,8 +1569,8 @@
       "question": "What is Kirana mainly talking about?",
       "options": [
         "The bus that leaves from school very early",
-        "Perjalanan panjang dan sunyi ke sekolah pagi ini",
-        "Sekolah baru tempat ia pindah pagi ini",
+        "A long and quiet trip to school this morning",
+        "The new school where she moved this morning",
         "The beginning of a friendship with a new student on the bus"
       ],
       "explain": "Throughout the audio, Kirana is mainly talking about this, so the correct answer is: “The beginning of a friendship with a new student on the bus”."
@@ -1579,19 +1579,19 @@
       "question": "Where did the two children meet?",
       "options": [
         "On the bus",
-        "Di gerbang sekolah",
-        "Di ruang kelas",
-        "Di halte bus dekat rumahnya"
+        "At the school gate",
+        "In the classroom",
+        "At the bus stop near his house"
       ],
       "explain": "This detail is stated directly in the audio: “On the bus”."
     },
     "listen_sc_a1_inference_030": {
       "question": "Why did Kirana greet first?",
       "options": [
-        "Ia ingin duduk sendirian",
+        "He wants to sit alone",
         "The new student did not know anyone yet",
         "The bus was very quiet today",
-        "Gurunya meminta ia melakukannya"
+        "His teacher asked him to do it"
       ],
       "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “The new student did not know anyone yet”."
     },
@@ -1599,7 +1599,7 @@
       "question": "How did Kirana treat the new student?",
       "options": [
         "With full of fear",
-        "Tanpa peduli sedikit pun",
+        "Without caring a bit",
         "Friendly",
         "Coldly"
       ],
@@ -1625,17 +1625,17 @@
         "Fried rice that he cooked at home",
         "A food list that he wrote himself",
         "Ordering food alone for the first time",
-        "Rumah makan milik orang tuanya"
+        "His parents' restaurant"
       ],
       "explain": "Throughout the audio, Lukman is mainly talking about this, so the correct answer is: “Ordering food alone for the first time”."
     },
     "listen_sc_a1_detail_031": {
       "question": "How did Lukman order?",
       "options": [
-        "Ia membaca seluruh daftar makanan",
-        "Ia menelepon orang tuanya dulu",
-        "Ia bertanya kepada tamu lain",
-        "Ia menunjuk sebuah foto"
+        "He read the entire menu",
+        "He called his parents first",
+        "He asked another guest",
+        "He pointed at a photo"
       ],
       "explain": "This detail is stated directly in the audio: “Ia menunjuk sebuah foto”."
     },
@@ -1643,9 +1643,9 @@
       "question": "Apa kesulitan Lukman?",
       "options": [
         "He did not understand all the words on the food list",
-        "Rumah makannya terlalu jauh",
+        "The restaurant is too far away",
         "His fried rice is not ready yet",
-        "Orang tuanya menunggu di luar"
+        "His parents are waiting outside"
       ],
       "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “He did not understand all the words on the food list”."
     },
@@ -1654,7 +1654,7 @@
       "options": [
         "He is bored with his food",
         "He is satisfied with his choice",
-        "Ia menyesal telah datang",
+        "He regrets coming",
         "He is annoyed by the price"
       ],
       "explain": "Lukman's word choice and tone in the audio show: “He is satisfied with his choice”."
@@ -1686,9 +1686,9 @@
     "listen_sc_a1_detail_032": {
       "question": "What did the dentist do first?",
       "options": [
-        "Ia menyuruhnya pulang lagi",
-        "Ia memanggil ibunya masuk",
-        "Ia menjelaskan peralatannya satu per satu",
+        "She told him to go home again",
+        "He called his mother inside",
+        "He explained the equipment one by one",
         "He asked about her cold hands"
       ],
       "explain": "This detail is stated directly in the audio: “Ia menjelaskan peralatannya satu per satu”."
@@ -1708,8 +1708,8 @@
       "options": [
         "Calmer than before",
         "More afraid than before",
-        "Marah kepada ibunya",
-        "Senang giginya sakit"
+        "Angry at his mother",
+        "Glad his tooth hurts"
       ],
       "explain": "Mira's word choice and tone in the audio show: “Calmer than before”."
     },
@@ -1741,19 +1741,19 @@
       "question": "How many bottles did Naufal bring?",
       "options": [
         "Did not bring any bottles",
-        "Empat botol",
-        "Dua botol",
-        "Satu botol"
+        "Four bottles",
+        "Two bottles",
+        "One bottle"
       ],
       "explain": "This detail is stated directly in the audio: “Empat botol”."
     },
     "listen_sc_a1_inference_033": {
       "question": "What will Naufal do on his next hike?",
       "options": [
-        "Membawa enam botol air",
-        "Tinggal di kaki gunung",
+        "Bringing six bottles of water",
+        "Living at the foot of the mountain",
         "Bring a lighter bag",
-        "Berjalan di depan temannya"
+        "Walking in front of his friend"
       ],
       "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “Bring a lighter bag”."
     },
@@ -1761,9 +1761,9 @@
       "question": "What is Naufal's assessment of his choice?",
       "options": [
         "It was very wise",
-        "Itu menolong temannya",
+        "It helped his friend",
         "It made him faster",
-        "Itu sebuah kekeliruan"
+        "It was a mistake"
       ],
       "explain": "Naufal's word choice and tone in the audio show: “Itu sebuah kekeliruan”."
     },
@@ -1794,19 +1794,19 @@
     "listen_sc_a1_detail_034": {
       "question": "How much does the new screen cost?",
       "options": [
-        "Setengah harga ponselnya",
+        "Half the price of his mobile phone",
         "Equal to the price of his phone",
         "Very cheap",
-        "Gratis"
+        "Free"
       ],
       "explain": "This detail is stated directly in the audio: “Setengah harga ponselnya”."
     },
     "listen_sc_a1_inference_034": {
       "question": "What is Oki likely to do now?",
       "options": [
-        "Memperbaikinya minggu depan",
+        "Repairing it next week",
         "Use his phone more carefully",
-        "Membeli ponsel baru di mal hari ini",
+        "Buying a new mobile phone at the mall today",
         "Sell his broken phone"
       ],
       "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “Use his phone more carefully”."
@@ -1815,11 +1815,11 @@
       "question": "What is Oki's opinion on the price?",
       "options": [
         "He does not care about it",
-        "Ia senang membayarnya",
-        "Menurutnya terlalu mahal",
+        "He is happy to pay for it",
+        "He thinks it is too expensive",
         "He thinks it is very reasonable"
       ],
-      "explain": "Oki's word choice and tone in the audio show: “Menurutnya terlalu mahal”."
+      "explain": "Oki's word choice and tone in the audio show: “They think it is too expensive”."
     },
     "listen_sc_a1_paraphrase_034": {
       "question": "Which sentence has the same meaning as “it fell on the road”?",
@@ -1848,10 +1848,10 @@
     "listen_sc_a1_detail_035": {
       "question": "What did the officer offer?",
       "options": [
-        "Memberikan formulir terakhir",
-        "Mengirim formulir ke rumahnya",
-        "Bertanya kepada guru sains",
-        "Mencetakkan formulir baru untuknya"
+        "Giving the final form",
+        "Sending the form to his house",
+        "Asking the science teacher",
+        "Printing a new form for him"
       ],
       "explain": "This detail is stated directly in the audio: “Mencetakkan formulir baru untuknya”."
     },
@@ -1860,7 +1860,7 @@
       "options": [
         "After the next lesson",
         "Before recess ends",
-        "Di akhir kegiatan klub sains",
+        "At the end of the science club activity",
         "On the next school day"
       ],
       "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “After the next lesson”."
@@ -1870,8 +1870,8 @@
       "options": [
         "He did not listen",
         "He was very helpful",
-        "Ia memarahinya",
-        "Ia tampak takut kepadanya"
+        "He/she scolded him/her",
+        "He seems afraid of him"
       ],
       "explain": "Prima's word choice and tone in the audio show: “He was very helpful”."
     },
@@ -1893,19 +1893,19 @@
       "question": "What is the main topic of Rangga's discussion?",
       "options": [
         "Rain falling on the rice fields all morning",
-        "Kerja berat di sawah bersama pamannya",
+        "Hard labor in the fields with his uncle",
         "A vacation he spent at the beach",
         "An uncle who stopped working this year"
       ],
-      "explain": "Throughout the audio, Rangga is mainly talking about this, so the correct answer is: “Kerja berat di sawah bersama pamannya”."
+      "explain": "Throughout the audio, Rangga is mainly talking about this, so the correct answer is: “Hard work in the rice field with his uncle”."
     },
     "listen_sc_a1_detail_036": {
       "question": "How long did Rangga work before getting exhausted?",
       "options": [
         "More than sixty minutes",
-        "Sepanjang liburan",
-        "Satu jam",
-        "Sepanjang pagi"
+        "All holiday long",
+        "One hour",
+        "All morning long"
       ],
       "explain": "This detail is stated directly in the audio: “Satu jam”."
     },
@@ -1913,7 +1913,7 @@
       "question": "What did Rangga learn about his uncle?",
       "options": [
         "His uncle does not like rice fields",
-        "Pamannya ingin berhenti bekerja",
+        "Her uncle wants to quit working",
         "His uncle only works during holidays",
         "His uncle is stronger than he looks"
       ],
@@ -1949,34 +1949,34 @@
         "What she did when she lost her mother in the store",
         "The supermarket she visited with a friend",
         "The door that was closed at night",
-        "Lima menit menunggu kendaraan"
+        "Five minutes waiting for transport"
       ],
       "explain": "Throughout the audio, Salsa is mainly talking about this, so the correct answer is: “What she did when she lost her mother in the store”."
     },
     "listen_sc_a1_detail_037": {
       "question": "Where was Salsa standing?",
       "options": [
-        "Di tengah kerumunan orang",
-        "Di dekat pintu",
+        "In the middle of the crowd",
+        "Near the door",
         "At the back of the store",
-        "Di luar toko"
+        "Outside the store"
       ],
       "explain": "This detail is stated directly in the audio: “Di dekat pintu”."
     },
     "listen_sc_a1_inference_037": {
       "question": "Why did Salsa stay in one place?",
       "options": [
-        "Tokonya segera tutup",
-        "Ibunya ada di belakangnya",
+        "The shop is closing soon",
+        "His mother is behind him",
         "Easier to be found",
-        "Ia terlalu lelah berjalan"
+        "He is too tired to walk"
       ],
       "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “Easier to be found”."
     },
     "listen_sc_a1_attitude_037": {
-      "question": "Apa pendapat ibunya?",
+      "question": "What is his mother's opinion?",
       "options": [
-        "Anaknya seharusnya memanggilnya",
+        "Her child should have called her",
         "Her child is not allowed to come again",
         "Her child was not actually lost",
         "Her child made a good decision"
@@ -2008,10 +2008,10 @@
       "explain": "Throughout the audio, Tegar is mainly talking about this, so the correct answer is: “Not yet able to climb the rope to the top”."
     },
     "listen_sc_a1_detail_038": {
-      "question": "Sampai mana Tegar memanjat?",
+      "question": "How high did Tegar climb?",
       "options": [
-        "Sampai tengah",
-        "Sampai puncak",
+        "To the middle",
+        "To the peak",
         "Only one meter",
         "He did not participate in climbing"
       ],
@@ -2021,16 +2021,16 @@
       "question": "What will Tegar do this week?",
       "options": [
         "Ask for an easier class",
-        "Berlatih di palang rendah",
-        "Memanjat tali lagi hari ini",
-        "Berhenti ikut kelas olahraga"
+        "Practicing on the low bar",
+        "Climbing the rope again today",
+        "Stopping participating in the sports class"
       ],
       "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “Berlatih di palang rendah”."
     },
     "listen_sc_a1_attitude_038": {
       "question": "How is his teacher's attitude?",
       "options": [
-        "Ia kesal soal tali itu",
+        "He was annoyed about the rope",
         "Ia menyuruh muridnya beristirahat",
         "Ia ingin muridnya terus mencoba",
         "Ia menganggap muridnya terlalu lemah"
@@ -2074,10 +2074,10 @@
     "listen_sc_a1_inference_039": {
       "question": "Why did the seller give extra flowers?",
       "options": [
-        "Ia tersentuh mendengar alasannya",
+        "She was touched upon hearing his reason",
         "The flowers were no longer fresh",
         "The buyer paid more",
-        "Tokonya tutup hari ini"
+        "The shop is closed today"
       ],
       "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “Ia tersentuh mendengar alasannya”."
     },
@@ -2118,28 +2118,28 @@
     "listen_sc_a1_detail_040": {
       "question": "Where did Vito sit?",
       "options": [
-        "Di belakang sepupunya",
+        "Behind his cousin",
         "At the back of the plane",
-        "Di samping jendela",
-        "Di samping pintu"
+        "Next to the window",
+        "Next to the door"
       ],
       "explain": "This detail is stated directly in the audio: “Di samping jendela”."
     },
     "listen_sc_a1_inference_040": {
       "question": "What did his cousin do for him?",
       "options": [
-        "Ia memberinya kursi dekat jendela",
-        "Ia menyuruhnya memejamkan mata",
+        "He gave her a seat near the window",
+        "He told her to close her eyes",
         "He asked him to be quiet",
-        "Ia menyiapkannya menghadapi suara pesawat"
+        "He prepared her to face the sound of the airplane"
       ],
-      "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “Ia menyiapkannya menghadapi suara pesawat”."
+      "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “They were preparing them for the sound of airplanes”."
     },
     "listen_sc_a1_attitude_040": {
       "question": "How did Vito feel when the plane took off?",
       "options": [
-        "Rasa takutnya hilang",
-        "Ia menjadi semakin takut",
+        "Her fear disappeared",
+        "She became increasingly frightened",
         "He felt sorry for his cousin",
         "He wanted to get off the plane"
       ],
@@ -2170,7 +2170,7 @@
       "explain": "Throughout the audio, Anisa is mainly talking about this, so the correct answer is: “The part-time job she started last month”."
     },
     "listen_sc_a2_detail_001": {
-      "question": "Seberapa sering Anisa bekerja?",
+      "question": "How often does Anisa work?",
       "options": [
         "Only on weekends",
         "Three afternoons a week",
@@ -2182,8 +2182,8 @@
     "listen_sc_a2_inference_001": {
       "question": "What does the shop owner want to improve from Anisa?",
       "options": [
-        "Jumlah hari kerjanya",
-        "Caranya menghitung uang",
+        "The number of days he worked",
+        "His method of counting money",
         "Her speed in using the machine",
         "Her way of talking to customers"
       ],
@@ -2192,8 +2192,8 @@
     "listen_sc_a2_attitude_001": {
       "question": "How is the shop owner's attitude toward Anisa?",
       "options": [
-        "Ia marah soal mesinnya",
-        "Ia ingin karyawan barunya berhenti",
+        "He was angry about the machine",
+        "He wants his new employee to stop",
         "He never talks to her",
         "He is patient but demanding"
       ],
@@ -2217,7 +2217,7 @@
       "question": "What is Bintang mainly talking about?",
       "options": [
         "The shoe factory opened by his class",
-        "Masalah listrik di gedung sekolahnya",
+        "Electrical problems in her school building",
         "The teacher who was annoyed with the event at the museum that afternoon",
         "The class trip that ended up at the museum, not the factory"
       ],
@@ -2227,7 +2227,7 @@
       "question": "Why did the factory close early?",
       "options": [
         "There was a power supply problem",
-        "Rombongan kelas datang terlambat",
+        "The class group arrived late",
         "The workers went home on Friday",
         "They were invited to come somewhere else"
       ],
@@ -2236,9 +2236,9 @@
     "listen_sc_a2_inference_002": {
       "question": "How did most of the students feel in the end?",
       "options": [
-        "Bosan sepanjang hari itu",
+        "Bored throughout the entire day",
         "Happier than they expected",
-        "Marah kepada gurunya",
+        "Angry at her teacher",
         "Sad because the factory closed"
       ],
       "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “Happier than they expected”."
@@ -2246,8 +2246,8 @@
     "listen_sc_a2_attitude_002": {
       "question": "Why did some students complain at first?",
       "options": [
-        "Museumnya terlalu jauh",
-        "Gurunya datang terlambat",
+        "The museum was too far away",
+        "The teacher arrived late",
         "They wanted a visit to the factory",
         "They disliked the long bus ride"
       ],
@@ -2268,38 +2268,38 @@
       "options": [
         "The race she lost by a five km margin",
         "The coach who accompanied her running every day",
-        "Sejauh apa ia kini mampu berlari dibanding bulan Juni",
+        "How far is he now able to run compared to June",
         "The running club she founded herself"
       ],
-      "explain": "Throughout the audio, Cahya is mainly talking about this, so the correct answer is: “Sejauh apa ia kini mampu berlari dibanding bulan Juni”."
+      "explain": "Throughout the audio, Cahya is mainly talking about this, so the correct answer is: “How far they can run now compared to June”."
     },
     "listen_sc_a2_detail_003": {
-      "question": "Seberapa jauh Cahya bisa berlari sekarang?",
+      "question": "How far can Cahya run now?",
       "options": [
-        "Paling jauh dua km",
+        "At most two kilometers",
         "Ten km when her condition was good",
         "She did not mention the distance",
-        "Lima km tanpa berhenti"
+        "Five km without stopping"
       ],
       "explain": "This detail is stated directly in the audio: “Lima km tanpa berhenti”."
     },
     "listen_sc_a2_inference_003": {
       "question": "Why did her coach give a warning?",
       "options": [
-        "Menambah jarak terlalu cepat memicu cedera",
+        "Increasing the distance too quickly triggers injuries",
         "She was practicing at the wrong time",
-        "Klub itu terlalu besar untuknya",
+        "The club was too big for him",
         "She ran much faster than the other members"
       ],
-      "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “Menambah jarak terlalu cepat memicu cedera”."
+      "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “Increasing distance too quickly causes injury”."
     },
     "listen_sc_a2_attitude_003": {
-      "question": "Apa kepedulian utama pelatihnya?",
+      "question": "What is his coach's main concern?",
       "options": [
         "Making the training shorter",
-        "Menjaga muridnya tetap sehat",
-        "Memenangkan lomba berikutnya",
-        "Menambah jumlah anggota klub"
+        "Keeping his students healthy",
+        "Winning the next race",
+        "Increasing the number of club members"
       ],
       "explain": "Cahya's word choice and tone in the audio show: “Menjaga muridnya tetap sehat”."
     },
@@ -2330,8 +2330,8 @@
     "listen_sc_a2_detail_004": {
       "question": "Why is his bill higher than usual?",
       "options": [
-        "Ia membeli ponsel baru",
-        "Ia dua kali mengganti paketnya",
+        "He bought a new cell phone",
+        "He changed his data plan twice",
         "He used more data than before",
         "The store made a mistake"
       ],
@@ -2342,7 +2342,7 @@
       "options": [
         "He rarely uses his phone",
         "His plan already includes free calls",
-        "Teman-temannya berbagi kuota dengannya",
+        "His friends shared their data quota with him",
         "He uses the school internet network"
       ],
       "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “He uses the school internet network”."
@@ -2375,7 +2375,7 @@
       "question": "What is the main topic of Erina's talk?",
       "options": [
         "Getting back the bag left behind on the train",
-        "Meja layanan tempat ia bekerja di stasiun",
+        "The service desk where he works at the station",
         "The train she missed yesterday morning",
         "The officer who lost her bag last week"
       ],
@@ -2384,9 +2384,9 @@
     "listen_sc_a2_detail_005": {
       "question": "What did the officer ask Erina to do?",
       "options": [
-        "Menulis surat ke perusahaan kereta",
-        "Menjelaskan bentuk tas dan isinya",
-        "Kembali lagi keesokan harinya",
+        "Writing a letter to the railway company",
+        "Describing the shape of the bag and its contents",
+        "Returning again the next day",
         "Pay a small fee for her bag"
       ],
       "explain": "This detail is stated directly in the audio: “Menjelaskan bentuk tas dan isinya”."
@@ -2394,20 +2394,20 @@
     "listen_sc_a2_inference_005": {
       "question": "What can we understand about the person who found it?",
       "options": [
-        "Orang itu mengambil sebagian uang",
-        "Orang itu mengenal pemilik tas",
-        "Orang itu jujur",
-        "Orang itu bekerja di stasiun"
+        "The person took some of the money",
+        "The person knew the owner of the bag",
+        "The person is honest",
+        "The person works at the station"
       ],
-      "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “Orang itu jujur”."
+      "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “The person is honest”."
     },
     "listen_sc_a2_attitude_005": {
       "question": "How does Erina feel about the outcome?",
       "options": [
-        "Marah kepada petugas",
-        "Khawatir soal uangnya",
+        "Angry at the officer",
+        "Worried about his money",
         "Disappointed with the service",
-        "Lega dan berterima kasih"
+        "Relieved and grateful"
       ],
       "explain": "Erina's word choice and tone in the audio show: “Lega dan berterima kasih”."
     },
@@ -2430,7 +2430,7 @@
       "options": [
         "The new house he built with his father",
         "The boxes he sold to his neighbor",
-        "Kota tempat keluarganya tinggal minggu lalu",
+        "The city where her family lived last week",
         "The boxes that were too small for his books"
       ],
       "explain": "Throughout the audio, Fikri is mainly talking about this, so the correct answer is: “The boxes that were too small for his books”."
@@ -2440,8 +2440,8 @@
       "options": [
         "The size was too small for his books",
         "Everything was already full of clothes",
-        "Kardus itu milik ayahnya",
-        "Harganya jauh terlalu mahal"
+        "The cardboard box belongs to his father",
+        "The price is way too expensive"
       ],
       "explain": "This detail is stated directly in the audio: “The size was too small for his books”."
     },
@@ -2458,10 +2458,10 @@
     "listen_sc_a2_attitude_006": {
       "question": "How did Fikri deal with the problem?",
       "options": [
-        "Ia meminta bantuan tetangga",
-        "Ia memutuskan meninggalkan bukunya",
+        "He asked the neighbors for help",
+        "He decided to leave his book behind",
         "He waited instead of forcing it",
-        "Ia membuang kardus-kardus kecil itu"
+        "He threw away those small cardboard boxes"
       ],
       "explain": "Fikri's word choice and tone in the audio show: “He waited instead of forcing it”."
     },
@@ -2488,7 +2488,7 @@
     "listen_sc_a2_detail_007": {
       "question": "What was wrong with the soup?",
       "options": [
-        "Supnya benar-benar dingin",
+        "The soup was completely cold",
         "There was no chicken in it",
         "There was too much water",
         "There was too much salt"
@@ -2500,18 +2500,18 @@
       "options": [
         "She made the soup flavor lighter",
         "She cooked a new soup",
-        "Ia menambahkan garam lagi",
-        "Ia membuang sup itu"
+        "He added more salt",
+        "He threw the soup away"
       ],
       "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “She made the soup flavor lighter”."
     },
     "listen_sc_a2_attitude_007": {
       "question": "How did his mother react to the mistake?",
       "options": [
-        "Ia menolak membantu",
-        "Ia menganggapnya lucu",
+        "He refused to help",
+        "He found it funny",
         "She became very angry",
-        "Ia merasa kecewa"
+        "He felt disappointed"
       ],
       "explain": "Gilang's word choice and tone in the audio show: “Ia menganggapnya lucu”."
     },
@@ -2533,7 +2533,7 @@
       "question": "What is the main topic of Halim's talk?",
       "options": [
         "The shopping bag he brought to his own house",
-        "Kegiatan mingguan membantu para lansia di jalannya",
+        "Weekly activities helping the elderly on his street",
         "The stall opened by elderly neighbors on Sunday morning",
         "The grandfather's stories written in a book"
       ],
@@ -2544,8 +2544,8 @@
       "options": [
         "Only a few minutes",
         "Two mornings every week",
-        "Sekitar dua jam",
-        "Sepanjang hari Minggu"
+        "About two hours",
+        "Throughout the whole Sunday"
       ],
       "explain": "This detail is stated directly in the audio: “Sekitar dua jam”."
     },
@@ -2596,9 +2596,9 @@
     "listen_sc_a2_detail_009": {
       "question": "What is the agreement between them?",
       "options": [
-        "Ia ikut tidur lewat tengah malam",
+        "He ended up staying awake past midnight",
         "His younger sibling plays while wearing a headset",
-        "Adiknya berhenti bermain gim di malam hari",
+        "His younger sibling stopped playing video games at night",
         "He moves to another bedroom"
       ],
       "explain": "This detail is stated directly in the audio: “His younger sibling plays while wearing a headset”."
@@ -2607,7 +2607,7 @@
       "question": "Why does Iqbal want a change?",
       "options": [
         "The room is too small for two people",
-        "Orang tuanya menyuruhnya protes",
+        "His parents told him to protest",
         "He must be ready to face the exam",
         "He does not like his sibling's game"
       ],
@@ -2618,8 +2618,8 @@
       "options": [
         "One of them moved rooms",
         "Their parents decided it",
-        "Masalahnya masih ada sampai sekarang",
-        "Keduanya menerima jalan keluarnya"
+        "The problem still exists today",
+        "Both of them accepted the solution"
       ],
       "explain": "Iqbal's word choice and tone in the audio show: “Keduanya menerima jalan keluarnya”."
     },
@@ -2650,19 +2650,19 @@
     "listen_sc_a2_detail_010": {
       "question": "What must Jihan do now?",
       "options": [
-        "Berjalan kaki dulu ke jalan besar",
+        "Walking to the main road first",
         "Take transport with a different number",
         "Leave home much earlier",
-        "Menunggu di jalannya sendiri"
+        "Waiting on her own street"
       ],
-      "explain": "This detail is stated directly in the audio: “Berjalan kaki dulu ke jalan besar”."
+      "explain": "This detail is stated directly in the audio: “Walking to the main road first”."
     },
     "listen_sc_a2_inference_010": {
       "question": "Why does Jihan accept the change?",
       "options": [
         "She has no other choice",
         "The trip is faster than before",
-        "Jalan kaki ke jalan besar baik untuknya",
+        "Walking to the main road is good for her",
         "The fare is now cheaper"
       ],
       "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “The trip is faster than before”."
@@ -2671,7 +2671,7 @@
       "question": "How does Jihan feel about walking in the rain?",
       "options": [
         "He does not care about it",
-        "Ia menolak melakukannya",
+        "She refused to do it",
         "She feels it is uncomfortable",
         "She really enjoys it"
       ],
@@ -2696,7 +2696,7 @@
       "options": [
         "The gate he repaired at his house",
         "The small room he rents in the city",
-        "Tempat ia mengikuti pelajaran daringnya",
+        "The place where she takes her online lessons",
         "The uncle who teaches him every morning"
       ],
       "explain": "Throughout the audio, Krisna is mainly talking about this, so the correct answer is: “Tempat ia mengikuti pelajaran daringnya”."
@@ -2715,7 +2715,7 @@
       "question": "Why does Krisna not study at his own house?",
       "options": [
         "The connection at his house is not strong",
-        "Rumahnya terlalu berisik",
+        "Her house is too noisy",
         "His uncle asks him to come before eight o'clock",
         "He does not have a computer at home"
       ],
@@ -2724,8 +2724,8 @@
     "listen_sc_a2_attitude_011": {
       "question": "What can we conclude about his uncle?",
       "options": [
-        "Ia bekerja di kamar belakang itu",
-        "Ia bersedia membantu keponakannya",
+        "She works in that back room",
+        "She is willing to help her nephew",
         "He does not like receiving guests",
         "He teaches at the same school as him"
       ],
@@ -2758,7 +2758,7 @@
     "listen_sc_a2_detail_012": {
       "question": "What happened during the holiday?",
       "options": [
-        "Seseorang mengambil tanamannya",
+        "Someone took her plants",
         "Her class made a new list",
         "No one watered the plants",
         "The garden was closed"
@@ -2779,8 +2779,8 @@
       "question": "What lesson did the class learn?",
       "options": [
         "Working together requires a clear division of names",
-        "Kebun terlalu merepotkan",
-        "Liburan buruk bagi tanaman",
+        "The garden is too much trouble",
+        "Bad holiday for plants",
         "The list is actually useless"
       ],
       "explain": "Lestari's word choice and tone in the audio show: “Working together requires a clear division of names”."
@@ -2812,27 +2812,27 @@
     "listen_sc_a2_detail_013": {
       "question": "What did Miko realize on the way home?",
       "options": [
-        "Satu rodanya hilang",
+        "One of its wheels is missing",
         "The brakes are not working well",
-        "Penjualnya membuntutinya",
-        "Sepedanya terlalu kecil"
+        "The seller followed him",
+        "The bicycle is too small"
       ],
       "explain": "This detail is stated directly in the audio: “The brakes are not working well”."
     },
     "listen_sc_a2_inference_013": {
       "question": "What is Miko's opinion about the price now?",
       "options": [
-        "Penjual di pasar mengembalikan uangnya",
+        "The market vendor refunded his money",
         "The repairs cost nothing",
         "The bike was not as cheap as it seemed",
-        "Sepeda itu sepenuhnya gratis"
+        "The bicycle was completely free"
       ],
       "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “The bike was not as cheap as it seemed”."
     },
     "listen_sc_a2_attitude_013": {
       "question": "What is his attitude toward the seller's explanation?",
       "options": [
-        "Ia berterima kasih atas keterangan itu",
+        "He thanked him for the information",
         "He finds it very helpful",
         "He never listened to it",
         "He no longer trusts it"
@@ -2866,17 +2866,17 @@
     "listen_sc_a2_detail_014": {
       "question": "What is missing from her application file?",
       "options": [
-        "Surat keterangan penghasilan orang tuanya",
-        "Rapor sekolahnya tahun lalu",
-        "Foto dan tanda tangannya",
-        "Alamat surel kantor itu"
+        "His parents' certificate of income",
+        "Her school report card from last year",
+        "His photo and signature",
+        "The office's email address"
       ],
-      "explain": "This detail is stated directly in the audio: “Surat keterangan penghasilan orang tuanya”."
+      "explain": "This detail is stated directly in the audio: “Her parents' income statement”."
     },
     "listen_sc_a2_inference_014": {
       "question": "What happens if she is late?",
       "options": [
-        "Ia boleh mengirimnya lewat surel",
+        "He may send it via email",
         "Her application will not be processed",
         "She will pay a small fine",
         "The office will call her again"
@@ -2884,14 +2884,14 @@
       "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “Her application will not be processed”."
     },
     "listen_sc_a2_attitude_014": {
-      "question": "Seberapa mendesak situasinya?",
+      "question": "How urgent is the situation?",
       "options": [
         "There is no deadline at all",
         "The deadline has passed",
-        "Waktunya tinggal beberapa hari",
-        "Waktunya masih beberapa bulan"
+        "There are only a few days left",
+        "There are still a few months left"
       ],
-      "explain": "Nabila's word choice and tone in the audio show: “Waktunya tinggal beberapa hari”."
+      "explain": "Nabila's word choice and tone in the audio show: “There are only a few days left”."
     },
     "listen_sc_a2_paraphrase_014": {
       "question": "Which sentence has the same meaning as “I sent everything by email”?",
@@ -2930,7 +2930,7 @@
     "listen_sc_a2_inference_015": {
       "question": "Why was the exchange easy for Oscar?",
       "options": [
-        "Ia menyimpan bukti pembeliannya",
+        "He kept his proof of purchase",
         "He knows the shop assistant",
         "He paid an extra fee for the service",
         "He returned it at the same hour"
@@ -2940,8 +2940,8 @@
     "listen_sc_a2_attitude_015": {
       "question": "What is Oscar's opinion about the store's policy?",
       "options": [
-        "Ia ingin aturannya diubah",
-        "Ia menganggapnya masuk akal",
+        "He wants the rules changed",
+        "He considers it reasonable",
         "He thinks the store's policy is unfair",
         "He does not understand the policy"
       ],
@@ -2974,10 +2974,10 @@
     "listen_sc_a2_detail_016": {
       "question": "How many days was the book overdue?",
       "options": [
-        "Tepat satu minggu",
+        "Exactly one week",
         "He does not remember anymore",
-        "Delapan hari",
-        "Dua hari"
+        "Eight days",
+        "Two days"
       ],
       "explain": "This detail is stated directly in the audio: “Delapan hari”."
     },
@@ -2985,7 +2985,7 @@
       "question": "Why did Pandu not know about the fine?",
       "options": [
         "There was no officer at the service desk",
-        "Aturannya baru dibuat minggu itu",
+        "The rules were just made that week",
         "His friend gave him incorrect information",
         "He never read the announcement"
       ],
@@ -2994,8 +2994,8 @@
     "listen_sc_a2_attitude_016": {
       "question": "What has changed in his habits?",
       "options": [
-        "Ia mencatat tanggal di ponselnya",
-        "Ia berhenti meminjam buku",
+        "He noted the date on his phone",
+        "He stopped borrowing books",
         "He reads every announcement twice",
         "He returns books on the same day"
       ],
@@ -3030,8 +3030,8 @@
       "options": [
         "To ask for a new group member",
         "To divide the empty parts and inform the teacher",
-        "Menunggu saja sampai anggota itu membalas",
-        "Membatalkan presentasinya"
+        "Just wait until that member replies",
+        "Cancel his presentation"
       ],
       "explain": "This detail is stated directly in the audio: “To divide the empty parts and inform the teacher”."
     },
@@ -3049,7 +3049,7 @@
       "question": "What is her attitude toward the missing member?",
       "options": [
         "She is worried about their health",
-        "Ia menganggap anggota itu benar",
+        "He thinks that member is right",
         "She does not care at all",
         "She is annoyed but remains practical"
       ],
@@ -3073,7 +3073,7 @@
       "question": "What is Reza mainly talking about?",
       "options": [
         "The sauce he cooked for the seller",
-        "Rumah sakit di dekat warung kampus",
+        "The hospital near the campus food stall",
         "Eggs he sells at a small stall",
         "The reason he asked about peanuts before eating"
       ],
@@ -3082,19 +3082,19 @@
     "listen_sc_a2_detail_018": {
       "question": "What did Reza order yesterday?",
       "options": [
-        "Nasi putih dan telur",
+        "White rice and eggs",
         "The sauce that contains peanuts",
         "Did not order anything from that stall",
         "The same food as usual"
       ],
-      "explain": "This detail is stated directly in the audio: “Nasi putih dan telur”."
+      "explain": "This detail is stated directly in the audio: “White rice and eggs”."
     },
     "listen_sc_a2_inference_018": {
       "question": "Why did Reza ask about the sauce?",
       "options": [
         "The seller told him to choose another sauce",
         "The wrong ingredients could harm him",
-        "Ia ingin mempelajari resepnya",
+        "He wants to learn the recipe",
         "He does not like sharp flavors"
       ],
       "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “The wrong ingredients could harm him”."
@@ -3102,9 +3102,9 @@
     "listen_sc_a2_attitude_018": {
       "question": "How did Reza respond to people calling him fussy?",
       "options": [
-        "Ia berhenti makan di warung itu",
+        "She stopped eating at that food stall",
         "He got angry at them",
-        "Ia menjelaskan risikonya bagi kesehatannya",
+        "He explained the risks to his health",
         "He admitted that he is indeed a fussy buyer"
       ],
       "explain": "Reza's word choice and tone in the audio show: “Ia menjelaskan risikonya bagi kesehatannya”."
@@ -3137,7 +3137,7 @@
       "question": "How much time do the residents have?",
       "options": [
         "One hour after the machine stops",
-        "Sampai hari mencuci berakhir",
+        "Until laundry day is over",
         "As long as they need",
         "Thirty minutes after the machine stops"
       ],
@@ -3146,17 +3146,17 @@
     "listen_sc_a2_inference_019": {
       "question": "What was the problem before the rule existed?",
       "options": [
-        "Pakaian dibiarkan terlalu lama di mesin",
+        "Clothes were left in the machine for too long",
         "The washing machine broke almost every week",
         "Only a few residents used it",
         "No one washed their clothes"
       ],
-      "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “Pakaian dibiarkan terlalu lama di mesin”."
+      "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “The clothes were left in the machine too long”."
     },
     "listen_sc_a2_attitude_019": {
       "question": "How well is the rule working?",
       "options": [
-        "Malah memperburuk masalahnya",
+        "It only made the problem worse",
         "Working well almost all the time",
         "Not working at all",
         "Only applies to new residents"
@@ -3177,7 +3177,7 @@
       "question": "What is Taufik mainly talking about?",
       "options": [
         "The heavy box he lifted at the clinic",
-        "Pengalaman pertamanya mendonorkan darah",
+        "His first experience donating blood",
         "The nurse who works at his village school",
         "Drinking water distributed by the clinic for guests"
       ],
@@ -3186,10 +3186,10 @@
     "listen_sc_a2_detail_020": {
       "question": "What did the nurse check first?",
       "options": [
-        "Darah anggota keluarganya",
-        "Namanya di daftar klinik",
-        "Berat badan dan tekanan darahnya",
-        "Umur dan alamat rumahnya"
+        "A family member's blood",
+        "His name on the clinic registry",
+        "His weight and blood pressure",
+        "His age and home address"
       ],
       "explain": "This detail is stated directly in the audio: “Berat badan dan tekanan darahnya”."
     },
@@ -3206,9 +3206,9 @@
     "listen_sc_a2_attitude_020": {
       "question": "How did Taufik describe the process?",
       "options": [
-        "Singkat dan tertata",
-        "Lama dan menyakitkan",
-        "Membingungkan baginya",
+        "Brief and organized",
+        "Long and painful",
+        "Confusing to him",
         "Cancelled by the nurse"
       ],
       "explain": "Taufik's word choice and tone in the audio show: “Singkat dan tertata”."
@@ -3241,9 +3241,9 @@
       "question": "What color must the shoes be?",
       "options": [
         "The rule does not mention color",
-        "Hitam",
-        "Putih",
-        "Warna gelap apa saja"
+        "Black",
+        "White",
+        "Any dark color"
       ],
       "explain": "This detail is stated directly in the audio: “Hitam”."
     },
@@ -3263,7 +3263,7 @@
         "She considers it very unfair",
         "She is angry because of the delay",
         "She does not understand the decision",
-        "Ia menganggapnya cukup adil"
+        "He thinks it is quite fair"
       ],
       "explain": "Ulya's word choice and tone in the audio show: “Ia menganggapnya cukup adil”."
     },
@@ -3287,15 +3287,15 @@
         "The museum she visited with her classmates",
         "Twenty visitor questions every week",
         "The ship she built herself for display",
-        "Pekerjaan Sabtunya menjelaskan kapal di museum"
+        "His Saturday job is explaining ships at the museum"
       ],
-      "explain": "Throughout the audio, Vanya is mainly talking about this, so the correct answer is: “Pekerjaan Sabtunya menjelaskan kapal di museum”."
+      "explain": "Throughout the audio, Vanya is mainly talking about this, so the correct answer is: “Her Saturday job explaining ships at the museum”."
     },
     "listen_sc_a2_detail_022": {
       "question": "What did Vanya do after that difficult question?",
       "options": [
-        "Ia mencatat pertanyaannya lalu mencari jawabannya",
-        "Ia meminta pengunjung itu datang lagi lain hari",
+        "He wrote down his question and then looked up the answer",
+        "He asked the visitor to come again another day",
         "She gave an incorrect answer",
         "She stopped working as a guide"
       ],
@@ -3304,7 +3304,7 @@
     "listen_sc_a2_inference_022": {
       "question": "What does this show about Vanya?",
       "options": [
-        "Ia menginginkan pekerjaan lain",
+        "He wants a different job",
         "She is serious about her work",
         "She does not like difficult visitors",
         "She knows everything about the ship"
@@ -3314,10 +3314,10 @@
     "listen_sc_a2_attitude_022": {
       "question": "What is Vanya's attitude when she doesn't know an answer?",
       "options": [
-        "Ia menganggap pertanyaannya konyol",
-        "Ia menyalahkan pihak museum",
+        "He thinks the question is silly",
+        "He blames the museum management",
         "She considers it something that can be improved",
-        "Ia malu dan ingin bersembunyi"
+        "He was embarrassed and wanted to hide"
       ],
       "explain": "Vanya's word choice and tone in the audio show: “She considers it something that can be improved”."
     },
@@ -3341,17 +3341,17 @@
         "The grandmother who moved to the village last year",
         "Sleeping for six hours before the trip",
         "An exhausting day when her cousin got married",
-        "Desa tempat seluruh keluarganya kini tinggal"
+        "The village where his whole family now lives"
       ],
       "explain": "Throughout the audio, Wulan is mainly talking about this, so the correct answer is: “An exhausting day when her cousin got married”."
     },
     "listen_sc_a2_detail_023": {
       "question": "When did the family leave?",
       "options": [
-        "Pukul enam sore",
+        "Six in the evening",
         "The following night",
         "After the wedding ceremony finished",
-        "Pukul empat pagi"
+        "Four in the morning"
       ],
       "explain": "This detail is stated directly in the audio: “Pukul empat pagi”."
     },
@@ -3368,10 +3368,10 @@
     "listen_sc_a2_attitude_023": {
       "question": "How did Wulan feel about that day?",
       "options": [
-        "Bosan selama acara pernikahan",
+        "Bored during the wedding reception",
         "Tired but happy she joined",
         "Regretting that she agreed to join",
-        "Marah kepada sepupunya"
+        "Angry with his cousin"
       ],
       "explain": "Wulan's word choice and tone in the audio show: “Tired but happy she joined”."
     },
@@ -3393,11 +3393,11 @@
       "question": "What is Yusuf mainly talking about?",
       "options": [
         "The holiday job he has been doing for two years",
-        "Menabung uang saku pelan-pelan demi laptop sekolah",
+        "Slowly saving up pocket money for a school laptop",
         "The laptop he already bought for school",
-        "Uang tiga juta pemberian keluarganya"
+        "Three million rupiah given by his family"
       ],
-      "explain": "Throughout the audio, Yusuf is mainly talking about this, so the correct answer is: “Menabung uang saku pelan-pelan demi laptop sekolah”."
+      "explain": "Throughout the audio, Yusuf is mainly talking about this, so the correct answer is: “Slowly saving his allowance for a school laptop”."
     },
     "listen_sc_a2_detail_024": {
       "question": "How much does Yusuf save every month?",
@@ -3424,7 +3424,7 @@
       "options": [
         "He is looking for a faster way",
         "He has decided to give up",
-        "Ia rela menunggu dua tahun",
+        "He is willing to wait two years",
         "He is waiting for a gift from his family"
       ],
       "explain": "Yusuf's word choice and tone in the audio show: “He is looking for a faster way”."
@@ -3466,7 +3466,7 @@
     "listen_sc_a2_inference_025": {
       "question": "Why did only a few people come?",
       "options": [
-        "Harganya terlalu mahal",
+        "The price is too expensive",
         "The fried bananas were sold out",
         "The weather was bad",
         "The market was closed"
@@ -3503,24 +3503,24 @@
         "The village library he founded with his teacher",
         "A boy who cannot yet read simple words",
         "The room that the children clean every week",
-        "Membantu anak kecil belajar membaca tiap Sabtu"
+        "Helping a young child learn to read every Saturday"
       ],
-      "explain": "Throughout the audio, Arya is mainly talking about this, so the correct answer is: “Membantu anak kecil belajar membaca tiap Sabtu”."
+      "explain": "Throughout the audio, Arya is mainly talking about this, so the correct answer is: “Helping a young child learn to read every Saturday”."
     },
     "listen_sc_a2_detail_026": {
       "question": "How many children read a full page alone last week?",
       "options": [
-        "Satu anak lelaki",
+        "A young boy",
         "All the children in the room",
-        "Tujuh anak",
-        "Seluruh kelompok membaca"
+        "Seven children",
+        "The whole group reads"
       ],
       "explain": "This detail is stated directly in the audio: “Satu anak lelaki”."
     },
     "listen_sc_a2_inference_026": {
       "question": "Why did the whole room clap?",
       "options": [
-        "Sang kakak pembimbing membacakan halamannya",
+        "The older mentor reads the page aloud",
         "The child succeeded in doing something difficult for him",
         "The library was closing early that day",
         "The children finished studying early"
@@ -3533,7 +3533,7 @@
         "Bored with the lesson",
         "Worried about the noise",
         "Proud of the child",
-        "Ikut malu melihat anak itu"
+        "Feeling embarrassed on behalf of that child"
       ],
       "explain": "Arya's word choice and tone in the audio show: “Proud of the child”."
     },
@@ -3556,27 +3556,27 @@
       "options": [
         "Notes that went missing the night before the exam",
         "Warm milk she drinks every night",
-        "Sulit tidur menjelang ujian matematikanya",
+        "Having trouble sleeping before the math exam",
         "A math book written by her older sibling"
       ],
-      "explain": "Throughout the audio, Bunga is mainly talking about this, so the correct answer is: “Sulit tidur menjelang ujian matematikanya”."
+      "explain": "Throughout the audio, Bunga is mainly talking about this, so the correct answer is: “Having trouble sleeping before her math exam”."
     },
     "listen_sc_a2_detail_027": {
-      "question": "Apa saran kakaknya?",
+      "question": "What advice did her older sibling give?",
       "options": [
-        "Membaca catatannya sekali lagi",
-        "Meminta bantuan kepada guru",
+        "Reading the notes one more time",
+        "Asking the teacher for help",
         "Drinking coffee and studying even longer",
-        "Berhenti membaca dan segera tidur"
+        "Stop reading and go to sleep right away"
       ],
       "explain": "This detail is stated directly in the audio: “Berhenti membaca dan segera tidur”."
     },
     "listen_sc_a2_inference_027": {
-      "question": "Apa alasan di balik saran itu?",
+      "question": "What is the reason behind that advice?",
       "options": [
-        "Istirahat membantu ingatan bekerja",
-        "Matematika tidaklah penting",
-        "Kakaknya ingin kamarnya tenang",
+        "Taking a break helps memory function",
+        "Math is not important",
+        "Her older sibling wants the room to be quiet",
         "The exam will be canceled"
       ],
       "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “Istirahat membantu ingatan bekerja”."
@@ -3609,7 +3609,7 @@
       "question": "What is Candra mainly talking about?",
       "options": [
         "The driving test he failed three times",
-        "Belajar menyetir dan sulitnya memarkir",
+        "Learning to drive and the difficulty of parking",
         "The road his father repairs every Sunday",
         "The car he bought with his father"
       ],
@@ -3618,32 +3618,32 @@
     "listen_sc_a2_detail_028": {
       "question": "What was the most difficult thing for Candra?",
       "options": [
-        "Memutar mobil di jalan sempit",
-        "Menghidupkan mesin mobilnya",
-        "Menempatkan mobil di ruang parkir",
+        "Turning the car around on a narrow street",
+        "Starting the car engine",
+        "Placing the car into a parking space",
         "Driving the car at high speed"
       ],
-      "explain": "This detail is stated directly in the audio: “Menempatkan mobil di ruang parkir”."
+      "explain": "This detail is stated directly in the audio: “Parking the car in a parking space”."
     },
     "listen_sc_a2_inference_028": {
       "question": "How did his father respond to mistakes?",
       "options": [
         "He yelled at his child in the car",
-        "Ia menghentikan pelajaran menyetir sepenuhnya",
+        "She stopped driving lessons altogether",
         "He asked someone else to teach",
-        "Ia tetap sabar dan merencanakan latihan lagi"
+        "She remained patient and planned another practice session"
       ],
-      "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “Ia tetap sabar dan merencanakan latihan lagi”."
+      "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “They stay patient and plan to practice again”."
     },
     "listen_sc_a2_attitude_028": {
       "question": "What is his father's view on learning?",
       "options": [
-        "Butuh waktu dan latihan berulang",
+        "It takes time and repeated practice",
         "Must be fast and easy to master",
         "Not worth the effort at all",
-        "Perlu latihan parkir berminggu-minggu"
+        "It takes weeks of parking practice"
       ],
-      "explain": "Candra's word choice and tone in the audio show: “Butuh waktu dan latihan berulang”."
+      "explain": "Candra's word choice and tone in the audio show: “It takes time and repeated practice”."
     },
     "listen_sc_a2_paraphrase_028": {
       "question": "Which sentence has the same meaning as “we would try again next week”?",
@@ -3673,7 +3673,7 @@
       "question": "What did the doctor find?",
       "options": [
         "Food that had already gone bad",
-        "Sepotong kecil plastik",
+        "A small piece of plastic",
         "A broken leg bone",
         "There was no problem with the cat"
       ],
@@ -3736,15 +3736,15 @@
     "listen_sc_a2_inference_030": {
       "question": "Why did she rewrite her email?",
       "options": [
-        "Ia mengubah isi pertanyaannya",
+        "She changed the content of her question",
         "Her sibling showed her the correct format",
-        "Gurunya memintanya menulis ulang",
+        "Her teacher asked her to rewrite it",
         "Her first email did not arrive"
       ],
       "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “Her sibling showed her the correct format”."
     },
     "listen_sc_a2_attitude_030": {
-      "question": "Seberapa cepat gurunya membalas?",
+      "question": "How quickly did her teacher reply?",
       "options": [
         "After a few days",
         "Her teacher did not reply",
@@ -3776,10 +3776,10 @@
     "listen_sc_a2_detail_031": {
       "question": "What is the new monthly fee?",
       "options": [
-        "Lima puluh ribu",
-        "Tiga puluh ribu",
+        "Fifty thousand",
+        "Thirty thousand",
         "The fee has not changed",
-        "Delapan puluh ribu"
+        "Eighty thousand"
       ],
       "explain": "This detail is stated directly in the audio: “Delapan puluh ribu”."
     },
@@ -3796,10 +3796,10 @@
     "listen_sc_a2_attitude_031": {
       "question": "What is shown by the way the coach resolved it?",
       "options": [
-        "Ia berencana menutup klubnya",
-        "Ia ingin para pemainnya bertahan",
+        "He plans to close his club",
+        "He wants his players to stay",
         "He does not need the money",
-        "Ia marah kepada para pemain"
+        "He is angry at the players"
       ],
       "explain": "Ferry's word choice and tone in the audio show: “Ia ingin para pemainnya bertahan”."
     },
@@ -3830,7 +3830,7 @@
     "listen_sc_a2_detail_032": {
       "question": "What happened last Sunday?",
       "options": [
-        "Kakaknya merusak alat cetak itu",
+        "His older sibling broke the printing tool",
         "His report was finished early",
         "The ink ran out late at night",
         "Their printing device was stolen"
@@ -3842,7 +3842,7 @@
       "options": [
         "The board shows the price of new ink",
         "The board forbids his sibling from using the printer at night",
-        "Papan itu mengingatkan waktu membeli kertas",
+        "The board reminds him of the time he bought paper",
         "Everyone can see who needs the printer"
       ],
       "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “Everyone can see who needs the printer”."
@@ -3851,9 +3851,9 @@
       "question": "What is his attitude toward the new system?",
       "options": [
         "He feels the system is better than before",
-        "Ia menganggap papan itu buang-buang waktu",
-        "Ia ingin membeli alat cetak sendiri",
-        "Ia masih marah kepada kakaknya"
+        "He considers the board a complete waste of time",
+        "He wants to buy his own printing tool",
+        "He is still angry at his older sibling"
       ],
       "explain": "Guntur's word choice and tone in the audio show: “He feels the system is better than before”."
     },
@@ -3884,10 +3884,10 @@
     "listen_sc_a2_detail_033": {
       "question": "What did the teacher ask her to do?",
       "options": [
-        "Bernyanyi lagi bersama kelompok kedua",
+        "Singing again with the second group",
         "Sing again with eyes closed",
         "Choose a different song",
-        "Datang lagi di hari lain"
+        "Coming back on another day"
       ],
       "explain": "This detail is stated directly in the audio: “Sing again with eyes closed”."
     },
@@ -3907,7 +3907,7 @@
         "She is very angry about it",
         "She wants to quit the choir",
         "She feels she doesn't deserve anything",
-        "Ia menerimanya tanpa mengeluh"
+        "She accepted it without complaining"
       ],
       "explain": "Hilda's word choice and tone in the audio show: “Ia menerimanya tanpa mengeluh”."
     },
@@ -3938,9 +3938,9 @@
     "listen_sc_a2_detail_034": {
       "question": "How many bags did they fill?",
       "options": [
-        "Empat puluh kantong",
-        "Empat belas kantong",
-        "Tiga kantong",
+        "Forty bags",
+        "Fourteen bags",
+        "Three bags",
         "They didn't count them"
       ],
       "explain": "This detail is stated directly in the audio: “Empat puluh kantong”."
@@ -3961,7 +3961,7 @@
         "A failure because of the amount of trash",
         "Work done only by his group",
         "An activity that grew beyond his group",
-        "Buang-buang waktu belaka"
+        "A mere waste of time"
       ],
       "explain": "Ivan's word choice and tone in the audio show: “An activity that grew beyond his group”."
     },
@@ -4005,17 +4005,17 @@
         "Small mistakes won't cost much",
         "It was the fastest way to finish",
         "The service provider told them to",
-        "Ibunya memang ingin mengirim uang"
+        "His mother actually wanted to send money"
       ],
       "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “Small mistakes won't cost much”."
     },
     "listen_sc_a2_attitude_035": {
       "question": "How did her mother feel at the beginning?",
       "options": [
-        "Yakin ia pasti bisa",
-        "Gugup takut salah menekan",
+        "Convinced that he could definitely do it",
+        "Nervous and afraid of pressing the wrong button",
         "Excited about the app",
-        "Marah kepada para pegawai"
+        "Angry at the employees"
       ],
       "explain": "Jasmine's word choice and tone in the audio show: “Gugup takut salah menekan”."
     },
@@ -4097,28 +4097,28 @@
       "question": "How long must Marco rest?",
       "options": [
         "Sampai turnamennya dimulai",
-        "Enam minggu",
-        "Enam hari",
+        "Six weeks",
+        "Six days",
         "Sepanjang tahun"
       ],
-      "explain": "This detail is stated directly in the audio: “Enam minggu”."
+      "explain": "This detail is stated directly in the audio: “Six weeks”."
     },
     "listen_sc_a2_inference_037": {
       "question": "Why is he doing the exercises from the doctor?",
       "options": [
-        "Ia ingin bermain di turnamen sekolah",
+        "He wants to play in the school tournament",
         "His team asked him to do it",
-        "Kembali terlalu cepat bisa merusak lututnya",
+        "Returning too soon could damage his knee",
         "His doctor monitors him every day"
       ],
-      "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “Kembali terlalu cepat bisa merusak lututnya”."
+      "explain": "This answer is not stated directly, but clues in the audio point to the conclusion: “Returning too soon could damage their knee”."
     },
     "listen_sc_a2_attitude_037": {
       "question": "How does he feel about missing the tournament?",
       "options": [
         "Not bothered at all",
-        "Marah kepada tim sekolahnya",
-        "Nekat ingin tetap bermain",
+        "Angry at his school team",
+        "Recklessly determined to keep playing",
         "Disappointed but still thinking clearly"
       ],
       "explain": "Marco's word choice and tone in the audio show: “Disappointed but still thinking clearly”."
@@ -4141,9 +4141,9 @@
       "question": "What is Nia mainly talking about?",
       "options": [
         "The water tank her father sells",
-        "Hutan tempat keluarganya berjalan tiap pagi",
+        "The forest where her family walks every morning",
         "The man from the village who lives with them",
-        "Ular di bawah tangki air dan tindakan ayahnya"
+        "The snake under the water tank and her father's action"
       ],
       "explain": "Throughout the audio, Nia is mainly talking about this, so the correct answer is: “Ular di bawah tangki air dan tindakan ayahnya”."
     },
@@ -4151,9 +4151,9 @@
       "question": "What did her father do first?",
       "options": [
         "Called someone who could move it safely",
-        "Membunuh ular itu sendirian di halaman",
+        "Killing the snake alone in the yard",
         "Closed the hole behind the tank first",
-        "Membawa ular itu ke hutan seorang diri"
+        "Carrying the snake to the forest all by herself"
       ],
       "explain": "This detail is stated directly in the audio: “Called someone who could move it safely”."
     },
@@ -4171,8 +4171,8 @@
       "question": "What does her father's action show?",
       "options": [
         "He does not care about his family",
-        "Ia ingin memelihara ular itu",
-        "Ia tahu batas kemampuannya sendiri",
+        "She wants to keep the snake as a pet",
+        "She knows her own limits",
         "He is not afraid of anything"
       ],
       "explain": "Nia's word choice and tone in the audio show: “Ia tahu batas kemampuannya sendiri”."
@@ -4197,17 +4197,17 @@
         "Passengers who actually missed the ferry",
         "The captain who refused to cross the sea",
         "The ferry that was delayed due to strong winds",
-        "Loket tempat ia bekerja di pelabuhan"
+        "The ticket counter where she works at the port"
       ],
       "explain": "Throughout the audio, Omar is mainly talking about this, so the correct answer is: “The ferry that was delayed due to strong winds”."
     },
     "listen_sc_a2_detail_039": {
       "question": "How long was the delay?",
       "options": [
-        "Lima hari",
+        "Five days",
         "Less than an hour",
         "The duration is not mentioned",
-        "Lima jam"
+        "Five hours"
       ],
       "explain": "This detail is stated directly in the audio: “Lima jam”."
     },
@@ -4215,7 +4215,7 @@
       "question": "Why does Omar not blame the staff?",
       "options": [
         "The weather is beyond their control",
-        "Petugas membayari tiket ferinya",
+        "The officer paid for her ferry ticket",
         "He did not realize the delay",
         "He is friends with the captain"
       ],
@@ -4226,7 +4226,7 @@
       "options": [
         "He does not trust the captain",
         "He is sure it was a safe choice",
-        "Ia merasa kapten menunggu terlalu lama",
+        "He felt the captain waited too long",
         "He wanted the ferry to leave earlier"
       ],
       "explain": "Omar's word choice and tone in the audio show: “He is sure it was a safe choice”."
@@ -4260,10 +4260,10 @@
       "options": [
         "More than five minutes",
         "He did not speak at all",
-        "Sekitar empat puluh detik",
-        "Dua menit penuh"
+        "About forty seconds",
+        "A full two minutes"
       ],
-      "explain": "This detail is stated directly in the audio: “Sekitar empat puluh detik”."
+      "explain": "This detail is stated directly in the audio: “About forty seconds”."
     },
     "listen_sc_a2_inference_040": {
       "question": "How did the other members react?",
@@ -4278,10 +4278,10 @@
     "listen_sc_a2_attitude_040": {
       "question": "What did the chairperson want to convey to him?",
       "options": [
-        "Pengalamannya wajar bagi pemula",
+        "His experience is normal for a beginner",
         "He needs to prepare better notes",
         "He is not a good fit for the club",
-        "Dua menit terlalu lama baginya"
+        "Two minutes was too long for him"
       ],
       "explain": "Rendra's word choice and tone in the audio show: “Pengalamannya wajar bagi pemula”."
     },
