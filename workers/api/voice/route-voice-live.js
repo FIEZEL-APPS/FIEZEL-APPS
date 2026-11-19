@@ -1410,8 +1410,9 @@ async function runGeminiJsonWithPool(keys, promptText, temperature = 0.5, maxOut
 async function runFastOpenerOnly({ keys, userText, targetLang, targetLocaleName, personaName }) {
   const openerPrompt = [
     `[FAST STAGE-1 WHITEBOARD OPENER JSON ONLY - Zero emojis, zero em-dash]`,
-    `Course: ${targetLang.toUpperCase()}, Learner UI language: ${targetLocaleName}, Mentor: ${personaName}.`,
+    `Course: ${targetLang.toUpperCase()}, Mandatory explanation language: ${targetLocaleName}, Mentor: ${personaName}.`,
     `Question: "${userText}"`,
+    `IMPORTANT: Even if the learner wrote or spoke in ${targetLang.toUpperCase()}, write topicTitle, text, and spokenNarration 100% in ${targetLocaleName} (quoting only short ${targetLang.toUpperCase()} example words).`,
     `Write ONLY Step 0 header + 1 warm, clear, complete opening hook sentence ("spokenNarration", 12-18 words in ${targetLocaleName}) immediately answering the question.`,
     `JSON: {"topicTitle":"...","patternFormula":"...","headingStep":{"kind":"heading","title":"...","text":"1 concise takeaway line","spokenNarration":"..."}}`,
   ].join('\n');
@@ -2089,22 +2090,32 @@ async function executePartnerTurnCore(ctx, streamHooks = null) {
     : (await readJsonFromCtx(ctx).catch(() => null)) || {};
   const body = readRes?.value || {};
   const targetLang = body.targetLang === 'ja' ? 'ja' : body.targetLang === 'zh' ? 'zh' : 'en';
-  const rawLocale = String(body.locale || 'id').toLowerCase().trim().split(/[-_]/)[0];
-  const locale = ['id', 'th', 'ja', 'zh', 'en', 'ms', 'vi', 'fil', 'km', 'ru'].includes(rawLocale) ? rawLocale : 'id';
-  const TARGET_LOCALE_NAME_MAP = {
-    id: 'Indonesian',
-    th: 'Thai',
-    ja: 'Japanese',
-    zh: 'Mandarin Chinese',
+  const WHITEBOARD_LOCALE_LABELS = {
+    id: 'Indonesian (Bahasa Indonesia)',
+    th: 'Thai (ภาษาไทย)',
+    ja: 'Japanese (日本語)',
+    zh: 'Mandarin Chinese (中文)',
     en: 'English',
-    ms: 'Malay (Bahasa Melayu)',
-    vi: 'Vietnamese',
+    ru: 'Russian (Русский)',
+    km: 'Khmer / Cambodian (ភាសាខ្មែរ)',
     fil: 'Filipino / Tagalog',
-    km: 'Khmer',
-    ru: 'Russian',
+    tl: 'Filipino / Tagalog',
+    vi: 'Vietnamese (Tiếng Việt)',
+    ms: 'Malay (Bahasa Melayu)',
+    ko: 'Korean (한국어)',
+    ar: 'Arabic (العربية)',
+    es: 'Spanish (Español)',
+    fr: 'French (Français)',
+    de: 'German (Deutsch)',
+    pt: 'Portuguese (Português)',
+    hi: 'Hindi (हिन्दी)',
+    my: 'Burmese (မြန်မာ)',
+    lo: 'Lao (ລາວ)',
   };
-  const targetLocaleName = TARGET_LOCALE_NAME_MAP[locale] || 'Indonesian';
-  const rawUserInput = cleanSpokenText(body.text || body.userText || '').slice(0, 400);
+  const rawLocaleRaw = String(body.locale || 'id').toLowerCase().trim().split(/[-_]/)[0];
+  const rawLocale = rawLocaleRaw === 'tl' ? 'fil' : rawLocaleRaw;
+  const locale = WHITEBOARD_LOCALE_LABELS[rawLocale] ? rawLocale : 'id';
+  const rawUserInput = cleanSpokenText(body.text || body.userText || '').slice(0, 460);
   if (!rawUserInput) {
     return {
       status: 400,
@@ -2112,7 +2123,28 @@ async function executePartnerTurnCore(ctx, streamHooks = null) {
     };
   }
   const forcePopup = Boolean(body.forcePopup) || /\[WHITEBOARD_REQUEST\]/i.test(rawUserInput);
-  const userText = rawUserInput.replace(/\[WHITEBOARD_REQUEST\]\s*/gi, '').trim() || rawUserInput;
+  const isRemediationRequest = /\[REMEDIATION_DIFFERENT_ANGLE\]/i.test(rawUserInput);
+  const userText = rawUserInput
+    .replace(/\[WHITEBOARD_REQUEST\]\s*/gi, '')
+    .replace(/\[REMEDIATION_DIFFERENT_ANGLE\]\s*/gi, '')
+    .trim() || rawUserInput;
+
+  const detectExplicitCourseExplainRequest = (txt, course) => {
+    const s = String(txt || '').toLowerCase();
+    if (course === 'en') {
+      return /\b(?:jelaskan|bahas|terangkan|ajar(?:i|kan)?|explain|teach)\s+(?:dalam|pakai|pake|in|using)\s+(?:bahasa\s+)?(?:inggris|english)\b|\b(?:in\s+english\s+(?:only|please)|pakai\s+bahasa\s+inggris\s+(?:aja|saja|dong)|อธิบายเป็นภาษาอังกฤษ)\b/i.test(s);
+    }
+    if (course === 'ja') {
+      return /\b(?:jelaskan|bahas|terangkan|explain|teach)\s+(?:dalam|pakai|pake|in|using)\s+(?:bahasa\s+)?(?:jepang|japanese)\b|日本語で(?:説明|解説|教えて)|にほんごで(?:せつめい|おしえて)/i.test(s);
+    }
+    if (course === 'zh') {
+      return /\b(?:jelaskan|bahas|terangkan|explain|teach)\s+(?:dalam|pakai|pake|in|using)\s+(?:bahasa\s+)?(?:mandarin|china|chinese|tionghoa)\b|用中文(?:解释|讲解|说明)/i.test(s);
+    }
+    return false;
+  };
+  const explicitCourseExplain = detectExplicitCourseExplainRequest(userText, targetLang);
+  const boardExplanationLocale = explicitCourseExplain ? targetLang : locale;
+  const targetLocaleName = WHITEBOARD_LOCALE_LABELS[boardExplanationLocale] || WHITEBOARD_LOCALE_LABELS[locale] || 'Indonesian (Bahasa Indonesia)';
 
   const requestedSwitchMode = forcePopup ? '' : detectCallModeSwitchIntent(userText);
   const effectiveCallMode =
@@ -2180,10 +2212,11 @@ async function executePartnerTurnCore(ctx, streamHooks = null) {
     ? cleanSpokenText(rawBoardCtx.currentVisualSummary || '').slice(0, 280)
     : '';
   const isVisualSwitchRequest =
-    /\b(?:ubah|ganti|tukar|bikin(?:kan)?\s+ulang|coba)\s+(?:visual|gambar|diagram|sketsa|grafik|bagan|tabel|cara\s+gambar)\b|\b(?:visual|gambar|diagram|sketsa|grafik)\s+(?:lain|baru|berbeda)\b|\b(?:change|switch|another|different)\s+(?:visual|diagram|drawing|chart)\b/i.test(
+    isRemediationRequest ||
+    /\b(?:ubah|ganti|tukar|bikin(?:kan)?\s+ulang|coba)\s+(?:visual|gambar|diagram|sketsa|grafik|bagan|tabel|cara\s+gambar)\b|\b(?:visual|gambar|diagram|sketsa|grafik)\s+(?:lain|baru|berbeda)\b|\b(?:change|switch|another|different)\s+(?:visual|diagram|drawing|chart|angle|analogy)\b/i.test(
       userText
     );
-  const hasBoardFollowUpContext = Boolean(boardCtxTopic || boardCtxArea || boardCtxSummary);
+  const hasBoardFollowUpContext = Boolean(boardCtxTopic || boardCtxArea || boardCtxSummary || isRemediationRequest);
   const followUpDirectiveBlock = hasBoardFollowUpContext
     ? [
         `[FOLLOW-UP CLARIFICATION ON OPEN WHITEBOARD - CRITICAL CONTINUITY]:`,
@@ -2193,9 +2226,11 @@ async function executePartnerTurnCore(ctx, streamHooks = null) {
         boardCtxArea ? `- Learner specifically CIRCLED this confusing part on the board: "${boardCtxArea}".` : '',
         boardCtxPrevQs.length ? `- Previous questions in this board session: ${boardCtxPrevQs.join(' | ')}` : '',
         `- Learner is asking follow-up: "${userText}".`,
-        isVisualSwitchRequest
+        isRemediationRequest
+          ? `- MANDATORY POST-QUIZ REMEDIATION DIRECTIVE: The learner JUST ANSWERED THE PRACTICE QUIZ WRONG! Re-teach this concept with a COMPLETELY DIFFERENT, SIMPLER mental model/analogy AND a DIFFERENT visual diagram archetype than [${boardCtxVisualKinds.join(', ') || 'previous diagram'}]. Address directly why their wrong choice broke the rule, explain patiently step-by-step in 100% ${targetLocaleName}, and generate a BRAND-NEW verification quiz sentence ("drillTargetSentence" & "drillTrapSentence") to test true mastery!`
+          : isVisualSwitchRequest
           ? `- MANDATORY VISUAL SWITCH DIRECTIVE: The learner explicitly asked to CHANGE THE VISUAL ("${userText}")! You MUST create a COMPLETELY DIFFERENT visual representation than [${boardCtxVisualKinds.join(', ') || 'the previous diagram'}]${boardCtxVisualSummary ? ` (${boardCtxVisualSummary})` : ''}. For example: if you previously used rough_scene side-by-side boxes, switch to BOTH a structured "contrast_scale" (termA, descA, termB, descB, analogy) or "syntax_flow" (nodes chain) AND a genuinely different "rough_scene" geometry (such as a top-down decision tree, timeline track, or 2x2 scenario comparison grid with concrete real-world examples inside EVERY box!). NEVER repeat the same layout or empty placeholder boxes!`
-          : `- MANDATORY PEDAGOGY FOR THIS FOLLOW-UP: Directly address WHY they are confused about "${boardCtxArea || userText}" in connection to "${boardCtxTopic || 'the board'}". Break it down MORE SLOWLY from zero basics via detailed spoken audio ("spokenNarration"), keep on-board text super visual & concise (keywords/formulas + 4-5 concrete examples, NOT articles!), and draw a focused clearer visual diagram ("rough_scene" / "contrast_scale" / "syntax_flow") showing the exact distinction they are stuck on.`,
+          : `- MANDATORY PEDAGOGY FOR THIS FOLLOW-UP: Directly address WHY they are confused about "${boardCtxArea || userText}" in connection to "${boardCtxTopic || 'the board'}". Break it down MORE SLOWLY from zero basics via detailed spoken audio ("spokenNarration") in 100% ${targetLocaleName}, keep on-board text super visual & concise (keywords/formulas + 4-5 concrete examples, NOT articles!), and draw a focused clearer visual diagram ("rough_scene" / "contrast_scale" / "syntax_flow") showing the exact distinction they are stuck on.`,
       ]
         .filter(Boolean)
         .join('\n')
@@ -2236,10 +2271,11 @@ async function executePartnerTurnCore(ctx, streamHooks = null) {
   if (isCacheableStandaloneBoard) {
     boardCacheKey = await sha256Hex(
       JSON.stringify({
-        v: 'wb-v2',
+        v: 'wb-v3',
         q: userText.trim().toLowerCase(),
         targetLang,
         locale,
+        boardExplanationLocale,
         effectiveCallMode,
         boardOnly,
         personaId,
@@ -2327,7 +2363,10 @@ async function executePartnerTurnCore(ctx, streamHooks = null) {
   const buildBoardCompilerPrompt = (extraRule = '', includeReplies = false) =>
     [
         `[JSON WHITEBOARD COMPILER: Return valid single-line JSON cleanly. Zero emojis. Zero em-dash.]`,
-        `Target course: ${targetLang.toUpperCase()}. Learner UI language: ${targetLocaleName}. Mentor name: ${personaName}.`,
+        `Target course: ${targetLang.toUpperCase()}. Mandatory whiteboard explanation language: ${targetLocaleName} (${boardExplanationLocale}). Mentor name: ${personaName}.`,
+        explicitCourseExplain
+          ? `[EXPLICIT COURSE-LANGUAGE EXPLANATION OVERRIDE]: The learner explicitly requested to be explained in ${targetLocaleName}. Deliver the full whiteboard explanation clearly in ${targetLocaleName}.`
+          : `[IRONCLAD NATIVE EXPLANATION LANGUAGE LOCK]: Even if the learner spoke or typed their question in ${targetLang.toUpperCase()} (or mixed languages) during the main call, ALL whiteboard explanation prose (topicTitle, explanationText, coachSpokenScript, aiReply, phaseLabels, note bullets, diagram titles/subtitles/captions, table meanings, trapWrongReason, drillMeaningPrompt, and EVERY step's spokenNarration) MUST BE WRITTEN 100% IN THE LEARNER'S NATIVE LANGUAGE: ${targetLocaleName}! Quote ONLY short target-language example words/sentences in ${targetLang.toUpperCase()} inside ${targetLocaleName} explanations!`,
         followUpDirectiveBlock,
         extraRule,
         `Learner exact question/request: "${userText}"`,
@@ -2367,7 +2406,7 @@ async function executePartnerTurnCore(ctx, streamHooks = null) {
         `5) STRICT COURSE PURITY: ZH uses Hanzi + pure Hanyu Pinyin only (never Japanese); JA uses Japanese + furigana/romaji; EN uses Indonesian analogies cleanly pronouncing English examples.`,
         `6) Quiz transfer rule: "drillMeaningPrompt" in ${targetLocaleName}, fresh "drillTargetSentence" & "drillTrapSentence" directly testing "${userText}".`,
         `7) ALWAYS include "highlightTerms":["term1","term2"] on key steps for Stabilo highlights.`,
-        `JSON schema (adapt step[2] to the exact visual archetype suited to this topic, NEVER omit step[2] child fields — if rough_scene ALWAYS populate shapes[] OR graphNodes[]+graphEdges[]!): {"aiReply":"... (in 100% ${targetLocaleName})","aiReplyTranslation":"...",${includeReplies ? `"replies":[{"tier":"easy","text":"...","pronunciation":"...","hint":"..."},{"tier":"mission","text":"...","pronunciation":"...","hint":"..."},{"tier":"rescue","text":"...","pronunciation":"...","hint":"..."}],` : ''}"uiAction":{"actionType":"open_learning_popup","topicTitle":"...","focusType":"grammar","patternFormula":"...","coachSpokenScript":"...","explanationText":"...","sampleTarget":"...","trapWrongSentence":"...","trapWrongReason":"...","drillMeaningPrompt":"...","drillTargetSentence":"...","drillTrapSentence":"...","phaseLabels":["0 Mulai","1 Logika","2 Visual","3 Contoh","4 Latihan"],"whiteboardSteps":[{"kind":"heading","column":"left","phaseIndex":0,"title":"...","text":"...","spokenNarration":"..."},{"kind":"note","column":"left","phaseIndex":1,"title":"Logika Dasar Dari Nol","bullets":["...","...","...","..."],"highlightTerms":["..."],"spokenNarration":"..."},{"kind":"formula_blocks | syntax_flow | timeline_track | mind_map | contrast_scale | metaphor_scene | kanji_grid | rough_scene","sceneTheme":"camera_vs_video | battery_meter | bridge_timeline | stage_spotlight | key_and_lock","column":"left","phaseIndex":2,"title":"...","analogy":"...","metaphorCenterLabel":"...","termA":"...","descA":"...","termB":"...","descB":"...","rightText":"...","wrongText":"...","highlightTerms":["..."],"leftPanel":{"badge":"...","title":"...","subtitle":"...","example":"...","icon":"..."},"rightPanel":{"badge":"...","title":"...","subtitle":"...","example":"...","icon":"..."},"branches":[{"label":"...","sublabel":"...","example":"...","icon":"star","color":"#0EA5E9"}],"timelineEvents":[{"timeLabel":"...","title":"...","example":"...","icon":"clock","isActive":false,"color":"#0EA5E9"}],"blocks":[{"role":"...","token":"...","note":"...","color":"#0EA5E9"}],"nodes":[{"role":"...","word":"...","color":"#DBEAFE"}],"graphDirection":"LR","graphNodes":[{"id":"n1","label":"...","sublabel":"...","fill":"#DBEAFE","stroke":"#1D4ED8"}],"graphEdges":[{"from":"n1","to":"n2","label":"..."}],"width":560,"height":240,"caption":"...","shapes":[{"op":"rect","x":20,"y":36,"w":152,"h":76,"fill":"#DBEAFE","stroke":"#1D4ED8","label":"...","sublabel":"..."},{"op":"arrow","x1":176,"y1":74,"x2":204,"y2":74,"stroke":"#1E293B"},{"op":"rect","x":208,"y":36,"w":152,"h":76,"fill":"#DCFCE7","stroke":"#15803D","label":"...","sublabel":"..."},{"op":"text","x":28,"y":170,"text":"...","stroke":"#0F172A","size":"sm"}],"spokenNarration":"..."},{"kind":"table","column":"right","phaseIndex":3,"title":"Contoh Penggunaan Nyata","tableHeaders":["...","...","..."],"tableRows":[["...","...","..."]],"spokenNarration":"..."},{"kind":"trap_vs_fix","column":"right","phaseIndex":3,"title":"Kesalahan Umum vs Bentuk Tepat","wrongText":"...","rightText":"...","reason":"...","highlightTerms":["..."],"spokenNarration":"..."},{"kind":"highlight_callout","column":"right","phaseIndex":4,"title":"Rumus Anti-Lupa","highlightPhrase":"...","spokenNarration":"..."}]}}`,
+        `JSON schema (adapt step[2] to the ONE visual archetype suited to this topic; populate all child fields of your chosen step[2].kind and OMIT unused sibling arrays from other diagram kinds to keep generation fast — if rough_scene ALWAYS populate shapes[] OR graphNodes[]+graphEdges[]!): {"aiReply":"... (in 100% ${targetLocaleName})","aiReplyTranslation":"...",${includeReplies ? `"replies":[{"tier":"easy","text":"...","pronunciation":"...","hint":"..."},{"tier":"mission","text":"...","pronunciation":"...","hint":"..."},{"tier":"rescue","text":"...","pronunciation":"...","hint":"..."}],` : ''}"uiAction":{"actionType":"open_learning_popup","topicTitle":"...","focusType":"grammar","patternFormula":"...","coachSpokenScript":"...","explanationText":"...","sampleTarget":"...","trapWrongSentence":"...","trapWrongReason":"...","drillMeaningPrompt":"...","drillTargetSentence":"...","drillTrapSentence":"...","drillDistractors":["...","..."],"phaseLabels":["0 Mulai","1 Logika","2 Visual","3 Contoh","4 Latihan"],"whiteboardSteps":[{"kind":"heading","column":"left","phaseIndex":0,"title":"...","text":"...","spokenNarration":"..."},{"kind":"note","column":"left","phaseIndex":1,"title":"Logika Dasar Dari Nol","bullets":["...","...","...","..."],"highlightTerms":["..."],"spokenNarration":"..."},{"kind":"formula_blocks | syntax_flow | timeline_track | mind_map | contrast_scale | metaphor_scene | kanji_grid | rough_scene","sceneTheme":"camera_vs_video | battery_meter | bridge_timeline | stage_spotlight | key_and_lock","column":"left","phaseIndex":2,"title":"...","analogy":"...","metaphorCenterLabel":"...","termA":"...","descA":"...","termB":"...","descB":"...","rightText":"...","wrongText":"...","highlightTerms":["..."],"leftPanel":{"badge":"...","title":"...","subtitle":"...","example":"...","icon":"..."},"rightPanel":{"badge":"...","title":"...","subtitle":"...","example":"...","icon":"..."},"branches":[{"label":"...","sublabel":"...","example":"...","icon":"star","color":"#0EA5E9"}],"timelineEvents":[{"timeLabel":"...","title":"...","example":"...","icon":"clock","isActive":false,"color":"#0EA5E9"}],"blocks":[{"role":"...","token":"...","note":"...","color":"#0EA5E9"}],"nodes":[{"role":"...","word":"...","color":"#DBEAFE"}],"graphDirection":"LR","graphNodes":[{"id":"n1","label":"...","sublabel":"...","fill":"#DBEAFE","stroke":"#1D4ED8"}],"graphEdges":[{"from":"n1","to":"n2","label":"..."}],"width":560,"height":240,"caption":"...","shapes":[{"op":"rect","x":20,"y":36,"w":152,"h":76,"fill":"#DBEAFE","stroke":"#1D4ED8","label":"...","sublabel":"..."},{"op":"arrow","x1":176,"y1":74,"x2":204,"y2":74,"stroke":"#1E293B"},{"op":"rect","x":208,"y":36,"w":152,"h":76,"fill":"#DCFCE7","stroke":"#15803D","label":"...","sublabel":"..."},{"op":"text","x":28,"y":170,"text":"...","stroke":"#0F172A","size":"sm"}],"spokenNarration":"..."},{"kind":"table","column":"right","phaseIndex":3,"title":"Contoh Penggunaan Nyata","tableHeaders":["...","...","..."],"tableRows":[["...","...","..."]],"spokenNarration":"..."},{"kind":"trap_vs_fix","column":"right","phaseIndex":3,"title":"Kesalahan Umum vs Bentuk Tepat","wrongText":"...","rightText":"...","reason":"...","highlightTerms":["..."],"spokenNarration":"..."},{"kind":"highlight_callout","column":"right","phaseIndex":4,"title":"Rumus Anti-Lupa","highlightPhrase":"...","spokenNarration":"..."}]}}`,
       ]
         .filter(Boolean)
         .join('\n');
@@ -2557,6 +2596,20 @@ JSON only: {"aiReply":"...","aiReplyTranslation":"...","diagnosis":{"ok":true,"m
             };
           }
         }
+      }
+      if (
+        !isOffTopicToBeDrift &&
+        lockedOpener?.headingStep?.spokenNarration &&
+        gen?.ok &&
+        gen?.parsed?.uiAction?.whiteboardSteps?.[0]?.kind === 'heading'
+      ) {
+        const s0 = gen.parsed.uiAction.whiteboardSteps[0];
+        gen.parsed.uiAction.whiteboardSteps[0] = {
+          ...s0,
+          title: lockedOpener.headingStep.title || s0.title,
+          text: lockedOpener.headingStep.text || s0.text,
+          spokenNarration: lockedOpener.headingStep.spokenNarration,
+        };
       }
     }
   }
@@ -3458,7 +3511,7 @@ JSON only: {"aiReply":"...","aiReplyTranslation":"...","diagnosis":{"ok":true,"m
           st.kind !== 'highlight_callout' &&
           /^(?:visualisasi|alur|skema|diagram|peta)\s+[\w\s]{1,36}\.?$/i.test(rawNarClean);
         const curWords = rawNarClean.split(/\s+/).filter(Boolean).length;
-        if (curWords < 11 || isVagueDiagramTitleOnly) {
+        if (boardExplanationLocale === 'id' && (curWords < 11 || isVagueDiagramTitleOnly)) {
           if (st.kind === 'timeline_track' && Array.isArray(st.timelineEvents) && st.timelineEvents.length) {
             st.spokenNarration = `Ikuti garis waktu dari kiri ke kanan: ${st.timelineEvents.slice(0, 4).map((ev) => `${ev.timeLabel || ''} yaitu ${ev.title || ''}${ev.example ? `, contohnya ${ev.example}` : ''}`).join('. Kemudian ')}.`;
           } else if (st.kind === 'formula_blocks' && Array.isArray(st.blocks) && st.blocks.length) {
@@ -3498,6 +3551,7 @@ JSON only: {"aiReply":"...","aiReplyTranslation":"...","diagnosis":{"ok":true,"m
         return val;
       };
       normalizeBoardHyphensDeep(uiAction);
+      uiAction.explanationLocale = boardExplanationLocale;
       aiReply = normalizeBoardHyphensDeep(aiReply);
       aiReplyTranslation = normalizeBoardHyphensDeep(aiReplyTranslation);
     } catch (_) {}
@@ -3875,15 +3929,24 @@ const LOCALE_LANG_NAMES = {
   ja: 'natural conversational Japanese',
   zh: 'natural conversational Mandarin Chinese',
   en: 'natural conversational English',
+  ru: 'natural conversational Russian',
+  km: 'natural conversational Khmer (Cambodian)',
+  fil: 'natural conversational Filipino (Tagalog)',
+  tl: 'natural conversational Filipino (Tagalog)',
   vi: 'natural conversational Vietnamese',
   ms: 'natural conversational Malay',
   fil: 'natural conversational Filipino / Tagalog',
   km: 'natural conversational Khmer',
   ru: 'natural conversational Russian',
   ko: 'natural conversational Korean',
+  ar: 'natural conversational Arabic',
   es: 'natural conversational Spanish',
   fr: 'natural conversational French',
   de: 'natural conversational German',
+  pt: 'natural conversational Portuguese',
+  hi: 'natural conversational Hindi',
+  my: 'natural conversational Burmese',
+  lo: 'natural conversational Lao',
 };
 
 async function fallbackGoogleTranslate(text, targetLocale) {
@@ -4119,8 +4182,9 @@ export async function routeVoiceGeminiTts(ctx) {
     .toLowerCase()
     .split(/[-_]/)[0]
     .trim();
-  let effectiveLang = ['id', 'th', 'ja', 'zh', 'en', 'vi', 'ru', 'ms', 'ko', 'es', 'fr', 'de'].includes(rawRequestedLang)
-    ? rawRequestedLang
+  const normReqLang = rawRequestedLang === 'tl' ? 'fil' : rawRequestedLang;
+  let effectiveLang = ['id', 'th', 'ja', 'zh', 'en', 'vi', 'ru', 'ms', 'ko', 'km', 'fil', 'ar', 'es', 'fr', 'de', 'pt', 'hi', 'my', 'lo'].includes(normReqLang)
+    ? normReqLang
     : 'en';
 
   const hasSubstantialLatinForSsw =
@@ -4131,12 +4195,18 @@ export async function routeVoiceGeminiTts(ctx) {
       ));
 
   // Auto-detect explanation language carefully:
-  // If Latin prose (Indonesian / English / Vietnamese) quotes a few Japanese/Chinese words (e.g. 食, は, 为),
-  // keep the explanation language as Indonesian/English so TTS NEVER switches to Japanese/Mandarin prosody!
+  // If Latin prose (Indonesian / English / Vietnamese / Filipino) quotes a few Japanese/Chinese words (e.g. 食, は, 为),
+  // keep the explanation language in the learner's native language so TTS NEVER switches to Japanese/Mandarin prosody!
   const latinWordCount = (cleanText.match(/\b[a-zA-Z]{2,}\b/g) || []).length;
   const kanaCount = (cleanText.match(/[ぁ-んァ-ヶー]/g) || []).length;
   const hanziCount = (cleanText.match(/[\u4e00-\u9fff]/g) || []).length;
   const thaiCount = (cleanText.match(/[\u0E00-\u0E7F]/g) || []).length;
+  const khmerCount = (cleanText.match(/[\u1780-\u17FF]/g) || []).length;
+  const hangulCount = (cleanText.match(/[\uAC00-\uD7AF]/g) || []).length;
+  const arabicCount = (cleanText.match(/[\u0600-\u06FF]/g) || []).length;
+  const devanagariCount = (cleanText.match(/[\u0900-\u097F]/g) || []).length;
+  const burmeseCount = (cleanText.match(/[\u1000-\u109F]/g) || []).length;
+  const laoCount = (cleanText.match(/[\u0E80-\u0EFF]/g) || []).length;
   const cyrillicCount = (cleanText.match(/[\u0400-\u04FF]/g) || []).length;
   const vietCount = (cleanText.match(/[\u1EA0-\u1EF9]/g) || []).length;
   const idMarkerCount = (
@@ -4147,6 +4217,18 @@ export async function routeVoiceGeminiTts(ctx) {
 
   if (thaiCount >= 3 && thaiCount >= latinWordCount) {
     effectiveLang = 'th';
+  } else if (khmerCount >= 3 && khmerCount >= latinWordCount) {
+    effectiveLang = 'km';
+  } else if (hangulCount >= 3 && hangulCount >= latinWordCount) {
+    effectiveLang = 'ko';
+  } else if (arabicCount >= 3 && arabicCount >= latinWordCount) {
+    effectiveLang = 'ar';
+  } else if (devanagariCount >= 3 && devanagariCount >= latinWordCount) {
+    effectiveLang = 'hi';
+  } else if (burmeseCount >= 3 && burmeseCount >= latinWordCount) {
+    effectiveLang = 'my';
+  } else if (laoCount >= 3 && laoCount >= latinWordCount) {
+    effectiveLang = 'lo';
   } else if (cyrillicCount >= 4 && cyrillicCount >= latinWordCount) {
     effectiveLang = 'ru';
   } else if (vietCount >= 2) {
@@ -4157,9 +4239,11 @@ export async function routeVoiceGeminiTts(ctx) {
     effectiveLang = 'ja';
   } else if (hanziCount >= 3 && kanaCount === 0 && latinWordCount < 4) {
     effectiveLang = 'zh';
-  } else if (idMarkerCount >= 2 || (rawRequestedLang === 'id' && latinWordCount >= 3)) {
+  } else if (idMarkerCount >= 2 || (normReqLang === 'id' && latinWordCount >= 3)) {
     effectiveLang = 'id';
-  } else if (rawRequestedLang === 'en' && latinWordCount >= 3) {
+  } else if (['fil', 'ms', 'es', 'fr', 'de', 'pt'].includes(normReqLang) && latinWordCount >= 3) {
+    effectiveLang = normReqLang;
+  } else if (normReqLang === 'en' && latinWordCount >= 3) {
     effectiveLang = 'en';
   } else if (kanaCount > 0 && kanaCount > latinWordCount) {
     effectiveLang = 'ja';
@@ -4386,12 +4470,16 @@ export async function routeVoiceGeminiTts(ctx) {
 
       if (res.status === 429) {
         const errBody = await res.text().catch(() => '');
-        const isHardQuota = /quota\s*exceeded|per\s*day|PerDay|requests\s*per\s*day|too_many_requests|check your plan|billing|limit:\s*0/i.test(
+        const isHardQuota = /quota\s*exceeded|per\s*day|PerDay|requests\s*per\s*day|too_many_requests|check your plan|billing|limit:\s*0|resource_exhausted/i.test(
           errBody
         );
-        const cdUntil = Date.now() + (isHardQuota ? 600000 : 8000);
+        const cdUntil = Date.now() + (isHardQuota ? 600000 : 12000);
         _ttsCooldownMap.set(cooldownKey, cdUntil);
         _ttsCooldownMap.set(modelCooldownKey, cdUntil);
+        if (isHardQuota) {
+          _quotaDeadKeys.add(key);
+          _verifiedHealthyKeys.delete(key);
+        }
         return { ok: false, reason: `HTTP 429 (${model})` };
       }
       if (!res.ok) {
@@ -4449,30 +4537,37 @@ export async function routeVoiceGeminiTts(ctx) {
   };
 
   // Prioritized healthy keys for fast hedged Gemini 3.8 Live 24kHz WAV synthesis
+  const liveNowMs = Date.now();
   const prioritizedLiveKeys = keys
     .map((_, idx) => keys[(startTtsIdx + idx * ttsStride) % keys.length])
     .sort((a, b) => {
+      const aCool = liveNowMs < (_ttsCooldownMap.get(`${a}::gemini-3.8-live-tts`) || 0) ? 1 : 0;
+      const bCool = liveNowMs < (_ttsCooldownMap.get(`${b}::gemini-3.8-live-tts`) || 0) ? 1 : 0;
+      if (aCool !== bCool) return aCool - bCool;
       const deadDiff = Number(_quotaDeadKeys.has(a)) - Number(_quotaDeadKeys.has(b));
       if (deadDiff !== 0) return deadDiff;
       return Number(_verifiedHealthyKeys.has(b)) - Number(_verifiedHealthyKeys.has(a));
     });
 
   const runLiveWavRace = async () => {
-    const candidates = prioritizedLiveKeys.slice(0, Math.min(6, prioritizedLiveKeys.length));
+    // Allow sweeping the entire rotated pool (up to 18 keys) so a contiguous dead-quota block never causes 503
+    const candidates = prioritizedLiveKeys.slice(0, Math.min(18, prioritizedLiveKeys.length));
     if (!candidates.length) return { ok: false, reason: 'no_live_keys' };
     return new Promise((resolve) => {
       let settled = false;
       let launched = 0;
       let pending = 0;
-      let hedgeTimer = null;
+      let hedgeTimer1 = null;
+      let hedgeTimer2 = null;
       let failReason = lastReason;
-      const raceGuardTimer = setTimeout(() => finish({ ok: false, reason: failReason || 'live_race_timeout' }), 10000);
+      const raceGuardTimer = setTimeout(() => finish({ ok: false, reason: failReason || 'live_race_timeout' }), 9500);
 
       const finish = (res) => {
         if (settled) return;
         settled = true;
         clearTimeout(raceGuardTimer);
-        if (hedgeTimer) clearTimeout(hedgeTimer);
+        if (hedgeTimer1) clearTimeout(hedgeTimer1);
+        if (hedgeTimer2) clearTimeout(hedgeTimer2);
         resolve(res);
       };
 
@@ -4528,7 +4623,10 @@ export async function routeVoiceGeminiTts(ctx) {
 
       launchNext();
       if (candidates.length > 1) {
-        hedgeTimer = setTimeout(launchNext, 180);
+        hedgeTimer1 = setTimeout(launchNext, 140);
+      }
+      if (candidates.length > 2) {
+        hedgeTimer2 = setTimeout(launchNext, 340);
       }
     });
   };
@@ -4773,16 +4871,30 @@ async function invokeGeminiLiveWavTts({
   if (Date.now() < (_ttsCooldownMap.get(cooldownKey) || 0)) {
     return { ok: false, reason: 'live_tts_cooldown' };
   }
-  const langLabel =
-    effectiveLang === 'id'
-      ? 'natural conversational Bahasa Indonesia'
-      : effectiveLang === 'th'
-        ? 'natural conversational Thai'
-        : effectiveLang === 'ja'
-          ? 'natural Japanese'
-          : effectiveLang === 'zh'
-            ? 'natural Beijing Mandarin Chinese'
-            : 'natural English';
+  const LIVE_TTS_LANG_LABELS = {
+    id: 'natural conversational Bahasa Indonesia',
+    en: 'natural English',
+    th: 'natural conversational Thai',
+    ja: 'natural Japanese',
+    zh: 'natural Beijing Mandarin Chinese',
+    ru: 'natural Russian',
+    km: 'natural Khmer (Cambodian)',
+    fil: 'natural Filipino / Tagalog',
+    tl: 'natural Filipino / Tagalog',
+    vi: 'natural Vietnamese',
+    ko: 'natural Korean',
+    ms: 'natural Bahasa Melayu',
+    ar: 'natural Modern Standard Arabic',
+    es: 'natural Spanish',
+    fr: 'natural French',
+    de: 'natural German',
+    pt: 'natural Portuguese',
+    hi: 'natural Hindi',
+    my: 'natural Burmese (Myanmar)',
+    lo: 'natural Lao',
+    it: 'natural Italian',
+  };
+  const langLabel = LIVE_TTS_LANG_LABELS[effectiveLang] || 'natural English';
   const wsUrl = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${encodeURIComponent(key)}`;
 
   return new Promise((resolve) => {
@@ -4835,7 +4947,7 @@ async function invokeGeminiLiveWavTts({
         return;
       }
       if (audioBase64 && audioBase64.length >= minExpectedB64) {
-        _copilotCooldownMap.delete(cooldownKey);
+        _ttsCooldownMap.delete(cooldownKey);
         resolve({ ok: true, audioBase64, transcript: spokenTranscript, fidelity });
       } else {
         resolve({ ok: false, reason: audioBase64 ? 'live_tts_trimmed_too_short' : reasonIfEmpty });
@@ -4858,20 +4970,30 @@ async function invokeGeminiLiveWavTts({
     ws.onopen = () => {
       try {
         const shouldUseLangCodeLock = !hasMixedBilingual && effectiveLang !== 'id';
-        const speechLangCode =
-          effectiveLang === 'ja'
-            ? 'ja-JP'
-            : effectiveLang === 'zh'
-              ? 'cmn-CN'
-              : effectiveLang === 'th'
-                ? 'th-TH'
-                : effectiveLang === 'vi'
-                  ? 'vi-VN'
-                  : effectiveLang === 'ru'
-                    ? 'ru-RU'
-                    : effectiveLang === 'id'
-                      ? 'id-ID'
-                      : 'en-US';
+        const LIVE_BCP47_MAP = {
+          ja: 'ja-JP',
+          zh: 'cmn-CN',
+          th: 'th-TH',
+          vi: 'vi-VN',
+          ru: 'ru-RU',
+          id: 'id-ID',
+          km: 'km-KH',
+          fil: 'fil-PH',
+          tl: 'fil-PH',
+          ko: 'ko-KR',
+          ms: 'ms-MY',
+          ar: 'ar-XA',
+          es: 'es-ES',
+          fr: 'fr-FR',
+          de: 'de-DE',
+          pt: 'pt-BR',
+          hi: 'hi-IN',
+          my: 'my-MM',
+          lo: 'lo-LA',
+          it: 'it-IT',
+          en: 'en-US',
+        };
+        const speechLangCode = LIVE_BCP47_MAP[effectiveLang] || 'en-US';
         const speechConfigPayload = {
           voiceConfig: { prebuiltVoiceConfig: { voiceName: voice || 'Puck' } },
         };
@@ -4978,8 +5100,16 @@ async function invokeGeminiLiveWavTts({
     };
     ws.onerror = () => finalize('live_tts_ws_error');
     ws.onclose = (ev) => {
-      if (ev.code === 1011) {
-        _ttsCooldownMap.set(cooldownKey, Date.now() + 45000);
+      const closeReason = String(ev?.reason || '');
+      const isQuotaClose =
+        ev.code === 1011 ||
+        /quota|exhausted|limit|billing|resource_exhausted/i.test(closeReason);
+      if (isQuotaClose) {
+        _ttsCooldownMap.set(cooldownKey, Date.now() + 180000);
+        _quotaDeadKeys.add(key);
+        _verifiedHealthyKeys.delete(key);
+      } else if (ev.code !== 1000 && pcmChunks.length === 0) {
+        _ttsCooldownMap.set(cooldownKey, Date.now() + 30000);
       }
       finalize(`live_tts_closed_${ev.code}`);
     };
@@ -5031,7 +5161,7 @@ export async function routeVoiceVerifySpeech(ctx) {
     .filter(Boolean)
     .join('\n');
 
-  const verifyModels = ['gemini-2.5-flash', 'gemini-3-flash-preview'];
+  const verifyModels = ['gemini-3.1-flash-lite-preview', 'gemini-3-flash-preview', 'gemini-3.5-flash-lite'];
   const total = keys.length;
   const startIdx = _copilotPoolIndex % total;
 

@@ -1,7 +1,7 @@
 {
-  "version": "m025-806",
-  "claimedBy": "branch feat/english-first-complete-m025-806",
-  "claimedAt": "2026-11-18T19:22:02.667Z",
-  "reason": "feat(i18n): complete english-first auth, content sidecars, voice studio & catalog fixes",
+  "version": "m025-811",
+  "claimedBy": "branch fix/mobile-pwa-whiteboard-zero-force-close",
+  "claimedAt": "2026-11-19T17:47:22.448Z",
+  "reason": "fix(voice-studio,pwa): eliminate real-device mobile PWA whiteboard force-close (autoload hold, split-brain guard, Silero VAD pause, single AudioContext, zero-copy PCM & mobile GPU/SVG relief)",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

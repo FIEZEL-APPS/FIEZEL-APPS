@@ -479,11 +479,16 @@ export class FiezelMochi {
     this.camera.position.set(0, this.baseCameraY, this.baseCameraZ || 5.05); // Configurable camera framing (e.g. 4.70 for full stage presence in FaceTime)
 
 
+    const isTouchMobile = typeof window !== 'undefined' && (
+      window.innerWidth < 768 ||
+      (typeof navigator !== 'undefined' && /iPhone|iPad|iPod|Android|Mobile/i.test(navigator.userAgent || ''))
+    );
+
     this.renderer = new THREE.WebGLRenderer({
       antialias: true, // Universal hardware MSAA: silky-smooth silhouette on mobile & desktop
       alpha: true,
       preserveDrawingBuffer: false, // Set to false to eliminate mobile GPU stall due to ReadPixels
-      powerPreference: 'high-performance'
+      powerPreference: isTouchMobile ? 'default' : 'high-performance'
     });
     // Tone mapping is strictly NoToneMapping to banish dark/black edge fringes along transparent alpha borders!
     this.renderer.toneMapping = THREE.NoToneMapping;
@@ -529,6 +534,14 @@ export class FiezelMochi {
 
   _computeTargetPixelRatio() {
     const baseDpr = (typeof window !== 'undefined' && window.devicePixelRatio) || 1;
+    const isTouchMobile = typeof window !== 'undefined' && (
+      window.innerWidth < 768 ||
+      (typeof navigator !== 'undefined' && /iPhone|iPad|iPod|Android|Mobile/i.test(navigator.userAgent || ''))
+    );
+    if (isTouchMobile) {
+      // Cap at 2.0 on mobile PWA (saves ~56% GPU framebuffer VRAM on 3x iPhones while keeping crisp Retina HD)
+      return Math.min(Math.max(baseDpr, 1.5), 2.0);
+    }
     return this.isCompactCard
       ? Math.min(Math.max(baseDpr, 2.0), 3.0)
       : Math.min(Math.max(baseDpr, 1.5), 2.25);
@@ -8167,6 +8180,20 @@ export class FiezelMochi {
     }
     if (this._sparkleTexture) { try { this._sparkleTexture.dispose(); } catch (_) {} this._sparkleTexture = null; }
     if (this._heartTexture) { try { this._heartTexture.dispose(); } catch (_) {} this._heartTexture = null; }
+    if (this.mochiSkinTexture) { try { this.mochiSkinTexture.dispose(); } catch (_) {} this.mochiSkinTexture = null; }
+    if (this.faceTexture) { try { this.faceTexture.dispose(); } catch (_) {} this.faceTexture = null; }
+    if (this.auraBackTexture) { try { this.auraBackTexture.dispose(); } catch (_) {} this.auraBackTexture = null; }
+    if (this.fxTexture) { try { this.fxTexture.dispose(); } catch (_) {} this.fxTexture = null; }
+    // Release offscreen 2D Canvas backing stores (~16 MB on iOS CoreGraphics) immediately on teardown
+    [this.skinCanvas, this.faceCanvas, this.auraBackCanvas, this.fxCanvas].forEach((cv) => {
+      if (cv) {
+        try { cv.width = 0; cv.height = 0; } catch (_) {}
+      }
+    });
+    this.skinCanvas = null; this.sCtx = null;
+    this.faceCanvas = null; this.fCtx = null;
+    this.auraBackCanvas = null; this.auraBackCtx = null;
+    this.fxCanvas = null; this.fxCtx = null;
     if (this.renderer) {
       if (this.renderer.domElement) {
         if (this._onContextLost) {
@@ -8175,6 +8202,7 @@ export class FiezelMochi {
         if (this._onContextRestored) {
           try { this.renderer.domElement.removeEventListener('webglcontextrestored', this._onContextRestored, false); } catch (_) {}
         }
+        try { this.renderer.domElement.width = 0; this.renderer.domElement.height = 0; } catch (_) {}
         if (this.renderer.domElement.parentNode) {
           this.renderer.domElement.parentNode.removeChild(this.renderer.domElement);
         }

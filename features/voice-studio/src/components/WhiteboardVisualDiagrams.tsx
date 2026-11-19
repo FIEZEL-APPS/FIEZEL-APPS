@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import type { WhiteboardSceneStep } from '../lib/whiteboardDirector';
 import { MathText } from './MathText';
 import { wbPick } from '../lib/i18n';
+import { isMobileLowMemoryDevice } from '../lib/boardAudioUnlock';
 
 const escapeRegExp = (str: string) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
@@ -546,6 +547,179 @@ const MetaphorThemeHeroSvg: React.FC<{
   );
 };
 
+const SPATIAL_STOPWORD_RE =
+  /^(?:yang|dan|atau|untuk|pakai|memakai|dengan|dari|pada|ini|itu|adalah|sebagai|bisa|akan|saat|jika|kalau|bukan|kata|arti|artinya|contoh|contohnya|kalimat|bentuk|sisi|panel|bagian|sebelah|pertama|kedua|ketiga|keempat|khusus|hanya|juga|dalam|lebih|the|and|with|from|into|that|this|use|used|can|not|also|only)$/;
+const CORE_SHORT_GRAMMAR_RE =
+  /^(?:am|is|are|be|do|did|does|to|in|on|at|by|for|of|no|wa|ga|wo|ni|de|he|ka|は|が|を|に|で|へ|も)$/;
+const CJK_OR_THAI_CHAR_RE = /[\u3040-\u30ff\u4e00-\u9faf\u0e00-\u0e7f]/;
+
+function normalizeSpokenForBoundaryMatch(raw: string): string {
+  return ` ${String(raw || '')
+    .toLowerCase()
+    .replace(/\b(?:bukan|alih-alih|instead\s+of|rather\s+than)\s+(?:untuk\s+|memakai\s+|pakai\s+)?[a-z0-9]+(?:\s+[a-z0-9]+){0,2}/gi, ' ')
+    .replace(/[^a-z0-9\u3040-\u30ff\u4e00-\u9faf\u0e00-\u0e7f]+/gi, ' ')
+    .trim()} `;
+}
+
+function findLastRegexMatchIdx(text: string, rx: RegExp): number {
+  let last = -1;
+  let m: RegExpExecArray | null;
+  const clone = new RegExp(rx.source, rx.flags.includes('g') ? rx.flags : `${rx.flags}g`);
+  while ((m = clone.exec(text)) !== null) {
+    last = m.index;
+    if (m[0].length === 0) clone.lastIndex += 1;
+  }
+  return last;
+}
+
+/** Extract meaningful content + short grammar/particle tokens from a board panel/item. */
+export function extractSpatialFocusTokens(raw: string): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const part of String(raw || '').toLowerCase().split(/[\s,/():;!?'"-]+/)) {
+    const tok = part.replace(/^[^a-z0-9\u3040-\u30ff\u4e00-\u9faf\u0e00-\u0e7f]+|[^a-z0-9\u3040-\u30ff\u4e00-\u9faf\u0e00-\u0e7f]+$/gi, '');
+    if (!tok) continue;
+    const isCjkOrThai = CJK_OR_THAI_CHAR_RE.test(tok);
+    const isShortGrammar = CORE_SHORT_GRAMMAR_RE.test(tok);
+    if (!isCjkOrThai && !isShortGrammar && tok.length < 3) continue;
+    if (!isShortGrammar && SPATIAL_STOPWORD_RE.test(tok)) continue;
+    if (!seen.has(tok)) {
+      seen.add(tok);
+      out.push(tok);
+    }
+  }
+  return out;
+}
+
+/** Count boundary-safe token matches between active speech and a board card/item. */
+export function countSpatialTokenHits(spokenLower: string, itemText: string, paddedSpoken?: string): number {
+  const cleanSpoken = String(spokenLower || '').toLowerCase();
+  if (cleanSpoken.length < 2) return 0;
+  const padded = paddedSpoken || normalizeSpokenForBoundaryMatch(cleanSpoken);
+  const tokens = extractSpatialFocusTokens(itemText);
+  let hits = 0;
+  for (const tok of tokens) {
+    if (CJK_OR_THAI_CHAR_RE.test(tok)) {
+      if (cleanSpoken.includes(tok)) hits += 1;
+    } else if (padded.includes(` ${tok} `)) {
+      hits += 1;
+    }
+  }
+  return hits;
+}
+
+/** Resolve Left vs Right panel focus following explicit directional cues first, then token hits, then Left-to-Right order. */
+export function resolveSpatialPanelFocus(opts: {
+  spokenText?: string;
+  progress: number;
+  leftText: string;
+  rightText: string;
+  isActive: boolean;
+  isPlaying: boolean;
+  autoZoom: boolean;
+  isLightbox?: boolean;
+  queuedPreview?: boolean;
+  chronologicalSplit?: number;
+}): 'left' | 'right' | 'none' {
+  const {
+    spokenText,
+    progress,
+    leftText,
+    rightText,
+    isActive,
+    isPlaying,
+    autoZoom,
+    isLightbox = false,
+    queuedPreview = false,
+    chronologicalSplit = 0.48,
+  } = opts;
+  if (isLightbox || queuedPreview || !autoZoom || !isActive || !isPlaying || progress < 0.01 || progress >= 0.93) {
+    return 'none';
+  }
+  const spokenLower = String(spokenText || '').toLowerCase();
+  const lastLeftCue = findLastRegexMatchIdx(
+    spokenLower,
+    /\b(?:(?:di\s+)?(?:sisi|sebelah|panel|kolom|bagian|kotak)\s+kiri|left\s+(?:side|panel|column|box)|on\s+the\s+left|pertama|first(?:ly)?)\b/gi
+  );
+  const lastRightCue = findLastRegexMatchIdx(
+    spokenLower,
+    /\b(?:(?:di\s+)?(?:sisi|sebelah|panel|kolom|bagian|kotak)\s+kanan|right\s+(?:side|panel|column|box)|on\s+the\s+right|kedua|second(?:ly)?|sebaliknya|sedangkan|sebagai\s+pembanding)\b/gi
+  );
+  if (lastLeftCue >= 0 || lastRightCue >= 0) {
+    return lastRightCue > lastLeftCue ? 'right' : 'left';
+  }
+
+  const padded = normalizeSpokenForBoundaryMatch(spokenLower);
+  const leftHits = countSpatialTokenHits(spokenLower, leftText, padded);
+  const rightHits = countSpatialTokenHits(spokenLower, rightText, padded);
+  if (leftHits > rightHits && leftHits > 0) return 'left';
+  if (rightHits > leftHits && rightHits > 0) {
+    if (progress < 0.16 && !(leftHits === 0 && rightHits >= 2)) {
+      return 'left';
+    }
+    return 'right';
+  }
+  return progress < chronologicalSplit ? 'left' : 'right';
+}
+
+/** Resolve active item index (0..N-1) using ordinal cues + boundary-safe token matching + Left-to-Right progression. */
+export function resolveSequentialItemFocus(opts: {
+  spokenText?: string;
+  progress: number;
+  itemTexts: string[];
+  isActive: boolean;
+  isPlaying: boolean;
+  autoZoom: boolean;
+  isLightbox?: boolean;
+  queuedPreview?: boolean;
+}): number {
+  const { spokenText, progress, itemTexts, isActive, isPlaying, autoZoom, isLightbox = false, queuedPreview = false } = opts;
+  if (isLightbox || queuedPreview || !autoZoom || !isActive || !isPlaying || itemTexts.length === 0 || progress < 0.01 || progress >= 0.93) {
+    return -1;
+  }
+  const spokenLower = String(spokenText || '').toLowerCase();
+  const n = itemTexts.length;
+  const chronoIdx = Math.min(n - 1, Math.floor(((progress - 0.01) / 0.92) * n));
+
+  const ordinalPatterns: Array<{ idx: number; rx: RegExp }> = [
+    { idx: 0, rx: /\b(?:pertama|kesatu|first|langkah\s*1|cabang\s*1|blok\s*1|bagian\s*1|di\s+(?:sisi\s+|sebelah\s+)?kiri)\b/gi },
+    { idx: Math.min(n - 1, 1), rx: /\b(?:kedua|second|langkah\s*2|cabang\s*2|blok\s*2|bagian\s*2)\b/gi },
+    { idx: Math.min(n - 1, 2), rx: /\b(?:ketiga|third|langkah\s*3|cabang\s*3|blok\s*3|bagian\s*3)\b/gi },
+    { idx: Math.min(n - 1, 3), rx: /\b(?:keempat|fourth|langkah\s*4|cabang\s*4|blok\s*4|bagian\s*4)\b/gi },
+    { idx: n - 1, rx: /\b(?:terakhir|di\s+(?:sisi\s+|sebelah\s+)?kanan)\b/gi },
+  ];
+  let bestOrdIdx = -1;
+  let bestOrdPos = -1;
+  for (const op of ordinalPatterns) {
+    const pos = findLastRegexMatchIdx(spokenLower, op.rx);
+    if (pos > bestOrdPos) {
+      bestOrdPos = pos;
+      bestOrdIdx = op.idx;
+    }
+  }
+  if (bestOrdIdx >= 0) return bestOrdIdx;
+
+  if (spokenLower.length >= 4) {
+    const padded = normalizeSpokenForBoundaryMatch(spokenLower);
+    let bestHits = 0;
+    let matchedIdx = -1;
+    itemTexts.forEach((txt, idx) => {
+      const hits = countSpatialTokenHits(spokenLower, txt, padded);
+      if (hits > bestHits) {
+        bestHits = hits;
+        matchedIdx = idx;
+      }
+    });
+    if (matchedIdx >= 0) {
+      if (progress < 0.14 && matchedIdx > 1 && bestHits < 2) {
+        return chronoIdx;
+      }
+      return matchedIdx;
+    }
+  }
+  return chronoIdx;
+}
+
 export const MetaphorSceneDiagram: React.FC<{
   step: WhiteboardSceneStep;
   progress: number;
@@ -583,36 +757,22 @@ export const MetaphorSceneDiagram: React.FC<{
   const isWritingNow = !isLightbox && !queuedPreview && isActive && isPlaying && effProgress > 0.01 && effProgress < 0.95;
   const terms = queuedPreview ? [] : step.highlightTerms || [];
 
-  // Sinkronkan panel Zoom In dengan kalimat yang sedang diucapkan tutor (atau fase urutan kiri -> kanan -> zoom out)
-  const spokenLower = String(spokenText || '').toLowerCase();
-  const extractTokens = (raw: string) =>
-    raw
-      .toLowerCase()
-      .split(/[\s,/():;!?'"-]+/)
-      .filter((w) => w.length >= 2 && !/^(yang|dan|atau|untuk|pakai|dengan|dari|pada|ini|itu|adalah|sebagai|bisa|akan|saat|jika|kalau)$/.test(w));
-  const leftTokens = extractTokens(`${lp.title || ''} ${step.termA || ''}`);
-  const rightTokens = extractTokens(`${rp.title || ''} ${step.termB || ''}`);
-  const escapeRx = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const leftHits = leftTokens.filter((t) => new RegExp(`(?<![a-z0-9])${escapeRx(t)}(?![a-z0-9])`, 'i').test(spokenLower)).length;
-  const rightHits = rightTokens.filter((t) => new RegExp(`(?<![a-z0-9])${escapeRx(t)}(?![a-z0-9])`, 'i').test(spokenLower)).length;
-
-  const chronologicalSide: 'left' | 'right' | 'none' =
-    effProgress >= 0.01 && effProgress < 0.46
-      ? 'left'
-      : effProgress >= 0.46 && effProgress < 0.93
-        ? 'right'
-        : 'none';
-
-  const focusSide: 'left' | 'right' | 'none' =
-    !isLightbox && autoZoom && isActive && isPlaying && effProgress < 0.93
-      ? leftHits > rightHits && leftHits > 0
-        ? 'left'
-        : rightHits > leftHits && rightHits > 0
-          ? 'right'
-          : chronologicalSide
-      : 'none';
+  // Sinkronkan panel Zoom In dengan kalimat yang sedang diucapkan tutor (arahan kiri/kanan -> token isi -> kiri lalu kanan)
+  const focusSide = resolveSpatialPanelFocus({
+    spokenText,
+    progress: effProgress,
+    leftText: `${lp.title || ''} ${step.termA || ''} ${lp.subtitle || ''} ${lp.example || ''}`,
+    rightText: `${rp.title || ''} ${step.termB || ''} ${rp.subtitle || ''} ${rp.example || ''}`,
+    isActive,
+    isPlaying,
+    autoZoom,
+    isLightbox,
+    queuedPreview,
+    chronologicalSplit: 0.46,
+  });
   const analogyZoomed =
     !isLightbox && autoZoom && isActive && isPlaying && effProgress >= 0.68 && effProgress < 0.93;
+  const isMobileLite = isMobileLowMemoryDevice();
 
   return (
     <div className="space-y-3" data-testid="wb-metaphor-scene">
@@ -643,8 +803,9 @@ export const MetaphorSceneDiagram: React.FC<{
             backgroundColor: lp.bgColor || '#E0F2FE',
             borderColor: focusSide === 'left' ? lp.accentColor || '#0284C7' : `${lp.accentColor || '#0284C7'}55`,
             opacity: focusSide === 'right' ? 0.44 : effProgress >= 0.12 ? 1 : 0.18,
-            transform:
-              focusSide === 'left'
+            transform: isMobileLite
+              ? undefined
+              : focusSide === 'left'
                 ? 'translateY(-3px) scale(1.04)'
                 : focusSide === 'right'
                   ? 'translateY(0) scale(0.97)'
@@ -653,15 +814,17 @@ export const MetaphorSceneDiagram: React.FC<{
                     : 'translateY(4px) scale(0.98)',
             boxShadow:
               focusSide === 'left'
-                ? `0 18px 38px ${lp.accentColor || '#0284C7'}38, 0 0 0 2.5px ${lp.accentColor || '#0284C7'}`
+                ? isMobileLite
+                  ? `0 0 0 2.5px ${lp.accentColor || '#0284C7'}`
+                  : `0 18px 38px ${lp.accentColor || '#0284C7'}38, 0 0 0 2.5px ${lp.accentColor || '#0284C7'}`
                 : undefined,
-            zIndex: focusSide === 'left' ? 20 : undefined,
+            zIndex: focusSide === 'left' && !isMobileLite ? 20 : undefined,
           }}
         >
           <div className="flex items-center justify-between gap-2 mb-1.5">
             <div className="flex items-center gap-1.5">
               <span
-                className="px-2 py-0.5 rounded-full text-[9.5px] font-black tracking-wider uppercase text-white"
+                className="px-2 py-0.5 rounded-full text-[9.5px] font-extrabold tracking-wider uppercase text-white"
                 style={{ backgroundColor: lp.accentColor || '#0284C7' }}
               >
                 {lp.badge || wbPick('CONCEPT 1', 'KONSEP 1')}
@@ -697,8 +860,9 @@ export const MetaphorSceneDiagram: React.FC<{
             backgroundColor: rp.bgColor || '#DCFCE7',
             borderColor: focusSide === 'right' ? rp.accentColor || '#15803D' : `${rp.accentColor || '#15803D'}55`,
             opacity: focusSide === 'left' ? 0.44 : effProgress >= 0.3 ? 1 : 0.18,
-            transform:
-              focusSide === 'right'
+            transform: isMobileLite
+              ? undefined
+              : focusSide === 'right'
                 ? 'translateY(-3px) scale(1.04)'
                 : focusSide === 'left'
                   ? 'translateY(0) scale(0.97)'
@@ -707,15 +871,17 @@ export const MetaphorSceneDiagram: React.FC<{
                     : 'translateY(4px) scale(0.98)',
             boxShadow:
               focusSide === 'right'
-                ? `0 18px 38px ${rp.accentColor || '#15803D'}38, 0 0 0 2.5px ${rp.accentColor || '#15803D'}`
+                ? isMobileLite
+                  ? `0 0 0 2.5px ${rp.accentColor || '#15803D'}`
+                  : `0 18px 38px ${rp.accentColor || '#15803D'}38, 0 0 0 2.5px ${rp.accentColor || '#15803D'}`
                 : undefined,
-            zIndex: focusSide === 'right' ? 20 : undefined,
+            zIndex: focusSide === 'right' && !isMobileLite ? 20 : undefined,
           }}
         >
           <div className="flex items-center justify-between gap-2 mb-1.5">
             <div className="flex items-center gap-1.5">
               <span
-                className="px-2 py-0.5 rounded-full text-[9.5px] font-black tracking-wider uppercase text-white"
+                className="px-2 py-0.5 rounded-full text-[9.5px] font-extrabold tracking-wider uppercase text-white"
                 style={{ backgroundColor: rp.accentColor || '#15803D' }}
               >
                 {rp.badge || wbPick('CONCEPT 2', 'KONSEP 2')}
@@ -748,8 +914,12 @@ export const MetaphorSceneDiagram: React.FC<{
         <div
           className="px-3.5 py-2.5 rounded-2xl bg-[#FFFBEB] border border-[#F59E0B]/45 text-[12px] font-semibold text-[#78350F] flex items-start gap-2 transition-transform duration-500 ease-out"
           style={{
-            transform: analogyZoomed ? 'scale(1.045)' : 'scale(1)',
-            boxShadow: analogyZoomed ? '0 12px 26px rgba(245, 158, 11, 0.28)' : undefined,
+            transform: isMobileLite ? undefined : analogyZoomed ? 'scale(1.045)' : 'scale(1)',
+            boxShadow: analogyZoomed
+              ? isMobileLite
+                ? '0 0 0 2px rgba(245, 158, 11, 0.55)'
+                : '0 12px 26px rgba(245, 158, 11, 0.28)'
+              : undefined,
           }}
         >
           <span className="shrink-0 text-sm">💡</span>
@@ -779,28 +949,17 @@ export const MindMapDiagram: React.FC<{
   const isWritingNow = !isLightbox && !queuedPreview && isActive && isPlaying && effProgress > 0.01 && effProgress < 0.95;
   const centerLabel = step.metaphorCenterLabel || step.title || wbPick('Core Concept', 'Konsep Inti');
   const terms = queuedPreview ? [] : step.highlightTerms || [];
-  const spokenL = String(spokenText || '').toLowerCase();
-  let tokenMatchedBranch = -1;
-  if (spokenL.length >= 6) {
-    let bestHits = 0;
-    branches.forEach((br, idx) => {
-      const toks = `${br.label || ''} ${br.example || ''}`
-        .toLowerCase()
-        .split(/[\s,/():;!?'"-]+/)
-        .filter((w) => w.length >= 3);
-      const hits = toks.filter((w) => spokenL.includes(w)).length;
-      if (hits > bestHits) {
-        bestHits = hits;
-        tokenMatchedBranch = idx;
-      }
-    });
-  }
-  const activeBranchIdx =
-    !isLightbox && autoZoom && isActive && isPlaying && branches.length > 0 && effProgress >= 0.01 && effProgress < 0.93
-      ? tokenMatchedBranch >= 0
-        ? tokenMatchedBranch
-        : Math.min(branches.length - 1, Math.floor(((effProgress - 0.01) / 0.92) * branches.length))
-      : -1;
+  const activeBranchIdx = resolveSequentialItemFocus({
+    spokenText,
+    progress: effProgress,
+    itemTexts: branches.map((br) => `${br.label || ''} ${br.sublabel || ''} ${br.example || ''}`),
+    isActive,
+    isPlaying,
+    autoZoom,
+    isLightbox,
+    queuedPreview,
+  });
+  const isMobileLite = isMobileLowMemoryDevice();
 
   return (
     <div className="space-y-3" data-testid="wb-mind-map">
@@ -816,7 +975,7 @@ export const MindMapDiagram: React.FC<{
       </div>
 
       {/* Organic Hub Banner */}
-      <div className="relative rounded-2xl bg-[#FFFDF7] border border-[#CBD5E1] p-3.5 overflow-hidden">
+      <div className="relative rounded-2xl bg-[#FFFDF7] border border-[#CBD5E1] p-3.5 overflow-visible">
         <svg viewBox="0 0 560 76" className="w-full h-auto block mb-2" aria-hidden="true">
           {branches.map((br, idx) => {
             const cols = Math.max(2, Math.min(branches.length, 4));
@@ -866,19 +1025,26 @@ export const MindMapDiagram: React.FC<{
             return (
               <div
                 key={idx}
+                data-wb-panel-focus={isFocused ? 'zoom-in' : activeBranchIdx >= 0 ? 'dim' : 'idle'}
                 className="relative rounded-2xl border-2 bg-white p-3 transition-all duration-200 shadow-xs"
                 style={{
                   borderColor: isFocused ? c : `${c}66`,
                   opacity: activeBranchIdx >= 0 && !isFocused ? 0.46 : visible ? 1 : 0.16,
-                  transform: !visible
-                    ? 'scale(0.98)'
-                    : isFocused
-                      ? 'translateY(-2px) scale(1.04)'
-                      : activeBranchIdx >= 0
-                        ? 'scale(0.955)'
-                        : 'scale(1)',
-                  boxShadow: isFocused ? `0 16px 34px ${c}38, 0 0 0 2.5px ${c}` : undefined,
-                  zIndex: isFocused ? 20 : undefined,
+                  transform: isMobileLite
+                    ? undefined
+                    : !visible
+                      ? 'scale(0.98)'
+                      : isFocused
+                        ? 'translateY(-2px) scale(1.04)'
+                        : activeBranchIdx >= 0
+                          ? 'scale(0.955)'
+                          : 'scale(1)',
+                  boxShadow: isFocused
+                    ? isMobileLite
+                      ? `0 0 0 2.5px ${c}`
+                      : `0 16px 34px ${c}38, 0 0 0 2.5px ${c}`
+                    : undefined,
+                  zIndex: isFocused && !isMobileLite ? 20 : undefined,
                 }}
               >
                 <div className="flex items-center gap-2 mb-1">
@@ -927,28 +1093,17 @@ export const TimelineTrackDiagram: React.FC<{
   const effProgress = isLightbox ? 1 : queuedPreview ? 0.04 : progress;
   const isWritingNow = !isLightbox && !queuedPreview && isActive && isPlaying && effProgress > 0.01 && effProgress < 0.95;
   const terms = queuedPreview ? [] : step.highlightTerms || [];
-  const spokenL = String(spokenText || '').toLowerCase();
-  let tokenMatchedEvent = -1;
-  if (spokenL.length >= 6) {
-    let bestHits = 0;
-    events.forEach((ev, idx) => {
-      const toks = `${ev.timeLabel || ''} ${ev.title || ''} ${ev.example || ''}`
-        .toLowerCase()
-        .split(/[\s,/():;!?'"-]+/)
-        .filter((w) => w.length >= 3);
-      const hits = toks.filter((w) => spokenL.includes(w)).length;
-      if (hits > bestHits) {
-        bestHits = hits;
-        tokenMatchedEvent = idx;
-      }
-    });
-  }
-  const activeEventIdx =
-    !isLightbox && autoZoom && isActive && isPlaying && events.length > 0 && effProgress >= 0.01 && effProgress < 0.93
-      ? tokenMatchedEvent >= 0
-        ? tokenMatchedEvent
-        : Math.min(events.length - 1, Math.floor(((effProgress - 0.01) / 0.92) * events.length))
-      : -1;
+  const activeEventIdx = resolveSequentialItemFocus({
+    spokenText,
+    progress: effProgress,
+    itemTexts: events.map((ev) => `${ev.timeLabel || ''} ${ev.title || ''} ${ev.example || ''}`),
+    isActive,
+    isPlaying,
+    autoZoom,
+    isLightbox,
+    queuedPreview,
+  });
+  const isMobileLite = isMobileLowMemoryDevice();
 
   return (
     <div className="space-y-3" data-testid="wb-timeline-track">
@@ -978,7 +1133,13 @@ export const TimelineTrackDiagram: React.FC<{
               className="relative z-10 w-8 h-8 rounded-full border-2 flex items-center justify-center bg-white shadow-xs transition-transform duration-300"
               style={{
                 borderColor: ev.color || '#0EA5E9',
-                transform: i === activeEventIdx ? 'scale(1.22)' : ev.isActive ? 'scale(1.12)' : 'scale(1)',
+                transform: isMobileLite
+                  ? undefined
+                  : i === activeEventIdx
+                    ? 'scale(1.22)'
+                    : ev.isActive
+                      ? 'scale(1.12)'
+                      : 'scale(1)',
               }}
             >
               <SmpVectorIcon name={ev.icon || 'clock'} color={ev.color || '#0EA5E9'} size={15} />
@@ -994,21 +1155,28 @@ export const TimelineTrackDiagram: React.FC<{
             return (
               <div
                 key={i}
+                data-wb-panel-focus={isFocused ? 'zoom-in' : activeEventIdx >= 0 ? 'dim' : 'idle'}
                 className="relative rounded-2xl border-2 p-2.5 transition-all duration-200"
                 style={{
                   backgroundColor: isFocused || ev.isActive ? '#ECFDF5' : '#FFFFFF',
                   borderColor: isFocused ? c : ev.isActive ? '#10B981' : '#E2E8F0',
                   opacity: activeEventIdx >= 0 && !isFocused ? 0.46 : visible ? 1 : 0.16,
-                  transform: isFocused
-                    ? 'translateY(-2px) scale(1.04)'
-                    : activeEventIdx >= 0
-                      ? 'scale(0.97)'
-                      : 'scale(1)',
-                  boxShadow: isFocused ? `0 16px 34px ${c}38, 0 0 0 2.5px ${c}` : undefined,
-                  zIndex: isFocused ? 20 : undefined,
+                  transform: isMobileLite
+                    ? undefined
+                    : isFocused
+                      ? 'translateY(-2px) scale(1.04)'
+                      : activeEventIdx >= 0
+                        ? 'scale(0.97)'
+                        : 'scale(1)',
+                  boxShadow: isFocused
+                    ? isMobileLite
+                      ? `0 0 0 2.5px ${c}`
+                      : `0 16px 34px ${c}38, 0 0 0 2.5px ${c}`
+                    : undefined,
+                  zIndex: isFocused && !isMobileLite ? 20 : undefined,
                 }}
               >
-                <div className="text-[10px] font-black uppercase tracking-wider" style={{ color: ev.color || '#0369A1' }}>
+                <div className="text-[10px] font-extrabold uppercase tracking-wider" style={{ color: ev.color || '#0369A1' }}>
                   {ev.timeLabel}
                 </div>
                 <div className="mt-0.5 text-[13px] font-extrabold text-[#0F172A] fz-handwriting-heading">
@@ -1044,28 +1212,17 @@ export const FormulaBlocksDiagram: React.FC<{
   const effProgress = isLightbox ? 1 : queuedPreview ? 0.04 : progress;
   const isWritingNow = !isLightbox && !queuedPreview && isActive && isPlaying && effProgress > 0.01 && effProgress < 0.95;
   const terms = queuedPreview ? [] : step.highlightTerms || [];
-  const spokenL = String(spokenText || '').toLowerCase();
-  let tokenMatchedBlock = -1;
-  if (spokenL.length >= 6) {
-    let bestHits = 0;
-    blocks.forEach((bl, idx) => {
-      const toks = `${bl.role || ''} ${bl.token || ''}`
-        .toLowerCase()
-        .split(/[\s,/():;!?'"-]+/)
-        .filter((w) => w.length >= 2);
-      const hits = toks.filter((w) => spokenL.includes(w)).length;
-      if (hits > bestHits) {
-        bestHits = hits;
-        tokenMatchedBlock = idx;
-      }
-    });
-  }
-  const activeBlockIdx =
-    !isLightbox && autoZoom && isActive && isPlaying && blocks.length > 0 && effProgress >= 0.01 && effProgress < 0.93
-      ? tokenMatchedBlock >= 0
-        ? tokenMatchedBlock
-        : Math.min(blocks.length - 1, Math.floor(((effProgress - 0.01) / 0.92) * blocks.length))
-      : -1;
+  const activeBlockIdx = resolveSequentialItemFocus({
+    spokenText,
+    progress: effProgress,
+    itemTexts: blocks.map((bl) => `${bl.role || ''} ${bl.token || ''} ${bl.note || ''}`),
+    isActive,
+    isPlaying,
+    autoZoom,
+    isLightbox,
+    queuedPreview,
+  });
+  const isMobileLite = isMobileLowMemoryDevice();
 
   return (
     <div className="space-y-3" data-testid="wb-formula-blocks">
@@ -1098,23 +1255,30 @@ export const FormulaBlocksDiagram: React.FC<{
                 return (
                   <React.Fragment key={idx}>
                     <div
+                      data-wb-panel-focus={isFocused ? 'zoom-in' : activeBlockIdx >= 0 ? 'dim' : 'idle'}
                       className="relative rounded-2xl border-2 px-3 py-2 text-center shadow-xs transition-all duration-200"
                       style={{
                         borderColor: c,
                         backgroundColor: isFocused ? `${c}26` : `${c}15`,
                         opacity: activeBlockIdx >= 0 && !isFocused ? 0.46 : visible ? 1 : 0.16,
-                        transform: !visible
-                          ? 'translateY(2px) scale(0.98)'
-                          : isFocused
-                            ? 'translateY(-4px) scale(1.075)'
-                            : activeBlockIdx >= 0
-                              ? 'translateY(0) scale(0.955)'
-                              : 'translateY(0) scale(1)',
-                        boxShadow: isFocused ? `0 16px 34px ${c}3C, 0 0 0 2.5px ${c}` : undefined,
-                        zIndex: isFocused ? 20 : undefined,
+                        transform: isMobileLite
+                          ? undefined
+                          : !visible
+                            ? 'translateY(2px) scale(0.98)'
+                            : isFocused
+                              ? 'translateY(-4px) scale(1.075)'
+                              : activeBlockIdx >= 0
+                                ? 'translateY(0) scale(0.955)'
+                                : 'translateY(0) scale(1)',
+                        boxShadow: isFocused
+                          ? isMobileLite
+                            ? `0 0 0 2.5px ${c}`
+                            : `0 16px 34px ${c}3C, 0 0 0 2.5px ${c}`
+                          : undefined,
+                        zIndex: isFocused && !isMobileLite ? 20 : undefined,
                       }}
                     >
-                      <div className="text-[9.5px] font-black uppercase tracking-wider mb-0.5" style={{ color: c }}>
+                      <div className="text-[9.5px] font-extrabold uppercase tracking-wider mb-0.5" style={{ color: c }}>
                         {bl.role}
                       </div>
                       <div className="text-[15px] font-extrabold text-[#0F172A] fz-handwriting-heading">
@@ -1125,7 +1289,7 @@ export const FormulaBlocksDiagram: React.FC<{
                       )}
                     </div>
                     {!isPatternMatrix && idx < blocks.length - 1 && (
-                      <span className="text-[15px] font-black text-[#64748B] select-none">➔</span>
+                      <span className="text-[15px] font-extrabold text-[#64748B] select-none">➔</span>
                     )}
                   </React.Fragment>
                 );

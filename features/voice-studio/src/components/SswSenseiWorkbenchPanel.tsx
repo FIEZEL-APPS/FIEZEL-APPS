@@ -163,10 +163,10 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="min-w-0 flex-1 space-y-1">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center rounded-full bg-[#8C2233] text-white px-2.5 py-0.5 text-[11px] font-black tracking-wide">
+              <span className="inline-flex items-center rounded-full bg-[#8C2233] text-white px-2.5 py-0.5 text-[11px] font-extrabold tracking-wide">
                 SSW SENSEI
               </span>
-              <span className="text-sm font-black text-[#1C1611]">
+              <span className="text-sm font-extrabold text-[#1C1611]">
                 Panduan SSW Pengolahan Makanan
               </span>
               <span className="inline-flex items-center rounded-full bg-white border border-[#DECFAF] px-2 py-0.5 text-[10.5px] font-bold text-[#6E4912]">
@@ -196,7 +196,7 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
                 <span className="text-[11px] font-bold text-[#6B5A48]">{wbPick('Exam Readiness:', 'Kesiapan Ujian:')}</span>
                 <span
                   data-testid="ssw-readiness-pct"
-                  className={`text-base font-black ${isPassReady ? 'text-emerald-700' : 'text-[#8C2233]'}`}
+                  className={`text-base font-extrabold ${isPassReady ? 'text-emerald-700' : 'text-[#8C2233]'}`}
                 >
                   {readiness}%
                 </span>
@@ -240,7 +240,7 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
           className="rounded-xl bg-white border border-[#E2D4BC] px-3 py-2 flex flex-wrap items-center justify-between gap-2"
         >
           <div className="min-w-0 flex items-center gap-2">
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#8C2233]/10 text-[#8C2233] text-[11px] font-black shrink-0">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#8C2233]/10 text-[#8C2233] text-[11px] font-extrabold shrink-0">
               {wbPick('Active Spot', 'Posisi Belajar')}
             </span>
             <p className="text-xs font-bold text-[#1C1611] leading-snug break-words">
@@ -333,14 +333,14 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
             <div className="rounded-2xl border border-[#DECFAF] bg-[#FFF8EB] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
               <div className="space-y-1.5 min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-black bg-[#8C2233] text-white">
+                  <span className="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-[#8C2233] text-white">
                     {progress.isZeroProgress ? wbPick('START HERE (ZERO BEGINNER)', 'MULAI DARI SINI (PEMULA NOL)') : wbPick('CURRENT ACTIVE STAGE', 'TAHAP AKTIF SEKARANG')}
                   </span>
                   <span className="text-xs font-bold text-[#8C2233]">
                     {progress.recommendedStage.pdfPages}
                   </span>
                 </div>
-                <p className="text-[15px] font-black text-[#1C1611]">
+                <p className="text-[15px] font-extrabold text-[#1C1611]">
                   {wbPick('Stage', 'Tahap')} {progress.recommendedStage.stage}: {progress.recommendedStage.title}
                 </p>
                 <p className="text-[13px] text-[#3F3326] leading-relaxed">
@@ -379,7 +379,7 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
             {/* Weak Topics Alert */}
             {state.weakTopics.length > 0 && (
               <div className="rounded-xl border border-rose-200 bg-rose-50/70 p-3.5">
-                <p className="text-xs font-black text-rose-800 mb-2">
+                <p className="text-xs font-extrabold text-rose-800 mb-2">
                   {wbPick('Topics That Still Need Review (Click for Practice Quiz):', 'Topik yang Masih Perlu Diulang (Klik untuk Latihan Soal):')}
                 </p>
                 <div className="flex flex-wrap gap-1.5">
@@ -403,7 +403,7 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
             {/* 8 Roadmap Stages Grid */}
             <div className="space-y-2.5">
               <div className="flex items-center justify-between gap-2">
-                <h3 className="text-xs font-black uppercase tracking-wider text-[#6B5A48]">
+                <h3 className="text-xs font-extrabold uppercase tracking-wider text-[#6B5A48]">
                   Urutan Belajar dari Dasar Sampai Siap Ujian (8 Tahap)
                 </h3>
               </div>
@@ -428,7 +428,7 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
                         <div className="min-w-0">
                           <div className="flex items-center gap-1.5 flex-wrap">
                             <span
-                              className={`text-[11px] font-black px-2 py-0.5 rounded-full ${
+                              className={`text-[11px] font-extrabold px-2 py-0.5 rounded-full ${
                                 isDone
                                   ? 'bg-emerald-600 text-white'
                                   : isActive
@@ -442,7 +442,7 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
                               {st.pdfPages}
                             </span>
                           </div>
-                          <p className="text-[13px] font-black text-[#1C1611] mt-1">{st.title}</p>
+                          <p className="text-[13px] font-extrabold text-[#1C1611] mt-1">{st.title}</p>
                         </div>
                         <button
                           type="button"
@@ -484,7 +484,7 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
               <button
                 type="button"
                 onClick={() => setShowGoldenNumbers((v) => !v)}
-                className="w-full px-4 py-3 flex items-center justify-between bg-[#F7F1E5] text-xs font-black text-[#1C1611] cursor-pointer"
+                className="w-full px-4 py-3 flex items-center justify-between bg-[#F7F1E5] text-xs font-extrabold text-[#1C1611] cursor-pointer"
               >
                 <span>{wbPick('13 Must-Know Exam Numbers Summary (Tap to Open)', 'Ringkasan 13 Angka Wajib Hafal Ujian (Klik untuk Buka)')}</span>
                 <span className="text-xs text-[#8C2233]">
@@ -505,11 +505,11 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
                     >
                       <div className="flex items-center justify-between gap-2">
                         <span className="text-xs font-extrabold text-[#6B5A48]">{gn.label}</span>
-                        <span className="text-[10.5px] font-black px-2 py-0.5 rounded bg-[#EDE3D2] text-[#1C1611]">
+                        <span className="text-[10.5px] font-extrabold px-2 py-0.5 rounded bg-[#EDE3D2] text-[#1C1611]">
                           {wbPick('Pg.', 'Hal.')} {gn.pdfPage}
                         </span>
                       </div>
-                      <p className="text-[13px] font-black text-[#8C2233] mt-1">{gn.value}</p>
+                      <p className="text-[13px] font-extrabold text-[#8C2233] mt-1">{gn.value}</p>
                     </button>
                   ))}
                 </div>
@@ -537,11 +537,11 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
                   data-testid="ssw-page-prev"
                   onClick={() => jumpToPageAndStep(Math.max(1, clampedPage - 1), 1)}
                   disabled={clampedPage <= 1}
-                  className="px-3 py-2 rounded-xl border border-[#D8CAB3] bg-white disabled:opacity-40 text-xs font-black cursor-pointer"
+                  className="px-3 py-2 rounded-xl border border-[#D8CAB3] bg-white disabled:opacity-40 text-xs font-extrabold cursor-pointer"
                 >
                   &lt; Prev
                 </button>
-                <span className="text-xs font-black px-3 py-2 rounded-xl bg-[#EFE6D5] text-[#1C1611]">
+                <span className="text-xs font-extrabold px-3 py-2 rounded-xl bg-[#EFE6D5] text-[#1C1611]">
                   Hal. {clampedPage} / {totalPages}
                 </span>
                 <button
@@ -549,7 +549,7 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
                   data-testid="ssw-page-next"
                   onClick={() => jumpToPageAndStep(Math.min(totalPages, clampedPage + 1), 1)}
                   disabled={clampedPage >= totalPages}
-                  className="px-3 py-2 rounded-xl border border-[#D8CAB3] bg-white disabled:opacity-40 text-xs font-black cursor-pointer"
+                  className="px-3 py-2 rounded-xl border border-[#D8CAB3] bg-white disabled:opacity-40 text-xs font-extrabold cursor-pointer"
                 >
                   Next &gt;
                 </button>
@@ -568,8 +568,8 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
             {searchResult && searchResult.mode === 'search' && (
               <div className="rounded-xl border border-amber-300 bg-amber-50/70 p-3.5 space-y-2.5">
                 <div className="flex items-center justify-between">
-                  <p className="text-xs font-black text-amber-900">
-                    {wbFmt('Search Results "{query}" ({count} matches)', 'Hasil Pencarian "{query}" ({count} temuan)', undefined, undefined, { query: searchQuery, count: searchResult.totalMatches })}
+                  <p className="text-xs font-extrabold text-amber-900">
+                    {wbFmt('Search Results "{query}" ({count} matches)', 'Hasil Pencarian "{query}" ({count} temuan)', undefined, { query: searchQuery, count: searchResult.totalMatches })}
                   </p>
                   <button
                     type="button"
@@ -600,7 +600,7 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
                   <div className="space-y-1.5 pt-1">
                     {searchResult.matchedTraps.map((t) => (
                       <div key={t.id} className="rounded-lg bg-white border border-rose-200 p-2.5 text-xs">
-                        <span className="font-black text-[#8C2233]">{wbPick('Trap', 'Jebakan')} ({wbPick('p.', 'Hal.')} {t.pdfPage}): {t.title} - </span>
+                        <span className="font-extrabold text-[#8C2233]">{wbPick('Trap', 'Jebakan')} ({wbPick('p.', 'Hal.')} {t.pdfPage}): {t.title} - </span>
                         <span className="text-[#3C3024]">{t.detail}</span>
                       </div>
                     ))}
@@ -608,13 +608,13 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
                 )}
                 {searchResult.matchedVideos && searchResult.matchedVideos.length > 0 && (
                   <div className="space-y-1.5 pt-1">
-                    <p className="text-xs font-black text-[#8C2233]">
+                    <p className="text-xs font-extrabold text-[#8C2233]">
                       Rujukan Penjelasan Video ({searchResult.matchedVideos.length}):
                     </p>
                     {searchResult.matchedVideos.map((vid) => (
                       <div key={vid.videoId} className="rounded-lg bg-white border border-[#E2D4BC] p-2.5 text-xs space-y-1">
                         <div className="flex flex-wrap items-center justify-between gap-1">
-                          <span className="font-black text-[#1C1611]">
+                          <span className="font-extrabold text-[#1C1611]">
                             [{vid.channel}] {vid.title}
                           </span>
                           {vid.pdfPagesSuggested.length > 0 && (
@@ -639,7 +639,7 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
                     ))}
                     {searchResult.matchedTranscriptQuotes && searchResult.matchedTranscriptQuotes.length > 0 && (
                       <div className="space-y-1 pt-1">
-                        <p className="text-[11px] font-black uppercase tracking-wide text-[#7A6855]">
+                        <p className="text-[11px] font-extrabold uppercase tracking-wide text-[#7A6855]">
                           Kutipan Transkrip Video ({searchResult.matchedTranscriptQuotes.length}):
                         </p>
                         {searchResult.matchedTranscriptQuotes.slice(0, 3).map((tq) => (
@@ -673,7 +673,7 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="space-y-1 min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-1.5">
-                      <span className="px-2.5 py-0.5 rounded-full bg-[#1C1611] text-white text-[11px] font-black">
+                      <span className="px-2.5 py-0.5 rounded-full bg-[#1C1611] text-white text-[11px] font-extrabold">
                         Hal. {pageDetail.page.page}
                       </span>
                       <span className="px-2.5 py-0.5 rounded-full bg-[#EFE6D5] text-[#4E4032] text-[11px] font-extrabold">
@@ -685,7 +685,7 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
                         </span>
                       )}
                     </div>
-                    <h4 data-testid="ssw-pdf-page-title" className="text-base sm:text-lg font-black text-[#1C1611] leading-snug">
+                    <h4 data-testid="ssw-pdf-page-title" className="text-base sm:text-lg font-extrabold text-[#1C1611] leading-snug">
                       {cleanSpacedJapanese(pageDetail.page.title)}
                     </h4>
                   </div>
@@ -706,7 +706,7 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
 
                 {/* Simple Beginner Compass */}
                 <div className="rounded-xl bg-[#FFF8EC] border border-[#F0DEC0] px-3.5 py-2.5 space-y-0.5">
-                  <p className="text-[11px] font-black uppercase tracking-wider text-[#8C5B18]">
+                  <p className="text-[11px] font-extrabold uppercase tracking-wider text-[#8C5B18]">
                     {wbPick('Key Takeaway on This Page', 'Inti Halaman Ini')}
                   </p>
                   <p className="text-[13px] text-[#3B280D] font-bold leading-relaxed">
@@ -741,7 +741,7 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
                           <div className="flex flex-wrap items-center justify-between gap-2">
                             <div className="flex items-center gap-2.5 min-w-0">
                               <span
-                                className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-black shrink-0 ${
+                                className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-extrabold shrink-0 ${
                                   isCurrentStep
                                     ? 'bg-[#8C2233] text-white'
                                     : isStepDone
@@ -752,14 +752,14 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
                                 {isStepDone && !isCurrentStep ? '✓' : step.stepNumber}
                               </span>
                               <div className="min-w-0">
-                                <h5 className="text-sm font-black text-[#1C1611] leading-snug">
+                                <h5 className="text-sm font-extrabold text-[#1C1611] leading-snug">
                                   {wbPick('Step', 'Langkah')} {step.stepNumber}: {cleanSpacedJapanese(step.title)}
                                 </h5>
                               </div>
                             </div>
 
                             <span
-                              className={`px-2.5 py-0.5 rounded-full text-[11px] font-black shrink-0 ${
+                              className={`px-2.5 py-0.5 rounded-full text-[11px] font-extrabold shrink-0 ${
                                 isCurrentStep
                                   ? 'bg-[#8C2233] text-white'
                                   : isStepDone
@@ -785,7 +785,7 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
                               data-testid="ssw-beginner-glossary"
                               className="rounded-xl bg-[#F6EFE2] border border-[#E4D8C4] p-3 space-y-1.5"
                             >
-                              <p className="text-[11px] font-black uppercase tracking-wider text-[#6E4912]">
+                              <p className="text-[11px] font-extrabold uppercase tracking-wider text-[#6E4912]">
                                 Arti Istilah Penting (Biar Nggak Bingung):
                               </p>
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -794,7 +794,7 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
                                     key={g.term}
                                     className="rounded-lg bg-white border border-[#E5DAC6] px-2.5 py-2 text-xs leading-snug"
                                   >
-                                    <span className="font-black text-[#8C2233]">{g.term}: </span>
+                                    <span className="font-extrabold text-[#8C2233]">{g.term}: </span>
                                     <span className="text-[#3C3024] font-medium">{g.simpleMeaningId}</span>
                                   </div>
                                 ))}
@@ -889,7 +889,7 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
                 {/* Page Traps & Formulas Callout */}
                 {pageDetail.trapsOnPage.map((tr) => (
                   <div key={tr.id} className="rounded-xl border border-rose-200 bg-rose-50/70 p-3.5 space-y-1">
-                    <p className="text-xs font-black text-rose-900">
+                    <p className="text-xs font-extrabold text-rose-900">
                       {wbPick('Exam Trap Alert:', 'Hati-hati Jebakan Ujian:')} {tr.title}
                     </p>
                     <p className="text-[13px] text-rose-950 leading-relaxed">{tr.detail}</p>
@@ -898,7 +898,7 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
 
                 {pageDetail.mathOnPage.map((mf) => (
                   <div key={mf.id} className="rounded-xl border border-sky-200 bg-sky-50/70 p-3.5 space-y-1">
-                    <p className="text-xs font-black text-sky-900">{wbPick('Exam Calculation Formula:', 'Rumus Hitungan Ujian:')} {mf.name}</p>
+                    <p className="text-xs font-extrabold text-sky-900">{wbPick('Exam Calculation Formula:', 'Rumus Hitungan Ujian:')} {mf.name}</p>
                     <p className="text-[13px] font-mono font-bold text-sky-950">{mf.formula}</p>
                     <p className="text-xs text-sky-900 leading-relaxed">{mf.rule}</p>
                   </div>
@@ -906,12 +906,12 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
 
                 {pageDetail.videosOnPage && pageDetail.videosOnPage.length > 0 && (
                   <div className="rounded-xl border border-[#DFD2BC] bg-[#FAF4E8] p-3.5 space-y-2">
-                    <p className="text-xs font-black text-[#1C1611]">
+                    <p className="text-xs font-extrabold text-[#1C1611]">
                       {wbFmt('Video Notes for Page {page}:', 'Catatan Video Pembahasan Halaman {page}:', undefined, { page: clampedPage })}
                     </p>
                     {pageDetail.videosOnPage.map((vid) => (
                       <div key={vid.videoId} className="rounded-lg bg-white border border-[#E6DAC5] p-2.5 text-xs space-y-1">
-                        <p className="font-black text-[#8C2233]">
+                        <p className="font-extrabold text-[#8C2233]">
                           [{vid.channel}] {vid.title}
                         </p>
                         {vid.keyPoints.length > 0 ? (
@@ -928,7 +928,7 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
 
             {/* Kotoba List for Current Page (or matched search) */}
             <div className="space-y-2.5">
-              <h5 className="text-xs font-black uppercase tracking-wider text-[#6B5A48]">
+              <h5 className="text-xs font-extrabold uppercase tracking-wider text-[#6B5A48]">
                 {searchResult && searchResult.mode === 'search' && searchResult.matchedKotoba.length > 0
                   ? wbFmt('Matching Vocabulary ({count})', 'Kosakata Cocok Pencarian ({count})', undefined, { count: searchResult.matchedKotoba.length })
                   : wbFmt(
@@ -967,7 +967,7 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
                           <div className="min-w-0 space-y-1">
                             <div
                               data-testid="ssw-kotoba-ruby"
-                              className="text-base font-black text-[#1C1611] leading-snug"
+                              className="text-base font-extrabold text-[#1C1611] leading-snug"
                               dangerouslySetInnerHTML={{
                                 __html: renderSswRubyHtml(k.rubyMarkup || k.jp, hideFurigana),
                               }}
@@ -1053,7 +1053,7 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
                 {SSW_MASTER_KB.mathFormulas.map((mf) => (
                   <div key={mf.id} className="rounded-lg bg-white border border-sky-200 p-3 space-y-1">
                     <div className="flex items-center justify-between gap-2">
-                      <span className="text-xs font-black text-sky-950">{mf.name}</span>
+                      <span className="text-xs font-extrabold text-sky-950">{mf.name}</span>
                       <button
                         type="button"
                         onClick={() => {
@@ -1080,7 +1080,7 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
               >
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="px-2.5 py-0.5 rounded-full bg-[#8C2233] text-white text-[11px] font-black">
+                    <span className="px-2.5 py-0.5 rounded-full bg-[#8C2233] text-white text-[11px] font-extrabold">
                       {wbPick('Question', 'Soal')} #{drawnQuiz.n} ({drawnQuiz.quizId})
                     </span>
                     <span className="px-2.5 py-0.5 rounded-full bg-[#EFE6D5] text-[#4E4032] text-[11px] font-extrabold">
@@ -1095,7 +1095,7 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
                 {/* Japanese Question with Furigana Ruby + Indonesian */}
                 <div className="rounded-xl bg-[#FAF5EC] border border-[#E8DEC9] p-4 space-y-2">
                   <div
-                    className="text-base font-black text-[#1C1611] leading-relaxed"
+                    className="text-base font-extrabold text-[#1C1611] leading-relaxed"
                     dangerouslySetInnerHTML={{
                       __html: renderSswRubyHtml(drawnQuiz.questionRuby || drawnQuiz.questionJp, hideFurigana),
                     }}
@@ -1133,7 +1133,7 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
                         className={`w-full text-left rounded-xl border p-3.5 flex items-start gap-3 transition cursor-pointer ${cardStyle}`}
                       >
                         <span
-                          className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-black shrink-0 ${
+                          className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-extrabold shrink-0 ${
                             isThisQuizGraded && isCorrectOpt
                               ? 'bg-emerald-600 text-white'
                               : isThisQuizGraded && isSelected && !latestGrade.ok
@@ -1145,7 +1145,7 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
                         </span>
                         <div className="min-w-0 flex-1 space-y-0.5">
                           <div
-                            className="text-sm font-black text-[#1C1611]"
+                            className="text-sm font-extrabold text-[#1C1611]"
                             dangerouslySetInnerHTML={{
                               __html: renderSswRubyHtml(opt.ruby || opt.jp, hideFurigana),
                             }}
@@ -1172,7 +1172,7 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
                   >
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <span
-                        className={`text-[13px] font-black ${
+                        className={`text-[13px] font-extrabold ${
                           latestGrade.ok ? 'text-emerald-800' : 'text-rose-800'
                         }`}
                       >
@@ -1180,7 +1180,7 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
                           ? `BENAR! Pilihan ${latestGrade.correctLetter} tepat.`
                           : `BELUM TEPAT. Kamu memilih ${latestGrade.selectedLetter || latestGrade.userAnswer}, jawaban benar adalah ${latestGrade.correctLetter} (${latestGrade.correctAnswerId}).`}
                       </span>
-                      <span className="text-xs font-black text-[#1C1611]">
+                      <span className="text-xs font-extrabold text-[#1C1611]">
                         Kesiapan: {latestGrade.readinessScorePct}% (Target {latestGrade.passingThresholdPct}%)
                       </span>
                     </div>
@@ -1220,7 +1220,7 @@ export const SswSenseiWorkbenchPanel: React.FC<SswSenseiWorkbenchPanelProps> = (
               </div>
             ) : (
               <div className="rounded-2xl border border-dashed border-[#D8CAB3] bg-white p-6 text-center space-y-3">
-                <p className="text-[15px] font-black text-[#1C1611]">
+                <p className="text-[15px] font-extrabold text-[#1C1611]">
                   {wbPick('Ready to Try SSW Food Processing Practice Quiz?', 'Siap Coba Latihan Soal SSW Pengolahan Makanan?')}
                 </p>
                 <p className="text-[13px] text-[#6B5A48] max-w-lg mx-auto leading-relaxed">

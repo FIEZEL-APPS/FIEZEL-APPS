@@ -1110,7 +1110,7 @@ function buildKakijunEntryFromSpecs(
     strokes,
     mnemonicId:
       metaSeed?.mnemonicId ||
-      `Urutan ${authLabel} (${strokes.length} goresan) — ikuti titik nomor 1 sampai ${strokes.length} sesuai arah coretan.`,
+      `Urutan ${authLabel} (${strokes.length} goresan), ikuti titik nomor 1 sampai ${strokes.length} sesuai arah coretan.`,
     compounds: metaSeed?.compounds,
   };
 }

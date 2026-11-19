@@ -128,7 +128,15 @@
       var existingFrame = mountPoint.querySelector('#fzMitraKaiwaStudioFrame');
       if (existingFrame && existingFrame.getAttribute('data-lang') === lang && existingFrame.getAttribute('data-locale') === locale) {
         if (api && typeof api.__setMounted === 'function') api.__setMounted(true);
-      try { if (root.FiezelMochiCompanion && typeof root.FiezelMochiCompanion.pause === 'function') root.FiezelMochiCompanion.pause(); } catch (_) {}
+      try {
+        if (root.FiezelMochiCompanion) {
+          if (typeof root.FiezelMochiCompanion.suspendWebGL === 'function') {
+            root.FiezelMochiCompanion.suspendWebGL();
+          } else if (typeof root.FiezelMochiCompanion.pause === 'function') {
+            root.FiezelMochiCompanion.pause({ releaseWebGL: true });
+          }
+        }
+      } catch (_) {}
         if (autoCall && api && api.StudioBridge && typeof api.StudioBridge.send === 'function') {
           api.StudioBridge.send('fz.shell.autocall', { at: Date.now() });
         }
@@ -145,7 +153,15 @@
         }
       } catch (_) {}
       if (api && typeof api.__setMounted === 'function') api.__setMounted(true);
-      try { if (root.FiezelMochiCompanion && typeof root.FiezelMochiCompanion.pause === 'function') root.FiezelMochiCompanion.pause(); } catch (_) {}
+      try {
+        if (root.FiezelMochiCompanion) {
+          if (typeof root.FiezelMochiCompanion.suspendWebGL === 'function') {
+            root.FiezelMochiCompanion.suspendWebGL();
+          } else if (typeof root.FiezelMochiCompanion.pause === 'function') {
+            root.FiezelMochiCompanion.pause({ releaseWebGL: true });
+          }
+        }
+      } catch (_) {}
       var targetSrc = './call.html?embed=1&tab=call&lang=' + encodeURIComponent(lang) + '&locale=' + encodeURIComponent(locale) + (nonce ? '&nonce=' + encodeURIComponent(nonce) : '') + (autoCall ? '&autoCall=1' : '') + (pageBuild ? '&v=' + encodeURIComponent(pageBuild) : '');
       var titleText = lang === 'ja'
         ? (locale === 'id' ? 'Mitra Kaiwa' : 'Kaiwa Partner')
@@ -5363,7 +5379,6 @@
       // Abort active Voice Call immediately and clean up all UI
       endVoiceCall();
       closeCallUI();
-      try { if (root.FiezelMochiCompanion && typeof root.FiezelMochiCompanion.resume === 'function') root.FiezelMochiCompanion.resume(); } catch (_) {}
 
       if (typeof document !== 'undefined') {
         var studioFrame = document.getElementById('fzMitraKaiwaStudioFrame');
@@ -5389,6 +5404,17 @@
           }
         }
       }
+      // Single-WebGL-Context Invariant: resume Host 3D Mochi ONLY AFTER iframe teardown completes
+      try { if (root.FiezelMochiCompanion && typeof root.FiezelMochiCompanion.resume === 'function') root.FiezelMochiCompanion.resume(); } catch (_) {}
+      // m025-811: Resume deferred offline neural-voice autoload only after exiting Kawan Bicara / Whiteboard
+      try {
+        if (root.FiezelVoiceOfflineAutoload && typeof root.FiezelVoiceOfflineAutoload.status === 'function') {
+          var _alSt = root.FiezelVoiceOfflineAutoload.status();
+          if (_alSt && _alSt.armed && !_alSt.done && typeof root.FiezelVoiceOfflineAutoload.resume === 'function') {
+            root.FiezelVoiceOfflineAutoload.resume();
+          }
+        }
+      } catch (_) {}
     },
     cleanup: function () {
       return api.unmount();

@@ -72,7 +72,7 @@ export const PTE_READ_ALOUD_BANK: PteReadAloudQuestion[] = [
       },
     ],
     examinerTips:
-      'Ambil nafas hanya pada tanda jeda // selama 0.3 detik. Jaga nada bicara datar (135–145 Hz). Pearson acoustic model menyukai irama stabil tanpa lonjakan nada.',
+      'Ambil nafas hanya pada tanda jeda // selama 0.3 detik. Jaga nada bicara datar (135-145 Hz). Pearson acoustic model menyukai irama stabil tanpa lonjakan nada.',
     oneSentenceHack:
       'Trik Lulus Cepat: Jika grogi membaca seluruh teks, baca kalimat pertama saja ("Hazard analysis and critical control points represent the international cornerstone of modern culinary hygiene.") dengan 100% kelancaran tanpa ragu lalu langsung tekan Next! Skor Oral Fluency tetap di-cap maksimal!',
   },
@@ -214,7 +214,7 @@ export const PTE_READ_ALOUD_BANK: PteReadAloudQuestion[] = [
       },
     ],
     examinerTips:
-      'Gunakan ritme sedang 120–130 WPM. Membaca terlalu cepat justru berisiko menelan suku kata akhir dan menurunkan nilai Pronunciation.',
+      'Gunakan ritme sedang 120-130 WPM. Membaca terlalu cepat justru berisiko menelan suku kata akhir dan menurunkan nilai Pronunciation.',
     oneSentenceHack:
       'Kunci Pearson 42+: Kalimat pertama ("Exceptional customer retention within luxury hotels hinges upon empathetic communication and rapid service recovery.") sudah mengandung 14 kata kunci bernilai tinggi!',
   },

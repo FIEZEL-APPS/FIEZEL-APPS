@@ -190,7 +190,11 @@
           if (activeNum !== null && effectiveNum !== null && activeNum > effectiveNum) {
             try {
               var stage = self.FiezelStage;
-              var inLesson = !!(stage && typeof stage.lessonMode === 'function' && stage.lessonMode() === true);
+              var inChatOrWb = !!(
+                (document.body && document.body.classList && document.body.classList.contains('fz-view-chat')) ||
+                (typeof document.getElementById === 'function' && document.getElementById('fzMitraKaiwaStudioFrame'))
+              );
+              var inLesson = inChatOrWb || !!(stage && typeof stage.lessonMode === 'function' && stage.lessonMode() === true);
               var healedKey = 'fiezel-healed-rev';
               var alreadyHealed = sessionStorage.getItem(healedKey) === activeRev;
               if (!inLesson && !alreadyHealed) {

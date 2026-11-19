@@ -189,7 +189,7 @@ const EN_CORE: Record<string, string> = {
   'prereq.bypassReady': 'Prerequisites mastered',
   'prereq.lockedTitle': 'Unlock Vocabulary Prerequisites',
   'prereq.lockedDesc': 'Review these key terms once so your conversation flows smoothly.',
-  'prereq.completeBtn': 'I understand — start conversation',
+  'prereq.completeBtn': 'I understand, start conversation',
   'diag.correctHeader': 'Clean Structure!',
   'diag.wrongHeader': 'Structure Review',
   'diag.exactInputLabel': 'What you said:',
@@ -721,7 +721,7 @@ const MULTI_UI: Record<string, Record<string, string>> = {
     'course.ja': '日本語',
     'prereq.lockedTitle': '必須語彙をアンロック',
     'prereq.lockedDesc': '会話をスムーズに進めるため、まずは基本表現を一度確認しましょう。',
-    'prereq.completeBtn': '確認完了 — 会話を始める',
+    'prereq.completeBtn': '確認完了、会話を始める',
     'call.startLive': 'FaceTime通話を開始',
     'call.endLive': '通話終了',
     'call.connecting': '接続中...',
@@ -947,7 +947,7 @@ export const SCENARIO_EN_META: Record<string, ScenarioEnMetaEntry> = {
     situation: 'Talk naturally about where you live, daily routines, and favorite spots nearby.',
     competency: 'Speaking: Present Simple & Everyday Places',
     openingTranslation: 'Tell me about your hometown and what places you like nearby.',
-    missionGoals: ['Use Present Simple cleanly ("I live in...", "There is/are...").', 'Describe 1–2 familiar places near home.'],
+    missionGoals: ['Use Present Simple cleanly ("I live in...", "There is/are...").', 'Describe 1-2 familiar places near home.'],
   },
   scen_en_a2_past_trip: {
     title: 'Simple Past Tense: Irregular Verbs & Trip Stories',
@@ -959,7 +959,7 @@ export const SCENARIO_EN_META: Record<string, ScenarioEnMetaEntry> = {
   scen_en_b2_ielts_exam: {
     title: 'Exam Mode · Structured Opinion & Concessive Clauses',
     situation: 'Formal IELTS Speaking simulation focusing on balanced arguments, lexical precision, and coherence.',
-    competency: 'Speaking: IELTS Academic Part 1–3 Simulation',
+    competency: 'Speaking: IELTS Academic Part 1-3 Simulation',
     openingTranslation: 'Respond fluently with structured examples and balanced reasoning.',
     missionGoals: ['Develop extended answers without repetition.', 'Use concessive clauses and academic linkers naturally.'],
   },
@@ -988,14 +988,14 @@ export const SCENARIO_EN_META: Record<string, ScenarioEnMetaEntry> = {
     title: 'Polite Requests & Asking Advice (〜ていただけますか / 〜たらいいですか)',
     situation: 'Ask a senior colleague or mentor politely for advice and guidance at school or work.',
     competency: 'Speaking: Advice & Polite Requests (N4)',
-    openingTranslation: 'Good work today! You seem busy with university reports lately—anything giving you trouble?',
+    openingTranslation: 'Good work today! You seem busy with university reports lately, anything giving you trouble?',
     missionGoals: ['Explain your situation politely using "～んです / ～ので".', 'Ask advice using "～たらいいですか".'],
   },
   scen_zh_free_talk: {
     title: 'Authentic Beijing Mandarin Coaching with Xiao Mochi',
     situation: 'Two-way conversation with instant tone/grammar feedback, live whiteboard drills, and voice navigation.',
     competency: 'Speaking: Natural Putonghua & 4-Tone Flow',
-    openingTranslation: 'Hey, you made it! Drop the textbook voice—tell me honestly which part of Mandarin is tripping you up lately?',
+    openingTranslation: 'Hey, you made it! Drop the textbook voice, tell me honestly which part of Mandarin is tripping you up lately?',
     missionGoals: ['Practice Mandarin tones clearly across full sentences.', 'Respond to Xiao Mochi and ask for tone drills anytime.'],
   },
   'zh-restaurant-ordering': {
@@ -1065,7 +1065,7 @@ export const SCENARIO_EN_META: Record<string, ScenarioEnMetaEntry> = {
     title: 'Office Nomikai Etiquette: Toasting & Building Rapport',
     situation: 'Join an after-work team gathering, make a toast, and chat naturally with colleagues.',
     competency: 'Kaiwa: Work & Business',
-    openingTranslation: 'Thank you for your hard work on this project! Let us toast first—what would you like to drink?',
+    openingTranslation: 'Thank you for your hard work on this project! Let us toast first, what would you like to drink?',
     missionGoals: ['Give a polite cheer/toast (otsukaresama desu, kanpai!).', 'Ask colleagues for food or drink recommendations.'],
   },
   scen_ja_soc_01: {
@@ -1086,7 +1086,7 @@ export const SCENARIO_EN_META: Record<string, ScenarioEnMetaEntry> = {
     title: 'Thesis Consultation & Paper Revision in a Professor Office',
     situation: 'Discuss your research hypothesis and survey methodology formally with your Japanese advisor.',
     competency: 'Kaiwa: Academic & Formal',
-    openingTranslation: 'Please come in. I read the report summary you submitted—your research angle is quite interesting.',
+    openingTranslation: 'Please come in. I read the report summary you submitted, your research angle is quite interesting.',
     missionGoals: ['Open formally (Shitsurei itashimasu).', 'Ask respectfully for feedback on survey methodology.'],
   },
   scen_pte_coach_intro: {
@@ -1369,6 +1369,8 @@ export function resolveRuntimeVoiceLocale(locale?: LearnerLocale | string): Lear
   return 'en';
 }
 
+export function wbPick(en: string, id: string, th?: string, locale?: LearnerLocale | string): string;
+export function wbPick<T>(en: T, id: T, th?: T, locale?: LearnerLocale | string): T;
 export function wbPick<T>(en: T, id: T, th?: T, locale?: LearnerLocale | string): T {
   const loc = resolveRuntimeVoiceLocale(locale);
   if (loc === 'id') return id;

@@ -1102,7 +1102,7 @@ toursSeen:{menu:false,library:false,listening:false}};let stateReady=false;
 // jatuh ke temporal dead zone: loadState() melempar, catch-nya mengembalikan state kosong, dan
 // SELURUH progres murid hilang tanpa satu pun galat terlihat. Urutan ini bukan gaya penulisan.
 let V=[],R=[],G={},GRAMMAR_ITEMS=[],GRAMMAR_CURRICULUM={},GRAMMAR_CURRICULUM_INDEX=Object.create(null),WRITING_BANK=null,READING_EXAM=null;
-let activeStateStorageKey=LEGACY_STATE_KEY,activeAccountUuid='';
+let activeStateStorageKey=LEGACY_STATE_KEY,activeAccountUuid='',accountSessionEpoch=0;
 const PROGRESS_STATE_FIELDS=Object.freeze([
   'level','placementDone','placementBandLevel','placementBands',
   'totalAnswered','totalCorrect','totalTimeMs',
@@ -1154,22 +1154,42 @@ function studentProgressEvidenceScore(blob){
   const name=String(blob.userName||'').trim()&&blob.userName!=='Murid'?10:0;
   return (answered*10)+(hist*5)+(vocabCount*2)+(grammarCount*2)+(readingCount*2)+(sideBucketCount*2)+(streak*20)+placement+name;
 }
-function findBestStoredStudentState(){
+function findBestStoredStudentState(targetUuid=''){
   let best=null,maxScore=0;
   try{
     if(typeof localStorage==='undefined'||!localStorage)return null;
-    const candidates=[LEGACY_STATE_KEY,SAFETY_SNAPSHOT_KEY];
+    const cleanTarget=String(targetUuid||'').replace(/[^A-Za-z0-9_-]/g,'').slice(0,128);
+    let legacyOwner='';
     try{
-      for(let i=0;i<localStorage.length;i++){
-        const k=localStorage.key(i);
-        if(k&&!candidates.includes(k))candidates.push(k);
+      const rawOwner=localStorage.getItem(LEGACY_STATE_OWNER_KEY)||'';
+      if(rawOwner){
+        try{
+          const p=JSON.parse(rawOwner);
+          legacyOwner=String(p?.uuid||p?.id||'').replace(/[^A-Za-z0-9_-]/g,'').slice(0,128);
+        }catch(_){}
+        if(!legacyOwner)legacyOwner=String(rawOwner).replace(/[^A-Za-z0-9_-]/g,'').slice(0,128);
       }
     }catch(_){}
+    const candidates=[];
+    if(cleanTarget){
+      const ownKey=accountStateKey(cleanTarget);
+      if(ownKey)candidates.push(ownKey);
+    }
+    candidates.push(LEGACY_STATE_KEY,SAFETY_SNAPSHOT_KEY);
     for(const k of candidates){
       try{
         const raw=localStorage.getItem(k);
         if(!raw)continue;
         const parsed=JSON.parse(raw);
+        if(!parsed||typeof parsed!=='object'||Array.isArray(parsed))continue;
+        const blobOwner=String(parsed.ownerUuid||'').replace(/[^A-Za-z0-9_-]/g,'').slice(0,128);
+        if(cleanTarget){
+          if(blobOwner&&blobOwner!==cleanTarget)continue;
+          if((k===LEGACY_STATE_KEY||k===SAFETY_SNAPSHOT_KEY)&&!blobOwner&&legacyOwner&&legacyOwner!==cleanTarget)continue;
+        }else{
+          if(blobOwner)continue;
+          if((k===LEGACY_STATE_KEY||k===SAFETY_SNAPSHOT_KEY)&&legacyOwner)continue;
+        }
         const score=studentProgressEvidenceScore(parsed);
         if(score>maxScore){
           maxScore=score;
@@ -1202,6 +1222,7 @@ function loadState(key=activeStateStorageKey){
       const pp=p.preferences||{};
       digabung.preferences[f]=Object.prototype.hasOwnProperty.call(pp,f)?pp[f]:kosong.preferences[f];
     });
+    delete digabung._integrity;
     const bersih=sanitizeState(digabung);
     GLOBAL_RHYTHM_FIELDS.forEach(f=>{
       if(dasar&&Object.prototype.hasOwnProperty.call(dasar,f))bersih[f]=dasar[f];
@@ -1241,7 +1262,7 @@ try{
 let state=loadState();
 try{
   if(studentProgressEvidenceScore(state)===0){
-    const best=findBestStoredStudentState();
+    const best=findBestStoredStudentState(activeAccountUuid);
     if(best&&best.score>0&&best.key!==activeStateStorageKey){
       state=loadState(best.key);
       if(activeStateStorageKey&&activeStateStorageKey!==best.key){
@@ -2172,7 +2193,7 @@ function saveFlushWrite(){
     }
     /* Bahasa bawaan menulis SATU blob utuh ke kunci dasar - persis perilaku sebelum sumbu
        bahasa lahir, byte per byte. Lihat catatan panjang di atas loadState(). */
-    if(lang==='en'){const json=JSON.stringify(state);localStorage.setItem(activeStateStorageKey,json);stateSyncMarkWritten(json);return}
+    if(lang==='en'){const json=JSON.stringify(state);localStorage.setItem(activeStateStorageKey,json);stateSyncMarkWritten(json);try{if(typeof queueAccountCloudStateSyncOnSave==='function')queueAccountCloudStateSyncOnSave()}catch(_){}return}
     /* Bahasa lain: progres ke kunci bahasanya, bidang global ke kunci dasar.
        Blob dasar dibaca ulang lalu HANYA bidang globalnya yang ditimpa, supaya progres
        INGGRIS yang tersimpan di sana tidak tersentuh sama sekali saat murid belajar Jepang. */
@@ -2181,7 +2202,7 @@ function saveFlushWrite(){
     const global=(dasar&&typeof dasar==='object')?dasar:{};
     Object.keys(state).forEach(f=>{
       if(PROGRESS_STATE_FIELDS.indexOf(f)>=0)return;
-      if(f==='preferences')return;
+      if(f==='preferences'||f==='_integrity')return;
       global[f]=state[f];
     });
     const prefsLama=(global.preferences&&typeof global.preferences==='object')?global.preferences:{};
@@ -2193,9 +2214,11 @@ function saveFlushWrite(){
       else delete prefsBaru[f];
     });
     global.preferences=prefsBaru;
+    if(typeof computeStateIntegrity==='function')global._integrity=computeStateIntegrity(global);
     localStorage.setItem(activeStateStorageKey,JSON.stringify(global));
     localStorage.setItem(progressStorageKey(activeStateStorageKey,lang),JSON.stringify(pickProgress(state)));
     stateSyncMarkWritten(null);
+    try{if(typeof queueAccountCloudStateSyncOnSave==='function')queueAccountCloudStateSyncOnSave()}catch(_){}
   }catch{if(!saveStorageWarned){saveStorageWarned=true;try{showToast(FiezelI18n.t('common.toast-penyimpanan-penuh'),'warn')}catch{}}}
 }
 let safetySnapshotTimer=null;
@@ -2291,7 +2314,7 @@ async function activateAccountStateFromPuter(sdk=self.puter){
         }
       }
     }
-    activeAccountUuid=uuid;activeStateStorageKey=key;
+    activeAccountUuid=uuid;activeStateStorageKey=key;accountSessionEpoch++;
     /* S1: side-state otak ikut pindah ke ruang akun ini SEBELUM state dibaca, supaya
        pembaca pertama (coreBrainCache di bawah) sudah melihat kunci yang benar. */
     migrateSideStateToAccount(uuid);
@@ -2342,11 +2365,14 @@ function activateAccountState(rawId){
   const uuid=String(rawId||'').replace(/[^A-Za-z0-9_-]/g,'').slice(0,128);
   const key=accountStateKey(uuid);
   if(!uuid||!key)return false;
-  if(activeAccountUuid===uuid&&activeStateStorageKey===key)return true;
+  if(activeAccountUuid===uuid&&activeStateStorageKey===key){
+    try{if(typeof ensureAccountCloudSyncOnSession==='function')ensureAccountCloudSyncOnSession({pullFirst:true})}catch(_){}
+    return true;
+  }
   try{
     let accRaw=null;try{accRaw=JSON.parse(localStorage.getItem(key))}catch(_){}
     if(studentProgressEvidenceScore(accRaw)===0){
-      const best=findBestStoredStudentState();
+      const best=findBestStoredStudentState(uuid);
       if(best&&best.score>0&&best.key!==key){
         const migrated={...best.state,ownerUuid:uuid};
         localStorage.setItem(key,JSON.stringify(migrated));
@@ -2364,7 +2390,7 @@ function activateAccountState(rawId){
     }
     localStorage.setItem('fz_last_account',JSON.stringify({uuid}));
   }catch(_){}
-  activeAccountUuid=uuid;activeStateStorageKey=key;
+  activeAccountUuid=uuid;activeStateStorageKey=key;accountSessionEpoch++;
   migrateSideStateToAccount(uuid);
   state=loadState(key);state.ownerUuid=uuid;coreBrainCache=null;
   try{
@@ -2380,14 +2406,11 @@ function activateAccountState(rawId){
     self.FiezelI18n?.setLocale?.(nextLoc);
     if(nextLoc&&nextLoc!=='id'&&typeof self.FiezelI18n?.loadLocale==='function')self.FiezelI18n.loadLocale(nextLoc);
   }catch(_){}
-  /* m025-669: Sinkron otomatis saat login Google/akun.
-   * Murid yang login sudah memberikan persetujuan implisit bahwa data belajarnya
-   * boleh disimpan di server — ini layanan inti FIEZEL, bukan opsional.
-   * Jika izin belum tercatat, catat sekarang sebagai 'murid-login' (otomatis saat login).
-   * Kemudian langsung flush data lokal ke server, dan tawarkan pulihkan dari server
-   * jika perangkat ini baru (history < 20 entri). */
+  /* m025-669 + m025-808: Sinkron otomatis penuh (snapshot akun + GEM + semua bahasa + riwayat Braincore) saat login. */
   try{
-    if(typeof progressSyncConsented==='function'&&!progressSyncConsented()){
+    if(typeof ensureAccountCloudSyncOnSession==='function'){
+      ensureAccountCloudSyncOnSession({pullFirst:true});
+    }else if(typeof progressSyncConsented==='function'&&!progressSyncConsented()){
       const prefs={...(state.preferences||{}),progressSyncConsent:{at:Date.now(),by:'murid-login'}};
       delete prefs.brainSync;
       state.preferences=prefs;save();
@@ -2419,7 +2442,23 @@ function activateAccountState(rawId){
   if(appOpened)render();return true;
 }
 function deactivateAccountState(){
-  try{save()}catch(_){}
+  accountSessionEpoch++;
+  try{
+    if(typeof saveFlushWrite==='function'&&saveWriteQueued)saveFlushWrite();
+    else save();
+  }catch(_){}
+  try{clearTimeout(safetySnapshotTimer);safetySnapshotTimer=null}catch(_){}
+  try{clearTimeout(accountCloudSyncTimer);accountCloudSyncTimer=null}catch(_){}
+  try{clearTimeout(accountCloudSaveTimer);accountCloudSaveTimer=null}catch(_){}
+  try{accountCloudPulledForKey='';accountCloudSyncPromise=null;accountCloudSyncInflight=false}catch(_){}
+  try{
+    if(typeof localStorage!=='undefined'&&localStorage){
+      localStorage.removeItem('fz_last_account');
+      targetLangsKnown().forEach((lang)=>{
+        try{localStorage.removeItem(progressStorageKey(SAFETY_SNAPSHOT_KEY,lang))}catch(_){}
+      });
+    }
+  }catch(_){}
   activeAccountUuid='';activeStateStorageKey=LEGACY_STATE_KEY;
   state=loadState(LEGACY_STATE_KEY);coreBrainCache=null;try{stateSyncReset()}catch(_){}
   if(appOpened)render();
@@ -5158,9 +5197,21 @@ function queueBrainSyncFlush(delay=2500){
   }catch(_){return false}
 }
 function setBrainSyncPreference(on){
-  state.preferences={...(state.preferences||{}),brainSync:on===true};
+  const prefs={...(state.preferences||{}),brainSync:on===true};
+  if(on===true){
+    delete prefs.brainSyncOptOut;
+    if(typeof progressSyncConsented==='function'&&!progressSyncConsented()){
+      prefs.progressSyncConsent={at:Date.now(),by:'settings-toggle'};
+    }
+  }else{
+    prefs.brainSyncOptOut=true;
+  }
+  state.preferences=prefs;
   save();
-  if(on===true)queueBrainSyncFlush(500);
+  if(on===true){
+    queueBrainSyncFlush(500);
+    if(typeof queueAccountCloudStateSync==='function')queueAccountCloudStateSync(300,{pullFirst:true});
+  }
   return state.preferences.brainSync;
 }
 window.setBrainSyncPreference=setBrainSyncPreference;
@@ -5294,12 +5345,24 @@ function brainSyncApplyRebuild(hasil){
  * waktu itu secara optimistis. Lihat tests/progress-sync-test.js.
  */
 function progressSyncMark(patch){try{brainSyncWrite({...brainSyncRead(),...patch})}catch{}}
+function progressSyncNormalizeOwnerId(v){
+  const s=String(v||'').trim().toLowerCase();
+  if(!s)return '';
+  if(s.startsWith('g:'))return 'u:g_'+s.slice(2).replace(/[^a-z0-9_-]/g,'_').slice(0,64);
+  return s;
+}
+function progressSyncSameOwner(a,b){
+  if(!a||!b)return false;
+  if(a===b)return true;
+  return progressSyncNormalizeOwnerId(a)===progressSyncNormalizeOwnerId(b);
+}
 /** Akun yang sedang masuk = pemilik antrean? Antrean tanpa pemilik dicap oleh akun pertama. */
 function progressSyncOwnerOk(){
   const now=progressSyncOwner();
   if(!now)return false;
   const st=brainSyncRead();
   if(!st.owner){brainSyncWrite({...st,owner:now});return true}
+  if(progressSyncSameOwner(st.owner,now)){if(st.owner!==now)brainSyncWrite({...st,owner:now});return true}
   return st.owner===now;
 }
 /** Keadaan untuk UI: 'off' | 'needs-consent' | 'needs-login' | 'other-account' | 'saving' | 'error' | 'saved' | 'pending'. */
@@ -5311,13 +5374,804 @@ function progressSyncStatus(nowMs=Date.now()){
   if(!brainSyncEnabled())return {state:'off'};
   const st=brainSyncRead();
   const owner=progressSyncOwner();
-  if(st.owner&&owner&&st.owner!==owner)return {state:'other-account'};
+  if(st.owner&&owner&&st.owner!==owner&&!progressSyncSameOwner(st.owner,owner))return {state:'other-account'};
   if(st.saving&&nowMs-Number(st.savingSince||0)<60000)return {state:'saving'};
   const okAt=Math.max(Number(st.lastPushedAt)||0,Number(st.lastCheckedAt)||0);
   if(Number(st.lastErrorAt)>okAt)return {state:'error',at:okAt||0};
   if(!okAt)return {state:'pending'};
   const sisa=brainSyncPending(BRAIN_SYNC_SENT_MAX).length;
   return sisa>0?{state:'pending',at:okAt,sisa}:{state:'saved',at:okAt};
+}
+
+/* ---- m025-806 SINKRONISASI SNAPSHOT AKUN LINTAS PERANGKAT (PROGRES MULTI-BAHASA + GEM + BRAINCORE) ---- */
+const ACCOUNT_CLOUD_STATE_SCHEMA='fiezel-account-cloud-state-v1';
+const CLOUD_SYNC_LANGS=Object.freeze(['en','ja','zh']);
+const CLOUD_SYNC_BUCKETS=Object.freeze(['vocab','grammar','reading','listening','speaking','pte','kana']);
+const CLOUD_Placeholder_NAMES=new Set(['','murid','pelajar','learner','student','guest','pengunjung']);
+
+function isPlaceholderAccountName(name){
+  return CLOUD_Placeholder_NAMES.has(String(name||'').trim().toLowerCase());
+}
+function sideStateKeyForLang(base,lang){
+  const berakun=activeAccountUuid?base+':'+activeAccountUuid:base;
+  try{return self.FiezelTargetLanguage?.key?.(berakun,lang)??berakun}
+  catch(_){return lang&&lang!=='en'?berakun+'@'+lang:berakun}
+}
+function readSideStateJsonForLang(baseKey,lang){
+  try{const raw=localStorage.getItem(sideStateKeyForLang(baseKey,lang));return raw?JSON.parse(raw):null}catch(_){return null}
+}
+function writeSideStateJsonForLang(baseKey,lang,val){
+  if(!val||typeof val!=='object')return;
+  try{localStorage.setItem(sideStateKeyForLang(baseKey,lang),JSON.stringify(val))}catch(_){}
+}
+function gemCloudEntryKey(entry){
+  if(!entry||typeof entry!=='object')return '';
+  const at=Math.floor(Number(entry.at)||0);
+  const delta=Math.floor(Number(entry.delta)||0);
+  const reason=String(entry.reason||'').trim().slice(0,64);
+  const sid=String(entry.sessionId||'').trim().slice(0,64);
+  return `${at}|${delta}|${reason}|${sid}`;
+}
+function sanitizeCloudGemsClient(raw){
+  const src=(raw&&typeof raw==='object'&&!Array.isArray(raw))?raw:{};
+  const rawLedger=Array.isArray(src.ledger)?src.ledger:[];
+  const seen=new Set(),ledger=[];
+  for(const item of rawLedger){
+    if(!item||typeof item!=='object')continue;
+    const at=Math.floor(Number(item.at)||0);
+    const delta=Math.floor(Number(item.delta)||0);
+    if(!delta||!Number.isFinite(delta))continue;
+    const entry={at:at>0?at:0,delta,reason:String(item.reason||'study').trim().slice(0,64)};
+    if(item.sessionId)entry.sessionId=String(item.sessionId).trim().slice(0,64);
+    if(item.level)entry.level=String(item.level).trim().slice(0,8);
+    const k=gemCloudEntryKey(entry);
+    if(k&&!seen.has(k)){seen.add(k);ledger.push(entry)}
+  }
+  const trimmed=ledger.sort((a,b)=>a.at-b.at).slice(-240);
+  let lEarn=0,lSpent=0;
+  for(const e of trimmed){if(e.delta>0)lEarn+=e.delta;else if(e.delta<0)lSpent+=-e.delta}
+  const rBal=Math.max(0,Math.floor(Number(src.balance)||0));
+  const rEarn=Math.max(0,Math.floor(Number(src.earnedTotal)||0));
+  const rSpent=Math.max(0,Math.floor(Number(src.spentTotal)||0));
+  const earnedTotal=Math.max(rEarn,rBal+rSpent,lEarn);
+  const spentTotal=Math.min(earnedTotal,Math.max(rSpent,lSpent));
+  const balance=Math.max(0,earnedTotal-spentTotal);
+  return {schema:'fiezel-gems-v1',balance,earnedTotal,spentTotal,ledger:trimmed};
+}
+function mergeCloudGemsClient(existingRaw,incomingRaw){
+  const a=sanitizeCloudGemsClient(existingRaw),b=sanitizeCloudGemsClient(incomingRaw);
+  const aEmpty=a.balance===0&&a.earnedTotal===0&&a.spentTotal===0&&a.ledger.length===0;
+  const bEmpty=b.balance===0&&b.earnedTotal===0&&b.spentTotal===0&&b.ledger.length===0;
+  if(aEmpty)return b;
+  if(bEmpty)return a;
+  const aKeys=new Set(a.ledger.map(gemCloudEntryKey).filter(Boolean));
+  const bKeys=new Set(b.ledger.map(gemCloudEntryKey).filter(Boolean));
+  let shared=0;
+  for(const k of bKeys){if(aKeys.has(k))shared++}
+  const map=new Map();
+  for(const e of a.ledger)map.set(gemCloudEntryKey(e),e);
+  for(const e of b.ledger){const k=gemCloudEntryKey(e);if(k&&!map.has(k))map.set(k,e)}
+  const mergedLedger=[...map.values()].sort((x,y)=>x.at-y.at).slice(-240);
+  let lEarn=0,lSpent=0;
+  for(const e of mergedLedger){if(e.delta>0)lEarn+=e.delta;else if(e.delta<0)lSpent+=-e.delta}
+  let earnedTotal=Math.max(a.earnedTotal,b.earnedTotal,lEarn);
+  let spentTotal=Math.max(a.spentTotal,b.spentTotal,lSpent);
+  if(shared>0){
+    let bOnlyEarn=0,bOnlySpent=0,aOnlyEarn=0,aOnlySpent=0;
+    for(const e of b.ledger){
+      const k=gemCloudEntryKey(e);
+      if(k&&!aKeys.has(k)){if(e.delta>0)bOnlyEarn+=e.delta;else if(e.delta<0)bOnlySpent+=-e.delta}
+    }
+    for(const e of a.ledger){
+      const k=gemCloudEntryKey(e);
+      if(k&&!bKeys.has(k)){if(e.delta>0)aOnlyEarn+=e.delta;else if(e.delta<0)aOnlySpent+=-e.delta}
+    }
+    earnedTotal=Math.max(earnedTotal,a.earnedTotal+bOnlyEarn,b.earnedTotal+aOnlyEarn);
+    spentTotal=Math.max(spentTotal,a.spentTotal+bOnlySpent,b.spentTotal+aOnlySpent);
+  }else if(a.ledger.length<240&&b.ledger.length<240){
+    const aMaxAt=a.ledger.reduce((m,e)=>Math.max(m,e.at||0),0);
+    const bMaxAt=b.ledger.reduce((m,e)=>Math.max(m,e.at||0),0);
+    const bNewerEarn=b.ledger.filter(e=>e.at>aMaxAt&&e.delta>0).reduce((s,e)=>s+e.delta,0);
+    const bNewerSpent=b.ledger.filter(e=>e.at>aMaxAt&&e.delta<0).reduce((s,e)=>s-e.delta,0);
+    const aNewerEarn=a.ledger.filter(e=>e.at>bMaxAt&&e.delta>0).reduce((s,e)=>s+e.delta,0);
+    const aNewerSpent=a.ledger.filter(e=>e.at>bMaxAt&&e.delta<0).reduce((s,e)=>s-e.delta,0);
+    if(aMaxAt>0&&bMaxAt>0){
+      earnedTotal=Math.max(earnedTotal,a.earnedTotal+bNewerEarn,b.earnedTotal+aNewerEarn);
+      spentTotal=Math.max(spentTotal,a.spentTotal+bNewerSpent,b.spentTotal+aNewerSpent);
+    }else if(a.ledger.length===0&&b.ledger.length>0){
+      const bAllEarn=b.ledger.filter(e=>e.delta>0).reduce((s,e)=>s+e.delta,0);
+      if(b.earnedTotal<=bAllEarn){
+        earnedTotal=Math.max(earnedTotal,a.earnedTotal+bNewerEarn);
+        spentTotal=Math.max(spentTotal,a.spentTotal+bNewerSpent);
+      }
+    }else if(b.ledger.length===0&&a.ledger.length>0){
+      const aAllEarn=a.ledger.filter(e=>e.delta>0).reduce((s,e)=>s+e.delta,0);
+      if(a.earnedTotal<=aAllEarn){
+        earnedTotal=Math.max(earnedTotal,b.earnedTotal+aNewerEarn);
+        spentTotal=Math.max(spentTotal,b.spentTotal+aNewerSpent);
+      }
+    }
+  }
+  if(spentTotal>earnedTotal)spentTotal=earnedTotal;
+  return {schema:'fiezel-gems-v1',balance:Math.max(0,earnedTotal-spentTotal),earnedTotal,spentTotal,ledger:mergedLedger};
+}
+function mergeCloudBucketItemRowClient(aRow,bRow){
+  if(!aRow||typeof aRow!=='object')return bRow;
+  if(!bRow||typeof bRow!=='object')return aRow;
+  const aSeen=Number(aRow.lastSeen)||0,bSeen=Number(bRow.lastSeen)||0;
+  const aTotal=Number(aRow.total)||0,bTotal=Number(bRow.total)||0;
+  const aMast=Number(aRow.mastery)||0,bMast=Number(bRow.mastery)||0;
+  let winner=aRow;
+  if(bSeen!==aSeen)winner=bSeen>aSeen?bRow:aRow;
+  else if(bTotal!==aTotal)winner=bTotal>aTotal?bRow:aRow;
+  else if(bMast>aMast)winner=bRow;
+  return {
+    ...winner,
+    total:Math.max(aTotal,bTotal),
+    correct:Math.max(Number(aRow.correct)||0,Number(bRow.correct)||0),
+    mastery:Math.max(aMast,bMast),
+    streak:Math.max(Number(aRow.streak)||0,Number(bRow.streak)||0),
+    lastSeen:Math.max(aSeen,bSeen),
+    nextReview:Math.max(Number(aRow.nextReview)||0,Number(bRow.nextReview)||0),
+    stability:Math.max(Number(aRow.stability)||0,Number(bRow.stability)||0)
+  };
+}
+function mergeCloudBucketMapClient(aBucket,bBucket){
+  const a=(aBucket&&typeof aBucket==='object'&&!Array.isArray(aBucket))?aBucket:{};
+  const b=(bBucket&&typeof bBucket==='object'&&!Array.isArray(bBucket))?bBucket:{};
+  const out={...a};
+  for(const k of Object.keys(b)){
+    if(b[k]&&typeof b[k]==='object')out[k]=out[k]?mergeCloudBucketItemRowClient(out[k],b[k]):{...b[k]};
+  }
+  return out;
+}
+function mergeCloudHistoryClient(aHist,bHist,limit=300){
+  const seen=new Set(),out=[];
+  for(const r of [...(Array.isArray(aHist)?aHist:[]),...(Array.isArray(bHist)?bHist:[])]){
+    const h=normalizeHistoryRow(r);
+    if(!h)continue;
+    const id=h.attemptId?'a:'+String(h.attemptId):`c:${h.at||0}|${h.skill||''}|${h.target||''}|${h.ok?1:0}`;
+    if(!seen.has(id)){seen.add(id);out.push(h)}
+  }
+  return out.sort((x,y)=>(Number(x.at)||0)-(Number(y.at)||0)).slice(-limit);
+}
+function sanitizeConfidenceHistoryClient(raw,limit=100){
+  if(!Array.isArray(raw))return[];
+  const seen=new Set(),out=[];
+  for(const r of raw){
+    if(!r||typeof r!=='object')continue;
+    const at=Math.floor(Number(r.at)||0),confidence=Math.floor(Number(r.confidence)||0);
+    if(at<=0||![1,2,3].includes(confidence))continue;
+    const k=`${at}|${r.skill||''}|${confidence}|${r.ok?1:0}`;
+    if(!seen.has(k)){
+      seen.add(k);
+      const row={confidence,ok:Boolean(r.ok),at,level:String(r.level||'').slice(0,8),skill:String(r.skill||'').slice(0,80),type:String(r.type||'').slice(0,32)};
+      if(r.errorTag)row.errorTag=String(r.errorTag).slice(0,48);
+      out.push(row);
+    }
+  }
+  return out.sort((x,y)=>x.at-y.at).slice(-limit);
+}
+function sanitizeSessionHistoryClient(raw,limit=40){
+  if(!Array.isArray(raw))return[];
+  const seen=new Set(),out=[];
+  for(const s of raw){
+    if(!s||typeof s!=='object')continue;
+    const atMs=Date.parse(s.at||'')||Math.floor(Number(s.endedAt||s.startedAt)||0);
+    const k=String(s.id||s.sessionId||atMs||'').slice(0,80);
+    if(!k||seen.has(k))continue;
+    seen.add(k);out.push(s);
+  }
+  return out.sort((x,y)=>(Date.parse(x.at||'')||Number(x.endedAt||x.startedAt)||0)-(Date.parse(y.at||'')||Number(y.endedAt||y.startedAt)||0)).slice(-limit);
+}
+function sanitizeFsrs6ShadowClient(raw,limit=80){
+  if(!Array.isArray(raw))return[];
+  const seen=new Set(),out=[];
+  for(const e of raw){
+    if(!e||typeof e!=='object')continue;
+    const at=Math.floor(Number(e.at||e.timestamp)||0);
+    const k=String(e.attemptId||`${at}|${e.lesson||e.skill||''}|${e.ok?1:0}`);
+    if(!k||seen.has(k))continue;
+    seen.add(k);out.push(e);
+  }
+  return out.sort((x,y)=>(Number(x.at||x.timestamp)||0)-(Number(y.at||y.timestamp)||0)).slice(-limit);
+}
+function extractCourseSnapshotFromRaw(rawBlob){
+  const src=(rawBlob&&typeof rawBlob==='object')?rawBlob:{};
+  const hist=mergeCloudHistoryClient(src.history,[],300);
+  const wSrc=(src.writing&&typeof src.writing==='object')?src.writing:{};
+  const out={
+    level:Math.max(1,Math.min(6,Math.floor(Number(src.level)||1))),
+    placementDone:Boolean(src.placementDone),
+    placementBandLevel:Math.max(1,Math.min(6,Math.floor(Number(src.placementBandLevel)||1))),
+    placementBands:(src.placementBands&&typeof src.placementBands==='object')?src.placementBands:null,
+    totalAnswered:Math.max(0,Math.floor(Number(src.totalAnswered)||0),hist.length),
+    totalCorrect:Math.max(0,Math.floor(Number(src.totalCorrect)||0),hist.filter(h=>h&&h.ok).length),
+    totalTimeMs:Math.max(0,Math.floor(Number(src.totalTimeMs)||0)),
+    adaptiveReady:Boolean(src.adaptiveReady),
+    adaptiveReadyByLevel:(src.adaptiveReadyByLevel&&typeof src.adaptiveReadyByLevel==='object')?{...src.adaptiveReadyByLevel}:{},
+    levelTrust:(src.levelTrust&&typeof src.levelTrust==='object')?src.levelTrust:null,
+    preferences:{
+      activeLevel:String(src.preferences?.activeLevel||''),
+      selfAssessedLevel:String(src.preferences?.selfAssessedLevel||''),
+      levelMode:String(src.preferences?.levelMode||''),
+      learningIntensity:String(src.preferences?.learningIntensity||'')
+    },
+    history:hist,
+    wrongAnswers:Array.isArray(src.wrongAnswers)?src.wrongAnswers.slice(-120):[],
+    confidenceHistory:sanitizeConfidenceHistoryClient(src.confidenceHistory,100),
+    sessionHistory:sanitizeSessionHistoryClient(src.sessionHistory,40),
+    writing:{
+      entries:Array.isArray(wSrc.entries)?wSrc.entries.slice(-80):[],
+      draft:String(wSrc.draft||'').slice(0,4000),
+      promptIndex:Math.max(0,Math.floor(Number(wSrc.promptIndex)||0)),
+      lastAt:Math.max(0,Math.floor(Number(wSrc.lastAt)||0))
+    }
+  };
+  for(const b of CLOUD_SYNC_BUCKETS){
+    out[b]=(src[b]&&typeof src[b]==='object'&&!Array.isArray(src[b]))?{...src[b]}:{};
+  }
+  return out;
+}
+function mergeCloudCourseClient(aCourse,bCourse){
+  const a=extractCourseSnapshotFromRaw(aCourse),b=extractCourseSnapshotFromRaw(bCourse);
+  const hist=mergeCloudHistoryClient(a.history,b.history,300);
+  const confidenceHistory=sanitizeConfidenceHistoryClient([...a.confidenceHistory,...b.confidenceHistory],100);
+  const sessionHistory=sanitizeSessionHistoryClient([...a.sessionHistory,...b.sessionHistory],40);
+  const wSeen=new Set(),wrongAnswers=[];
+  for(const w of [...a.wrongAnswers,...b.wrongAnswers]){
+    if(!w||typeof w!=='object')continue;
+    const wk=`${w.at||0}|${w.question||''}|${w.target||''}`;
+    if(!wSeen.has(wk)){wSeen.add(wk);wrongAnswers.push(w)}
+  }
+  const eSeen=new Set(),entries=[];
+  for(const e of [...(a.writing?.entries||[]),...(b.writing?.entries||[])]){
+    if(!e||typeof e!=='object')continue;
+    const ek=String(e.id||e.at||JSON.stringify(e).slice(0,80));
+    if(!eSeen.has(ek)){eSeen.add(ek);entries.push(e)}
+  }
+  const newerW=(Number(b.writing?.lastAt)||0)>=(Number(a.writing?.lastAt)||0)?b.writing:a.writing;
+  const readyByLevel={};
+  for(const lvl of LEVELS)readyByLevel[lvl]=Boolean(a.adaptiveReadyByLevel?.[lvl]||b.adaptiveReadyByLevel?.[lvl]);
+  const rankOf=v=>Math.max(1,LEVELS.indexOf(String(v||'A1'))+1);
+  let levelTrust=a.levelTrust||b.levelTrust||null;
+  if(a.levelTrust&&b.levelTrust){
+    const bWins=rankOf(b.levelTrust.verified)>=rankOf(a.levelTrust.verified);
+    const baseT=bWins?b.levelTrust:a.levelTrust;
+    levelTrust={...baseT,verified:bWins?b.levelTrust.verified:a.levelTrust.verified,exams:{...(a.levelTrust.exams||{}),...(b.levelTrust.exams||{})}};
+  }
+  const out={
+    level:Math.max(a.level,b.level),
+    placementDone:Boolean(a.placementDone||b.placementDone),
+    placementBandLevel:Math.max(a.placementBandLevel,b.placementBandLevel),
+    placementBands:b.placementBands||a.placementBands||null,
+    totalAnswered:Math.max(a.totalAnswered,b.totalAnswered,hist.length),
+    totalCorrect:Math.max(a.totalCorrect,b.totalCorrect,hist.filter(h=>h&&h.ok).length),
+    totalTimeMs:Math.max(a.totalTimeMs,b.totalTimeMs),
+    adaptiveReady:Boolean(a.adaptiveReady||b.adaptiveReady),
+    adaptiveReadyByLevel:readyByLevel,
+    levelTrust,
+    preferences:{
+      activeLevel:b.preferences?.activeLevel||a.preferences?.activeLevel||'',
+      selfAssessedLevel:b.preferences?.selfAssessedLevel||a.preferences?.selfAssessedLevel||'',
+      levelMode:b.preferences?.levelMode||a.preferences?.levelMode||'',
+      learningIntensity:b.preferences?.learningIntensity||a.preferences?.learningIntensity||''
+    },
+    history:hist,
+    wrongAnswers:wrongAnswers.slice(-120),
+    confidenceHistory,
+    sessionHistory,
+    writing:{
+      entries:entries.slice(-80),
+      draft:newerW?.draft||a.writing?.draft||b.writing?.draft||'',
+      promptIndex:Math.max(Number(a.writing?.promptIndex)||0,Number(b.writing?.promptIndex)||0),
+      lastAt:Math.max(Number(a.writing?.lastAt)||0,Number(b.writing?.lastAt)||0)
+    }
+  };
+  for(const bName of CLOUD_SYNC_BUCKETS)out[bName]=mergeCloudBucketMapClient(a[bName],b[bName]);
+  return out;
+}
+function mergeCloudBktClient(aBkt,bBkt){
+  if(!aBkt||typeof aBkt!=='object')return (bBkt&&typeof bBkt==='object')?bBkt:null;
+  if(!bBkt||typeof bBkt!=='object')return aBkt;
+  const aLessons=(aBkt.lessons&&typeof aBkt.lessons==='object')?aBkt.lessons:{};
+  const bLessons=(bBkt.lessons&&typeof bBkt.lessons==='object')?bBkt.lessons:{};
+  const lessons={...aLessons};
+  for(const [k,bRec] of Object.entries(bLessons)){
+    if(!bRec||typeof bRec!=='object')continue;
+    const aRec=lessons[k];
+    if(!aRec||typeof aRec!=='object'){lessons[k]=bRec;continue}
+    const aN=Math.max(0,Number(aRec.n??aRec.attempts)||0),bN=Math.max(0,Number(bRec.n??bRec.attempts)||0);
+    const aLast=Math.max(0,Number(aRec.lastAt??aRec.updatedAt)||0),bLast=Math.max(0,Number(bRec.lastAt??bRec.updatedAt)||0);
+    const winner=(bN>aN||(bN===aN&&bLast>=aLast))?bRec:aRec;
+    const mergedRec={...winner,L:Number.isFinite(Number(winner.L))?Number(winner.L):Math.max(Number(aRec.L)||0.2,Number(bRec.L)||0.2),n:Math.max(aN,bN),lastAt:Math.max(aLast,bLast)};
+    const gateAt=Math.max(Number(aRec.gatePassedAt)||0,Number(bRec.gatePassedAt)||0);
+    if(gateAt>0)mergedRec.gatePassedAt=gateAt;
+    lessons[k]=mergedRec;
+  }
+  return {schema:aBkt.schema||bBkt.schema||'fiezel-mastery-bkt-v1',lessons};
+}
+function mergeCloudGenericSideClient(aObj,bObj){
+  if(!aObj||typeof aObj!=='object')return (bObj&&typeof bObj==='object')?bObj:null;
+  if(!bObj||typeof bObj!=='object')return aObj;
+  const out={...aObj,...bObj};
+  for(const mk of ['entries','items','pairs','skills','concepts','probes','records']){
+    if((aObj[mk]&&typeof aObj[mk]==='object')||(bObj[mk]&&typeof bObj[mk]==='object')){
+      out[mk]={...(aObj[mk]||{}),...(bObj[mk]||{})};
+    }
+  }
+  return out;
+}
+function accountCloudRealEvidenceScore(snap){
+  if(!snap||typeof snap!=='object')return 0;
+  let score=0;
+  if(snap.gems&&typeof snap.gems==='object'){
+    score+=(Math.max(0,Number(snap.gems.earnedTotal)||0)*2)+(Math.max(0,Number(snap.gems.balance)||0)*2)+((Array.isArray(snap.gems.ledger)?snap.gems.ledger.length:0)*5);
+  }
+  for(const lang of CLOUD_SYNC_LANGS){
+    const c=snap.courses?.[lang];
+    if(!c||typeof c!=='object')continue;
+    score+=(Math.max(0,Number(c.totalAnswered)||0)*10)+((Array.isArray(c.history)?c.history.length:0)*5);
+    for(const b of CLOUD_SYNC_BUCKETS)score+=Object.keys(c[b]||{}).length*3;
+    if(Array.isArray(c.writing?.entries))score+=c.writing.entries.length*5;
+    if(c.placementDone)score+=25;
+    if((Number(c.level)||1)>1)score+=15;
+  }
+  for(const lang of CLOUD_SYNC_LANGS){
+    const side=snap.sideStateByLang?.[lang];
+    if(side?.bkt?.lessons)score+=Object.keys(side.bkt.lessons).length*3;
+  }
+  return score;
+}
+function clampCloudSnapshotPayloadSize(snap,maxBytes=850000){
+  try{
+    let txt=JSON.stringify(snap);
+    if(txt.length<=maxBytes)return snap;
+    for(const lang of CLOUD_SYNC_LANGS){
+      const c=snap.courses?.[lang];
+      if(!c)continue;
+      if(Array.isArray(c.writing?.entries))c.writing.entries=c.writing.entries.slice(-30);
+      if(Array.isArray(c.wrongAnswers))c.wrongAnswers=c.wrongAnswers.slice(-60);
+      if(Array.isArray(c.confidenceHistory))c.confidenceHistory=c.confidenceHistory.slice(-40);
+      if(Array.isArray(c.sessionHistory))c.sessionHistory=c.sessionHistory.slice(-20);
+      if(Array.isArray(c.history))c.history=c.history.slice(-150);
+    }
+    txt=JSON.stringify(snap);
+    if(txt.length<=maxBytes)return snap;
+    for(const lang of CLOUD_SYNC_LANGS){
+      const c=snap.courses?.[lang];
+      if(c&&Array.isArray(c.history))c.history=c.history.slice(-60);
+      const s=snap.sideStateByLang?.[lang];
+      if(s&&Array.isArray(s.fsrs6Shadow))s.fsrs6Shadow=s.fsrs6Shadow.slice(-30);
+    }
+  }catch(_){}
+  return snap;
+}
+function buildAccountCloudSnapshot(nowMs=Date.now()){
+  try{if(saveWriteQueued)saveFlushWrite()}catch(_){}
+  const curLang=(function(){try{return activeTargetLang()}catch(_){return state?.preferences?.targetLang||'en'}}());
+  let dasar=null;
+  try{dasar=JSON.parse(localStorage.getItem(activeStateStorageKey))}catch(_){}
+  const courses={};
+  const sideStateByLang={};
+  for(const lang of CLOUD_SYNC_LANGS){
+    if(lang===curLang){
+      courses[lang]=extractCourseSnapshotFromRaw(state);
+    }else if(lang==='en'){
+      courses[lang]=extractCourseSnapshotFromRaw(dasar||defaultState);
+    }else{
+      let pBlob=null;
+      try{pBlob=JSON.parse(localStorage.getItem(progressStorageKey(activeStateStorageKey,lang)))}catch(_){}
+      courses[lang]=extractCourseSnapshotFromRaw(pBlob||pickProgress(defaultState));
+    }
+    sideStateByLang[lang]={
+      bkt:readSideStateJsonForLang(BKT_KEY,lang),
+      misconceptionLedger:readSideStateJsonForLang(MISCONCEPTION_LEDGER_KEY,lang),
+      itemCalibration:readSideStateJsonForLang(ITEM_CALIBRATION_KEY,lang),
+      confusionMatrix:readSideStateJsonForLang(CONFUSION_MATRIX_KEY,lang),
+      olmNegotiation:readSideStateJsonForLang(OLM_NEGOTIATION_KEY,lang),
+      srlCoach:readSideStateJsonForLang(SRL_KEY,lang),
+      slState:readSideStateJsonForLang(SL_STATE_KEY,lang),
+      retentionProbe:readSideStateJsonForLang(RETENTION_PROBE_KEY,lang),
+      fsrs6Shadow:sanitizeFsrs6ShadowClient(readSideStateJsonForLang(FSRS6_SHADOW_KEY,lang),80)
+    };
+  }
+  return clampCloudSnapshotPayloadSize({
+    schema:ACCOUNT_CLOUD_STATE_SCHEMA,
+    updatedAt:nowMs,
+    userName:String(state?.userName||dasar?.userName||'').trim(),
+    level:Math.max(1,Number(state?.level)||1),
+    placementDone:Boolean(state?.placementDone||courses.en.placementDone),
+    streak:Math.max(0,Number(state?.streak)||0),
+    daily:state?.daily&&typeof state.daily==='object'?{...state.daily}:{date:'',count:0,attempts:0,meaningful:false},
+    learningDays:Array.isArray(state?.learningDays)?state.learningDays.slice(-400):[],
+    gems:sanitizeCloudGemsClient(state?.gems),
+    dailyRewards:state?.dailyRewards&&typeof state.dailyRewards==='object'?{...state.dailyRewards}:{date:'',loginBonusClaimed:false,study10MinClaimed:false,studyTimeMs:0},
+    prasasti:state?.prasasti&&typeof state.prasasti==='object'?{schema:'fiezel-prasasti-v1',earned:{...(state.prasasti.earned||{})}}:{schema:'fiezel-prasasti-v1',earned:{}},
+    toursSeen:state?.toursSeen&&typeof state.toursSeen==='object'?{...state.toursSeen}:{menu:false,library:false,listening:false},
+    preferences:{
+      targetLang:CLOUD_SYNC_LANGS.includes(curLang)?curLang:'en',
+      learnerLocale:String(state?.preferences?.learnerLocale||'id'),
+      learnerLocaleExplicit:Boolean(state?.preferences?.learnerLocaleExplicit),
+      activeLevel:String(state?.preferences?.activeLevel||''),
+      selfAssessedLevel:String(state?.preferences?.selfAssessedLevel||''),
+      levelMode:String(state?.preferences?.levelMode||''),
+      learningIntensity:String(state?.preferences?.learningIntensity||'santai'),
+      goalProfile:String(state?.preferences?.goalProfile||'')
+    },
+    courses,
+    sideStateByLang
+  });
+}
+function mergeAccountCloudSnapshotsClient(localRaw,remoteRaw,nowMs=Date.now()){
+  const a=localRaw&&typeof localRaw==='object'?localRaw:buildAccountCloudSnapshot(nowMs);
+  const b=remoteRaw&&typeof remoteRaw==='object'?remoteRaw:a;
+  const aScore=accountCloudRealEvidenceScore(a);
+  const bScore=accountCloudRealEvidenceScore(b);
+  const aRealName=!isPlaceholderAccountName(a.userName);
+  const bRealName=!isPlaceholderAccountName(b.userName);
+  let userName=a.userName||b.userName||'Murid';
+  if(aScore===0&&bScore>0&&bRealName)userName=b.userName;
+  else if(bRealName&&!aRealName)userName=b.userName;
+  else if(aRealName&&!bRealName)userName=a.userName;
+  else if(bRealName&&aRealName)userName=(Number(b.updatedAt)||0)>=(Number(a.updatedAt)||0)?b.userName:a.userName;
+
+  const courses={},sideStateByLang={};
+  for(const lang of CLOUD_SYNC_LANGS){
+    const aCourse=a.courses?.[lang]||(lang==='en'?a:{});
+    const bCourse=b.courses?.[lang]||(lang==='en'?b:{});
+    courses[lang]=mergeCloudCourseClient(aCourse,bCourse);
+    const aSide=a.sideStateByLang?.[lang]||(lang==='en'?a.sideState:{})||{};
+    const bSide=b.sideStateByLang?.[lang]||(lang==='en'?b.sideState:{})||{};
+    sideStateByLang[lang]={
+      bkt:mergeCloudBktClient(aSide.bkt,bSide.bkt),
+      misconceptionLedger:mergeCloudGenericSideClient(aSide.misconceptionLedger,bSide.misconceptionLedger),
+      itemCalibration:mergeCloudGenericSideClient(aSide.itemCalibration,bSide.itemCalibration),
+      confusionMatrix:mergeCloudGenericSideClient(aSide.confusionMatrix,bSide.confusionMatrix),
+      olmNegotiation:mergeCloudGenericSideClient(aSide.olmNegotiation,bSide.olmNegotiation),
+      srlCoach:mergeCloudGenericSideClient(aSide.srlCoach,bSide.srlCoach),
+      slState:mergeCloudGenericSideClient(aSide.slState,bSide.slState),
+      retentionProbe:mergeCloudGenericSideClient(aSide.retentionProbe,bSide.retentionProbe),
+      fsrs6Shadow:sanitizeFsrs6ShadowClient([...(Array.isArray(aSide.fsrs6Shadow)?aSide.fsrs6Shadow:[]),...(Array.isArray(bSide.fsrs6Shadow)?bSide.fsrs6Shadow:[])],80)
+    };
+  }
+  const aDaily=a.daily||{},bDaily=b.daily||{};
+  let daily=aDaily;
+  if(String(bDaily.date||'')>String(aDaily.date||''))daily=bDaily;
+  else if(String(bDaily.date||'')===String(aDaily.date||'')){
+    daily={
+      date:String(aDaily.date||bDaily.date||''),
+      count:Math.max(Number(aDaily.count)||0,Number(bDaily.count)||0),
+      attempts:Math.max(Number(aDaily.attempts)||0,Number(bDaily.attempts)||0),
+      meaningful:Boolean(aDaily.meaningful||bDaily.meaningful)
+    };
+  }
+  const aRew=a.dailyRewards||{},bRew=b.dailyRewards||{};
+  let dailyRewards=aRew;
+  if(String(bRew.date||'')>String(aRew.date||''))dailyRewards=bRew;
+  else if(String(bRew.date||'')===String(aRew.date||'')){
+    dailyRewards={
+      date:String(aRew.date||bRew.date||''),
+      loginBonusClaimed:Boolean(aRew.loginBonusClaimed||bRew.loginBonusClaimed),
+      study10MinClaimed:Boolean(aRew.study10MinClaimed||bRew.study10MinClaimed),
+      studyTimeMs:Math.max(Number(aRew.studyTimeMs)||0,Number(bRew.studyTimeMs)||0)
+    };
+  }
+  const aWasEmpty=(aScore===0&&bScore>0);
+  const prefPrimary=aWasEmpty?(b.preferences||{}):(a.preferences||{});
+  const prefSecondary=aWasEmpty?(a.preferences||{}):(b.preferences||{});
+  const streak=aWasEmpty?Math.max(0,Number(b.streak)||0):Math.max(Number(a.streak)||0,Number(b.streak)||0);
+
+  return {
+    schema:ACCOUNT_CLOUD_STATE_SCHEMA,
+    updatedAt:Math.max(Number(a.updatedAt)||0,Number(b.updatedAt)||0,nowMs),
+    userName,
+    level:Math.max(Number(a.level)||1,Number(b.level)||1,courses.en.level),
+    placementDone:Boolean(a.placementDone||b.placementDone||courses.en.placementDone),
+    streak,
+    daily,
+    learningDays:[...new Set([...(Array.isArray(a.learningDays)?a.learningDays:[]),...(Array.isArray(b.learningDays)?b.learningDays:[])])].sort().slice(-400),
+    gems:mergeCloudGemsClient(a.gems,b.gems),
+    dailyRewards,
+    prasasti:{schema:'fiezel-prasasti-v1',earned:{...(a.prasasti?.earned||{}),...(b.prasasti?.earned||{})}},
+    toursSeen:{
+      menu:Boolean(a.toursSeen?.menu||b.toursSeen?.menu),
+      library:Boolean(a.toursSeen?.library||b.toursSeen?.library),
+      listening:Boolean(a.toursSeen?.listening||b.toursSeen?.listening)
+    },
+    preferences:{
+      targetLang:CLOUD_SYNC_LANGS.includes(prefPrimary.targetLang)?prefPrimary.targetLang:(CLOUD_SYNC_LANGS.includes(prefSecondary.targetLang)?prefSecondary.targetLang:'en'),
+      learnerLocale:prefPrimary.learnerLocale||prefSecondary.learnerLocale||'id',
+      learnerLocaleExplicit:Boolean(prefPrimary.learnerLocaleExplicit||prefSecondary.learnerLocaleExplicit),
+      activeLevel:prefPrimary.activeLevel||prefSecondary.activeLevel||'',
+      selfAssessedLevel:prefPrimary.selfAssessedLevel||prefSecondary.selfAssessedLevel||'',
+      levelMode:prefPrimary.levelMode||prefSecondary.levelMode||'',
+      learningIntensity:prefPrimary.learningIntensity||prefSecondary.learningIntensity||'santai',
+      goalProfile:prefPrimary.goalProfile||prefSecondary.goalProfile||''
+    },
+    courses,
+    sideStateByLang
+  };
+}
+let accountCloudApplying=false;
+function applyAccountCloudSnapshot(remoteSnap){
+  if(!remoteSnap||typeof remoteSnap!=='object')return false;
+  const remoteScore=accountCloudRealEvidenceScore(remoteSnap);
+  if(remoteScore===0&&!remoteSnap.placementDone&&(Number(remoteSnap.level)||1)<=1&&(Number(remoteSnap.streak)||0)===0&&isPlaceholderAccountName(remoteSnap.userName))return false;
+  accountCloudApplying=true;
+  try{
+    const localSnap=buildAccountCloudSnapshot();
+    const localScore=accountCloudRealEvidenceScore(localSnap);
+    const merged=mergeAccountCloudSnapshotsClient(localSnap,remoteSnap);
+    const prevLang=(function(){try{return activeTargetLang()}catch(_){return state?.preferences?.targetLang||'en'}}());
+    const nextLang=(localScore===0&&remoteScore>0&&CLOUD_SYNC_LANGS.includes(remoteSnap?.preferences?.targetLang))
+      ?remoteSnap.preferences.targetLang
+      :prevLang;
+
+    let dasar=null;
+    try{dasar=JSON.parse(localStorage.getItem(activeStateStorageKey))}catch(_){}
+    const baseObj=(dasar&&typeof dasar==='object')?{...defaultState,...dasar}:{...defaultState,...state};
+    baseObj.ownerUuid=activeAccountUuid||state?.ownerUuid||'';
+    if(merged.userName&&!isPlaceholderAccountName(merged.userName))baseObj.userName=merged.userName;
+    baseObj.streak=merged.streak;
+    baseObj.daily=merged.daily;
+    baseObj.learningDays=merged.learningDays;
+    baseObj.gems=sanitizeGemsState(merged.gems);
+    baseObj.dailyRewards=merged.dailyRewards;
+    baseObj.prasasti=merged.prasasti;
+    baseObj.toursSeen=merged.toursSeen;
+
+    const enCourse=merged.courses.en;
+    PROGRESS_STATE_FIELDS.forEach(f=>{
+      if(Object.prototype.hasOwnProperty.call(enCourse,f))baseObj[f]=clonePlainContainer(enCourse[f]);
+    });
+    const basePrefs={...(state?.preferences||{}),...(baseObj.preferences||{}),targetLang:nextLang};
+    if(state?.preferences?.brainSync===true&&basePrefs.brainSync!==false&&basePrefs.brainSyncOptOut!==true){
+      basePrefs.brainSync=true;
+    }else if(state?.preferences?.brainSync===true&&baseObj.preferences?.brainSyncOptOut!==true&&state?.preferences?.progressSyncConsent?.by==='murid-login'){
+      basePrefs.brainSync=true;
+    }
+    if(state?.preferences?.progressSyncConsent&&!basePrefs.progressSyncConsent){
+      basePrefs.progressSyncConsent=state.preferences.progressSyncConsent;
+    }
+    if(merged.preferences?.goalProfile)basePrefs.goalProfile=merged.preferences.goalProfile;
+    if(merged.preferences?.learningIntensity)basePrefs.learningIntensity=merged.preferences.learningIntensity;
+    PROGRESS_PREF_FIELDS.forEach(f=>{
+      if(enCourse.preferences&&enCourse.preferences[f])basePrefs[f]=enCourse.preferences[f];
+    });
+    baseObj.preferences=basePrefs;
+    if(typeof computeStateIntegrity==='function')baseObj._integrity=computeStateIntegrity(baseObj);
+    else delete baseObj._integrity;
+    localStorage.setItem(activeStateStorageKey,JSON.stringify(baseObj));
+
+    for(const lang of ['ja','zh']){
+      const cProg=merged.courses[lang];
+      const cScore=(Number(cProg?.totalAnswered)||0)+(Array.isArray(cProg?.history)?cProg.history.length:0)+(cProg?.placementDone?25:0)+((Number(cProg?.level)||1)>1?10:0)+CLOUD_SYNC_BUCKETS.reduce((acc,b)=>acc+Object.keys(cProg?.[b]||{}).length,0);
+      if(cScore>0||localStorage.getItem(progressStorageKey(activeStateStorageKey,lang))!==null){
+        localStorage.setItem(progressStorageKey(activeStateStorageKey,lang),JSON.stringify(cProg));
+      }
+    }
+
+    for(const lang of CLOUD_SYNC_LANGS){
+      const side=merged.sideStateByLang?.[lang];
+      if(!side)continue;
+      if(side.bkt)writeSideStateJsonForLang(BKT_KEY,lang,side.bkt);
+      if(side.misconceptionLedger)writeSideStateJsonForLang(MISCONCEPTION_LEDGER_KEY,lang,side.misconceptionLedger);
+      if(side.itemCalibration)writeSideStateJsonForLang(ITEM_CALIBRATION_KEY,lang,side.itemCalibration);
+      if(side.confusionMatrix)writeSideStateJsonForLang(CONFUSION_MATRIX_KEY,lang,side.confusionMatrix);
+      if(side.olmNegotiation)writeSideStateJsonForLang(OLM_NEGOTIATION_KEY,lang,side.olmNegotiation);
+      if(side.srlCoach)writeSideStateJsonForLang(SRL_KEY,lang,side.srlCoach);
+      if(side.slState)writeSideStateJsonForLang(SL_STATE_KEY,lang,side.slState);
+      if(side.retentionProbe)writeSideStateJsonForLang(RETENTION_PROBE_KEY,lang,side.retentionProbe);
+      if(Array.isArray(side.fsrs6Shadow)&&side.fsrs6Shadow.length)writeSideStateJsonForLang(FSRS6_SHADOW_KEY,lang,side.fsrs6Shadow);
+    }
+
+    if(nextLang!==prevLang){
+      try{localStorage.setItem(FIEZEL_TARGET_COURSE_KEY,nextLang)}catch(_){}
+    }
+    if(merged.userName&&!isPlaceholderAccountName(merged.userName)){
+      try{
+        const ob=JSON.parse(localStorage.getItem('fiezel-onboarding-v1')||'{}');
+        if(ob&&typeof ob==='object'){
+          ob.name=merged.userName;
+          ob.course=nextLang;
+          ob.done=true;
+          localStorage.setItem('fiezel-onboarding-v1',JSON.stringify(ob));
+        }
+      }catch(_){}
+    }
+
+    const currentView=state?.view||'home';
+    const currentSession=state?.activeSession||null;
+    const prevHomeSig=currentView==='home'
+      ? `${state?.userName||''}|${state?.level||''}|${Number(state?.streak)||0}|${Number(state?.gems?.balance)||0}|${prevLang}|${Array.isArray(state?.history)?state.history.length:0}`
+      : '';
+    const reloaded=loadState(activeStateStorageKey);
+    Object.keys(state).forEach(k=>{if(!Object.prototype.hasOwnProperty.call(reloaded,k))delete state[k]});
+    Object.assign(state,reloaded);
+    state.view=currentView;
+    if(currentSession)state.activeSession=currentSession;
+    if(merged.userName&&!isPlaceholderAccountName(merged.userName))state.userName=merged.userName;
+    state.gems=sanitizeGemsState(merged.gems);
+    state.streak=merged.streak;
+    coreBrainCache=null;
+    try{stateSyncReset()}catch(_){}
+    try{reconcileStateAfterBankLoad()}catch(_){}
+    try{
+      const xVal=$('topbarXpVal');
+      if(xVal&&(state.xp===undefined||state.xp===null))xVal.textContent=String(gemsBalance());
+    }catch(_){}
+    const nextHomeSig=currentView==='home'
+      ? `${state?.userName||''}|${state?.level||''}|${Number(state?.streak)||0}|${Number(state?.gems?.balance)||0}|${nextLang}|${Array.isArray(state?.history)?state.history.length:0}`
+      : '';
+    if(nextLang!==prevLang&&typeof load==='function'&&appOpened){
+      load({kontenSaja:true}).then(()=>{try{reconcileStateAfterBankLoad();render()}catch(_){}}).catch(()=>{});
+    }else if(appOpened){
+      // Avoid destructive full-#app innerHTML wipe on Home when visible stats did not change (prevents 3D Mochi & greeting flash)
+      if(!(currentView==='home'&&prevHomeSig&&prevHomeSig===nextHomeSig)){
+        try{render()}catch(_){}
+      }
+    }
+    return true;
+  }catch(_){
+    return false;
+  }finally{
+    accountCloudApplying=false;
+  }
+}
+let accountCloudSyncInflight=false,accountCloudSyncTimer=null,accountCloudSaveTimer=null,accountCloudPulledForKey='',accountCloudSyncPromise=null;
+async function accountCloudStatePull(){
+  if(!brainSyncEnabled())return null;
+  try{
+    const r=await progressSyncFetch('/api/brain/state',{method:'GET'});
+    if(!r||!r.ok)return null;
+    const data=await r.json().catch(()=>null);
+    if(data&&data.ok&&data.hasSnapshot&&data.snapshot&&typeof data.snapshot==='object'){
+      return data.snapshot;
+    }
+    return null;
+  }catch(_){return null}
+}
+async function accountCloudStatePush(pushOpts={}){
+  if(!brainSyncEnabled())return null;
+  try{
+    const snapshot=buildAccountCloudSnapshot();
+    const payload=JSON.stringify({snapshot});
+    const fetchOpts={
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:payload
+    };
+    if(pushOpts.keepalive&&payload.length<60000)fetchOpts.keepalive=true;
+    const r=await progressSyncFetch('/api/brain/state',fetchOpts);
+    if(!r||!r.ok)return null;
+    const data=await r.json().catch(()=>null);
+    if(data&&data.ok&&data.snapshot&&typeof data.snapshot==='object'){
+      const stamp=Date.now();
+      progressSyncMark({saving:false,lastCheckedAt:stamp,lastCloudStateSyncAt:stamp,lastErrorAt:0});
+      return data.snapshot;
+    }
+    return null;
+  }catch(_){return null}
+}
+async function accountCloudStateSync(opts={}){
+  if(!brainSyncEnabled())return false;
+  if(accountCloudSyncPromise)return accountCloudSyncPromise;
+  if(accountCloudSyncInflight)return false;
+  accountCloudSyncInflight=true;
+  const run=(async()=>{
+    try{
+      const curKey=activeStateStorageKey||'';
+      const syncEpoch=accountSessionEpoch;
+      const needPull=Boolean(opts.pullFirst||accountCloudPulledForKey!==curKey);
+      let remoteSnap=null;
+      if(needPull){
+        remoteSnap=await accountCloudStatePull();
+        if(syncEpoch!==accountSessionEpoch||(activeStateStorageKey||'')!==curKey)return false;
+        accountCloudPulledForKey=curKey;
+        if(remoteSnap){
+          applyAccountCloudSnapshot(remoteSnap);
+        }
+        if(appOpened&&typeof checkDailyGemRewards==='function'){
+          try{
+            const awardedDaily=checkDailyGemRewards(true);
+            if(awardedDaily&&typeof render==='function')render();
+          }catch(_){}
+        }
+      }
+      if(syncEpoch!==accountSessionEpoch||(activeStateStorageKey||'')!==curKey)return false;
+      const localSnap=buildAccountCloudSnapshot();
+      const localScore=accountCloudRealEvidenceScore(localSnap);
+      if(localScore>0||!remoteSnap){
+        const mergedFromServer=await accountCloudStatePush();
+        if(mergedFromServer&&syncEpoch===accountSessionEpoch&&(activeStateStorageKey||'')===curKey&&accountCloudRealEvidenceScore(mergedFromServer)>localScore){
+          applyAccountCloudSnapshot(mergedFromServer);
+        }
+      }
+      return true;
+    }catch(_){
+      return false;
+    }finally{
+      accountCloudSyncInflight=false;
+      accountCloudSyncPromise=null;
+    }
+  })();
+  accountCloudSyncPromise=run;
+  return run;
+}
+function startAccountCloudSyncNow(opts={}){
+  if(!brainSyncEnabled())return Promise.resolve(false);
+  try{clearTimeout(accountCloudSyncTimer);accountCloudSyncTimer=null}catch(_){}
+  if(accountCloudSyncPromise)return accountCloudSyncPromise;
+  return accountCloudStateSync(opts);
+}
+async function awaitAccountCloudSyncReady(timeoutMs=2000){
+  if(!brainSyncEnabled())return false;
+  const curKey=activeStateStorageKey||'';
+  if(accountCloudPulledForKey===curKey&&!accountCloudSyncPromise)return true;
+  if(typeof navigator!=='undefined'&&navigator.onLine===false)return false;
+  const p=startAccountCloudSyncNow({pullFirst:true});
+  const limit=Math.max(100,Number(timeoutMs)||2000);
+  try{
+    await Promise.race([p,new Promise(r=>{const t=setTimeout(r,limit);t?.unref?.()})]);
+  }catch(_){}
+  return accountCloudPulledForKey===curKey;
+}
+function pushPendingCloudStateOnHide(){
+  try{
+    if(!brainSyncEnabled())return false;
+    if(typeof navigator!=='undefined'&&navigator.onLine===false)return false;
+    const hadPending=Boolean(accountCloudSaveTimer||accountCloudSyncTimer||saveWriteQueued);
+    try{clearTimeout(accountCloudSaveTimer);accountCloudSaveTimer=null}catch(_){}
+    try{clearTimeout(accountCloudSyncTimer);accountCloudSyncTimer=null}catch(_){}
+    try{if(saveWriteQueued)saveFlushWrite()}catch(_){}
+    if(!hadPending&&accountCloudPulledForKey===(activeStateStorageKey||''))return false;
+    accountCloudStatePush({keepalive:true}).catch(()=>{});
+    return true;
+  }catch(_){return false}
+}
+function queueAccountCloudStateSync(delay=400,opts={}){
+  try{
+    if(!brainSyncEnabled())return false;
+    clearTimeout(accountCloudSyncTimer);
+    accountCloudSyncTimer=setTimeout(()=>{
+      accountCloudSyncTimer=null;
+      if(typeof navigator!=='undefined'&&navigator.onLine===false)return;
+      accountCloudStateSync(opts).catch(()=>{});
+    },Math.max(0,Number(delay)||0));
+    accountCloudSyncTimer?.unref?.();
+    return true;
+  }catch(_){return false}
+}
+function queueAccountCloudStateSyncOnSave(){
+  if(accountCloudApplying)return false;
+  if(!brainSyncEnabled())return false;
+  clearTimeout(accountCloudSaveTimer);
+  accountCloudSaveTimer=setTimeout(()=>{
+    accountCloudSaveTimer=null;
+    if(typeof navigator!=='undefined'&&navigator.onLine===false)return;
+    const needPull=accountCloudPulledForKey!==(activeStateStorageKey||'');
+    accountCloudStateSync({pullFirst:needPull}).catch(()=>{});
+  },1800);
+  accountCloudSaveTimer?.unref?.();
+  return true;
+}
+function ensureAccountCloudSyncOnSession(opts={}){
+  try{
+    if(!progressSyncSignedIn())return false;
+    const optedOut=state?.preferences?.brainSyncOptOut===true||(state?.preferences?.brainSync===false&&typeof progressSyncConsented==='function'&&progressSyncConsented()&&state?.preferences?.progressSyncConsent?.by!=='murid-login');
+    if(optedOut)return false;
+    if(state?.preferences?.brainSync!==true||(typeof progressSyncConsented==='function'&&!progressSyncConsented())){
+      const existingConsent=(typeof progressSyncConsented==='function'&&progressSyncConsented())?state.preferences.progressSyncConsent:{at:Date.now(),by:'murid-login'};
+      const prefs={...(state.preferences||{}),brainSync:true,progressSyncConsent:existingConsent};
+      delete prefs.brainSyncOptOut;
+      state.preferences=prefs;
+      save();
+    }
+    queueAccountCloudStateSync(opts.delay??50,{pullFirst:opts.pullFirst!==false});
+    queueBrainSyncFlush(opts.flushDelay??600);
+    return true;
+  }catch(_){return false}
 }
 function progressSyncAgo(at,nowMs=Date.now()){
   const menit=Math.max(0,Math.round((nowMs-Number(at||0))/60000));
@@ -5337,18 +6191,26 @@ function progressSyncStatusText(){
 /** Catat izin orang tua/wali (atau pernyataan murid dewasa) lalu nyalakan sinkron. */
 function progressSyncGiveConsent(by){
   const siapa=by==='dewasa'?'dewasa':'wali';
-  const prefs={...(state.preferences||{}),progressSyncConsent:{at:Date.now(),by:siapa}};
-  delete prefs.brainSync;
+  const prefs={...(state.preferences||{}),brainSync:true,progressSyncConsent:{at:Date.now(),by:siapa}};
+  delete prefs.brainSyncOptOut;
   state.preferences=prefs;save();
   queueBrainSyncFlush(300);
+  if(typeof queueAccountCloudStateSync==='function')queueAccountCloudStateSync(300,{pullFirst:true});
   setTimeout(()=>{try{progressSyncRestoreOffer()}catch(_){}},800);
   return true;
 }
 /** Matikan/nyalakan lagi. Mematikan TIDAK menghapus salinan server — itu tombol terpisah. */
 function progressSyncSetOn(on){
   if(on===true&&!progressSyncConsented())return false;
-  state.preferences={...(state.preferences||{}),brainSync:on===true?true:false};save();
-  if(on===true)queueBrainSyncFlush(300);
+  const enabled=on===true;
+  const prefs={...(state.preferences||{}),brainSync:enabled};
+  if(enabled)delete prefs.brainSyncOptOut;
+  else prefs.brainSyncOptOut=true;
+  state.preferences=prefs;save();
+  if(enabled){
+    queueBrainSyncFlush(300);
+    if(typeof queueAccountCloudStateSync==='function')queueAccountCloudStateSync(300,{pullFirst:true});
+  }
   return true;
 }
 /** Hapus seluruh salinan progres di server milik akun ini, lalu matikan sinkron. */
@@ -5357,7 +6219,10 @@ async function progressSyncDeleteServer(){
     const r=await progressSyncFetch('/api/brain/attempts/delete',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});
     if(!r||!r.ok)return {ok:false};
     const d=await r.json().catch(()=>null);
-    state.preferences={...(state.preferences||{}),brainSync:false};save();
+    accountCloudPulledForKey='';
+    try{clearTimeout(accountCloudSyncTimer);accountCloudSyncTimer=null}catch(_){}
+    try{clearTimeout(accountCloudSaveTimer);accountCloudSaveTimer=null}catch(_){}
+    state.preferences={...(state.preferences||{}),brainSync:false,brainSyncOptOut:true};save();
     brainSyncWrite({queue:[],sent:[],lastPushedAt:0,lastCheckedAt:0,lastErrorAt:0,saving:false,owner:''});
     return {ok:true,deleted:Number(d?.deleted)||0};
   }catch{return {ok:false}}
@@ -10188,76 +11053,87 @@ function showAuthGate(at,next){
          menanyakannya lagi. Kode KelasKu dari layar masuk dipakai persis seperti kode yang
          dulu diketik di perkenalan - disimpan, lalu guru diberi tahu murid ini bergabung. */
       try{self.FiezelOnboarding?.markLocaleSelected?.(self,self.FiezelI18n?.getLocale?.()||'id')}catch(_){}
+      const gEmail=self.FiezelGoogle?.rememberedEmail?.()||email||'';
+      const acc=self.FiezelAccount?.getAccount?.()||self.FiezelAccount?.state?.();
+      const h=acc?.handle||handle||'';
       try{
-        const gEmail=self.FiezelGoogle?.rememberedEmail?.()||email||'';
-        const acc=self.FiezelAccount?.getAccount?.()||self.FiezelAccount?.state?.();
-        const h=acc?.handle||handle||'';
         if(gEmail){
           activateAccountState('g_'+gEmail.replace(/[^A-Za-z0-9_-]/g,'_').slice(0,64));
         }else if(h){
           activateAccountState(h);
-          if(!state.userName||state.userName===FALLBACK_LEARNER_NAME)state.userName=h;
           try{rememberSocialHandle(h)}catch(_){}
           save();
         }
-        /* m025-688: Murid yang login (bukan pendaftaran akun baru pertama kali) adalah murid lama
-           atau pengguna akun yang kembali. Mereka tidak boleh dipaksa mengulang onboarding 6 langkah
-           (nama, kursus, tujuan, tes penempatan) di HP baru/sesudah keluar. Tandai onboarding selesai
-           dan pastikan nama terisi agar langsung masuk ke Beranda (Homepage). */
-        const hasLocalProgress = Boolean(
-          state && (state.totalAnswered > 0 || state.placementDone || (Array.isArray(state.history) && state.history.length > 0))
-        );
-        const isReturningStudent = role === 'murid' && (
-          via === 'guest' ||
-          via === 'local_bypass' ||
-          (via === 'google' ? (isNew === false || hasLocalProgress) : (action === 'masuk' || isNew === false || hasLocalProgress))
-        );
-        if(isReturningStudent){
-          const fallbackGName=gEmail?gEmail.split('@')[0].replace(/[._-]/g,' ').replace(/\b\w/g,c=>c.toUpperCase()):'';
-          const finalName=String(state?.userName||h||fallbackGName||'').trim()||'Murid';
-          if(!state.userName||state.userName===FALLBACK_LEARNER_NAME){
-            state.userName=finalName;
-          }
-          state.level=state.level||1;
-          if(!state.placementDone)state.placementDone=true;
-          state.streak=Math.max(Number(state.streak)||0,1);
-          if(!state.gems||typeof state.gems!=='object'||typeof state.gems.balance!=='number'){
-            state.gems={balance:(typeof state.gems==='number'&&!Number.isNaN(state.gems))?state.gems:120};
-          }
-          save();
-          try{
-            const onbLocale=self.FiezelI18n?.getLocale?.()||state?.preferences?.learnerLocale||'id';
-            const onbCourse=state?.preferences?.targetLang||'en';
-            if(self.FiezelOnboarding?.markCompleted){
-              self.FiezelOnboarding.markCompleted(self,{
-                at:Date.now(),
-                via:via==='google'?'google_login':'account_login',
-                name:finalName,
-                locale:onbLocale,
-                role:'murid',
-                course:onbCourse
-              });
-            }else{
-              const ob=JSON.parse(localStorage.getItem('fiezel-onboarding-v1')||'{}');
-              ob.done=true;
-              ob.at=Date.now();
-              ob.via=via==='google'?'google_login':'account_login';
-              ob.name=finalName;
-              ob.locale=onbLocale;
-              ob.role='murid';
-              ob.course=onbCourse;
-              localStorage.setItem('fiezel-onboarding-v1',JSON.stringify(ob));
-            }
-          }catch(_){}
-        }
       }catch(_){}
-      if(role==='murid'&&classCode){
-        saveClassCode(classCode);
-        try{self.FiezelLearnerFlow?.announceJoin?.()}catch(_){}
-        try{self.FiezelInbox?.poll?.(true)}catch(_){}
+      const finishReturningAndNext=()=>{
+        try{
+          /* m025-688 + m025-806: Setelah snapshot akun ditarik dari server, hidratkan status murid kembali tanpa menimpa GEM/nama/streak/kursus asli. */
+          const hasLocalProgress=Boolean(
+            state&&(state.totalAnswered>0||state.placementDone||(Array.isArray(state.history)&&state.history.length>0)||gemsBalance()>0||Number(state.streak||0)>0||Number(state.level||1)>1)
+          );
+          const isReturningStudent=role==='murid'&&(
+            via==='guest'||
+            via==='local_bypass'||
+            (via==='google'?(isNew===false||hasLocalProgress):(action==='masuk'||isNew===false||hasLocalProgress))
+          );
+          if(isReturningStudent){
+            const fallbackGName=gEmail?gEmail.split('@')[0].replace(/[._-]/g,' ').replace(/\b\w/g,c=>c.toUpperCase()):'';
+            const existingReal=(state?.userName&&!isPlaceholderAccountName(state.userName)&&state.userName!==FALLBACK_LEARNER_NAME)?state.userName:'';
+            const finalName=String(existingReal||h||fallbackGName||'').trim()||'Murid';
+            if(!existingReal){
+              state.userName=finalName;
+            }
+            state.level=state.level||1;
+            if(!state.placementDone)state.placementDone=true;
+            state.streak=Math.max(Number(state.streak)||0,1);
+            if(!state.gems||typeof state.gems!=='object'||state.gems.schema!=='fiezel-gems-v1'){
+              state.gems=sanitizeGemsState(state.gems);
+            }
+            save();
+            try{
+              const onbLocale=self.FiezelI18n?.getLocale?.()||state?.preferences?.learnerLocale||'id';
+              const onbCourse=(typeof activeTargetLang==='function'?activeTargetLang():state?.preferences?.targetLang)||'en';
+              const obName=state.userName||finalName;
+              if(self.FiezelOnboarding?.markCompleted){
+                self.FiezelOnboarding.markCompleted(self,{
+                  at:Date.now(),
+                  via:via==='google'?'google_login':'account_login',
+                  name:obName,
+                  locale:onbLocale,
+                  role:'murid',
+                  course:onbCourse
+                });
+              }else{
+                const ob=JSON.parse(localStorage.getItem('fiezel-onboarding-v1')||'{}');
+                ob.done=true;
+                ob.at=Date.now();
+                ob.via=via==='google'?'google_login':'account_login';
+                ob.name=obName;
+                ob.locale=onbLocale;
+                ob.role='murid';
+                ob.course=onbCourse;
+                localStorage.setItem('fiezel-onboarding-v1',JSON.stringify(ob));
+              }
+            }catch(_){}
+          }else if(h&&(!state.userName||isPlaceholderAccountName(state.userName))){
+            state.userName=h;
+            save();
+          }
+        }catch(_){}
+        if(role==='murid'&&classCode){
+          saveClassCode(classCode);
+          try{self.FiezelLearnerFlow?.announceJoin?.()}catch(_){}
+          try{self.FiezelInbox?.poll?.(true)}catch(_){}
+        }
+        if(role==='guru'){state.view='tutor'}
+        try{if(typeof next==='function')next()}catch(_){}
+      };
+      const needCloudWait=role==='murid'&&via!=='guest'&&via!=='local_bypass'&&typeof brainSyncEnabled==='function'&&brainSyncEnabled()&&(accountCloudPulledForKey!==(activeStateStorageKey||'')||accountCloudSyncInflight||Boolean(accountCloudSyncPromise));
+      if(needCloudWait&&typeof awaitAccountCloudSyncReady==='function'){
+        awaitAccountCloudSyncReady(2000).then(finishReturningAndNext,finishReturningAndNext);
+        return;
       }
-      if(role==='guru'){state.view='tutor'}
-      try{if(typeof next==='function')next()}catch(_){}
+      finishReturningAndNext();
     }
   });
 }
@@ -12272,9 +13148,9 @@ function todayHomeMarkup(){
     + `<span>${esc(FiezelI18n.t('home.semangat-sub-2', 'Kamu pasti bisa!'))}</span>`
     + `</div>`
     + `</div>`
-    + `<div class="fz-vissol-mascot-wrap${(typeof window !== 'undefined' && (window.FiezelMochiCompanion || window.FiezelMochi)) ? ' has-3d-mochi' : ''}" role="button" tabindex="0" aria-label="Mochi 3D Mascot" data-testid="home-mochi-mascot" onclick="try{window.FiezelMochiCompanion?.interact?.();}catch(_){}" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();try{window.FiezelMochiCompanion?.interact?.();}catch(_){}}">`
+    + `<div class="fz-vissol-mascot-wrap${(typeof window !== 'undefined' && !(window.FiezelMochiCompanion?.isFailed?.()) && !(window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches)) ? ' has-3d-mochi' : ''}" role="button" tabindex="0" aria-label="Mochi 3D Mascot" data-testid="home-mochi-mascot" onclick="try{window.FiezelMochiCompanion?.interact?.();}catch(_){}" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();try{window.FiezelMochiCompanion?.interact?.();}catch(_){}}">`
     + `<div class="fz-vissol-mascot-cloud-bg" aria-hidden="true"></div>`
-    + `<img src="./assets/brand/paw-mochi-idle.svg" alt="Mochi Mascot" class="fz-vissol-mascot-img"${(typeof window !== 'undefined' && (window.FiezelMochiCompanion || window.FiezelMochi)) ? ' style="display:none;"' : ''} />`
+    + `<img src="./assets/brand/paw-mochi-idle.svg" alt="Mochi Mascot" class="fz-vissol-mascot-img"${(typeof window !== 'undefined' && !(window.FiezelMochiCompanion?.isFailed?.()) && !(window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches)) ? ' style="display:none;"' : ''} />`
     + `</div>`
     + (currentStreak > 0 ? `<div class="tactile-streak-badge" style="display:none;" title="${esc(FiezelI18n.t('today.streak', { days: currentStreak }))}">`
     + flameSvg
@@ -13764,7 +14640,14 @@ function shellCssSettled(){
       var extras=self.document.querySelectorAll('link[data-fz-shell-css]');
       for(var i=0;extras&&i<extras.length;i++){
         var el=extras[i];
-        if(el&&el.media==='print'&&el.dataset?.fzShellReady!=='1'&&el.dataset?.fzShellReady!=='error'){extraOk=false;break}
+        if(el&&el.media==='print'&&el.dataset?.fzShellReady!=='1'&&el.dataset?.fzShellReady!=='error'){
+          // WebKit/iOS PWA cached <link media="print"> quirk: sheet is already attached even if onload was skipped
+          if(el.sheet){
+            try{el.media='all';if(el.dataset)el.dataset.fzShellReady='1'}catch(_){}
+          }else{
+            extraOk=false;break;
+          }
+        }
       }
     }
     if(self.__fzShellCss==='ready')return extraOk;
@@ -13792,6 +14675,20 @@ function dismissBootSplash(){
     setTimeout(dismissBootSplash,60);
     return true;
   }
+  // Safety promotion: before lifting splash, force-promote any still-print shell CSS links so Home never FOUC-morphs
+  try{
+    if(typeof self.document?.querySelectorAll==='function'){
+      var pendingCss=self.document.querySelectorAll('link[data-fz-shell-css]');
+      for(var pi=0;pendingCss&&pi<pendingCss.length;pi++){
+        if(pendingCss[pi]&&pendingCss[pi].media==='print'){
+          pendingCss[pi].media='all';
+          if(pendingCss[pi].dataset)pendingCss[pi].dataset.fzShellReady='1';
+        }
+      }
+    }
+    var mainCss=self.document?.querySelector?.('link[href="./style.css"]');
+    if(mainCss&&mainCss.rel==='preload'){mainCss.rel='stylesheet';self.__fzShellCss='ready'}
+  }catch(_){}
   try{self.__fiezelBootSplash?.clearRecovery?.()}catch(_){}
   try{self.__fiezelBootSplash?.clearWatchdog?.()}catch(_){}
   try{const r=self.document?.getElementById?.('fiezelBootRecovery');if(r)r.remove()}catch(_){}
@@ -14294,16 +15191,21 @@ function openFiezelAuthModal(initialTab){
     const host=$('authGoogleBtn');
     const status=$('authGoogleStatus');
     if(!host||!self.FiezelGoogle?.renderButton)return;
-    const hasil=await self.FiezelGoogle.renderButton(host,(res)=>{
+    const hasil=await self.FiezelGoogle.renderButton(host,async(res)=>{
       const errBox=$('authModalError');
       if(res?.ok){
         const email=res.email||self.FiezelGoogle?.rememberedEmail?.()||'';
+        try{self.FiezelAuthScreen?.saveSession?.(self,{role:'murid',via:'google',email:res.email||email,name:res.name||''})}catch(_){}
         if(email){
           activateAccountState('g_'+email.replace(/[^A-Za-z0-9_-]/g,'_').slice(0,64));
+        }
+        if(typeof awaitAccountCloudSyncReady==='function'){
+          await awaitAccountCloudSyncReady(2000).catch(()=>{});
         }
         if(status)status.textContent=FiezelI18n.t('google.status-masuk',{email:res.email||''});
         showToast(res.linked?FiezelI18n.t('google.toast-tertaut'):FiezelI18n.t('google.toast-berhasil'));
         closeModal();
+        try{render()}catch(_){}
         setTimeout(openSettings,100);
         return;
       }
@@ -14430,13 +15332,20 @@ function openFiezelAuthModal(initialTab){
             if(res?.ok){
               const h=res.account?.handle||self.FiezelAccount?.getAccount?.()?.handle||handle;
               if(h){
+                try{self.FiezelAuthScreen?.saveSession?.(self,{role:'murid',via:'akun',name:h})}catch(_){}
                 activateAccountState(h);
-                state.userName=h;
                 try{rememberSocialHandle(h)}catch(_){}
-                save();
+                if(typeof awaitAccountCloudSyncReady==='function'){
+                  await awaitAccountCloudSyncReady(2000).catch(()=>{});
+                }
+                if(!state.userName||isPlaceholderAccountName(state.userName)){
+                  state.userName=h;
+                  save();
+                }
               }
               showToast(`Berhasil masuk sebagai @${h}`);
               closeModal();
+              try{render()}catch(_){}
               setTimeout(openSettings,100);
               return;
             }
@@ -14452,13 +15361,18 @@ function openFiezelAuthModal(initialTab){
             if(res?.ok){
               const h=res.account?.handle||self.FiezelAccount?.getAccount?.()?.handle||handle;
               if(h){
+                try{self.FiezelAuthScreen?.saveSession?.(self,{role:'murid',via:'akun',name:h})}catch(_){}
                 activateAccountState(h);
-                state.userName=h;
+                if(!state.userName||isPlaceholderAccountName(state.userName))state.userName=h;
                 try{rememberSocialHandle(h)}catch(_){}
                 save();
+                if(typeof awaitAccountCloudSyncReady==='function'){
+                  await awaitAccountCloudSyncReady(2000).catch(()=>{});
+                }
               }
               showToast(FiezelI18n.t('account.toast-dibuat',{handle:h}),'success');
               closeModal();
+              try{render()}catch(_){}
               setTimeout(openSettings,100);
               return;
             }
@@ -14748,6 +15662,7 @@ function gemsHook(){
       const n=Math.max(0,Math.floor(Number(amount)||0));if(!n)return 0;
       state.gems=g.gemsEarn(state.gems,n,reason||'listening_streak_5',Date.now(),sessionId,String(meta?.level||''));
       save();
+      try{if(typeof queueAccountCloudStateSync==='function')queueAccountCloudStateSync(250,{pullFirst:false})}catch(_){}
       try{showToast(g.toastFor(meta?.streak,n))}catch(_){}
       try{celebrate()}catch(_){}
       // [ADAPTASI] OA-7 §4: streak_5 pada momen streak beruntun yang sama dengan pawReact.
@@ -14765,6 +15680,7 @@ function gemsHook(){
       const r=g.gemsSpend(state.gems,cost,reason||'translation_session',Date.now(),sessionId);
       if(!r.ok)return false;
       state.gems=r.gems;save();
+      try{if(typeof queueAccountCloudStateSync==='function')queueAccountCloudStateSync(250,{pullFirst:false})}catch(_){}
       // [FASE-8] 09 §3.1 GEMS_SPEND: membelanjakan gem = memberi hadiah pada diri
       // sendiri → love singkat, tanpa bunyi (uang keluar tidak difanfarekan).
       try{pawReact('favorite')}catch(_){}
@@ -14845,6 +15761,7 @@ async function checkPendingGemGrants(silent = false) {
       }
       if (totalGems > 0) {
         save();
+        try{if(typeof queueAccountCloudStateSync==='function')queueAccountCloudStateSync(250,{pullFirst:false})}catch(_){}
         try {
           const xVal = $('topbarXpVal');
           if (xVal && (state.xp === undefined || state.xp === null)) {
@@ -14914,9 +15831,15 @@ function checkDailyGemRewards(silent = false) {
   }
   const dr = state.dailyRewards;
   let awardedAny = false;
+  const curCloudKey = activeStateStorageKey || '';
+  const deferLoginBonusForCloudSync = Boolean(
+    typeof brainSyncEnabled === 'function' && brainSyncEnabled() &&
+    accountCloudPulledForKey !== curCloudKey &&
+    (accountCloudSyncInflight || accountCloudSyncPromise || accountCloudSyncTimer)
+  );
 
   // 1. Bonus Login Harian: +5 Gem (1x per hari kalender)
-  if (!dr.loginBonusClaimed) {
+  if (!dr.loginBonusClaimed && !deferLoginBonusForCloudSync) {
     dr.loginBonusClaimed = true;
     const g = gemsCore();
     if (g && typeof g.gemsEarn === 'function') {
@@ -14967,6 +15890,14 @@ function checkDailyGemRewards(silent = false) {
         }
       } catch (_) {}
     }
+  }
+
+  if (awardedAny) {
+    try {
+      if (typeof queueAccountCloudStateSync === 'function') {
+        queueAccountCloudStateSync(250, { pullFirst: false });
+      }
+    } catch (_) {}
   }
 
   return awardedAny;
@@ -21792,7 +22723,7 @@ function resetProgress(){openModal(`<div class="modal-mark">FIEZEL</div><h2>${Fi
   try{localStorage.removeItem(UNDERCOVER_EVIDENCE_KEY)}catch{}
   try{const q=braincoreEvidenceQueue();if(q&&typeof q.purge==='function'){const p=q.purge();if(p&&typeof p.catch==='function')p.catch(()=>{})}}catch{}
   try{const q=identityEvidenceQueue();if(q&&typeof q.purge==='function'){const p=q.purge();if(p&&typeof p.catch==='function')p.catch(()=>{})}}catch{}
-  state=loadState();if(activeAccountUuid)state.ownerUuid=activeAccountUuid;coreBrainCache=null;save();closeModal();go('home');showToast(FiezelI18n.t('settings.progres-akun-berhasil-direset'),'success')}}
+  state=loadState();if(activeAccountUuid)state.ownerUuid=activeAccountUuid;coreBrainCache=null;save();closeModal();go('home');showToast(FiezelI18n.t('settings.progres-akun-berhasil-direset'),'success');try{accountCloudPulledForKey='';clearTimeout(accountCloudSyncTimer);clearTimeout(accountCloudSaveTimer);if(brainSyncEnabled()&&typeof progressSyncFetch==='function')progressSyncFetch('/api/brain/attempts/delete',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'}).catch(()=>{})}catch(_){}}}
 document.addEventListener?.('keydown',e=>{if(e.key==='Escape'&&!$('modal')?.classList.contains('hidden'))closeModal()});
 document.addEventListener?.('click',function modalBackdropClick(e){if(e.target&&e.target.id==='modal'&&!e.target.classList.contains('hidden'))closeModal()});
 /* q17-S1 2026-08-29: trap Tab di dalam dialog \u2014 latar tidak boleh bisa dijelajah selama modal terbuka (aria-modal jujur). Siklus manual first<->last, tanpa inert supaya kompatibel luas. */
@@ -24698,8 +25629,11 @@ async function accountSubmit(){
       return true;
     }
     const accHandle=String(st?.handle||handle||'').trim();
-    try{activateAccountState(accHandle||'murid')}catch(_){}
     try{self.FiezelAuthScreen?.saveSession?.(self,{role:'murid',via:'akun',name:accHandle})}catch(_){}
+    try{activateAccountState(accHandle||'murid')}catch(_){}
+    if(typeof awaitAccountCloudSyncReady==='function'){
+      await awaitAccountCloudSyncReady(2000).catch(()=>{});
+    }
     showToast(FiezelI18n.t('account.signed-in',{handle:accHandle||handle}),'success');
     try{render()}catch(_){}
     return true;
@@ -24737,8 +25671,11 @@ function accountStatusLine(){
  */
 function accountBootRefresh(){
   const core=accountCore();if(!core)return false;
+  const bootEpoch=accountSessionEpoch;
   const t=setTimeout(()=>{
+    if(bootEpoch!==accountSessionEpoch)return;
     core.refresh().then(r=>{
+      if(bootEpoch!==accountSessionEpoch)return;
       if(r&&r.ok){
         if(isVerifiedTeacher()){
           try{localStorage.setItem('fz_teacher_mode','1')}catch(_){}
@@ -24746,6 +25683,9 @@ function accountBootRefresh(){
           try{save()}catch(_){}
           if(state.view!=='tutor')go('tutor');
         }else{
+          const h=String(core.state()?.handle||'').trim();
+          if(h&&!activeAccountUuid){try{activateAccountState(h)}catch(_){}}
+          else{try{ensureAccountCloudSyncOnSession({pullFirst:true})}catch(_){}}
           repaintQuietly();
         }
       }
@@ -24801,6 +25741,7 @@ setTimeout(()=>{
     maybeSyncLearnerName();
   }catch(_){}
   try{itemPoolSync()}catch(_){}
+  try{if(progressSyncSignedIn())ensureAccountCloudSyncOnSession({pullFirst:true})}catch(_){}
   try{queueBrainSyncFlush(0)}catch(_){}/* Audit F2: sisa riwayat dari sesi offline sebelumnya */
   try{progressSyncRestoreOffer()}catch(_){}/* m025-464: HP baru -> tawarkan pulihkan progres dari akun */
 },2500);
@@ -24815,6 +25756,7 @@ if(typeof window!=='undefined'&&window.addEventListener){
     /* Audit offline F2/F4/F5 2026-10-04: yang tertahan selama offline ikut dikirim begitu koneksi
        kembali - riwayat BrainCore (bila murid menyalakan sinkron), ringkasan aktivitas untuk
        pengingat, dan antrean hasil kebijakan sesi - bukan menunggu sesi online berikutnya. */
+    try{queueAccountCloudStateSync(800,{pullFirst:true})}catch(_){}
     try{queueBrainSyncFlush(1500)}catch(_){}
     try{if(Number(state?.totalAnswered||0)>0)queueRemoteActivitySync()}catch(_){}
     try{if(state?.policyOutcomeMeta?.queue?.length)flushPolicyOutcomeQueue()}catch(_){}
@@ -24829,12 +25771,19 @@ if(typeof document!=='undefined'&&document.addEventListener){
         if(identityEvidenceActive())identityEvidenceFlush();
         if(braincoreEvidenceMode()==='on')braincoreEvidenceFlush();
       }catch(_){}
+    }else if(document.visibilityState==='hidden'){
+      try{pushPendingCloudStateOnHide()}catch(_){}
     }
+  });
+}
+if(typeof window!=='undefined'&&window.addEventListener){
+  window.addEventListener('pagehide',()=>{
+    try{pushPendingCloudStateOnHide()}catch(_){}
   });
 }
 /* ============================== akhir blok SOSIAL (SLOT 7) ========================== */
 window.istilahMurid=istilahMurid;/* dipapar untuk gerbang QA: penerjemah enum harus bisa disapu penuh */window.__getFiezelData=()=>({vocab:V.length,reading:R.length,grammar:Object.keys(G).length});window.__fiezelAudit={showBrandSplash,showOnboarding,prefersReducedMotion,readInstallHealth,installHealthReportMarkup,buildBackupFile,previewRestoreForState,applyRestore,continuitySettingsMarkup,academicReadinessMarkup,unifiedSkillsMarkup,buildPersonalJourney,journeyMarkup,setGoalProfile,loadState,sanitizeState,validateQuestion,makeGrammarQuestion,makeReadingQuestion,makeVocabQuestion,buildGrammarLessonQuestions,buildPlacement,startLevelPlacement,/* m025-246: dipapar untuk regression-test - gerbang itu harus bisa MENANYAKAN ukuran rencana penempatan, bukan memaku 25 dan merah setiap kali ukurannya berubah dengan sengaja. */placementSize,placementBlueprint,/* cetak biru PENUH dipapar terpisah: gerbang harus tetap bisa menjaga invarian 'penempatan penuh memuat ketiga jenis konten' walau jalur murid memakai cetak biru lite */PLACEMENT_BLUEPRINT_FULL:PLACEMENT_BLUEPRINT,buildAdaptivePool,getScenePalette,getCelestialState,getDiagnosticProfile,buildLearningSnapshot,buildLearnerEvidenceModel,remoteLearnerEvidenceSnapshot,deriveAdaptivePolicy,buildAdaptivePolicy,adaptivePolicyRequestPayload,sanitizeAdaptivePolicy,/* m025-201: dipapar untuk tests/core-policy-parity-test.js - gerbang paritas tidak bisa membandingkan apa yang tidak bisa ia panggil */capRationaleCodes,policyEffectiveness,sanitizePolicyEffectiveness,resolveAdaptivePolicy,evaluatePolicyOutcome,sanitizePolicyOutcome,recordPolicyOutcomeFromSession,backfillPolicyOutcomes,recentPolicyOutcomes,policyOutcomeSummary,buildALRSContext,selectALRSDecision,buildCreatorReport,validReportEndpoint,forgettingProbability,scheduleNext,coreBrainMemory,tutorSession,tutorObserve,misconceptionLedgerRead,misconceptionLedgerActive,coreBrainAttempts,quizPredictedSuccess,evidenceKappa,bktRead,bktRecord,bktShadowMarkup,brainManifestMarkup,learningTelemetryMode,learningTelemetryEmitAnswer,learningTelemetryStudyDay,braincoreEvidenceMode,braincoreEvidenceCohort,braincoreEvidenceCohortForBuild,braincoreEvidenceDay,braincoreEvidenceEmitSnapshot,activeLevelOverallMastery,braincoreEvidenceEmitDecision,braincoreEvidenceFlush,braincoreEvidenceObserveSession,braincoreDecisionReason,braincoreEvidenceAnyLaneActive,identityEvidenceMode,learnerNameSyncToServer,maybeSyncLearnerName,identityEvidenceActive,identityEvidenceMirror,identityEvidenceFlush,forgetLearnerEvidence,confusionMatrixRead,confusionMatrixRecord,affectObserve,affectSessionSync,affectTargetSuccess,listeningAdaptivePolicy,olmPanelMarkup,coreBrainPanelMarkup,diagnosticEvidenceReady,skillTimeline,errorPatterns,confusionPairs,diagnosticReport,confidenceCalibration,dueItems,selectLoginMessage,notificationPermission,checkStudyReminders,lastLearningAt,beginLearningSession,abandonActiveSession,completeActiveSession,/* Fase 3 (C5): kalibrasi item, cloze, OLM negotiated, SRL, speaking adaptif, step tutor */itemCalibrationRead,itemCalibrationObserve,itemCalibrationEffective,calibrationItemId,ensureClozeBank,makeClozeQuestion,clozeAdaptivePicks,clozeSkillReady,clozeProductionRecord,olmSummarizeInput,olmDispute,olmProbeNextSkill,olmProbeConsume,olmNegotiationRead,srlSessionPlan,srlPredictPrompt,srlCaptureConfidence,srlReflect,srlSessionSync,speakingCoverageRows,speakingAdaptiveEvidence,speakingAdaptivePolicy,stepTutorGuidance,stepTutorGuidanceMarkup,isLearnerOverwhelmed,record,quizLoop,startAdaptive,/* m025-308: dipapar untuk tests/th-content-overlay-test.js. Gerbang itu harus bisa memanggil overlay yang SUNGGUHAN lalu membacanya lewat jalur baca yang dipakai penyaji - kalau ia hanya boleh memeriksa isi sidecar, ia mengulang kebutaan yang justru membiarkan 45 petunjuk writing dan 96 umpan balik reading-exam menganggur. */applyContentLocale,writingPromptPool,writingExamTask,readingExamSets,makeExamReadingQuestion,/* m025-314: dipapar untuk tests/target-lang-surface-guard-test.js. Gerbang itu harus bisa MEMANGGIL daftar kartu yang sungguhan lalu membacanya, bukan menebak dari pola teks di app.js - penjaga yang hanya diuji lewat grep akan tetap hijau saat kartunya dipindah ke fungsi lain. */latihanCards,skillHubModel,skillHubMarkup,continueLearningCard,aiBoosterCard,targetLangSurfaceBlocked,targetLangVoiceBlocked,courseLanguageLabel,/* `state` adalah binding modul, jadi ia TIDAK muncul sebagai properti global di vm - gerbang yang perlu menggeser bahasa target atau membaca layar aktif tidak punya jalan lain. Diekspor sebagai FUNGSI, bukan nilai: salinan yang diambil saat berkas dimuat akan basi begitu state ditugaskan ulang (loadState dipanggil lagi saat akun berpindah). */liveState:()=>state,/* B1 (m025-317): dipapar untuk tests/target-lang-progress-isolation-test.js. Gerbang itu harus MENJALANKAN jalur simpan/muat yang sungguhan di kedua bahasa - sumbu yang hanya diuji lewat modulnya adalah persis cara cacat ini bertahan berbulan-bulan. */saveFlushWrite,switchTargetLangStorage,progressStorageKey,pickProgress,sideStateKey,PROGRESS_STATE_FIELDS,PROGRESS_PREF_FIELDS,/* Migrasi sekali-jalan saat murid masuk akun. Dipapar karena inilah satu-satunya jalur yang bisa MENELANTARKAN progres bahasa: ia lahir sebelum ruang nama @lang ada. Gerbang harus menjalankannya, bukan membaca namanya. */activateAccountStateFromPuter,migrateSideStateToAccount,FIEZEL_TARGET_COURSE_KEY,decisionTrace:()=>self.FiezelDecisionTrace,presenceEngine:()=>self.FiezelPresenceEngine,/* m025-375: dipapar untuk tests/policy-evidence-window-test.js - gerbang harus bisa memanggil jendela bukti dan panel Home yang sungguhan. */policyEvidenceArms,policyEvidenceMin,policyEvidenceProgress,evidenceProgressPanelMarkup,todayHomeMarkup,/* m025-376: dipapar untuk tests/self-tune-retention-test.js. */selfTuneAfterOutcome,selfTuneTargetFor,selfTuneRetentionArms,loadSelfTuneState,retentionProbeResults,RETENTION_PROBE_KEY,SELF_TUNE_KEY,/* Audit UI/UX Home 2026-09-27: dipapar untuk tests/home-honesty-test.js. */homeWeekStats,homeVocabStats,HOME_WEEK_MIN,/* Braincore langkah 2: dipapar untuk tests/item-pool-test.js - gerbang harus menjalankan jalur catat/kirim/baca yang sungguhan. */itemPoolObserve,itemPoolFlush,itemPoolRefreshTable,itemPoolEffective,itemPoolCanonicalPrior,itemPoolPriorPrediction,itemPoolTable,ITEM_POOL_KEY,ITEM_POOL_TABLE_KEY,/* langkah 3 */itemPoolProbePrediction,itemPoolObserveProbe};
-Object.assign(window.__fiezelAudit,{brainConfigAvailable,FSRS6_SHADOW_KEY,fsrsShadowAllowed,fsrsShadowRead,fsrsShadowStep,fsrsShadowCompareSnapshot});
+Object.assign(window.__fiezelAudit,{brainConfigAvailable,FSRS6_SHADOW_KEY,fsrsShadowAllowed,fsrsShadowRead,fsrsShadowStep,fsrsShadowCompareSnapshot,activateAccountState,deactivateAccountState,findBestStoredStudentState,buildAccountCloudSnapshot,mergeAccountCloudSnapshotsClient,applyAccountCloudSnapshot,accountCloudStateSync,ensureAccountCloudSyncOnSession,awaitAccountCloudSyncReady,pushPendingCloudStateOnHide,accountCloudRealEvidenceScore});
 window.FIEZEL_TARGET_COURSE_KEY=FIEZEL_TARGET_COURSE_KEY;
 window.startVocabQuiz=startVocabQuiz;window.buildAdaptivePool=buildAdaptivePool;window.buildGrammarLessonQuestions=buildGrammarLessonQuestions;window.getScenePalette=getScenePalette;window.getCelestialState=getCelestialState;window.playFeedbackSound=playFeedbackSound;window.updateMastery=updateMastery;window.bktRecord=bktRecord;window.record=record;window.undercoverEvidenceDrain=undercoverEvidenceDrain;window.misconceptionLedgerRecord=misconceptionLedgerRecord;window.markMastered=markMastered;window.__getFiezelState=()=>state;window.__fiezelValidViews=()=>[...VALID_VIEWS];window.__fiezelDueReviews=()=>dueItems().length;window.buildAdaptivePolicy=buildAdaptivePolicy;window.studyDayKey=studyDayKey;window.startAdaptive=startAdaptive;window.showToast=showToast;window.answerFeedbackSignal=answerFeedbackSignal;window.practiceSkill=practiceSkill;window.openReadingLevel=openReadingLevel;window.startReadingRandom=startReadingRandom;window.startReadingAdaptive=startReadingAdaptive;window.startPlacement=startPlacement;window.startLevelPlacement=startLevelPlacement;window.startLevelPractice=startLevelPractice;window.startAdaptive=startAdaptive;window.resetProgress=resetProgress;window.closeModal=closeModal;window.openSettings=openSettings;window.openReportPreview=openReportPreview;window.sendCreatorReport=sendCreatorReport;window.askCoachAI=askCoachAI;window.dismissWelcome=dismissWelcome;window.requestStudyNotificationPermission=requestStudyNotificationPermission;window.declineStudyNotifications=declineStudyNotifications;window.skipPuterSignIn=skipPuterSignIn;window.attemptGoogleSignIn=attemptGoogleSignIn;window.shouldPresentPuterPopup=shouldPresentPuterPopup;window.notifyAppUpdateIfNew=notifyAppUpdateIfNew;window.setConfidence=setConfidence;window.explainWithAI=explainWithAI;window.explainWordWithAI=explainWordWithAI;window.olmDispute=olmDispute;/* Fase 3 (C5 butir 3): handler tombol sanggah di panel OLM */
 // m025-84: dipasang di ujung berkas, saat go()/state/VALID_VIEWS sudah ada, dan SEBELUM

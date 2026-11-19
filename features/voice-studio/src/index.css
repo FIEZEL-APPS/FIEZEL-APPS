@@ -676,24 +676,21 @@ rt.zh-rt {
 
 @keyframes fzStabiloGlow {
   0% {
-    opacity: 0.55;
-    transform: scale(1);
+    opacity: 0.65;
     box-shadow: 0 0 0 rgba(250, 204, 21, 0);
   }
   45% {
     opacity: 1;
-    transform: scale(1.14);
-    box-shadow: 0 4px 16px rgba(245, 158, 11, 0.52);
+    box-shadow: 0 4px 16px rgba(245, 158, 11, 0.56);
   }
   100% {
     opacity: 1;
-    transform: scale(1.05);
     box-shadow: 0 2px 10px rgba(250, 204, 21, 0.38);
   }
 }
 
 .fz-keyword-highlight {
-  display: inline-block;
+  display: inline;
   background: linear-gradient(
     104deg,
     rgba(254, 240, 138, 0.28) 0%,
@@ -707,7 +704,7 @@ rt.zh-rt {
   padding: 0 4px;
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
-  transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 320ms ease;
+  transition: box-shadow 260ms ease, filter 260ms ease;
 }
 
 .fz-keyword-highlight-active {
@@ -821,10 +818,146 @@ rt.zh-rt {
 .fz-atelier-wave-bar-4 { animation-delay: 420ms; animation-duration: 0.9s; }
 .fz-atelier-wave-bar-5 { animation-delay: 560ms; animation-duration: 1.08s; }
 
+/* Tactile Floating Studio Start Popup (Physical Spring Push-Button + Acoustic Ring Burst) */
+@keyframes fzStudioModalEnter {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 16px, 0) scale(0.93);
+  }
+  68% {
+    opacity: 1;
+    transform: translate3d(0, -2px, 0) scale(1.012);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes fzStudioModalExit {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  34% {
+    opacity: 0.96;
+    transform: translate3d(0, -3px, 0) scale(1.022);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(0, -16px, 0) scale(0.95);
+  }
+}
+
+@keyframes fzStudioVeilExit {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes fzSpringButtonLaunch {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+    box-shadow: 0 7px 0 #0f5e30, 0 16px 30px rgba(15, 94, 48, 0.28), inset 0 1.5px 0 rgba(255, 255, 255, 0.34);
+  }
+  30% {
+    transform: translate3d(0, 6px, 0) scale(0.96);
+    box-shadow: 0 1px 0 #0f5e30, 0 4px 10px rgba(15, 94, 48, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  }
+  66% {
+    transform: translate3d(0, -3px, 0) scale(1.045);
+    box-shadow: 0 10px 0 #0f5e30, 0 22px 38px rgba(15, 94, 48, 0.34), inset 0 1.5px 0 rgba(255, 255, 255, 0.42);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    box-shadow: 0 6px 0 #0f5e30, 0 14px 24px rgba(15, 94, 48, 0.24), inset 0 1.5px 0 rgba(255, 255, 255, 0.34);
+  }
+}
+
+@keyframes fzAcousticBurstRing {
+  0% {
+    opacity: 0.78;
+    transform: scale(0.84);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2.15);
+  }
+}
+
+@keyframes fzStudioBreatheOrb {
+  0%, 100% {
+    transform: scale(0.96);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 0.9;
+  }
+}
+
+.fz-studio-launch-card {
+  will-change: transform, opacity;
+  animation: fzStudioModalEnter 380ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.fz-studio-launch-card.is-launching {
+  animation: fzStudioModalExit 310ms cubic-bezier(0.32, 0, 0.2, 1) forwards;
+}
+
+.fz-studio-launch-veil {
+  transition: opacity 260ms ease-out;
+}
+
+.fz-studio-launch-veil.is-launching {
+  animation: fzStudioVeilExit 300ms ease-out forwards;
+}
+
+.fz-tactile-start-btn {
+  background: linear-gradient(180deg, #1b8c4c 0%, #15753e 100%);
+  box-shadow: 0 7px 0 #0f5e30, 0 16px 30px rgba(15, 94, 48, 0.28), inset 0 1.5px 0 rgba(255, 255, 255, 0.34);
+  transition: transform 140ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 140ms cubic-bezier(0.22, 1, 0.36, 1), filter 160ms ease;
+}
+
+.fz-tactile-start-btn:hover {
+  filter: brightness(1.04);
+  transform: translate3d(0, -1px, 0);
+  box-shadow: 0 8px 0 #0f5e30, 0 20px 34px rgba(15, 94, 48, 0.32), inset 0 1.5px 0 rgba(255, 255, 255, 0.4);
+}
+
+.fz-tactile-start-btn:active {
+  transform: translate3d(0, 5px, 0) scale(0.985);
+  box-shadow: 0 2px 0 #0f5e30, 0 6px 14px rgba(15, 94, 48, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.fz-tactile-start-btn.is-launching {
+  animation: fzSpringButtonLaunch 290ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.fz-acoustic-burst-ring {
+  pointer-events: none;
+  animation: fzAcousticBurstRing 420ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.fz-acoustic-burst-ring-2 {
+  pointer-events: none;
+  animation: fzAcousticBurstRing 520ms cubic-bezier(0.16, 1, 0.3, 1) 70ms forwards;
+}
+
+.fz-studio-breathe-orb {
+  will-change: transform, opacity;
+  animation: fzStudioBreatheOrb 2.8s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .fz-atelier-ink-path,
   .fz-atelier-nib,
-  .fz-atelier-wave-bar {
+  .fz-atelier-wave-bar,
+  .fz-studio-launch-card,
+  .fz-studio-launch-veil,
+  .fz-tactile-start-btn,
+  .fz-acoustic-burst-ring,
+  .fz-acoustic-burst-ring-2,
+  .fz-studio-breathe-orb {
     animation: none;
   }
 }
@@ -838,4 +971,63 @@ rt.zh-rt {
   font-size: 1.08em;
   color: inherit;
   white-space: nowrap;
+}
+
+/* Crisp Furigana & Pinyin ruby kerning (prevents wide intra-word gaps on multi-kana <rt>) */
+.fz-ja-ruby-text ruby,
+.fz-zh-ruby-text ruby {
+  ruby-position: over;
+  ruby-align: center;
+}
+.fz-ja-ruby-text rt {
+  font-size: 0.48em;
+  letter-spacing: -0.02em;
+  font-weight: 600;
+  color: #6B5E4E;
+  line-height: 1.1;
+}
+.fz-zh-ruby-text rt {
+  font-size: 0.50em;
+  letter-spacing: 0.01em;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+/* Mobile PWA GPU Layer & Auto-Scroll Discipline (m025-810):
+   Prevent WebKit CoreAnimation / Android Chrome tile-cache OOM crashes during Whiteboard
+   auto-slideshow & auto-scrolling by removing static will-change promotions on tall cards
+   and locking overscroll so scroll chaining NEVER triggers PWA pull-to-refresh! */
+@media (max-width: 767px) {
+  .fz-atelier-nib,
+  .fz-atelier-wave-bar,
+  .fz-studio-breathe-orb,
+  .fz-studio-launch-card,
+  .fz-wb-spotlight-card,
+  .fz-wb-step-panel,
+  .fz-wb-sheet,
+  .fz-wb-tab-glider,
+  .fz-wb-mastery-fill,
+  .fz-marker-nib-bob {
+    will-change: auto !important;
+  }
+  .fz-wb-spotlight-dimmed,
+  .fz-sub-dim {
+    transform: none !important;
+  }
+  .fz-wb-spotlight-zoom-in,
+  .fz-wb-spotlight-active,
+  .fz-wb-spotlight-zoom-out {
+    transform: none !important;
+  }
+  .fz-sub-zoom-in,
+  .fz-table-row-focus,
+  .fz-table-row-focus-active {
+    transform: none !important;
+  }
+  .fz-pen-float-badge,
+  .fz-marker-nib-bob,
+  .fz-wb-spotlight-card .animate-ping,
+  .fz-wb-spotlight-card .animate-pulse {
+    animation: none !important;
+  }
 }

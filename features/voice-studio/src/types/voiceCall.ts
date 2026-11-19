@@ -106,6 +106,8 @@ export interface VoiceUiAction {
   whiteboardSteps?: WhiteboardStepCommand[];
   /** Custom AI-generated phase labels for the board scrubber */
   phaseLabels?: string[];
+  /** Authoritative language code used for whiteboard explanations & TTS (native learner locale unless explicitly overridden to course target language) */
+  explanationLocale?: LearnerLocale;
 }
 
 export interface WhiteboardVectorShape {

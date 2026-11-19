@@ -407,6 +407,7 @@ jobs:
           node tests/kurikulum-integritas-test.js
           node tests/teacher-demo-preview-test.js
           node tests/progress-sync-test.js
+          node tests/account-cloud-sync-test.js
 
   quality-shard-2:
     name: 'Meja 2 — Core UI, PWA & Braincore A'
@@ -721,6 +722,7 @@ jobs:
           node tests/voice-call-ai-studio-port-test.js
           node tests/voice-call-studio-integration-test.js
           node tests/voice-studio-ui-architecture-test.js
+          node tests/whiteboard-contract-test.js
           node tests/voice-duplex-fullphone-contract-test.js
           node tests/kawan-bicara-lock-in-gate-test.js
           node tests/kawan-bicara-hardening-test.js

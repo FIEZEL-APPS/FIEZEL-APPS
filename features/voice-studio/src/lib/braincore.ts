@@ -1190,10 +1190,12 @@ function readHostPwaPreferences(): { targetLang?: TargetLang; learnerLocale?: Le
     const isSupportedUiLocale = (val?: string | null): val is LearnerLocale => {
       if (!val) return false;
       const clean = String(val).trim().toLowerCase().split(/[-_]/)[0];
-      return ['id', 'th', 'ja', 'en', 'zh', 'vi', 'ru', 'ko', 'ms', 'fil', 'km', 'es', 'fr', 'de', 'ar'].includes(clean);
+      return ['id', 'th', 'ja', 'en', 'zh', 'vi', 'ru', 'ko', 'ms', 'fil', 'tl', 'km', 'es', 'fr', 'de', 'ar', 'pt', 'hi', 'my', 'lo'].includes(clean);
     };
-    const normalizeLocale = (val: string): LearnerLocale =>
-      String(val).trim().toLowerCase().split(/[-_]/)[0] as LearnerLocale;
+    const normalizeLocale = (val: string): LearnerLocale => {
+      const clean = String(val).trim().toLowerCase().split(/[-_]/)[0];
+      return (clean === 'tl' ? 'fil' : clean) as LearnerLocale;
+    };
     if (typeof window !== 'undefined' && window.location && window.location.search) {
       const params = new URLSearchParams(window.location.search);
       const explicitTarget = params.get('target') || params.get('course');
@@ -3720,7 +3722,7 @@ Candidate: ${learner}
 Evaluated Task: ${input.questionTitle || 'Speaking Diagnostic'}${alignmentDossier}
 - Real Speech Pacing: ${wpm} WPM (Articulation ${articulationWpm} WPM | Durasi ${duration.toFixed(1)}s${isAcousticTiming ? `, Vokal aktif ${activeSec.toFixed(1)}s / ${Math.round(phonationRatio * 100)}%` : ''}) [${pacingQuality === 'optimal' ? 'OPTIMAL 115-152 WPM' : pacingQuality === 'slow' ? 'LAMBAT < 115 WPM' : 'TERBURU-BURU > 152 WPM'}]
 - Pause Breakdown: ${longPausesCount} long (>=2s), ${hesitationPausesCount} hesitation (0.7-2s), ${shortPausesCount} breath (<0.7s) [Source: ${measurementSource}]
-- Oral Fluency Score: ${fluencyScore} / 5.0 (BKT P(L): ${fluencyP.toFixed(2)}, Latent Ability Theta: ${fluencyTheta.toFixed(2)}) — ${fluencyReasons.join('; ')}
+- Oral Fluency Score: ${fluencyScore} / 5.0 (BKT P(L): ${fluencyP.toFixed(2)}, Latent Ability Theta: ${fluencyTheta.toFixed(2)}), ${fluencyReasons.join('; ')}
 - Pronunciation Score: ${pronunciationScore} / 5.0 (BKT P(L): ${pronP.toFixed(2)}, Latent Ability Theta: ${pronTheta.toFixed(2)})
 - Content Coverage: ${contentScore} / 3.0 (Intro: ${hasIntro ? '✓' : '✗'}, Key Elements: ${hasKeyElements ? '✓' : '✗'}, Max: ${hasMax ? '✓' : '✗'}, Min: ${hasMin ? '✓' : '✗'}, Conclusion: ${hasConclusion ? '✓' : '✗'})
 - Estimated Pearson Concordance: ${pearsonEstimate} / 90 (${passedTarget ? 'MEMENUHI TARGET 42+' : 'BELUM MEMENUHI TARGET 42 - WAJIB REMEDIAL'})
