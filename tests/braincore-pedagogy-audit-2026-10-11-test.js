@@ -205,7 +205,10 @@ test('P4 diagnosis urutan tidak menempel aturan tense/HTML', () => {
 });
 
 test('P5 susun kata di locale th tidak memakai terjemahan Indonesia', () => {
-  assert.match(app, /const idTranslation=\(!localeTh&&self\.FiezelGrammarTranslations/);
+  assert.match(
+    app,
+    /const idTranslation\s*=\s*(?:\(!localeTh&&self\.FiezelGrammarTranslations|locNow==='id'\s*\?\s*\(\(self\.FiezelGrammarTranslations)/
+  );
 });
 
 test('P6 mode bandingkan: alasan nyata, bukan "cuma kunci yang cocok" (id + th)', () => {
