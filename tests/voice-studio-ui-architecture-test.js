@@ -99,11 +99,13 @@ assert.ok(
   'callStateKey prioritizes speaking state over live connected state during audio playback'
 );
 assert.ok(
-  appContent.includes("Mochi berbicara... (${formatTimer(callDurationSec)})"),
+  appContent.includes("Mochi berbicara... (${formatTimer(callDurationSec)})") ||
+  appContent.includes("${t(locale, 'ui.mochiSpeakingStatus')} (${formatTimer(callDurationSec)})"),
   'Status text explicitly indicates when Mochi is actively speaking during live duplex calls'
 );
 assert.ok(
-  appContent.includes("Merekam suara... (${formatTimer(pttRecordingSec)})"),
+  appContent.includes("Merekam suara... (${formatTimer(pttRecordingSec)})") ||
+  appContent.includes("${t(locale, 'ui.recordingStatus')} (${formatTimer(pttRecordingSec)})"),
   'Status text explicitly indicates when user is speaking/recording'
 );
 assert.ok(

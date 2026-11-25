@@ -1,7 +1,7 @@
-# Handoff Dossier — FIEZEL m025-814: Perombakan UI/UX PTE Academic, Papan Tulis Kawan Bicara, Keamanan Kredensial Owner, & Sinkronisasi Audio-Visual 1:1
+﻿# Handoff Dossier â€” FIEZEL m025-813: Perombakan UI/UX PTE Academic, Papan Tulis Kawan Bicara, Keamanan Kredensial Owner, & Sinkronisasi Audio-Visual 1:1
 
-- **Build**: `m025-814` (meloncat dari `origin/main` `m025-812`, melewati `m025-813` yang diklaim PR #891)
-- **Cabang**: `feat/wb-pte-overhaul-m025-814`
+- **Build**: `m025-813` (meloncat dari `origin/main` `m025-812`, melewati `m025-813` yang diklaim PR #891)
+- **Cabang**: `feat/wb-pte-overhaul-m025-813`
 - **Cakupan**: PTE Academic UI/UX + Kawan Bicara Whiteboard (`features/voice-studio/**`) + Worker Voice Live (`workers/api/voice/route-voice-live.js`)
 
 ---
@@ -27,9 +27,9 @@
 
 ## 2. Bukti Pengujian Empiris (Playwright Chromium Headless)
 
-Diujikan secara empiris di peramban Chromium headless (`390×844` mobile & `1280×860` desktop) pada `call.html?locale=id&lang=en`:
+Diujikan secara empiris di peramban Chromium headless (`390Ã—844` mobile & `1280Ã—860` desktop) pada `call.html?locale=id&lang=en`:
 - `hasApiKeyLeak: false`, `leakedGoogleApiCalls: []`, `hasDebugTagLeak: false`, `consoleErrors: []`
-- `docOverflowX: false`, `modalOverflowX: false`, `emojisSample: "✕ ✓"`
+- `docOverflowX: false`, `modalOverflowX: false`, `emojisSample: "âœ• âœ“"`
 - `voiceMicStayedOpen: true`
 - `tier1Observed: "compact"` -> `tier2Observed: "elevated"` -> `bufferingDismissedCleanly: true`
 - `mode: "webaudio"`, `silentChunksCount: 0`, `wordClockMatchedCount: 1` (karaoke kata & jam audio bergerak selaras)
@@ -52,7 +52,7 @@ Diujikan secara empiris di peramban Chromium headless (`390×844` mobile & `1280
 - `features/voice-studio/dist/voice-studio.js` & `features/voice-studio/dist/voice-studio.css`
 - `workers/api/voice/route-voice-live.js`
 - `id-golden-baseline.json`
-- Penanda Hexa-Sync `m025-814`: `coordination/BUILD-VERSION.json`, `sw.js`, `core-config.js`, `features/neural-voice/fiezel-diag-panel.js`, `index.html`, `kurikulum.html`, `misi.html`, `call.html`, `features/voice-studio/call.html`
+- Penanda Hexa-Sync `m025-813`: `coordination/BUILD-VERSION.json`, `sw.js`, `core-config.js`, `features/neural-voice/fiezel-diag-panel.js`, `index.html`, `kurikulum.html`, `misi.html`, `call.html`, `features/voice-studio/call.html`
 
 ---
 
