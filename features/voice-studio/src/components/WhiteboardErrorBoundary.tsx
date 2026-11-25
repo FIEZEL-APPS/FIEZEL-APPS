@@ -55,23 +55,26 @@ export class WhiteboardErrorBoundary extends React.Component<
         className="flex-1 min-h-[260px] w-full flex items-center justify-center p-5 bg-[#FAFBF9]"
       >
         <div className="w-full max-w-sm rounded-[24px] bg-[#FFFDF8] border border-[#E6DFD1] shadow-[0_18px_44px_rgba(28,22,17,0.12)] p-6 text-center space-y-3.5">
-          <div className="w-12 h-12 mx-auto rounded-2xl bg-[#FEF3C7] border border-[#FDE68A] flex items-center justify-center text-xl">
-            📝
+          <div className="w-12 h-12 mx-auto rounded-2xl bg-[#FEF3C7] border border-[#FDE68A] flex items-center justify-center text-[#B45309]">
+            <svg viewBox="0 0 24 24" className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <rect x="3" y="4" width="18" height="13" rx="2.5" />
+              <path d="M8 21h8M12 17v4M8 9h8M8 12.5h5" />
+            </svg>
           </div>
           <h4 className="text-[15px] font-extrabold text-[#1C1611] leading-snug">
             {wbPick(
-              loc,
               'Whiteboard needs a quick refresh',
               'Papan tulis perlu disegarkan sebentar',
-              'กระดานไวท์บอร์ดต้องรีเฟรชสักครู่'
+              'กระดานไวท์บอร์ดต้องรีเฟรชสักครู่',
+              loc
             )}
           </h4>
           <p className="text-xs text-[#6B5E4E] leading-relaxed">
             {wbPick(
-              loc,
               'Your voice session is still safe. Tap reload to reopen the visual explanation cleanly.',
               'Sesi belajarmu tetap aman. Tekan muat ulang agar papan tulis terbuka kembali dengan mulus.',
-              'เซสชันการเรียนของคุณยังปลอดภัย กดโหลดใหม่เพื่อเปิดกระดานอีกครั้งอย่างราบรื่น'
+              'เซสชันการเรียนของคุณยังปลอดภัย กดโหลดใหม่เพื่อเปิดกระดานอีกครั้งอย่างราบรื่น',
+              loc
             )}
           </p>
           <div className="flex items-center gap-2 pt-1">
@@ -80,7 +83,7 @@ export class WhiteboardErrorBoundary extends React.Component<
               onClick={this.handleRetry}
               className="flex-1 py-2.5 px-4 rounded-xl bg-[#15803D] hover:bg-[#166534] text-white text-xs font-extrabold cursor-pointer"
             >
-              {wbPick(loc, 'Reload Board', 'Muat Ulang Papan', 'โหลดกระดานใหม่')}
+              {wbPick('Reload Board', 'Muat Ulang Papan', 'โหลดกระดานใหม่', loc)}
             </button>
             {this.props.onClose && (
               <button
@@ -88,7 +91,7 @@ export class WhiteboardErrorBoundary extends React.Component<
                 onClick={this.props.onClose}
                 className="py-2.5 px-4 rounded-xl bg-[#F3EBE0] hover:bg-[#EADBCE] text-[#5C4A38] text-xs font-bold cursor-pointer"
               >
-                {wbPick(loc, 'Close', 'Tutup', 'ปิด')}
+                {wbPick('Close', 'Tutup', 'ปิด', loc)}
               </button>
             )}
           </div>

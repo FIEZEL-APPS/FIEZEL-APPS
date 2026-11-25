@@ -4,7 +4,6 @@ import '@fontsource/caveat/700.css';
 import '@fontsource/kalam/400.css';
 import '@fontsource/kalam/700.css';
 import rough from 'roughjs';
-import { annotate } from 'rough-notation';
 import { getStroke } from 'perfect-freehand';
 import {
   cleanReadingForLang,
@@ -203,80 +202,75 @@ const RoughMarkedText: React.FC<{
   type: 'highlight' | 'circle' | 'strike-through' | 'underline';
   color: string;
   show: boolean;
+  terms?: string[];
+  emphasize?: boolean;
+  sweepProgress?: number;
   strokeWidth?: number;
   className?: string;
-}> = ({ text, type, color, show, strokeWidth = 2.4, className = '' }) => {
-  const spanRef = useRef<HTMLSpanElement | null>(null);
-  const annotationRef = useRef<ReturnType<typeof annotate> | null>(null);
-  const isMobileLite = isMobileLowMemoryDevice();
-
-  useEffect(() => {
-    if (isMobileLite) return;
-    const el = spanRef.current;
-    if (!el) return;
-    if (annotationRef.current) {
-      try {
-        annotationRef.current.remove();
-      } catch {
-        // Ignore cleanup error
-      }
-      annotationRef.current = null;
+}> = ({
+  text,
+  type,
+  color,
+  show,
+  terms = [],
+  emphasize = false,
+  sweepProgress = 1,
+  strokeWidth = 2.4,
+  className = '',
+}) => {
+  const clampedSweep = Math.max(0, Math.min(1, sweepProgress));
+  const markStyle = useMemo<React.CSSProperties | undefined>(() => {
+    if (!show || clampedSweep <= 0.01) return undefined;
+    const encColor = encodeURIComponent(color);
+    if (type === 'strike-through') {
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 6" preserveAspectRatio="none"><path d="M0 3.3 Q8 1.9 16 3.2 T32 2.9" fill="none" stroke="${encColor}" stroke-width="${strokeWidth}" stroke-linecap="round"/></svg>`;
+      return {
+        backgroundImage: `url("data:image/svg+xml,${svg}")`,
+        opacity: clampedSweep < 1 ? 0.55 + clampedSweep * 0.45 : 1,
+      };
     }
-    if (!show) return;
-
-    const timer = window.setTimeout(() => {
-      if (!spanRef.current) return;
-      try {
-        const ann = annotate(spanRef.current, {
-          type,
-          color,
-          strokeWidth,
-          multiline: true,
-          padding: type === 'circle' ? 5 : 2,
-          animationDuration: 320,
-          iterations: type === 'highlight' ? 2 : 1,
-        });
-        annotationRef.current = ann;
-        ann.show();
-      } catch {
-        // Ignore annotation fallback
-      }
-    }, 12);
-
-    return () => {
-      window.clearTimeout(timer);
-      if (annotationRef.current) {
-        try {
-          annotationRef.current.remove();
-        } catch {
-          // Ignore
-        }
-        annotationRef.current = null;
-      }
+    if (type === 'underline') {
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 6" preserveAspectRatio="none"><path d="M0 3.8 Q7 2.1 14 3.7 T28 3.4" fill="none" stroke="${encColor}" stroke-width="${strokeWidth}" stroke-linecap="round"/></svg>`;
+      return {
+        backgroundImage: `url("data:image/svg+xml,${svg}")`,
+        opacity: clampedSweep < 1 ? 0.55 + clampedSweep * 0.45 : 1,
+      };
+    }
+    if (type === 'circle') {
+      return {
+        border: `2px solid ${color}`,
+        backgroundColor: 'rgba(220, 252, 231, 0.36)',
+        opacity: clampedSweep < 1 ? 0.65 + clampedSweep * 0.35 : 1,
+      };
+    }
+    // Progressive marker highlight sweep synchronized with spoken emphasis
+    const bg = color.startsWith('rgba') || color.startsWith('rgb') ? color : `${color}38`;
+    const pct = Math.round(clampedSweep * 97 + 2);
+    return {
+      background:
+        clampedSweep >= 0.99
+          ? `linear-gradient(104deg, transparent 0%, ${bg} 3%, ${bg} 97%, transparent 100%)`
+          : `linear-gradient(90deg, ${bg} 0%, ${bg} ${pct}%, transparent ${Math.min(100, pct + 4)}%)`,
     };
-  }, [isMobileLite, show, type, color, strokeWidth, text]);
+  }, [show, type, color, strokeWidth, clampedSweep]);
 
-  // Mobile PWA compositor-safe equivalent (avoids rough-notation global ResizeObserver/SVG storms during auto-scroll)
-  if (isMobileLite) {
-    const mobileMarkStyle: React.CSSProperties | undefined = !show
-      ? undefined
-      : type === 'strike-through'
-        ? { textDecorationLine: 'line-through', textDecorationColor: color, textDecorationThickness: '2.2px' }
-        : type === 'underline'
-          ? { textDecorationLine: 'underline', textDecorationColor: color, textDecorationThickness: '2.4px', textUnderlineOffset: '3px' }
-          : type === 'circle'
-            ? { border: `2px solid ${color}`, borderRadius: '999px', padding: '1px 7px' }
-            : { backgroundColor: `${color}28`, borderRadius: '6px', padding: '0 4px' };
-    return (
-      <span ref={spanRef} style={mobileMarkStyle} className={`relative inline ${className}`}>
-        <MathText text={text} active={false} />
-      </span>
-    );
-  }
+  const variantClass = !show || clampedSweep <= 0.01
+    ? ''
+    : type === 'strike-through'
+      ? 'fz-ink-mark fz-ink-strike'
+      : type === 'underline'
+        ? 'fz-ink-mark fz-ink-underline'
+        : type === 'circle'
+          ? 'fz-ink-mark fz-ink-circle'
+          : 'fz-ink-mark fz-ink-highlight';
 
   return (
-    <span ref={spanRef} className={`relative inline ${className}`}>
-      <MathText text={text} active={false} />
+    <span style={markStyle} className={`relative inline ${variantClass} ${className}`}>
+      {terms.length > 0 ? (
+        <HighlightText text={text} terms={terms} active={show} emphasize={emphasize} />
+      ) : (
+        <MathText text={text} active={false} />
+      )}
     </span>
   );
 };
@@ -320,8 +314,6 @@ const RoughContrastScaleDiagram: React.FC<{
   isLightbox = false,
 }) => {
   const beamSvgRef = useRef<SVGSVGElement | null>(null);
-  const leftBoxRef = useRef<SVGSVGElement | null>(null);
-  const rightBoxRef = useRef<SVGSVGElement | null>(null);
 
   const termA = cleanBracketArtifacts(step.termA) || wbPick('Concept A', 'Konsep A');
   const descA = cleanBracketArtifacts(step.descA);
@@ -359,34 +351,6 @@ const RoughContrastScaleDiagram: React.FC<{
   };
 
   useEffect(() => {
-    if (leftBoxRef.current) {
-      leftBoxRef.current.innerHTML = '';
-      const rcL = rough.svg(leftBoxRef.current);
-      leftBoxRef.current.appendChild(
-        rcL.rectangle(4, 4, 212, 92, {
-          stroke: leftStroke,
-          strokeWidth: 2,
-          fill: leftFill,
-          fillStyle: 'solid',
-          roughness: 1.35,
-        })
-      );
-      animateRoughSvgPaths(leftBoxRef.current);
-    }
-    if (rightBoxRef.current) {
-      rightBoxRef.current.innerHTML = '';
-      const rcR = rough.svg(rightBoxRef.current);
-      rightBoxRef.current.appendChild(
-        rcR.rectangle(4, 4, 212, 92, {
-          stroke: '#15803D',
-          strokeWidth: 2.2,
-          fill: '#DCFCE7',
-          fillStyle: 'solid',
-          roughness: 1.35,
-        })
-      );
-      animateRoughSvgPaths(rightBoxRef.current);
-    }
     const svg = beamSvgRef.current;
     if (!svg) return;
     svg.innerHTML = '';
@@ -404,19 +368,24 @@ const RoughContrastScaleDiagram: React.FC<{
         { stroke: '#334155', strokeWidth: 2, fill: '#E2E8F0', fillStyle: 'hachure', roughness: 1.3 }
       )
     );
-    animateRoughSvgPaths(svg);
-  }, [step.id, termA, termB]);
+    if (!queuedPreview) {
+      animateRoughSvgPaths(svg);
+    }
+  }, [step.id, termA, termB, queuedPreview]);
 
   return (
-    <div data-testid="contrast-scale-diagram" className="relative my-2 rounded-2xl bg-white/90 border border-[#E5E7EB] p-3.5">
+    <div data-testid="contrast-scale-diagram" className="relative my-2 rounded-2xl bg-white/95 border border-[#E2E8F0] p-3.5 shadow-2xs">
       <div className="flex flex-wrap items-center justify-between gap-2 mb-2.5">
-        <div className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[#64748B]">
-          <span>⚖️</span>
-          <span>{cleanBracketArtifacts(step.title) || wbPick('Concept Balance Diagram', 'Diagram Timbangan Konsep')}</span>
+        <div className="inline-flex items-center gap-1.5 text-[11px] font-extrabold uppercase tracking-wider text-[#475569]">
+          <svg viewBox="0 0 20 20" className="w-3.5 h-3.5 shrink-0 text-[#0284C7]" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M10 3v14M4 6h12M6 17h8" />
+            <path d="M4 6L2.2 11h3.6L4 6ZM16 6l-1.8 5h3.6L16 6Z" />
+          </svg>
+          <span>{cleanBracketArtifacts(step.title) || wbPick('Concept Balance Diagram', 'Diagram Timbangan Konsep', 'แผนภาพตาชั่งเปรียบเทียบ')}</span>
         </div>
         <div className="flex items-center gap-2">
           {!isLightbox && isActive && isPlaying && effP > 0.02 && effP < 0.98 && (
-            <AnimatedTutorPenSvg label={wbPick('Comparing...', 'Membandingkan...')} />
+            <AnimatedTutorPenSvg label={wbPick('Comparing...', 'Membandingkan...', 'กำลังเปรียบเทียบ...')} />
           )}
           {!isLightbox && onZoomInspect && (
             <button
@@ -425,39 +394,42 @@ const RoughContrastScaleDiagram: React.FC<{
               onClick={onZoomInspect}
               className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-white hover:bg-[#EFF6FF] border border-[#CBD5E1] text-[10.5px] font-bold text-[#1E40AF] cursor-pointer"
             >
-              <span>🔍</span>
-              <span>Perbesar</span>
+              <svg viewBox="0 0 20 20" className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <circle cx="8.5" cy="8.5" r="5.2" />
+                <path d="M12.5 12.5L16.8 16.8M8.5 6.3v4.4M6.3 8.5h4.4" />
+              </svg>
+              <span>{wbPick('Zoom', 'Perbesar', 'ขยาย')}</span>
             </button>
           )}
         </div>
       </div>
-      <div className="w-full max-w-[500px] mx-auto">
+      <div className="w-full max-w-[520px] mx-auto">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-stretch">
           <div
             data-wb-box="pan-a"
             data-wb-panel-focus={focusPan === 'left' ? 'zoom-in' : focusPan === 'right' ? 'dim' : 'idle'}
-            className="relative min-h-[96px] px-3.5 py-3 flex flex-col items-center justify-center text-center rounded-2xl transition-all duration-400"
+            className="relative min-h-[96px] px-3.5 py-3 flex flex-col items-center justify-center text-center rounded-2xl border-2 transition-[transform,opacity,box-shadow,border-color] duration-300"
             style={{
+              backgroundColor: leftFill,
+              borderColor: focusPan === 'left' ? leftStroke : `${leftStroke}88`,
               opacity: focusPan === 'right' ? 0.48 : 1,
               transform: isMobileLite
                 ? undefined
                 : focusPan === 'left'
-                  ? 'translateY(-3px) scale(1.065)'
+                  ? 'translateY(-3px) scale(1.045)'
                   : focusPan === 'right'
-                    ? 'scale(0.96)'
+                    ? 'scale(0.965)'
                     : 'scale(1)',
               zIndex: focusPan === 'left' && !isMobileLite ? 15 : undefined,
-              filter: !isMobileLite && focusPan === 'left' ? `drop-shadow(0 12px 24px ${leftShadow})` : undefined,
-              boxShadow: isMobileLite && focusPan === 'left' ? `0 0 0 2.5px ${leftStroke}` : undefined,
+              boxShadow:
+                focusPan === 'left'
+                  ? isMobileLite
+                    ? `0 0 0 2.5px ${leftStroke}`
+                    : `0 12px 24px ${leftShadow}, 0 0 0 2px ${leftStroke}`
+                  : 'inset 0 1px 0 rgba(255,255,255,0.75)',
             }}
           >
-            <svg
-              ref={leftBoxRef}
-              viewBox="0 0 220 100"
-              preserveAspectRatio="none"
-              className="absolute inset-0 w-full h-full pointer-events-none"
-            />
-            <div className="relative z-10 flex items-center gap-1.5 mb-0.5">
+            <div className="relative z-10 flex items-center gap-1.5 mb-1">
               <SmpVectorIcon name={leftIsErrorTrap ? 'warn' : 'target'} color={leftStroke} size={16} />
               <span
                 className="px-2 py-0.5 rounded-full text-white text-[9px] font-extrabold tracking-wider uppercase"
@@ -478,28 +450,28 @@ const RoughContrastScaleDiagram: React.FC<{
           <div
             data-wb-box="pan-b"
             data-wb-panel-focus={focusPan === 'right' ? 'zoom-in' : focusPan === 'left' ? 'dim' : 'idle'}
-            className="relative min-h-[96px] px-3.5 py-3 flex flex-col items-center justify-center text-center rounded-2xl transition-all duration-400"
+            className="relative min-h-[96px] px-3.5 py-3 flex flex-col items-center justify-center text-center rounded-2xl border-2 transition-[transform,opacity,box-shadow,border-color] duration-300"
             style={{
+              backgroundColor: '#DCFCE7',
+              borderColor: focusPan === 'right' ? '#15803D' : 'rgba(21, 128, 61, 0.55)',
               opacity: focusPan === 'left' ? 0.48 : 1,
               transform: isMobileLite
                 ? undefined
                 : focusPan === 'right'
-                  ? 'translateY(-3px) scale(1.065)'
+                  ? 'translateY(-3px) scale(1.045)'
                   : focusPan === 'left'
-                    ? 'scale(0.96)'
+                    ? 'scale(0.965)'
                     : 'scale(1)',
               zIndex: focusPan === 'right' && !isMobileLite ? 15 : undefined,
-              filter: !isMobileLite && focusPan === 'right' ? 'drop-shadow(0 12px 24px rgba(21,128,61,0.22))' : undefined,
-              boxShadow: isMobileLite && focusPan === 'right' ? '0 0 0 2.5px #15803D' : undefined,
+              boxShadow:
+                focusPan === 'right'
+                  ? isMobileLite
+                    ? '0 0 0 2.5px #15803D'
+                    : '0 12px 24px rgba(21,128,61,0.22), 0 0 0 2px #15803D'
+                  : 'inset 0 1px 0 rgba(255,255,255,0.75)',
             }}
           >
-            <svg
-              ref={rightBoxRef}
-              viewBox="0 0 220 100"
-              preserveAspectRatio="none"
-              className="absolute inset-0 w-full h-full pointer-events-none"
-            />
-            <div className="relative z-10 flex items-center gap-1.5 mb-0.5">
+            <div className="relative z-10 flex items-center gap-1.5 mb-1">
               <SmpVectorIcon name="star" color="#15803D" size={16} />
               <span className="px-2 py-0.5 rounded-full bg-[#15803D] text-white text-[9px] font-extrabold tracking-wider uppercase">
                 {step.rightPanel?.badge || formatBadgeLabel(termB)}
@@ -515,17 +487,20 @@ const RoughContrastScaleDiagram: React.FC<{
             )}
           </div>
         </div>
-        <svg ref={beamSvgRef} viewBox="0 0 460 68" className="w-full h-auto block select-none -mt-0.5" />
+        <svg ref={beamSvgRef} viewBox="0 0 460 68" className="hidden sm:block w-full h-auto select-none -mt-0.5" />
       </div>
       {analogy && (
         <div
-          className="mt-2 px-3 py-2 rounded-xl bg-[#F0FDF4] border border-[#BBF7D0] text-xs font-semibold text-[#166534] transition-all duration-300"
+          className="mt-2 px-3 py-2 rounded-xl bg-[#F0FDF4] border border-[#BBF7D0] text-xs font-semibold text-[#166534] transition-opacity duration-300 flex items-start gap-1.5"
           style={{ opacity: effP > 0.48 ? 1 : 0.72 }}
         >
-          <span className="font-extrabold mr-1">💡 Kuncinya:</span>
-          <span className="fz-handwriting-body text-sm">
-            <HighlightText text={analogy} terms={terms} active={effP > 0.48} />
-          </span>
+          <SmpVectorIcon name="key" color="#15803D" size={15} />
+          <div>
+            <span className="font-extrabold mr-1">{wbPick('Key Takeaway:', 'Kuncinya:', 'หัวใจสำคัญ:')}</span>
+            <span className="fz-handwriting-body text-sm">
+              <HighlightText text={analogy} terms={terms} active={effP > 0.48} />
+            </span>
+          </div>
         </div>
       )}
     </div>
@@ -564,7 +539,6 @@ const RoughSyntaxFlowDiagram: React.FC<{
         .filter((n) => n.word || n.role),
     [step.nodes]
   );
-  const boxRefs = useRef<Array<SVGSVGElement | null>>([]);
   const effP = isLightbox ? 1 : queuedPreview ? 0.04 : progress;
   const terms = queuedPreview ? [] : step.highlightTerms || [];
   const activeNodeIdx = resolveSequentialItemFocus({
@@ -579,35 +553,20 @@ const RoughSyntaxFlowDiagram: React.FC<{
   });
   const isMobileLite = isMobileLowMemoryDevice();
 
-  useEffect(() => {
-    boxRefs.current.forEach((svg, idx) => {
-      if (!svg || idx >= nodes.length) return;
-      svg.innerHTML = '';
-      const rc = rough.svg(svg);
-      const fill = nodes[idx]?.color || '#E0F2FE';
-      svg.appendChild(
-        rc.rectangle(4, 4, 180, 74, {
-          stroke: '#334155',
-          strokeWidth: 1.9,
-          fill,
-          fillStyle: 'solid',
-          roughness: 1.35,
-        })
-      );
-      animateRoughSvgPaths(svg);
-    });
-  }, [step.id, nodes]);
-
   return (
-    <div data-testid="syntax-flow-diagram" className="my-2 rounded-2xl bg-white/90 border border-[#E5E7EB] p-3.5">
+    <div data-testid="syntax-flow-diagram" className="my-2 rounded-2xl bg-white/95 border border-[#E2E8F0] p-3.5 shadow-2xs">
       <div className="flex flex-wrap items-center justify-between gap-2 mb-2.5">
-        <div className="text-[11px] font-bold uppercase tracking-wider text-[#64748B] flex items-center gap-1.5">
-          <span>🚂</span>
-          <span>{cleanBracketArtifacts(step.title) || wbPick('Sentence Pattern Flow', 'Alur Pola Kalimat')}</span>
+        <div className="text-[11px] font-extrabold uppercase tracking-wider text-[#475569] flex items-center gap-1.5">
+          <svg viewBox="0 0 20 20" className="w-3.5 h-3.5 shrink-0 text-[#2563EB]" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <rect x="2" y="6" width="5" height="8" rx="1.2" />
+            <rect x="13" y="6" width="5" height="8" rx="1.2" />
+            <path d="M7 10h6M10.8 7.8L13 10l-2.2 2.2" />
+          </svg>
+          <span>{cleanBracketArtifacts(step.title) || wbPick('Sentence Pattern Flow', 'Alur Pola Kalimat', 'ลำดับโครงสร้างประโยค')}</span>
         </div>
         <div className="flex items-center gap-2">
           {!isLightbox && isActive && isPlaying && effP > 0.02 && effP < 0.98 && (
-            <AnimatedTutorPenSvg label={wbPick('Building flow...', 'Menyusun alur...')} />
+            <AnimatedTutorPenSvg label={wbPick('Building flow...', 'Menyusun alur...', 'กำลังเรียงลำดับ...')} />
           )}
           {!isLightbox && onZoomInspect && (
             <button
@@ -616,8 +575,11 @@ const RoughSyntaxFlowDiagram: React.FC<{
               onClick={onZoomInspect}
               className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-white hover:bg-[#EFF6FF] border border-[#CBD5E1] text-[10.5px] font-bold text-[#1E40AF] cursor-pointer"
             >
-              <span>🔍</span>
-              <span>{wbPick('Zoom', 'Perbesar')}</span>
+              <svg viewBox="0 0 20 20" className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <circle cx="8.5" cy="8.5" r="5.2" />
+                <path d="M12.5 12.5L16.8 16.8M8.5 6.3v4.4M6.3 8.5h4.4" />
+              </svg>
+              <span>{wbPick('Zoom', 'Perbesar', 'ขยาย')}</span>
             </button>
           )}
         </div>
@@ -627,34 +589,32 @@ const RoughSyntaxFlowDiagram: React.FC<{
           const threshold = (idx / Math.max(1, nodes.length)) * 0.65;
           const visible = queuedPreview || effP >= threshold;
           const isFocused = idx === activeNodeIdx;
+          const fill = node.color || '#E0F2FE';
           return (
             <React.Fragment key={idx}>
               <div
                 data-wb-box={`syntax-${idx}`}
                 data-wb-panel-focus={isFocused ? 'zoom-in' : activeNodeIdx >= 0 ? 'dim' : 'idle'}
-                className="relative min-w-[140px] max-w-[235px] min-h-[76px] h-auto flex flex-col items-center justify-center px-3.5 py-2 transition-all duration-300"
+                className="relative min-w-[128px] max-w-[240px] min-h-[72px] h-auto flex flex-col items-center justify-center px-3.5 py-2 rounded-2xl border-2 transition-[transform,opacity,box-shadow,border-color] duration-300"
                 style={{
+                  backgroundColor: fill,
+                  borderColor: isFocused ? '#2563EB' : '#475569',
                   opacity: activeNodeIdx >= 0 && !isFocused ? 0.48 : visible ? 1 : 0.72,
                   transform: isMobileLite
                     ? undefined
                     : isFocused
-                      ? 'translateY(-3px) scale(1.075)'
+                      ? 'translateY(-3px) scale(1.06)'
                       : activeNodeIdx >= 0
-                        ? 'scale(0.955)'
+                        ? 'scale(0.96)'
                         : 'scale(1)',
                   zIndex: isFocused && !isMobileLite ? 15 : undefined,
-                  filter: !isMobileLite && isFocused ? 'drop-shadow(0 10px 20px rgba(37,99,235,0.22))' : undefined,
-                  boxShadow: isMobileLite && isFocused ? '0 0 0 2.5px #2563EB' : undefined,
+                  boxShadow: isFocused
+                    ? isMobileLite
+                      ? '0 0 0 2.5px #2563EB'
+                      : '0 10px 22px rgba(37,99,235,0.22), 0 0 0 2px #2563EB'
+                    : '0 2px 0 rgba(51,65,85,0.14)',
                 }}
               >
-                <svg
-                  ref={(el) => {
-                    boxRefs.current[idx] = el;
-                  }}
-                  viewBox="0 0 188 82"
-                  preserveAspectRatio="none"
-                  className="absolute inset-0 w-full h-full pointer-events-none"
-                />
                 {node.role && (
                   <span className="relative z-10 text-[9.5px] font-extrabold uppercase tracking-wider text-[#475569] text-center break-words">
                     {node.role}
@@ -1136,9 +1096,9 @@ const InteractiveToneWaveWidget: React.FC<{
     >
       <div className="flex items-center justify-between gap-2">
         <span className="text-[11px] font-bold uppercase tracking-wider text-[#0284C7]">
-          ~ {step.title || 'Gelombang Nada & Intonasi'}
+          ~ {step.title || wbPick('Pitch & Intonation Wave', 'Gelombang Nada & Intonasi', 'คลื่นระดับเสียงและทำนอง')}
         </span>
-        <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#E0F2FE] text-[#0369A1]">
+        <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#E0F2FE] text-[#0369A1] tabular-nums">
           {freq.toFixed(1)}x Tempo
         </span>
       </div>
@@ -1154,7 +1114,7 @@ const InteractiveToneWaveWidget: React.FC<{
             onClick={() => setIsAnimating((v) => !v)}
             className="px-2.5 py-1 rounded-lg bg-[#0F172A] text-white font-bold text-[11px] cursor-pointer"
           >
-            {isAnimating ? '⏸ Pause' : '▶ Play'}
+            {isAnimating ? wbPick('Pause', 'Jeda', 'หยุด') : wbPick('Play', 'Putar', 'เล่น')}
           </button>
           <button
             type="button"
@@ -1169,7 +1129,7 @@ const InteractiveToneWaveWidget: React.FC<{
           </button>
         </div>
         <label className="flex items-center gap-2 text-[11px] font-semibold text-[#475569]">
-          <span>Frekuensi Nada</span>
+          <span>{wbPick('Pitch Tempo', 'Frekuensi Nada', 'ความถี่เสียง')}</span>
           <input
             type="range"
             min="0.5"
@@ -1875,22 +1835,33 @@ const RoughFreeformSceneDiagram: React.FC<{
         }
       }
       if (g.childNodes.length > 0) {
-        animateRoughSvgPaths(g);
+        if (!queuedPreview) {
+          animateRoughSvgPaths(g);
+        }
         svg.appendChild(g);
       }
     }
 
     renderedCountRef.current = visibleCount;
-  }, [step.id, visibleCount, stageFilter, shapes]);
+  }, [step.id, visibleCount, stageFilter, shapes, queuedPreview]);
+
+  const animatedReachedSetRef = useRef<{ stepId: string; set: Set<number> }>({ stepId: '', set: new Set() });
 
   useEffect(() => {
     const svg = svgRef.current;
     if (!svg) return;
+    if (animatedReachedSetRef.current.stepId !== step.id || queuedPreview) {
+      animatedReachedSetRef.current = { stepId: step.id, set: new Set() };
+    }
     const isMobileLite = isMobileLowMemoryDevice();
     const groups = Array.from(svg.querySelectorAll<SVGGElement>('[data-wb-shape-idx]'));
     groups.forEach((g) => {
       const idx = Number(g.getAttribute('data-wb-shape-idx') || '-1');
       const isReached = stageFilter !== null || idx < reachedCount;
+      if (!queuedPreview && isReached && idx >= 0 && !animatedReachedSetRef.current.set.has(idx)) {
+        animatedReachedSetRef.current.set.add(idx);
+        animateRoughSvgPaths(g);
+      }
       if (activeShapeIdx < 0) {
         g.style.opacity = queuedPreview ? '0.2' : isReached ? '1' : '0.28';
         g.style.transform = isMobileLite ? '' : 'scale(1)';
@@ -1910,7 +1881,7 @@ const RoughFreeformSceneDiagram: React.FC<{
         g.style.filter = '';
       }
     });
-  }, [activeShapeIdx, reachedCount, stageFilter, queuedPreview, shapes]);
+  }, [step.id, activeShapeIdx, reachedCount, stageFilter, queuedPreview, shapes]);
 
   const penShapeIdx =
     shapes.length === 0
@@ -1997,9 +1968,9 @@ const RoughFreeformSceneDiagram: React.FC<{
     if (shapes.length < 4) return [];
     const mid = Math.max(2, Math.ceil(shapes.length / 2));
     return [
-      { label: 'Tahap 1', count: 2 },
-      { label: 'Tahap 2', count: mid },
-      { label: 'Lengkap', count: shapes.length },
+      { id: 'tahap-1', label: wbPick('Stage 1', 'Tahap 1', 'ขั้นที่ 1'), count: 2 },
+      { id: 'tahap-2', label: wbPick('Stage 2', 'Tahap 2', 'ขั้นที่ 2'), count: mid },
+      { id: 'lengkap', label: wbPick('Complete', 'Lengkap', 'ครบถ้วน'), count: shapes.length },
     ];
   }, [shapes.length]);
 
@@ -2016,11 +1987,14 @@ const RoughFreeformSceneDiagram: React.FC<{
               type="button"
               data-testid="wb-visual-zoom-btn"
               onClick={onZoomInspect}
-              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold border border-[#E2D9C5] bg-white/95 text-[#334155] hover:bg-[#FEF3C7] hover:border-[#F59E0B] transition-colors cursor-pointer"
-              title={wbPick('Zoom in to inspect details', 'Perbesar diagram untuk melihat detail')}
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-[10.5px] font-bold border border-[#CBD5E1] bg-white/95 text-[#1E40AF] hover:bg-[#EFF6FF] transition-colors cursor-pointer"
+              title={wbPick('Zoom in to inspect details', 'Perbesar diagram untuk melihat detail', 'ขยายแผนภาพเพื่อดูรายละเอียด')}
             >
-              <span>🔍</span>
-              <span>{wbPick('Zoom', 'Perbesar')}</span>
+              <svg viewBox="0 0 20 20" className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <circle cx="8.5" cy="8.5" r="5.2" />
+                <path d="M12.5 12.5L16.8 16.8M8.5 6.3v4.4M6.3 8.5h4.4" />
+              </svg>
+              <span>{wbPick('Zoom', 'Perbesar', 'ขยาย')}</span>
             </button>
           )}
         </div>
@@ -2030,9 +2004,9 @@ const RoughFreeformSceneDiagram: React.FC<{
               const active = stageFilter === m.count || (stageFilter === null && m.count === shapes.length && progress >= 0.94);
               return (
                 <button
-                  key={m.label}
+                  key={m.id}
                   type="button"
-                  data-testid={`diagram-stage-${m.label.replace(/\s+/g, '-').toLowerCase()}`}
+                  data-testid={`diagram-stage-${m.id}`}
                   onClick={() => setStageFilter(stageFilter === m.count ? null : m.count)}
                   className={`px-2 py-0.5 rounded-full text-[10px] font-bold transition cursor-pointer ${
                     active
@@ -2193,10 +2167,12 @@ const RoughFreeformSceneDiagram: React.FC<{
         {penActive && nibPt && (
           <div
             data-testid="wb-freeform-pen-nib"
-            style={{ left: `${nibPt.x}%`, top: `${nibPt.y}%`, transform: 'translate(-4px, -18px)' }}
-            className="absolute pointer-events-none transition-[left,top] duration-100 ease-linear"
+            style={{ transform: `translate3d(${nibPt.x}%, ${nibPt.y}%, 0)` }}
+            className="absolute inset-0 w-full h-full pointer-events-none transition-transform duration-100 ease-linear"
           >
-            <MarkerNibCursor color="#15803D" />
+            <div style={{ transform: 'translate(-4px, -18px)' }} className="inline-block">
+              <MarkerNibCursor color="#15803D" />
+            </div>
           </div>
         )}
       </div>
@@ -2958,7 +2934,7 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
               <HighlightText
                 text={cleanBracketArtifacts(step.title)}
                 terms={step.highlightTerms}
-                active
+                active={!isQueued}
                 emphasize={inFocusWindow}
               />
             </div>
@@ -3166,11 +3142,14 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
               type="button"
               data-testid="wb-visual-zoom-btn"
               onClick={() => setZoomedStep(step)}
-              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold border border-[#E2D9C5] bg-white/95 text-[#334155] hover:bg-[#FEF3C7] hover:border-[#F59E0B] transition-colors cursor-pointer"
-              title="Perbesar panduan urutan guratan Kanji"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-[10.5px] font-bold border border-[#CBD5E1] bg-white/95 text-[#1E40AF] hover:bg-[#EFF6FF] transition-colors cursor-pointer"
+              title={wbPick('Enlarge stroke order guide', 'Perbesar panduan urutan guratan Kanji', 'ขยายลำดับการเขียน')}
             >
-              <span>🔍</span>
-              <span>Perbesar</span>
+              <svg viewBox="0 0 20 20" className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <circle cx="8.5" cy="8.5" r="5.2" />
+                <path d="M12.5 12.5L16.8 16.8M8.5 6.3v4.4M6.3 8.5h4.4" />
+              </svg>
+              <span>{wbPick('Zoom', 'Perbesar', 'ขยาย')}</span>
             </button>
           </div>
           <div
@@ -3185,7 +3164,7 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
 
     if (step.kind === 'tone_wave') {
       return wrapQueued(
-        <div data-wb-excerpt={step.text || step.title || 'Gelombang Nada'}>
+        <div data-wb-excerpt={step.text || step.title || wbPick('Pitch Wave', 'Gelombang Nada')}>
           <InteractiveToneWaveWidget step={step} progress={textProg} />
         </div>
       );
@@ -3194,10 +3173,11 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
     if (step.kind === 'highlight_callout') {
       const mainText = step.text || '';
       const hlPhrase = step.highlightPhrase || mainText;
+      const calloutSweep = isCompleted ? 1 : Math.max(0, Math.min(1, (textProg - 0.68) / 0.24));
       return wrapQueued(
         <div
           data-wb-excerpt={mainText}
-          className="py-1.5 space-y-1 rounded-xl px-2.5 transition-all duration-500 ease-out"
+          className="py-1.5 space-y-1 rounded-xl px-2.5 transition-[transform,background-color] duration-500 ease-out"
           style={{
             transform: isMobileBoardLite ? undefined : inFocusWindow ? 'scale(1.045)' : 'scale(1)',
             backgroundColor: inFocusWindow ? 'rgba(254, 249, 195, 0.65)' : 'transparent',
@@ -3205,7 +3185,7 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
         >
           {step.title && (
             <div className="fz-handwriting-heading text-lg font-bold text-[#0F172A]">
-              <HighlightText text={step.title} terms={step.highlightTerms} active emphasize={inFocusWindow} />
+              <HighlightText text={step.title} terms={step.highlightTerms} active={!isQueued} emphasize={inFocusWindow} />
             </div>
           )}
           <div className="fz-handwriting-body text-[15px] text-[#1E293B] leading-relaxed">
@@ -3216,17 +3196,20 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
                 isActive={false}
                 queuedPreview
               />
-            ) : textProg >= 0.72 ? (
+            ) : textProg >= 0.68 ? (
               <RoughMarkedText
                 text={hlPhrase}
                 type="highlight"
                 color={step.highlightColor || 'rgba(125, 211, 252, 0.48)'}
-                show={isCompleted || (isCurrent && textProg >= 0.72)}
+                show={isCompleted || (isCurrent && textProg >= 0.68)}
+                sweepProgress={calloutSweep}
+                terms={step.highlightTerms}
+                emphasize={inFocusWindow}
               />
             ) : (
               <HandwrittenReveal
                 text={hlPhrase}
-                progress={Math.min(1, textProg / 0.72)}
+                progress={Math.min(1, textProg / 0.68)}
                 isActive={isPlaying && isCurrent}
                 highlightTerms={step.highlightTerms}
                 emphasize={inFocusWindow}
@@ -3289,17 +3272,20 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="fz-handwriting-heading text-xl font-bold text-[#0F172A] flex items-center gap-1.5">
               <SmpVectorIcon name="sparkles" color="#15803D" size={16} />
-              <span>{step.title || 'Perbandingan di Papan'}</span>
+              <span>{step.title || wbPick('Board Comparison', 'Perbandingan di Papan', 'ตารางเปรียบเทียบ')}</span>
             </div>
             <button
               type="button"
               data-testid="wb-visual-zoom-btn"
               onClick={() => setZoomedStep(step)}
-              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold border border-[#E2D9C5] bg-white/95 text-[#334155] hover:bg-[#FEF3C7] hover:border-[#F59E0B] transition-colors cursor-pointer"
-              title="Perbesar tabel perbandingan"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-[10.5px] font-bold border border-[#CBD5E1] bg-white/95 text-[#1E40AF] hover:bg-[#EFF6FF] transition-colors cursor-pointer"
+              title={wbPick('Enlarge comparison table', 'Perbesar tabel perbandingan', 'ขยายตารางเปรียบเทียบ')}
             >
-              <span>🔍</span>
-              <span>Perbesar</span>
+              <svg viewBox="0 0 20 20" className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <circle cx="8.5" cy="8.5" r="5.2" />
+                <path d="M12.5 12.5L16.8 16.8M8.5 6.3v4.4M6.3 8.5h4.4" />
+              </svg>
+              <span>{wbPick('Zoom', 'Perbesar', 'ขยาย')}</span>
             </button>
           </div>
           <div className="rounded-2xl overflow-visible border border-[#E2E0D8] bg-white/85 shadow-2xs p-0.5">
@@ -3415,17 +3401,17 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
           className="pl-3.5 border-l-[3px] border-[#DC2626]/70 py-1 space-y-2"
         >
           <div className="fz-handwriting-heading text-lg font-bold text-[#0F172A]">
-            {step.title || 'Coretan Salah vs Benar'}
+            {step.title || wbPick('Common Mistake vs Natural Fix', 'Coretan Salah vs Benar', 'แก้จุดผิดเป็นประโยคธรรมชาติ')}
           </div>
           {step.wrongText && (
             <div
               data-wb-panel-focus={focusWrong ? 'zoom-in' : focusRight ? 'dim' : 'idle'}
-              className="flex items-start gap-2 rounded-xl px-2.5 py-1.5 transition-all duration-400"
+              className="flex items-start gap-2 rounded-xl px-2.5 py-1.5 transition-[transform,opacity,background-color,box-shadow] duration-300"
               style={{
                 transform: isMobileBoardLite
                   ? undefined
                   : focusWrong
-                    ? 'scale(1.065)'
+                    ? 'scale(1.045)'
                     : focusRight
                       ? 'scale(0.97)'
                       : 'scale(1)',
@@ -3450,17 +3436,18 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
                     isActive={false}
                     queuedPreview
                   />
-                ) : textProg >= 0.25 ? (
+                ) : textProg >= 0.26 ? (
                   <RoughMarkedText
                     text={step.wrongText}
                     type="strike-through"
                     color="#DC2626"
-                    show={textProg >= 0.25}
+                    show={textProg >= 0.26}
+                    sweepProgress={isCompleted ? 1 : Math.min(1, (textProg - 0.26) / 0.14)}
                   />
                 ) : (
                   <HandwrittenReveal
                     text={step.wrongText}
-                    progress={Math.min(1, textProg / 0.25)}
+                    progress={Math.min(1, textProg / 0.26)}
                     isActive={isPlaying && isCurrent}
                   />
                 )}
@@ -3470,12 +3457,12 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
           {step.rightText && (
             <div
               data-wb-panel-focus={focusRight ? 'zoom-in' : focusWrong ? 'dim' : 'idle'}
-              className="flex items-start gap-2 rounded-xl px-2.5 py-1.5 transition-all duration-400"
+              className="flex items-start gap-2 rounded-xl px-2.5 py-1.5 transition-[transform,opacity,background-color,box-shadow] duration-300"
               style={{
                 transform: isMobileBoardLite
                   ? undefined
                   : focusRight
-                    ? 'scale(1.04)'
+                    ? 'scale(1.035)'
                     : focusWrong
                       ? 'scale(0.98)'
                       : 'scale(1)',
@@ -3500,18 +3487,23 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
                     isActive={false}
                     queuedPreview
                   />
-                ) : textProg >= 0.72 ? (
+                ) : textProg >= 0.66 ? (
                   <RoughMarkedText
                     text={step.rightText}
                     type={step.rightText.length > 26 ? 'underline' : 'circle'}
                     color="#16A34A"
-                    show={textProg >= 0.72}
+                    show={textProg >= 0.66}
+                    sweepProgress={isCompleted ? 1 : Math.min(1, (textProg - 0.66) / 0.14)}
+                    terms={step.highlightTerms}
+                    emphasize={focusRight}
                   />
                 ) : (
                   <HandwrittenReveal
                     text={step.rightText}
-                    progress={Math.max(0, (textProg - 0.36) / 0.36)}
-                    isActive={isPlaying && isCurrent && textProg >= 0.36}
+                    progress={Math.max(0, (textProg - 0.34) / 0.32)}
+                    isActive={isPlaying && isCurrent && textProg >= 0.34}
+                    highlightTerms={step.highlightTerms}
+                    emphasize={focusRight}
                   />
                 )}
               </div>
@@ -3519,11 +3511,11 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
           )}
           {step.reason && (
             <div className="text-xs text-[#475569] italic leading-relaxed">
-              <span className="font-bold text-[#0F172A] not-italic">Alasan: </span>
+              <span className="font-bold text-[#0F172A] not-italic">{wbPick('Why:', 'Alasan:', 'เหตุผล:')} </span>
               <HandwrittenReveal
                 text={step.reason}
-                progress={isQueued ? 0 : Math.max(0, Math.min(1, (textProg - 0.25) / 0.72))}
-                isActive={isPlaying && isCurrent && textProg >= 0.25 && textProg < 0.97}
+                progress={isQueued ? 0 : Math.max(0, Math.min(1, (textProg - 0.62) / 0.36))}
+                isActive={isPlaying && isCurrent && textProg >= 0.62 && textProg < 0.98}
                 queuedPreview={isQueued}
                 highlightTerms={step.highlightTerms}
                 emphasize={focusRight}
@@ -3541,7 +3533,7 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
           className="rounded-2xl bg-[#EFF6FF]/90 border border-[#BFDBFE] p-3 space-y-1.5 shadow-2xs"
         >
           <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#2563EB] text-white text-[10px] font-extrabold tracking-wider uppercase">
-            <span>PERTANYAANMU</span>
+            <span>{wbPick('YOUR QUESTION', 'PERTANYAANMU', 'คำถามของคุณ')}</span>
           </div>
           {step.highlightPhrase && (
             <div className="text-[11px] text-[#1D4ED8] italic line-clamp-1">
@@ -3583,10 +3575,10 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
 
   return (
     <div className="relative flex-1 min-h-0 flex flex-col overflow-hidden">
-      {/* Phase Scrubber Bar (terinspirasi dari [0 Copy] [1 Cut] [2 Half-turn] [3 Fit] Solvely) */}
-      <div className="px-3 sm:px-4 py-2 bg-[#F4F6F3] border-b border-[#E5E8E3] flex flex-wrap items-center justify-between gap-2 shrink-0">
+      {/* Phase Scrubber Bar (Compact Architectural Strip) */}
+      <div className="px-3 sm:px-4 py-1.5 bg-[#F4F6F3] border-b border-[#E5E8E3] flex items-center justify-between gap-2 shrink-0">
         <div
-          className="flex items-center gap-1 overflow-x-auto whitespace-nowrap max-w-full pb-0.5"
+          className="flex items-center gap-1 overflow-x-auto whitespace-nowrap min-w-0 flex-1 scrollbar-none"
           data-testid="wb-phase-scrubber"
         >
           {plan.phaseLabels.map((label, pIdx) => {
@@ -3597,7 +3589,7 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
                 key={label}
                 type="button"
                 onClick={() => jumpToPhase(pIdx)}
-                className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer shrink-0 whitespace-nowrap ${
+                className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-colors cursor-pointer shrink-0 whitespace-nowrap ${
                   active
                     ? 'bg-[#15803D] text-white shadow-2xs'
                     : passed
@@ -3619,31 +3611,32 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
         </div>
 
         {/* Status Live Menulis + Auto Zoom Lens Indicator */}
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex items-center gap-1.5 shrink-0">
           {isPlaying && (
-            <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-[#15803D] bg-[#DCFCE7] px-2.5 py-0.5 rounded-full">
+            <span className="hidden sm:inline-flex items-center gap-1.5 text-[11px] font-bold text-[#15803D] bg-[#DCFCE7] px-2.5 py-0.5 rounded-full">
               <span className="w-1.5 h-1.5 rounded-full bg-[#15803D] animate-ping" />
-              <span>{wbPick('Tutor is writing on the board...', 'Tutor sedang menulis di papan...')}</span>
+              <span>{wbPick('Tutor is writing on the board...', 'Tutor sedang menulis di papan...', 'ผู้สอนกำลังเขียนบนกระดาน...')}</span>
             </span>
           )}
           {autoSpotlight && isPlaying && (
             <span
               data-testid="wb-auto-zoom-indicator"
-              className="inline-flex items-center gap-1 text-[10.5px] font-extrabold text-[#1D4ED8] bg-[#EFF6FF] border border-[#BFDBFE] px-2 py-0.5 rounded-full"
+              className="inline-flex items-center gap-1 text-[10px] sm:text-[10.5px] font-extrabold text-[#1D4ED8] bg-[#EFF6FF] border border-[#BFDBFE] px-2 py-0.5 rounded-full whitespace-nowrap"
             >
-              <span>🔍</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-[#2563EB]" />
               <span>
                 {activeStepProgress > 0.93
-                  ? wbPick('Zoom Out Transition', 'Zoom Out Transisi')
+                  ? wbPick('Zoom Out', 'Zoom Out', 'ซูมออก')
                   : activeStepProgress >= 0.01
-                    ? wbPick('Focus Zoom', 'Zoom In Fokus')
-                    : wbPick('Focus Ready', 'Fokus Siap')}
+                    ? wbPick('Focus', 'Fokus', 'โฟกัส')
+                    : wbPick('Ready', 'Siap', 'พร้อม')}
               </span>
             </span>
           )}
           {isPenActive && (
-            <div className="flex items-center gap-1.5 bg-white border border-[#BFDBFE] px-2.5 py-0.5 rounded-full text-[11px] font-bold text-[#1D4ED8]">
-              <span>{wbPick('✏️ Pen Mode Active: circle any part to ask', '✏️ Mode Spidol Aktif: lingkari bagian mana pun untuk bertanya')}</span>
+            <div className="flex items-center gap-1.5 bg-white border border-[#BFDBFE] px-2.5 py-0.5 rounded-full text-[10.5px] font-bold text-[#1D4ED8] whitespace-nowrap">
+              <span className="hidden sm:inline">{wbPick('Pen Mode: circle any part to ask', 'Mode Spidol: lingkari bagian untuk bertanya', 'โหมดปากกา: วงส่วนที่ต้องการถาม')}</span>
+              <span className="sm:hidden">{wbPick('Circle to ask', 'Lingkari & tanya', 'วงเพื่อถาม')}</span>
               {strokes.length > 0 && (
                 <>
                   <button
@@ -3664,7 +3657,7 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
                     }}
                     className="underline text-[#DC2626] cursor-pointer"
                   >
-                    {wbPick('Clear', 'Hapus')}
+                    {wbPick('Clear', 'Hapus', 'ล้าง')}
                   </button>
                 </>
               )}
@@ -3672,26 +3665,26 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
           )}
         </div>
       </div>
-      {/* Live Lesson Progress Rail (smooth forward momentum bar) */}
+      {/* Live Lesson Progress Rail (smooth GPU-composited forward momentum bar) */}
       <div
         className="h-[3px] w-full bg-[#E5E8E3] shrink-0 overflow-hidden"
         aria-hidden="true"
         data-testid="wb-lesson-progress-rail"
       >
         <div
-          className="h-full bg-gradient-to-r from-[#15803D] via-[#10B981] to-[#34D399] transition-[width] duration-150 ease-out"
+          className="h-full w-full origin-left bg-gradient-to-r from-[#15803D] via-[#10B981] to-[#34D399] transition-transform duration-150 ease-out"
           style={{
-            width: `${Math.max(
+            transform: `scaleX(${Math.max(
               0,
               Math.min(
-                100,
+                1,
                 plan.steps.length > 0
-                  ? ((Math.min(plan.steps.length, activeStepIndex) + (activeStepIndex < plan.steps.length ? activeStepProgress : 0)) /
-                      plan.steps.length) *
-                      100
+                  ? (Math.min(plan.steps.length, activeStepIndex) +
+                      (activeStepIndex < plan.steps.length ? activeStepProgress : 0)) /
+                      plan.steps.length
                   : 0
               )
-            ).toFixed(1)}%`,
+            ).toFixed(4)})`,
           }}
         />
       </div>
@@ -3805,12 +3798,17 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
                         onPenToggle(false);
                         onCircleAsk(
                           targetExcerpt,
-                          `Tolong jelaskan lebih detail bagian yang saya lingkari ini: "${targetExcerpt}"`
+                          wbPick(
+                            `Please explain this circled part in detail: "${targetExcerpt}"`,
+                            `Tolong jelaskan lebih detail bagian yang saya lingkari ini: "${targetExcerpt}"`,
+                            `ช่วยอธิบายส่วนที่วงไว้นี้ให้ละเอียดหน่อย: "${targetExcerpt}"`
+                          )
                         );
                       }}
-                      className="cursor-pointer hover:underline"
+                      className="cursor-pointer hover:underline inline-flex items-center gap-1.5"
                     >
-                      ✨ Tanya Bagian Yang Dilingkari
+                      <span className="w-2 h-2 rounded-full bg-[#38BDF8]" />
+                      <span>{wbPick('Ask About Circled Area', 'Tanya Bagian Yang Dilingkari', 'ถามเกี่ยวกับส่วนที่วงไว้')}</span>
                     </button>
                     <button
                       type="button"
@@ -3926,7 +3924,7 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
             return (
               <div className="space-y-2">
                 <div className="fz-handwriting-heading text-2xl font-bold text-[#0F172A]">
-                  {step.title || 'Perbandingan di Papan'}
+                  {step.title || wbPick('Board Comparison', 'Perbandingan di Papan', 'ตารางเปรียบเทียบ')}
                 </div>
                 <div className="rounded-2xl overflow-hidden border border-[#E2E0D8] bg-white shadow-sm">
                   <table className="w-full border-collapse text-left">

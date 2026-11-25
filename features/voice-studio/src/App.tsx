@@ -3106,7 +3106,7 @@ export default function App() {
               ) {
                 void synthesizeFlexibleTts({
                   text: firstChunk,
-                  targetLang: locale,
+                  targetLang: String(locale || 'id').toLowerCase().split(/[-_]/)[0],
                   persona: activePersona,
                 }).catch(() => null);
               }
@@ -9190,7 +9190,7 @@ ${
                           ) {
                             void synthesizeFlexibleTts({
                               text: firstChunk,
-                              targetLang: locale,
+                              targetLang: String(locale || 'id').toLowerCase().split(/[-_]/)[0],
                               persona: activePersona,
                             }).catch(() => null);
                           }
@@ -11188,7 +11188,7 @@ ${
                       ) {
                         void synthesizeFlexibleTts({
                           text: firstChunk,
-                          targetLang: activeLoc,
+                          targetLang: String(activeLoc || 'id').toLowerCase().split(/[-_]/)[0],
                           persona: activePersona,
                         }).catch(() => null);
                       }

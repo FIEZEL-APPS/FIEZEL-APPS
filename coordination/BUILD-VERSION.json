@@ -1,7 +1,7 @@
 {
-  "version": "m025-812",
-  "claimedBy": "branch feat/all-9-locales-wave1-m025-812",
-  "claimedAt": "2026-11-19T20:10:54.706Z",
-  "reason": "feat(i18n): [ALLOW-MASS-DELETE] 9-locale native localization wave 1 (UI, Voice Studio, Workers, 79 sidecars)",
+  "version": "m025-814",
+  "claimedBy": "branch feat/wb-pte-overhaul-m025-814",
+  "claimedAt": "2026-11-25T17:25:34.658Z",
+  "reason": "feat(voice,pte): overhaul PTE Academic UI, Whiteboard lockstep sync, anti-slop buffering & owner key secrecy",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

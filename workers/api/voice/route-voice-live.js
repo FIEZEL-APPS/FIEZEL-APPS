@@ -43,9 +43,15 @@ export function stripFiezelDashes(text) {
     .replace(/,\s*,/g, ',')
     .replace(/^,\s*|\s*,$/g, '');
 }
+function redactOwnerSecrets(str) {
+  if (typeof str !== 'string' || !str) return str;
+  return str
+    .replace(/AIza[0-9A-Za-z_-]{12,}/g, '[REDACTED]')
+    .replace(/([?&]key=)[^&\s"']+/gi, '$1[REDACTED]');
+}
 function stripDashesDeep(value, depth = 0) {
   if (depth > 8) return value;
-  if (typeof value === 'string') return stripFiezelDashes(value);
+  if (typeof value === 'string') return stripFiezelDashes(redactOwnerSecrets(value));
   if (Array.isArray(value)) return value.map((v) => stripDashesDeep(v, depth + 1));
   if (value && typeof value === 'object') {
     const out = {};
@@ -88,7 +94,24 @@ const _ttsCooldownMap = new Map(); // `${key}::${model}` -> timestamp ms
 let _copilotPoolIndex = Math.floor(Math.random() * 16);
 let _livePoolCursor = Math.floor(Math.random() * 16);
 const _verifiedHealthyKeys = new Set();
-const _quotaDeadKeys = new Set();
+const _quotaDeadUntilMap = new Map();
+const _quotaDeadKeys = {
+  add(k, ttlMs = 600000) {
+    if (k) _quotaDeadUntilMap.set(k, Date.now() + ttlMs);
+  },
+  has(k) {
+    const exp = _quotaDeadUntilMap.get(k);
+    if (!exp) return false;
+    if (Date.now() >= exp) {
+      _quotaDeadUntilMap.delete(k);
+      return false;
+    }
+    return true;
+  },
+  delete(k) {
+    _quotaDeadUntilMap.delete(k);
+  },
+};
 
 // Zero-KV-write worker cache (Cloudflare edge caches.default + bounded isolate Map fallback)
 const _ttsMemoryCache = new Map();
@@ -296,9 +319,9 @@ export async function routeVoiceLiveSession(ctx) {
     return jsonResponse(
       {
         ok: false,
-        error: 'no_keys_configured',
+        error: 'service_unavailable',
         fallback: true,
-        message: 'Kunci Gemini Live belum terkonfigurasi di server.',
+        message: 'Layanan suara langsung sedang tidak tersedia sementara.',
       },
       { status: 503 }
     );
@@ -307,7 +330,6 @@ export async function routeVoiceLiveSession(ctx) {
   const now = Date.now();
   const totalKeys = keys.length;
   let attempts = 0;
-  let lastFailReason = '';
 
   // Round-robin failover loop
   while (attempts < totalKeys) {
@@ -340,7 +362,6 @@ export async function routeVoiceLiveSession(ctx) {
       );
     }
 
-    lastFailReason = result.reason;
     if (result.isQuota) {
       // Cooldown 65 detik jika menyentuh limit kuota/rate-limit
       _cooldownMap.set(key, now + 65000);
@@ -352,14 +373,13 @@ export async function routeVoiceLiveSession(ctx) {
     attempts++;
   }
 
-  // Jika seluruh kunci dalam cooldown
+  // Jika seluruh kunci dalam cooldown (jangan bocorkan raw upstream Google error ke klien)
   return jsonResponse(
     {
       ok: false,
       error: 'all_keys_busy',
       fallback: true,
-      lastError: lastFailReason,
-      message: 'Seluruh kapasitas jalur suara Gemini Live sedang penuh. Mengalihkan ke jalur cadangan.',
+      message: 'Seluruh kapasitas jalur suara langsung sedang penuh. Mengalihkan ke jalur cadangan.',
     },
     { status: 503 }
   );
@@ -776,10 +796,10 @@ async function invokeSingleGeminiJson({
     }
 
     let res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(key)}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
       {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
         body: JSON.stringify({
           contents: [{ role: 'user', parts: [{ text: promptText }] }],
           generationConfig: genConfigPrimary,
@@ -4422,12 +4442,12 @@ export async function routeVoiceGeminiTts(ctx) {
     try {
       const isGc = kind === 'generateContent';
       const url = isGc
-        ? `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(key)}`
+        ? `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`
         : GOOGLE_INTERACTIONS_API;
       const res = await fetch(url, {
         method: 'POST',
         headers: isGc
-          ? { 'content-type': 'application/json' }
+          ? { 'content-type': 'application/json', 'x-goog-api-key': key }
           : {
               'content-type': 'application/json',
               'x-goog-api-key': key,
@@ -4470,17 +4490,17 @@ export async function routeVoiceGeminiTts(ctx) {
 
       if (res.status === 429) {
         const errBody = await res.text().catch(() => '');
-        const isHardQuota = /quota\s*exceeded|per\s*day|PerDay|requests\s*per\s*day|too_many_requests|check your plan|billing|limit:\s*0|resource_exhausted/i.test(
+        const isHardDailyQuota = /per\s*day|PerDay|requests\s*per\s*day|GenerateRequestsPerDay|check your plan|billing|limit:\s*0\b/i.test(
           errBody
         );
-        const cdUntil = Date.now() + (isHardQuota ? 600000 : 12000);
+        const cdUntil = Date.now() + (isHardDailyQuota ? 600000 : 18000);
         _ttsCooldownMap.set(cooldownKey, cdUntil);
         _ttsCooldownMap.set(modelCooldownKey, cdUntil);
-        if (isHardQuota) {
-          _quotaDeadKeys.add(key);
+        if (isHardDailyQuota) {
+          _quotaDeadKeys.add(key, 600000);
           _verifiedHealthyKeys.delete(key);
         }
-        return { ok: false, reason: `HTTP 429 (${model})` };
+        return { ok: false, reason: 'tts_rate_limited' };
       }
       if (!res.ok) {
         if (res.status !== 404 && res.status !== 503) {
@@ -5101,13 +5121,16 @@ async function invokeGeminiLiveWavTts({
     ws.onerror = () => finalize('live_tts_ws_error');
     ws.onclose = (ev) => {
       const closeReason = String(ev?.reason || '');
+      const isDailyQuotaClose = /per\s*day|PerDay|billing|limit:\s*0\b/i.test(closeReason);
       const isQuotaClose =
         ev.code === 1011 ||
         /quota|exhausted|limit|billing|resource_exhausted/i.test(closeReason);
-      if (isQuotaClose) {
-        _ttsCooldownMap.set(cooldownKey, Date.now() + 180000);
-        _quotaDeadKeys.add(key);
+      if (isDailyQuotaClose) {
+        _ttsCooldownMap.set(cooldownKey, Date.now() + 300000);
+        _quotaDeadKeys.add(key, 300000);
         _verifiedHealthyKeys.delete(key);
+      } else if (isQuotaClose) {
+        _ttsCooldownMap.set(cooldownKey, Date.now() + 45000);
       } else if (ev.code !== 1000 && pcmChunks.length === 0) {
         _ttsCooldownMap.set(cooldownKey, Date.now() + 30000);
       }
@@ -5176,10 +5199,10 @@ export async function routeVoiceVerifySpeech(ctx) {
       const timer = setTimeout(() => controller.abort(), 3200);
       try {
         const res = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(key)}`,
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
           {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
             body: JSON.stringify({
               contents: [
                 {
