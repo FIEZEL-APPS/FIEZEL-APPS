@@ -56,9 +56,27 @@ export function deriveHeadingSpokenNarration(step: OpenerHeadingLike, topicTitle
     .trim();
 }
 
+function humanizeLatexForSpeech(str: string): string {
+  if (!str || (!str.includes('$') && !str.includes('\\'))) return str;
+  return str
+    .replace(/\$\$/g, ' ')
+    .replace(/\$([^$]+)\$/g, ' $1 ')
+    .replace(/\\text\s*\{([^}]*)\}/g, ' $1 ')
+    .replace(/\\frac\s*\{([^}]*)\}\s*\{([^}]*)\}/g, '$1 per $2')
+    .replace(/\\sqrt\s*\{([^}]*)\}/g, 'akar $1')
+    .replace(/\\(?:cdot|times)\b/g, ' kali ')
+    .replace(/\\implies\b/g, ' menjadi ')
+    .replace(/\\pi\b/g, ' pi ')
+    .replace(/\^2\b/g, ' kuadrat')
+    .replace(/\^3\b/g, ' pangkat tiga')
+    .replace(/[{}]/g, '')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+}
+
 /** Caption (ditampilkan) + teks tutur (dikirim ke TTS) untuk satu langkah papan. */
 export function cleanStepCaptionAndSpokenText(rawNarration: string): { caption: string; spokenText: string } {
-  const caption = cleanBoardDisplayText(rawNarration || '')
+  const caption = humanizeLatexForSpeech(cleanBoardDisplayText(rawNarration || ''))
     .replace(
       /\b(?:perhatikan|dengar(?:kan)?|simak|catat)\s+baik[- ]?baik(?:\s+pembagian\s+tugasnya|\s+aturan\s+ini|\s+kawan|\s+ya)?[,!.:;\s]*/gi,
       ''

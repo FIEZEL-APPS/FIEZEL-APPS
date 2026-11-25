@@ -1,7 +1,7 @@
 {
-  "version": "m025-813",
-  "claimedBy": "branch feat/wb-pte-overhaul-m025-814",
-  "claimedAt": "2026-11-25T17:32:26.937Z",
-  "reason": "feat(voice,pte): [ALLOW-MASS-DELETE] overhaul PTE Academic UI, Whiteboard lockstep sync, anti-slop buffering & owner key secrecy",
+  "version": "m025-814",
+  "claimedBy": "branch feat/socratic-wb-combinatorial-m025-814",
+  "claimedAt": "2026-11-25T20:56:17.086Z",
+  "reason": "feat(voice-studio): [ALLOW-MASS-DELETE] living socratic whiteboard combinatorial labs & scratch engine",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

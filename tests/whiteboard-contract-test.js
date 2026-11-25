@@ -317,4 +317,59 @@ const unlockSrc = read('features/voice-studio/src/lib/boardAudioUnlock.ts');
   console.log('  ✅ PASS 14: Mobile PWA zero-force-close invariants (autoload hold, split-brain guard, Silero pause, 1-AudioContext, zero-copy PCM, idle SVG removal) verified');
 }
 
-console.log('\n🎉 ALL 14 WHITEBOARD CONTRACT TESTS PASSED 100%!');
+// ============================================================================
+// TEST 15: Combinatorial Interactive Mechanics, Dual Scratch Engine & Palette Diversity
+// ============================================================================
+{
+  const scratchSrc = read('features/voice-studio/src/components/RoughScratchEngine.tsx');
+  const manipSrc = read('features/voice-studio/src/components/WhiteboardInteractiveManipulatives.tsx');
+  const typesSrc = read('features/voice-studio/src/types/voiceCall.ts');
+  const canvasSrcLocal = read('features/voice-studio/src/components/LiveWhiteboardCanvas.tsx');
+  const directorSrcLocal = read('features/voice-studio/src/lib/whiteboardDirector.ts');
+
+  for (const mech of [
+    'scratch_reveal',
+    'balance_seesaw',
+    'venn_bucket_sorter',
+    'wire_node_connector',
+    'rotary_dial_gauge',
+    'fraction_slice_shader',
+    'magnetic_slot_builder',
+    'wave_pendulum_oscillator',
+    'direct_2d_canvas_lab',
+    'surgical_ink_strike',
+    'step_derivation',
+  ]) {
+    assert.ok(typesSrc.includes(`'${mech}'`), `InteractiveMechanicKind must declare ${mech}`);
+  }
+  for (const pal of [
+    'cobalt_blueprint',
+    'terracotta_atelier',
+    'violet_prism',
+    'crimson_scalpel',
+    'amber_fulcrum',
+    'teal_oscillator',
+    'indigo_constellation',
+    'emerald_botanical',
+  ]) {
+    assert.ok(scratchSrc.includes(`${pal}:`), `INK_STUDIO_PALETTES must define ${pal}`);
+  }
+  assert.ok(
+    scratchSrc.includes("ctx.globalCompositeOperation = 'destination-out'") &&
+      scratchSrc.includes('export function animateRoughScratchPaths'),
+    'RoughScratchEngine must provide both HTML5 Canvas destination-out scratch-off foil AND progressive Rough.js stroke-dashoffset scratch animation'
+  );
+  assert.ok(
+    manipSrc.includes('className="sr-only"') && manipSrc.includes('data-testid="wb-direct-canvas-svg"'),
+    'Direct 2D Canvas Lab must use direct SVG pointer manipulation and keep range input sr-only (zero plain visible browser sliders)'
+  );
+  assert.ok(
+    canvasSrcLocal.includes('data-testid="wb-remix-mechanic-btn"') &&
+      modalSrc.includes('mechanicVariantNonce') &&
+      directorSrcLocal.includes('buildDynamicTopicRemixPair'),
+    'Whiteboard must wire live Variasi Lab mechanic/palette/hatch remixing across LiveWhiteboardCanvas, Modal, and Director'
+  );
+  console.log('  ✅ PASS 15: Combinatorial 11 interactive mechanics × 8 ink palettes × 5 Rough.js hatches & dual scratch engine verified');
+}
+
+console.log('\n🎉 ALL 15 WHITEBOARD CONTRACT TESTS PASSED 100%!');

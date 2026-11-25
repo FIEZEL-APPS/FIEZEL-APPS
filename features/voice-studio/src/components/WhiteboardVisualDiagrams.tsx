@@ -1026,7 +1026,7 @@ export const MindMapDiagram: React.FC<{
       </div>
 
       {/* Organic Hub Banner */}
-      <div className="relative rounded-2xl bg-[#FFFDF7] border border-[#CBD5E1] p-3.5 overflow-visible">
+      <div className="relative py-1.5 overflow-visible">
         {/* Mobile Compact Hub Header (avoids floating horizontal dots above single-column cards) */}
         <div className="sm:hidden flex flex-col items-center mb-2.5">
           <div className="px-4 py-1.5 rounded-full bg-[#DBEAFE] border-2 border-[#1D4ED8] text-[12.5px] font-extrabold text-[#1E3A8A] text-center shadow-2xs">
@@ -1086,7 +1086,7 @@ export const MindMapDiagram: React.FC<{
               <div
                 key={idx}
                 data-wb-panel-focus={isFocused ? 'zoom-in' : activeBranchIdx >= 0 ? 'dim' : 'idle'}
-                className="relative rounded-2xl border-2 bg-white p-3 transition-[transform,opacity,box-shadow,border-color] duration-200 shadow-xs"
+                className="relative rounded-2xl border-2 bg-white/85 p-3 transition-[transform,opacity,box-shadow,border-color] duration-200 shadow-2xs"
                 style={{
                   borderColor: isFocused ? c : `${c}66`,
                   opacity: activeBranchIdx >= 0 && !isFocused ? 0.46 : visible ? 1 : 0.16,
@@ -1181,7 +1181,7 @@ export const TimelineTrackDiagram: React.FC<{
         </div>
       </div>
 
-      <div className="rounded-2xl bg-[#FFFDF7] border border-[#CBD5E1] p-3.5 space-y-3">
+      <div className="py-1.5 space-y-3">
         {/* Progress Time Rail */}
         <div className="relative flex items-center justify-between px-4 py-2">
           <div className="absolute left-6 right-6 top-1/2 -translate-y-1/2 h-1.5 rounded-full bg-[#E2E8F0] overflow-hidden">
@@ -1221,7 +1221,7 @@ export const TimelineTrackDiagram: React.FC<{
                 data-wb-panel-focus={isFocused ? 'zoom-in' : activeEventIdx >= 0 ? 'dim' : 'idle'}
                 className="relative rounded-2xl border-2 p-2.5 transition-[transform,opacity,box-shadow,border-color,background-color] duration-200"
                 style={{
-                  backgroundColor: isFocused || ev.isActive ? '#ECFDF5' : '#FFFFFF',
+                  backgroundColor: isFocused || ev.isActive ? '#ECFDF5' : 'rgba(255,255,255,0.85)',
                   borderColor: isFocused ? c : ev.isActive ? '#10B981' : '#E2E8F0',
                   opacity: activeEventIdx >= 0 && !isFocused ? 0.46 : visible ? 1 : 0.16,
                   transform: isMobileLite
@@ -1304,7 +1304,7 @@ export const FormulaBlocksDiagram: React.FC<{
         </div>
       </div>
 
-      <div className="rounded-2xl bg-[#FFFDF7] border border-[#CBD5E1] p-3.5 space-y-3">
+      <div className="py-1.5 space-y-3">
         {(() => {
           const isPatternMatrix = blocks.some((b) => /\s/.test((b.token || '').trim()));
           return (

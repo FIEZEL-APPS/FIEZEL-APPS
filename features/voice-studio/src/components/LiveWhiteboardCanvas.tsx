@@ -13,8 +13,13 @@ import {
   subscribeKanjiVgUpdates,
   synthesizeFallbackStrokesForAnyChar,
 } from '../data/kakijunStrokeBank';
-import type { TargetLang, WhiteboardVectorShape } from '../types/voiceCall';
+import type { LearnerLocale, TargetLang, WhiteboardVectorShape } from '../types/voiceCall';
 import type { WhiteboardScenePlan, WhiteboardSceneStep } from '../lib/whiteboardDirector';
+import {
+  InlineSocraticCheckpointBar,
+  PolymorphicInteractiveLab,
+  type SocraticInteractionEvent,
+} from './WhiteboardInteractiveManipulatives';
 import {
   AnimatedTutorPenSvg,
   FormulaBlocksDiagram,
@@ -44,6 +49,7 @@ interface FreehandStroke {
 
 interface LiveWhiteboardCanvasProps {
   plan: WhiteboardScenePlan;
+  locale?: LearnerLocale;
   targetLang?: TargetLang;
   playbackSpeed: 0.75 | 1 | 1.25 | 1.5;
   isPlaying: boolean;
@@ -63,6 +69,12 @@ interface LiveWhiteboardCanvasProps {
   externalStepProgress?: number | null;
   activeSpokenText?: string;
   onSelectStepIndex?: (idx: number) => void;
+  socraticWaitingStepId?: string | null;
+  completedSocraticStepIds?: Set<string>;
+  onSocraticInteraction?: (ev: SocraticInteractionEvent) => void;
+  onSkipSocraticGate?: (stepId: string) => void;
+  onBargeInInterrupt?: (activeExcerpt: string) => void;
+  onRemixInteractiveStyle?: () => void;
 }
 
 function cleanBracketArtifacts(val?: unknown): string {
@@ -2182,6 +2194,7 @@ const RoughFreeformSceneDiagram: React.FC<{
 
 export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
   plan,
+  locale,
   targetLang,
   playbackSpeed,
   isPlaying,
@@ -2201,6 +2214,12 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
   externalStepProgress = null,
   activeSpokenText = '',
   onSelectStepIndex,
+  socraticWaitingStepId = null,
+  completedSocraticStepIds,
+  onSocraticInteraction,
+  onSkipSocraticGate,
+  onBargeInInterrupt,
+  onRemixInteractiveStyle,
 }) => {
   const steps = plan.steps;
   const totalSteps = steps.length;
@@ -2797,6 +2816,29 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
       autoSpotlight && isPlaying && !isCurrent && activeStepProgress >= 0.01 && activeStepProgress <= 0.93;
     const showActivePen =
       step.kind !== 'checkpoint' && isPlaying && isCurrent && activeStepProgress > 0.01 && activeStepProgress < 0.95;
+    const isWaitingThisStep = socraticWaitingStepId === step.id;
+    const isSolvedThisStep = Boolean(completedSocraticStepIds?.has(step.id));
+    const emitSocraticResult = (ev: SocraticInteractionEvent) => {
+      onSocraticInteraction?.(ev);
+    };
+    const skipThisSocraticGate = onSkipSocraticGate ? () => onSkipSocraticGate(step.id) : undefined;
+
+    // Living Ink Progressive Reveal: do NOT clutter the open whiteboard with pre-printed queued cards or premature quiz boxes before the teacher reaches them!
+    if (isQueued) {
+      return null;
+    }
+
+    const hasInlineSocraticBar =
+      step.kind !== 'interactive_mechanic' &&
+      step.kind !== 'socratic_slider' &&
+      step.kind !== 'surgical_strike' &&
+      step.kind !== 'step_derivation' &&
+      step.kind !== 'checkpoint' &&
+      Boolean(step.socraticPrompt || (step.quickChoices && step.quickChoices.length > 0));
+    const showInlineSocraticBar =
+      hasInlineSocraticBar &&
+      (isCompleted || isWaitingThisStep || isSolvedThisStep || (isCurrent && activeRevealP >= 0.62));
+
     const wrapQueued = (node: React.ReactNode) => (
       <div
         key={step.id}
@@ -2808,49 +2850,104 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
           }
         }}
         data-wb-step-id={step.id}
-        data-wb-step-state={isCompleted ? 'completed' : isCurrent ? 'active' : 'queued'}
+        data-wb-step-state={
+          isWaitingThisStep
+            ? 'waiting-socratic'
+            : isCompleted
+              ? 'completed'
+              : isCurrent
+                ? 'active'
+                : 'queued'
+        }
         data-wb-auto-zoom={inFocusWindow ? 'in' : isZoomingOutTransition ? 'out' : 'idle'}
-        className={`relative rounded-2xl px-3.5 pt-2.5 ${step.kind === 'checkpoint' ? 'pb-3.5' : 'pb-9'} mx-0.5 border fz-wb-spotlight-card ${
-          isCurrent
-            ? inFocusWindow
-              ? 'border-[#22C55E]/90 bg-white opacity-100 fz-wb-spotlight-zoom-in'
-              : isZoomingOutTransition
-                ? 'border-[#86EFAC]/85 bg-white/95 opacity-100 fz-wb-spotlight-zoom-out'
-                : `border-[#86EFAC]/85 bg-white/95 shadow-[0_6px_22px_rgba(21,128,61,0.09)] opacity-100 ${
-                    autoSpotlight ? 'fz-wb-spotlight-active' : ''
-                  }`
-            : isDimmedByFocus
-              ? 'border-transparent bg-white/40 fz-wb-spotlight-dimmed'
-              : isCompleted
-                ? 'border-transparent bg-white/45 opacity-100'
-                : 'border-dashed border-[#CBD5E1]/70 bg-white/40 opacity-55'
+        className={`relative px-3 pt-2 ${step.kind === 'checkpoint' ? 'pb-3' : 'pb-6'} mx-0.5 transition-[opacity,background-color,border-color] duration-200 fz-wb-spotlight-card ${
+          isWaitingThisStep
+            ? 'rounded-r-2xl border-l-[3.5px] border-y-0 border-r-0 border-l-[#D97706] bg-[#FFFBEB]/55 opacity-100'
+            : isCurrent
+              ? inFocusWindow
+                ? 'rounded-r-2xl border-l-[3.5px] border-y-0 border-r-0 border-l-[#1D4ED8] bg-[#EFF6FF]/35 opacity-100 fz-wb-spotlight-zoom-in'
+                : isZoomingOutTransition
+                  ? 'rounded-r-2xl border-l-[3px] border-y-0 border-r-0 border-l-[#93C5FD] bg-transparent opacity-100 fz-wb-spotlight-zoom-out'
+                  : `rounded-r-2xl border-l-[3px] border-y-0 border-r-0 border-l-[#1D4ED8]/75 bg-transparent opacity-100 ${
+                      autoSpotlight ? 'fz-wb-spotlight-active' : ''
+                    }`
+              : isDimmedByFocus
+                ? 'border-0 bg-transparent fz-wb-spotlight-dimmed'
+                : 'border-0 bg-transparent opacity-100'
         }`}
       >
-        {isQueued && (
-          <div className="mb-1.5 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#F1F5F9] border border-[#E2E8F0] text-[10px] font-bold text-[#64748B] pointer-events-none">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#94A3B8]" />
-            <span>{wbPick('Up next', 'Menunggu giliran')}{step.title ? `: ${step.title}` : ''}</span>
-          </div>
-        )}
         {showActivePen && (
           <div
             data-testid="wb-active-pen-badge"
-            className="fz-pen-float-badge absolute bottom-2 right-3 z-20 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-white/95 border border-[#86EFAC] shadow-xs pointer-events-none"
+            className="flex justify-end mb-1 pointer-events-none"
           >
-            <AnimatedTutorPenSvg color="#15803D" label={wbPick('Tutor Writing...', 'Tutor Menulis...')} />
+            <AnimatedTutorPenSvg color="#1D4ED8" label={wbPick('Sketching...', 'Menggores...', 'กำลังวาด...', locale)} />
           </div>
         )}
-        <div className={isQueued ? (step.kind === 'checkpoint' ? 'opacity-95 focus-within:opacity-100 hover:opacity-100 transition-opacity duration-300' : 'opacity-25 select-none transition-opacity duration-300') : 'fz-wb-card-enter'}>{node}</div>
+        <div className={isQueued ? 'opacity-95 transition-opacity duration-300' : 'fz-wb-card-enter'}>
+          {node}
+          {showInlineSocraticBar && (
+            <InlineSocraticCheckpointBar
+              stepId={step.id}
+              prompt={step.socraticPrompt}
+              choices={step.quickChoices}
+              successVoiceFeedback={step.successVoiceFeedback}
+              locale={locale}
+              targetLang={targetLang}
+              isSolved={isSolvedThisStep}
+              isWaitingOnStudent={isWaitingThisStep}
+              onResult={emitSocraticResult}
+              onSkipContinue={skipThisSocraticGate}
+            />
+          )}
+        </div>
       </div>
     );
 
+    if (
+      step.kind === 'interactive_mechanic' ||
+      step.kind === 'socratic_slider' ||
+      step.kind === 'surgical_strike' ||
+      step.kind === 'step_derivation'
+    ) {
+      return wrapQueued(
+        <div
+          data-wb-excerpt={`${step.title || ''} ${step.socraticPrompt || step.wrongText || ''}`.trim()}
+        >
+          <PolymorphicInteractiveLab
+            step={step}
+            locale={locale}
+            targetLang={targetLang}
+            isCompletedByStudent={isSolvedThisStep}
+            isWaitingOnStudent={isWaitingThisStep}
+            onInteractionResult={emitSocraticResult}
+            onSkipContinue={skipThisSocraticGate}
+          />
+        </div>
+      );
+    }
+
     if (step.kind === 'heading') {
+      const headingInkMap: Record<string, string> = {
+        cobalt_blueprint: '#1E3A8A',
+        terracotta_atelier: '#9A3412',
+        violet_prism: '#5B21B6',
+        crimson_scalpel: '#991B1B',
+        amber_fulcrum: '#92400E',
+        teal_oscillator: '#115E59',
+        indigo_constellation: '#312E81',
+        emerald_botanical: '#14532D',
+      };
+      const headingInk = (step.inkPalette && headingInkMap[step.inkPalette]) || '#14532D';
       return wrapQueued(
         <div
           data-wb-excerpt={`${step.title || ''}: ${step.text || ''}`}
-          className="space-y-1 pb-2"
+          className="space-y-1 pb-2 border-b border-[#E2DEC9]/80"
         >
-          <h2 className="fz-handwriting-heading text-2xl sm:text-3xl font-bold text-[#15803D] leading-snug">
+          <h2
+            className="fz-handwriting-heading text-2xl sm:text-3xl font-bold leading-snug tracking-[-0.01em]"
+            style={{ color: headingInk }}
+          >
             <HandwrittenReveal
               text={step.title || plan.boardTitle}
               progress={isQueued ? 1 : Math.min(1, Math.max(0.15, textProg / 0.44))}
@@ -2861,7 +2958,7 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
             />
           </h2>
           {step.text && (
-            <p className="fz-handwriting-body text-sm sm:text-base text-[#334155] leading-snug">
+            <p className="fz-handwriting-body text-sm sm:text-[16px] font-semibold text-[#334155] leading-snug">
               <HandwrittenReveal
                 text={step.text}
                 progress={isQueued ? 1 : Math.max(0, (textProg - 0.44) / 0.56)}
@@ -3288,10 +3385,10 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
               <span>{wbPick('Zoom', 'Perbesar', 'ขยาย')}</span>
             </button>
           </div>
-          <div className="rounded-2xl overflow-visible border border-[#E2E0D8] bg-white/85 shadow-2xs p-0.5">
-            <table className="w-full border-collapse text-left rounded-xl overflow-visible">
+          <div className="overflow-visible py-1">
+            <table className="w-full border-collapse text-left overflow-visible">
               <thead>
-                <tr className="bg-[#F2F1EC] border-b border-[#E2E0D8]">
+                <tr className="border-b-2 border-[#334155]/25">
                   {headers.map((h, hIdx) => {
                     const start = (hIdx / Math.max(1, headers.length)) * 0.14;
                     const len = Math.max(0.06, 0.14 / Math.max(1, headers.length));
@@ -3299,7 +3396,7 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
                     return (
                       <th
                         key={hIdx}
-                        className="px-3 py-2 fz-handwriting-body text-xs sm:text-sm font-bold text-[#1E293B] border-r last:border-r-0 border-[#E2E0D8]"
+                        className="px-2.5 py-1.5 fz-handwriting-body text-xs sm:text-sm font-extrabold uppercase tracking-wider text-[#14532D]"
                       >
                         <HandwrittenReveal
                           text={h}
@@ -3322,8 +3419,8 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
                   return (
                     <tr
                       key={rIdx}
-                      className={`border-b last:border-b-0 border-[#EAE8E1] fz-table-row-focus ${
-                        isRowFocused ? 'fz-table-row-focus-active' : ''
+                      className={`border-b last:border-b-0 border-[#CBD5E1]/55 fz-table-row-focus ${
+                        isRowFocused ? 'fz-table-row-focus-active bg-[#F0FDF4]/60' : ''
                       }`}
                       style={
                         isRowFocused
@@ -3352,7 +3449,7 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
                         return (
                           <td
                             key={cIdx}
-                            className="px-3 py-2.5 align-top fz-handwriting-body text-xs sm:text-[13.5px] text-[#334155] border-r last:border-r-0 border-[#EAE8E1] min-h-[42px]"
+                            className="px-2.5 py-2 align-top fz-handwriting-body text-xs sm:text-[14px] text-[#1E293B] min-h-[38px]"
                           >
                             <HandwrittenReveal
                               text={cell}
@@ -3556,7 +3653,7 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
       return wrapQueued(
         <div
           data-wb-excerpt={wbPick('Quick Check Practice', 'Latihan Cek Pemahaman')}
-          className="relative z-30 rounded-2xl bg-white border border-[#E2E8F0] shadow-sm p-3.5"
+          className="relative z-30 rounded-2xl bg-[#FFFDF9]/95 border border-[#E2DEC9] shadow-2xs p-3.5"
         >
           {quizSlot}
         </div>
@@ -3608,15 +3705,55 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
           >
             Reset
           </button>
+          {onRemixInteractiveStyle && (
+            <button
+              type="button"
+              data-testid="wb-remix-mechanic-btn"
+              onClick={onRemixInteractiveStyle}
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-extrabold text-[#6D28D9] bg-[#EDE9FE] hover:bg-[#DDD6FE] border border-[#C4B5FD] cursor-pointer shrink-0 whitespace-nowrap transition-transform active:scale-95"
+              title={wbPick('Switch to a brand-new interactive visual mechanic & sketch style', 'Ganti ke variasi visual & mekanik interaktif baru', 'เปลี่ยนรูปแบบอินเทอร์แอคทีฟ', locale)}
+            >
+              <svg viewBox="0 0 16 16" className="w-3 h-3 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M2.5 5h8.2l-2-2M13.5 11H5.3l2 2" />
+              </svg>
+              <span>{wbPick('Remix Lab', 'Variasi Lab', 'สลับรูปแบบ', locale)}</span>
+            </button>
+          )}
         </div>
 
-        {/* Status Live Menulis + Auto Zoom Lens Indicator */}
+        {/* Status Live Menulis + Socratic Gate + Barge-In Interrupt */}
         <div className="flex items-center gap-1.5 shrink-0">
-          {isPlaying && (
-            <span className="hidden sm:inline-flex items-center gap-1.5 text-[11px] font-bold text-[#15803D] bg-[#DCFCE7] px-2.5 py-0.5 rounded-full">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#15803D] animate-ping" />
-              <span>{wbPick('Tutor is writing on the board...', 'Tutor sedang menulis di papan...', 'ผู้สอนกำลังเขียนบนกระดาน...')}</span>
+          {socraticWaitingStepId && (
+            <span
+              data-testid="wb-socratic-waiting-pill"
+              className="inline-flex items-center gap-1.5 text-[10.5px] font-extrabold text-[#92400E] bg-[#FEF3C7] border border-[#F59E0B] px-2.5 py-0.5 rounded-full whitespace-nowrap"
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-[#D97706] animate-ping" />
+              <span>{wbPick('Your Turn on Board', 'Giliranmu di Papan', 'ตาคุณลองบนกระดาน', locale)}</span>
             </span>
+          )}
+          {isPlaying && (
+            <span className="hidden md:inline-flex items-center gap-1.5 text-[11px] font-bold text-[#15803D] bg-[#DCFCE7] px-2.5 py-0.5 rounded-full">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#15803D] animate-ping" />
+              <span>{wbPick('Mentor speaking...', 'Tutor menjelaskan...', 'ผู้สอนกำลังอธิบาย...', locale)}</span>
+            </span>
+          )}
+          {isPlaying && onBargeInInterrupt && (
+            <button
+              type="button"
+              data-testid="wb-barge-in-btn"
+              onClick={() => {
+                const curStep = steps[activeStepIndex];
+                onBargeInInterrupt(curStep?.title || plan.boardTitle);
+              }}
+              className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10.5px] font-extrabold bg-[#FFFBEB] hover:bg-[#FEF3C7] text-[#92400E] border border-[#FCD34D] cursor-pointer transition-colors whitespace-nowrap"
+              title={wbPick('Pause mentor and ask right now', 'Sela penjelasan tutor & tanya langsung sekarang', 'หยุดถามตอนนี้เลย', locale)}
+            >
+              <svg viewBox="0 0 16 16" className="w-3 h-3 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M8 2.2v6.2M5.2 5.8v2.6a2.8 2.8 0 0 0 5.6 0V5.8M8 11.2v2.6" />
+              </svg>
+              <span>{wbPick('Interrupt & Ask', 'Sela / Tanya', 'แทรกถาม', locale)}</span>
+            </button>
           )}
           {autoSpotlight && isPlaying && (
             <span
