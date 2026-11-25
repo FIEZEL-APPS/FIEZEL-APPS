@@ -482,14 +482,16 @@ function bootApp() {
   const index = new Map();
   (function walk(dir) {
     for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
-      if (['node_modules', '.git', 'vendor', 'assets', 'docs', '.audit-tmp'].includes(e.name)) continue; // .audit-tmp: release-audit.py sets TMPDIR=ROOT/.audit-tmp; leftover adoption/rehearsal snapshots there shadow the canonical root data files in this basename index (precedent: tests/level-grammar-contract-test.js)
+      if (['node_modules', '.git', 'vendor', 'assets', 'docs', '.audit-tmp', 'sides'].includes(e.name)) continue; // .audit-tmp & sides: prevent i18n sidecars or temp snapshots from shadowing canonical root banks
       const full = path.join(dir, e.name);
       if (e.isDirectory()) walk(full); else if (!index.has(e.name)) index.set(e.name, full);
     }
   })(root);
   const fetchStub = async url => {
-    const file = String(url).split('/').pop();
-    const full = index.get(file);
+    const cleanRel = String(url).replace(/^https?:\/\/[^/]+\//i, '').replace(/^\.\//, '').split('?')[0];
+    const direct = path.join(root, cleanRel);
+    const file = cleanRel.split('/').pop();
+    const full = (fs.existsSync(direct) && fs.statSync(direct).isFile()) ? direct : index.get(file);
     if (!full) return { ok: false, status: 404, json: async () => { throw new Error('404'); } };
     return { ok: true, status: 200, json: async () => JSON.parse(fs.readFileSync(full, 'utf8')) };
   };
@@ -763,7 +765,10 @@ async function auditPlacementRuntime(ctx) {
   if (ctx) {
     await new Promise(r => setTimeout(r, 50)); // let load() settle
     try { auditGrammarRuntime(ctx, templates); } catch (e) { critical('grammar', 'AUDIT_THREW', 'runtime', 'grammar runtime audit crashed', e.stack); }
-    try { auditReadingRuntime(ctx, vm.runInContext('R', ctx)); } catch (e) { critical('reading', 'AUDIT_THREW', 'runtime', 'reading runtime audit crashed', e.stack); }
+    try {
+      const runtimeR = vm.runInContext('typeof R !== "undefined" ? R : null', ctx);
+      auditReadingRuntime(ctx, Array.isArray(runtimeR) ? runtimeR : R);
+    } catch (e) { critical('reading', 'AUDIT_THREW', 'runtime', 'reading runtime audit crashed', e.stack); }
     try { auditVocabularyRuntime(ctx); } catch (e) { critical('vocabulary', 'AUDIT_THREW', 'runtime', 'vocabulary runtime audit crashed', e.stack); }
     try { await auditPlacementRuntime(ctx); } catch (e) { critical('placement', 'AUDIT_THREW', 'runtime', 'placement runtime audit crashed', e.stack); }
   }
