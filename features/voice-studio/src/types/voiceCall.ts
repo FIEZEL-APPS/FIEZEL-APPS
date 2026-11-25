@@ -151,6 +151,106 @@ export type WhiteboardMetaphorTheme =
   | 'traffic_light'
   | 'key_and_lock';
 
+export type WhiteboardDomainType =
+  | 'language'
+  | 'math'
+  | 'physics'
+  | 'science'
+  | 'character'
+  | 'exam';
+
+export interface SocraticSliderStop {
+  value: number;
+  tag?: string;
+  label?: string;
+  expression?: string;
+  example?: string;
+  formula?: string;
+  subnote?: string;
+  voiceFeedback?: string;
+  spokenHint?: string;
+}
+
+export interface StepDerivationLine {
+  expr?: string;
+  latex?: string;
+  sideOp?: string;
+  isInteractiveBlank?: boolean;
+  expectedValue?: string;
+  choices?: string[];
+  hint?: string;
+}
+
+export interface SocraticQuickChoice {
+  id?: string;
+  label: string;
+  isCorrect: boolean;
+  socraticHint?: string;
+}
+
+export type InteractiveMechanicKind =
+  | 'balance_seesaw'
+  | 'scratch_reveal'
+  | 'venn_bucket_sorter'
+  | 'wire_node_connector'
+  | 'rotary_dial_gauge'
+  | 'fraction_slice_shader'
+  | 'direct_2d_canvas_lab'
+  | 'magnetic_slot_builder'
+  | 'wave_pendulum_oscillator'
+  | 'surgical_ink_strike'
+  | 'step_derivation';
+
+export type InkPaletteId =
+  | 'cobalt_blueprint'
+  | 'terracotta_atelier'
+  | 'violet_prism'
+  | 'crimson_scalpel'
+  | 'amber_fulcrum'
+  | 'teal_oscillator'
+  | 'indigo_constellation'
+  | 'emerald_botanical';
+
+export type RoughHatchKind =
+  | 'hachure'
+  | 'cross-hatch'
+  | 'zigzag'
+  | 'dots'
+  | 'dashed';
+
+export interface SeesawItemToken {
+  id: string;
+  label: string;
+  weight: number;
+  side?: 'left' | 'right' | 'tray';
+}
+
+export interface BucketZoneSpec {
+  id: string;
+  label: string;
+  sublabel?: string;
+}
+
+export interface BucketSortableChip {
+  id: string;
+  label: string;
+  targetZoneId: string;
+  hint?: string;
+}
+
+export interface WirePairSpec {
+  id: string;
+  leftLabel: string;
+  rightLabel: string;
+}
+
+export interface DialSectorStop {
+  angleDeg: number;
+  label: string;
+  expression: string;
+  note?: string;
+}
+
 export interface WhiteboardStepCommand {
   id?: string;
   kind:
@@ -168,8 +268,76 @@ export interface WhiteboardStepCommand {
     | 'trap_vs_fix'
     | 'kanji_grid'
     | 'tone_wave'
+    | 'socratic_slider'
+    | 'surgical_strike'
+    | 'step_derivation'
+    | 'interactive_mechanic'
     | 'student_question'
     | 'checkpoint';
+  domainType?: WhiteboardDomainType;
+  mechanic?: InteractiveMechanicKind;
+  inkPalette?: InkPaletteId;
+  roughHatch?: RoughHatchKind;
+  variantSeed?: number;
+  /** Pauses lockstep audio & writing at the end of this step until the learner interacts or answers */
+  pauseForInteraction?: boolean;
+  socraticPrompt?: string;
+  successVoiceFeedback?: string;
+  quickChoices?: SocraticQuickChoice[];
+  /** Seesaw Balance Lab (`mechanic === 'balance_seesaw'`) */
+  seesawLeftFixedLabel?: string;
+  seesawLeftWeight?: number;
+  seesawRightFixedLabel?: string;
+  seesawRightBaseWeight?: number;
+  seesawTokens?: SeesawItemToken[];
+  /** Scratch-Off Foil Mystery (`mechanic === 'scratch_reveal'`) */
+  scratchClueHeader?: string;
+  scratchHiddenFormula?: string;
+  scratchHiddenSubnote?: string;
+  scratchSketchKind?: 'arch_bridge' | 'prism_split' | 'vector_burst' | 'venn_core';
+  /** Venn / Concentric Zone Sorter (`mechanic === 'venn_bucket_sorter'`) */
+  bucketLayout?: 'concentric' | 'dual_rings' | 'triple_bins';
+  bucketZones?: BucketZoneSpec[];
+  bucketChips?: BucketSortableChip[];
+  /** Bezier Wire Node Connector (`mechanic === 'wire_node_connector'`) */
+  wirePairs?: WirePairSpec[];
+  /** Rotary Compass / Protractor Dial (`mechanic === 'rotary_dial_gauge'`) */
+  dialTargetDeg?: number;
+  dialInitialDeg?: number;
+  dialUnit?: string;
+  dialStops?: DialSectorStop[];
+  /** Fraction / Sector Hachure Slicer (`mechanic === 'fraction_slice_shader'`) */
+  sliceTotal?: number;
+  sliceTargetCount?: number;
+  sliceShape?: 'circle' | 'bar_grid';
+  sliceCaptionUnit?: string;
+  /** Magnetic Blueprint Slot Builder (`mechanic === 'magnetic_slot_builder'`) */
+  magnetTargetTokens?: string[];
+  magnetDistractors?: string[];
+  magnetSlotRoles?: string[];
+  /** Wave / Pendulum Live Oscillator (`mechanic === 'wave_pendulum_oscillator'`) */
+  waveMode?: 'sine_frequency' | 'tone_pitch' | 'pendulum_arc';
+  waveTargetLevel?: number;
+  waveInitialLevel?: number;
+  waveUnitLabel?: string;
+  /** Interactive Slider Lab fields (`kind === 'socratic_slider'`) */
+  sliderDomain?: 'tense_timeline' | 'math_graph' | 'physics_vector' | 'degree_scale';
+  mathFnType?: 'linear' | 'quadratic' | 'pythagoras' | 'circle_area';
+  sliderLabel?: string;
+  sliderMin?: number;
+  sliderMax?: number;
+  sliderStep?: number;
+  sliderInitial?: number;
+  sliderTarget?: number;
+  sliderUnit?: string;
+  sliderStops?: SocraticSliderStop[];
+  /** Tap-to-Fix Surgical Strike fields (`kind === 'surgical_strike'`) */
+  strikeTokens?: string[];
+  bugTokenIndex?: number;
+  fixedToken?: string;
+  wrongTapHint?: string;
+  /** Step-by-step STEM / Logic Derivation fields (`kind === 'step_derivation'`) */
+  derivationSteps?: StepDerivationLine[];
   sceneTheme?: WhiteboardMetaphorTheme;
   highlightTerms?: string[];
   leftPanel?: {

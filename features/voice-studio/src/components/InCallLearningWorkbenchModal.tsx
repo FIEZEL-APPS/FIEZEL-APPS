@@ -98,6 +98,7 @@ import {
   getPteRaQuestionsByCategory,
   getRandomPteRaQuestion,
 } from '../data/pteReadAloudBank';
+import { MathText } from './MathText';
 
 export type WorkbenchContextMode =
   | 'confusing_pair'   // Timbangan Konseptual / Dual Contrast Stream
@@ -545,7 +546,32 @@ function synthesizeSentenceDistractors(
     }
   }
 
-  if (targetLang === 'en') {
+  if (/\d/.test(cleanTarget) && (/[=+\-*/÷×^²³π]|m\/s|cm|kg|\bN\b/i.test(cleanTarget) || cleanTarget.split(/\s+/).length <= 4)) {
+    const numMatch = cleanTarget.match(/-?\d+(?:\.\d+)?/);
+    if (numMatch && numMatch.index !== undefined) {
+      const baseNum = Number(numMatch[0]);
+      const prefix = cleanTarget.slice(0, numMatch.index);
+      const suffix = cleanTarget.slice(numMatch.index + numMatch[0].length);
+      if (Number.isFinite(baseNum)) {
+        const alt1 = baseNum === 0 ? 2 : baseNum * 2;
+        const alt2 = baseNum > 2 ? baseNum + 2 : baseNum + 3;
+        pushCandidate(
+          `${prefix}${alt1}${suffix}`,
+          pick(
+            'Recheck the calculation step and operation sign on the board.',
+            'Periksa kembali langkah perhitungan dan operasi pada rumus di papan.'
+          )
+        );
+        pushCandidate(
+          `${prefix}${alt2}${suffix}`,
+          pick(
+            'Check the exact substitution values in the equation.',
+            'Cek kembali hasil substitusi angkanya pada persamaan di papan.'
+          )
+        );
+      }
+    }
+  } else if (targetLang === 'en') {
     if (/\b(?:am|is|are)\s+([a-z]+)\b/i.test(cleanTarget)) {
       pushCandidate(
         cleanTarget.replace(/\b(?:am|is|are)\s+/i, ''),
@@ -4231,6 +4257,13 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
   const boardMicStopTimerRef = useRef<number | null>(null);
   const handleSubmitBoardQuestionRef = useRef<((rawQ: string, areaExcerpt?: string) => void) | null>(null);
 
+  // Socratic Micro-Beat Pause-Gate State (Declared BEFORE any early return to satisfy React Hook Order Contract!)
+  const [socraticWaitingStepId, setSocraticWaitingStepId] = useState<string | null>(null);
+  const [completedSocraticIds, setCompletedSocraticIds] = useState<string[]>([]);
+  const completedSocraticSetRef = useRef<Set<string>>(new Set());
+  const socraticAdvanceTimerRef = useRef<number | null>(null);
+  const completedSocraticSet = useMemo(() => new Set(completedSocraticIds), [completedSocraticIds]);
+
   const stopBoardVoiceCapture = (submitCollected = false) => {
     if (boardMicStopTimerRef.current) {
       window.clearTimeout(boardMicStopTimerRef.current);
@@ -4454,6 +4487,13 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
         window.clearTimeout(unlockLaunchTimerRef.current);
         unlockLaunchTimerRef.current = null;
       }
+      if (socraticAdvanceTimerRef.current) {
+        window.clearTimeout(socraticAdvanceTimerRef.current);
+        socraticAdvanceTimerRef.current = null;
+      }
+      completedSocraticSetRef.current.clear();
+      setCompletedSocraticIds([]);
+      setSocraticWaitingStepId(null);
       setIsMinimized(false);
       setIsPenActive(false);
       setStudentQuestions([]);
@@ -4474,6 +4514,13 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
       const prevBaseTitle = lastKeyRef.current.split('::')[1] || '';
       const nextBaseTitle = topicKey.split('::')[1] || '';
       trackCacheRef.current.clear();
+      if (socraticAdvanceTimerRef.current) {
+        window.clearTimeout(socraticAdvanceTimerRef.current);
+        socraticAdvanceTimerRef.current = null;
+      }
+      completedSocraticSetRef.current.clear();
+      setCompletedSocraticIds([]);
+      setSocraticWaitingStepId(null);
       setSelectedOptionId(null);
       setClozeAnswer(null);
       setPlacedBlocks([]);
@@ -4553,6 +4600,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
   }, [isOpen, isReady, isInitialAudioGateActive, boardState?.contextMode, focusType, uiAction?.focusType]);
 
   const [cjkRevision, setCjkRevision] = useState(0);
+  const [mechanicVariantNonce, setMechanicVariantNonce] = useState(0);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -4591,8 +4639,9 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
       locale: effectiveBoardLocale,
       studentQuestions,
       uploadedMaterials,
+      variantNonce: mechanicVariantNonce,
     });
-  }, [boardState, uiAction, scenario, targetLang, effectiveBoardLocale, studentQuestions, uploadedMaterials, cjkRevision]);
+  }, [boardState, uiAction, scenario, targetLang, effectiveBoardLocale, studentQuestions, uploadedMaterials, cjkRevision, mechanicVariantNonce]);
 
   const cohesiveAudioPlan = useMemo(
     () => (whiteboardPlan ? buildCohesiveBoardNarrationScript(whiteboardPlan) : null),
@@ -5428,6 +5477,36 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
             trackCacheRef.current.delete(`${activePersona.id}::${locCode}::chunk::${playedChunkText}`);
           }
         }
+        // Socratic Micro-Beat Pause Gate:
+        // When the last spoken chunk of an interactive Beat finishes, pause automatically and invite the student to interact!
+        const curStepIdx = packedChunks[chunkIdx]?.stepIndex ?? -1;
+        const nextStepIdx = !isLastChunk ? (packedChunks[chunkIdx + 1]?.stepIndex ?? -1) : -1;
+        if (curStepIdx >= 0 && (isLastChunk || nextStepIdx !== curStepIdx)) {
+          const finishedStep = steps[curStepIdx];
+          if (
+            finishedStep &&
+            finishedStep.pauseForInteraction &&
+            !completedSocraticSetRef.current.has(finishedStep.id)
+          ) {
+            const endF = resolveLiveChunkBounds().endFrac;
+            applyTrackFraction(Math.max(0.01, Math.min(0.992, endF - 0.001)), false);
+            lastCommitIdxRef.current = curStepIdx;
+            lastCommitProgRef.current = 0.992;
+            setLockstepIndex(curStepIdx);
+            setLockstepProgress(0.992);
+            setSocraticWaitingStepId(finishedStep.id);
+            setIsStepAudioActive(false);
+            setNeedsAudioUnlock(false);
+            setIsWritingPlaying(false);
+            publishAudioDebug({
+              isPlaying: false,
+              socraticPausedAtStep: finishedStep.id,
+              interChunkGapsMs: [...interChunkGapsMs],
+              wordClockMatchedCount,
+            });
+            return;
+          }
+        }
         if (isLastChunk) {
           setIsStepAudioActive(false);
           setNeedsAudioUnlock(false);
@@ -6182,6 +6261,13 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
   const handleReplayVoice = () => {
     unlockSharedBoardAudioContext();
     setNeedsAudioUnlock(false);
+    if (socraticAdvanceTimerRef.current) {
+      window.clearTimeout(socraticAdvanceTimerRef.current);
+      socraticAdvanceTimerRef.current = null;
+    }
+    completedSocraticSetRef.current.clear();
+    setCompletedSocraticIds([]);
+    setSocraticWaitingStepId(null);
     const isPteBoardNow =
       Boolean(boardState?.contextMode?.startsWith('pte_')) ||
       Boolean(focusType?.startsWith('pte_')) ||
@@ -6268,6 +6354,10 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
     const qId = `q_${Date.now()}`;
     const currentVisualSteps = (whiteboardPlan?.steps || []).filter((s) =>
       [
+        'interactive_mechanic',
+        'socratic_slider',
+        'surgical_strike',
+        'step_derivation',
         'rough_scene',
         'contrast_scale',
         'syntax_flow',
@@ -7763,15 +7853,19 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                             className="w-full h-24 object-cover rounded-xl border border-[#E2E8F0] mb-1.5"
                           />
                         )}
-                        <div className="text-xs font-extrabold text-[#0F172A] line-clamp-1">{pg.title}</div>
-                        <div className="text-[10.5px] text-[#64748B] line-clamp-1 mb-1.5">{pg.subtitle}</div>
+                        <div className="text-xs font-extrabold text-[#0F172A] line-clamp-1">
+                          <MathText text={pg.title} active />
+                        </div>
+                        <div className="text-[10.5px] text-[#64748B] line-clamp-1 mb-1.5">
+                          <MathText text={pg.subtitle} active />
+                        </div>
                         <ul className="space-y-1">
                           {pg.highlights.slice(0, 3).map((hl, idx) => (
                             <li
                               key={idx}
                               className="text-[10px] text-[#334155] bg-[#F8FAFC] px-2 py-1 rounded-lg border border-[#F1F5F9] line-clamp-2"
                             >
-                              {hl}
+                              <MathText text={hl} active />
                             </li>
                           ))}
                         </ul>
@@ -7821,10 +7915,16 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                   >
                   <LiveWhiteboardCanvas
                     plan={whiteboardPlan}
+                    locale={effectiveBoardLocale}
                     targetLang={targetLang}
                     playbackSpeed={playbackSpeed}
                     isPlaying={isWritingPlaying && !needsAudioUnlock && !isAudioPreparing && !isGeneratingTopic}
                     onPlayingChange={(playing) => {
+                      if (playing && socraticWaitingStepId) {
+                        completedSocraticSetRef.current.add(socraticWaitingStepId);
+                        setCompletedSocraticIds(Array.from(completedSocraticSetRef.current));
+                        setSocraticWaitingStepId(null);
+                      }
                       setIsWritingPlaying(playing);
                       if (!playing && lockstepAudioRef.current) {
                         try {
@@ -7851,9 +7951,184 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                     externalStepIndex={lockstepIndex}
                     externalStepProgress={lockstepProgress}
                     activeSpokenText={activeSpokenWindowText || activeSentenceText}
+                    socraticWaitingStepId={socraticWaitingStepId}
+                    completedSocraticStepIds={completedSocraticSet}
+                    onSocraticInteraction={(ev) => {
+                      unlockSharedBoardAudioContext();
+                      setNeedsAudioUnlock(false);
+                      const attemptSig = `${currentKey}::socratic::${ev.stepId}::${ev.userAnswer}`;
+                      const firstAttempt = !reportedQuizKeysRef.current.has(attemptSig);
+                      if (firstAttempt) {
+                        reportedQuizKeysRef.current.add(attemptSig);
+                      }
+                      if (ev.isCorrect) {
+                        playFiezelSfx('answer_correct');
+                        if (onEvaluatePractice && firstAttempt) {
+                          onEvaluatePractice(
+                            ev.userAnswer,
+                            ev.expectedAnswer || ev.userAnswer,
+                            boardState?.patternFormula,
+                            {
+                              isQuizSuccess: true,
+                              misconceptionId: resolvedMisconceptionId,
+                            }
+                          );
+                        }
+                        completedSocraticSetRef.current.add(ev.stepId);
+                        setCompletedSocraticIds(Array.from(completedSocraticSetRef.current));
+                        const wasWaitingThisStep = socraticWaitingStepId === ev.stepId;
+                        if (wasWaitingThisStep) {
+                          setSocraticWaitingStepId(null);
+                        }
+                        if (ev.feedbackToSpeak) {
+                          setActiveStepSubtitle(ev.feedbackToSpeak);
+                          speakQuizCoachLine(ev.feedbackToSpeak);
+                        }
+                        const solvedIdx = whiteboardPlan.steps.findIndex((s) => s.id === ev.stepId);
+                        if (solvedIdx >= 0 && (wasWaitingThisStep || lockstepIndex === solvedIdx)) {
+                          if (socraticAdvanceTimerRef.current) {
+                            window.clearTimeout(socraticAdvanceTimerRef.current);
+                          }
+                          const feedbackWords = (ev.feedbackToSpeak || '').split(/\s+/).filter(Boolean).length;
+                          const waitMs = ev.feedbackToSpeak
+                            ? Math.min(4400, Math.max(1900, feedbackWords * 290))
+                            : 550;
+                          socraticAdvanceTimerRef.current = window.setTimeout(() => {
+                            socraticAdvanceTimerRef.current = null;
+                            stopQuizCoachSpeech();
+                            const nextIdx = solvedIdx + 1;
+                            const total = whiteboardPlan.steps.length;
+                            const bounded = Math.max(0, Math.min(total, nextIdx));
+                            seekTargetStepRef.current = bounded < total ? bounded : null;
+                            const span = cohesiveAudioPlan?.stepSpans[bounded];
+                            const estSec = Math.max(
+                              4,
+                              whiteboardPlan.steps.reduce((s, st) => s + (st.durationMs || 2200), 0) / 1000
+                            );
+                            const totalSec = trackTotalSecRef.current || estSec;
+                            const targetFrac = bounded >= total ? 1 : span ? span.startFrac : 0;
+                            trackFracRef.current = targetFrac;
+                            trackOffsetSecRef.current =
+                              bounded >= total ? totalSec : span ? span.startFrac * totalSec : 0;
+                            lastCommitIdxRef.current = bounded;
+                            lastCommitProgRef.current = bounded >= total ? 1 : 0.04;
+                            lastCommitSubRef.current = span?.caption || '';
+                            spokenCursorRef.current = null;
+                            setSpokenCursor(null);
+                            setActiveStepSubtitle(span?.caption || '');
+                            setLockstepIndex(bounded);
+                            setLockstepProgress(bounded >= total ? 1 : 0.04);
+                            setIsWritingPlaying(bounded < total);
+                            setSeekNonce((n) => n + 1);
+                          }, waitMs);
+                        }
+                      } else {
+                        playFiezelSfx('answer_wrong');
+                        if (onEvaluatePractice && firstAttempt) {
+                          onEvaluatePractice(
+                            ev.userAnswer,
+                            ev.expectedAnswer || boardState?.topicTitle || '',
+                            boardState?.patternFormula,
+                            {
+                              isQuizSuccess: false,
+                              isQuizFailure: true,
+                              trapWrongToken: ev.userAnswer,
+                              misconceptionId: resolvedMisconceptionId,
+                            }
+                          );
+                        }
+                        if (ev.feedbackToSpeak) {
+                          setActiveStepSubtitle(ev.feedbackToSpeak);
+                          speakQuizCoachLine(ev.feedbackToSpeak);
+                        }
+                      }
+                    }}
+                    onSkipSocraticGate={(stepId) => {
+                      unlockSharedBoardAudioContext();
+                      playFiezelSfx('button_tap');
+                      if (socraticAdvanceTimerRef.current) {
+                        window.clearTimeout(socraticAdvanceTimerRef.current);
+                        socraticAdvanceTimerRef.current = null;
+                      }
+                      stopQuizCoachSpeech();
+                      completedSocraticSetRef.current.add(stepId);
+                      setCompletedSocraticIds(Array.from(completedSocraticSetRef.current));
+                      setSocraticWaitingStepId(null);
+                      const curIdx = whiteboardPlan.steps.findIndex((s) => s.id === stepId);
+                      const nextIdx = curIdx >= 0 ? curIdx + 1 : lockstepIndex + 1;
+                      const total = whiteboardPlan.steps.length;
+                      const bounded = Math.max(0, Math.min(total, nextIdx));
+                      seekTargetStepRef.current = bounded < total ? bounded : null;
+                      const span = cohesiveAudioPlan?.stepSpans[bounded];
+                      const estSec = Math.max(
+                        4,
+                        whiteboardPlan.steps.reduce((s, st) => s + (st.durationMs || 2200), 0) / 1000
+                      );
+                      const totalSec = trackTotalSecRef.current || estSec;
+                      const targetFrac = bounded >= total ? 1 : span ? span.startFrac : 0;
+                      trackFracRef.current = targetFrac;
+                      trackOffsetSecRef.current =
+                        bounded >= total ? totalSec : span ? span.startFrac * totalSec : 0;
+                      lastCommitIdxRef.current = bounded;
+                      lastCommitProgRef.current = bounded >= total ? 1 : 0.04;
+                      lastCommitSubRef.current = span?.caption || '';
+                      spokenCursorRef.current = null;
+                      setSpokenCursor(null);
+                      setActiveStepSubtitle(span?.caption || '');
+                      setLockstepIndex(bounded);
+                      setLockstepProgress(bounded >= total ? 1 : 0.04);
+                      setIsWritingPlaying(bounded < total);
+                      setSeekNonce((n) => n + 1);
+                    }}
+                    onBargeInInterrupt={(activeExcerpt) => {
+                      playFiezelSfx('button_tap');
+                      if (socraticAdvanceTimerRef.current) {
+                        window.clearTimeout(socraticAdvanceTimerRef.current);
+                        socraticAdvanceTimerRef.current = null;
+                      }
+                      stopQuizCoachSpeech();
+                      stopLockstepAudio();
+                      setIsWritingPlaying(false);
+                      setIsStepAudioActive(false);
+                      if (activeExcerpt && !questionDraft.trim()) {
+                        setBoardMicHint(
+                          wbT(
+                            effectiveBoardLocale,
+                            `Tutor paused at "${activeExcerpt.slice(0, 38)}". Ask or speak directly below!`,
+                            `Tutor berhenti sejenak di "${activeExcerpt.slice(0, 38)}". Ketik atau bicara langsung di bawah!`,
+                            `ผู้สอนหยุดรอที่ "${activeExcerpt.slice(0, 38)}" พิมพ์หรือพูดถามด้านล่างได้เลย!`
+                          )
+                        );
+                      }
+                      window.setTimeout(() => {
+                        questionInputRef.current?.focus();
+                      }, 40);
+                    }}
+                    onRemixInteractiveStyle={() => {
+                      unlockSharedBoardAudioContext();
+                      playFiezelSfx('button_tap');
+                      if (socraticAdvanceTimerRef.current) {
+                        window.clearTimeout(socraticAdvanceTimerRef.current);
+                        socraticAdvanceTimerRef.current = null;
+                      }
+                      stopQuizCoachSpeech();
+                      completedSocraticSetRef.current.clear();
+                      setCompletedSocraticIds([]);
+                      setSocraticWaitingStepId(null);
+                      setMechanicVariantNonce((n) => n + 1);
+                      setLockstepIndex(1);
+                      setLockstepProgress(0.95);
+                      setIsWritingPlaying(false);
+                    }}
                     onSelectStepIndex={(idx) => {
                       unlockSharedBoardAudioContext();
                       setNeedsAudioUnlock(false);
+                      if (socraticAdvanceTimerRef.current) {
+                        window.clearTimeout(socraticAdvanceTimerRef.current);
+                        socraticAdvanceTimerRef.current = null;
+                      }
+                      stopQuizCoachSpeech();
+                      setSocraticWaitingStepId(null);
                       stopLockstepAudio();
                       const total = whiteboardPlan.steps.length;
                       const bounded = Math.max(0, Math.min(total, idx));

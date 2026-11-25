@@ -613,19 +613,16 @@ rt.zh-rt {
 }
 
 .fz-wb-spotlight-active {
-  box-shadow: 0 10px 28px rgba(21, 128, 61, 0.13), 0 0 0 2px rgba(34, 197, 94, 0.45);
   transform: translate3d(0, -1px, 0);
 }
 
 .fz-wb-spotlight-zoom-in {
   z-index: 25;
-  box-shadow: 0 16px 38px rgba(21, 128, 61, 0.16), 0 0 0 2px rgba(34, 197, 94, 0.62);
-  transform: translate3d(0, -2px, 0) scale(1.016);
+  transform: translate3d(0, -1px, 0) scale(1.012);
 }
 
 .fz-wb-spotlight-zoom-out {
   z-index: 18;
-  box-shadow: 0 8px 20px rgba(21, 128, 61, 0.1), 0 0 0 1.5px rgba(134, 239, 172, 0.72);
   transform: translate3d(0, 0, 0) scale(1);
 }
 
