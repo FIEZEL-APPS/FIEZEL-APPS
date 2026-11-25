@@ -693,10 +693,10 @@ rt.zh-rt {
   display: inline;
   background: linear-gradient(
     104deg,
-    rgba(254, 240, 138, 0.28) 0%,
-    rgba(254, 240, 138, 0.92) 12%,
-    rgba(253, 224, 71, 0.96) 88%,
-    rgba(254, 240, 138, 0.35) 100%
+    rgba(254, 240, 138, 0.34) 0%,
+    rgba(254, 240, 138, 0.94) 10%,
+    rgba(253, 224, 71, 0.96) 90%,
+    rgba(254, 240, 138, 0.38) 100%
   );
   color: #142117;
   font-weight: 800;
@@ -711,6 +711,55 @@ rt.zh-rt {
   animation: fzStabiloGlow 760ms cubic-bezier(0.22, 1, 0.36, 1) both;
   box-shadow: 0 2px 10px rgba(245, 158, 11, 0.45);
 }
+
+/* Distortion-free Multi-Line Ink Annotations (Immune to CSS transform scale & font reflow) */
+.fz-ink-mark {
+  display: inline;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  transition: opacity 220ms ease;
+}
+
+.fz-ink-highlight {
+  border-radius: 6px;
+  padding: 1px 6px;
+}
+
+.fz-ink-underline {
+  padding-bottom: 2px;
+  background-repeat: repeat-x;
+  background-position: 0 100%;
+  background-size: 28px 5px;
+}
+
+.fz-ink-strike {
+  background-repeat: repeat-x;
+  background-position: 0 56%;
+  background-size: 32px 4px;
+}
+
+.fz-ink-circle {
+  border-radius: 999px;
+  padding: 1px 8px;
+}
+
+@keyframes fzWbMicPulseBar {
+  0%, 100% {
+    transform: scaleY(0.35);
+    opacity: 0.65;
+  }
+  50% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+.fz-wb-mic-bar {
+  transform-origin: center center;
+  animation: fzWbMicPulseBar 680ms ease-in-out infinite;
+}
+.fz-wb-mic-bar:nth-child(2) { animation-delay: 130ms; }
+.fz-wb-mic-bar:nth-child(3) { animation-delay: 260ms; }
 
 @keyframes fzPenFloatBob {
   0%, 100% {
@@ -764,31 +813,42 @@ rt.zh-rt {
 
 @keyframes fzInkTrace {
   0% {
-    stroke-dashoffset: 240;
+    stroke-dashoffset: 64;
     opacity: 0.45;
   }
   50% {
-    stroke-dashoffset: 60;
+    stroke-dashoffset: 0;
     opacity: 1;
   }
   100% {
-    stroke-dashoffset: -240;
+    stroke-dashoffset: -64;
     opacity: 0.45;
   }
 }
 
 @keyframes fzAtelierNibFloat {
   0%, 100% {
-    transform: translate3d(0, 0, 0) rotate(-3deg);
+    transform: translate3d(-12px, 0, 0);
   }
   50% {
-    transform: translate3d(8px, -4px, 0) rotate(2deg);
+    transform: translate3d(6px, -2px, 0);
+  }
+}
+
+@keyframes fzBufHighlightPulse {
+  0%, 100% {
+    transform: scaleX(0.72);
+    opacity: 0.72;
+  }
+  50% {
+    transform: scaleX(1);
+    opacity: 1;
   }
 }
 
 @keyframes fzAtelierWaveBar {
   0%, 100% {
-    transform: scaleY(0.32);
+    transform: scaleY(0.38);
     opacity: 0.55;
   }
   50% {
@@ -798,8 +858,8 @@ rt.zh-rt {
 }
 
 .fz-atelier-ink-path {
-  stroke-dasharray: 120 120;
-  animation: fzInkTrace 2.2s cubic-bezier(0.42, 0, 0.58, 1) infinite;
+  stroke-dasharray: 32 32;
+  animation: fzInkTrace 2s cubic-bezier(0.42, 0, 0.58, 1) infinite;
 }
 
 .fz-atelier-nib {
@@ -807,8 +867,14 @@ rt.zh-rt {
   animation: fzAtelierNibFloat 2.2s cubic-bezier(0.42, 0, 0.58, 1) infinite;
 }
 
+.fz-buf-hl-sweep {
+  transform-box: fill-box;
+  transform-origin: left center;
+  animation: fzBufHighlightPulse 2.4s cubic-bezier(0.42, 0, 0.58, 1) infinite;
+}
+
 .fz-atelier-wave-bar {
-  transform-origin: center bottom;
+  transform-origin: center center;
   will-change: transform, opacity;
   animation: fzAtelierWaveBar 0.96s ease-in-out infinite;
 }
@@ -817,6 +883,45 @@ rt.zh-rt {
 .fz-atelier-wave-bar-3 { animation-delay: 280ms; animation-duration: 1.04s; }
 .fz-atelier-wave-bar-4 { animation-delay: 420ms; animation-duration: 0.9s; }
 .fz-atelier-wave-bar-5 { animation-delay: 560ms; animation-duration: 1.08s; }
+
+/* 2-Tier Adaptive Buffering UX (Tier 1 Dynamic Capsule -> Tier 2 Double-Bezel Studio Sheet) */
+@keyframes fzBufCompactIn {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -6px, 0) scale(0.97);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes fzBufElevatedIn {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+.fz-buf-compact-card {
+  will-change: transform, opacity;
+  animation: fzBufCompactIn 200ms cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+
+.fz-buf-elevated-card {
+  will-change: transform, opacity;
+  animation: fzBufElevatedIn 260ms cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+
+.fz-buf-progress-fill {
+  transform-origin: left center;
+  transition: transform 240ms cubic-bezier(0.23, 1, 0.32, 1);
+  will-change: transform;
+}
 
 /* Tactile Floating Studio Start Popup (Physical Spring Push-Button + Acoustic Ring Burst) */
 @keyframes fzStudioModalEnter {
@@ -952,6 +1057,9 @@ rt.zh-rt {
   .fz-atelier-ink-path,
   .fz-atelier-nib,
   .fz-atelier-wave-bar,
+  .fz-buf-compact-card,
+  .fz-buf-elevated-card,
+  .fz-buf-hl-sweep,
   .fz-studio-launch-card,
   .fz-studio-launch-veil,
   .fz-tactile-start-btn,

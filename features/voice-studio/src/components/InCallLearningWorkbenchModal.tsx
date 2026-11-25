@@ -55,7 +55,13 @@ import {
   resolveKakijunRequestFromPrompt,
   subscribeKanjiVgUpdates,
 } from '../data/kakijunStrokeBank';
-import { pruneTtsMemoryCache, sanitizeSpokenTextForClassicTts, synthesizeFlexibleTts } from '../lib/liveTransport';
+import {
+  ensureVoiceWorkerSession,
+  pruneTtsMemoryCache,
+  resolveVoiceApiCandidateBases,
+  sanitizeSpokenTextForClassicTts,
+  synthesizeFlexibleTts,
+} from '../lib/liveTransport';
 import { wbPick, wbFmt } from '../lib/i18n';
 import {
   decodeAudioDataSafe,
@@ -1817,15 +1823,35 @@ export const PteDescribeImageCanvas: React.FC<{
 
   const fullSampleSpoken = `${activeQuestion.universalTemplate.intro} ${activeQuestion.universalTemplate.keyElements} ${activeQuestion.universalTemplate.maximum} ${activeQuestion.universalTemplate.minimum} ${activeQuestion.universalTemplate.conclusion}`;
 
-  const CATEGORY_TABS: Array<{ key: 'all' | PteChartCategory; label: string; icon: string; count: number }> = [
-    { key: 'all', label: 'Semua', icon: '📚', count: PTE_DESCRIBE_IMAGE_BANK.length },
-    { key: 'bar', label: 'Bar', icon: '📊', count: getPteQuestionsByCategory('bar').length },
-    { key: 'line', label: 'Line', icon: '📈', count: getPteQuestionsByCategory('line').length },
-    { key: 'pie', label: 'Pie', icon: '🥧', count: getPteQuestionsByCategory('pie').length },
-    { key: 'process', label: 'Process', icon: '🔄', count: getPteQuestionsByCategory('process').length },
-    { key: 'map', label: 'Map', icon: '🗺️', count: getPteQuestionsByCategory('map').length },
-    { key: 'table', label: 'Table', icon: '📋', count: getPteQuestionsByCategory('table').length },
+  const CATEGORY_TABS: Array<{ key: 'all' | PteChartCategory; label: string; count: number }> = [
+    { key: 'all', label: wbT(locale, 'All', 'Semua', 'ทั้งหมด'), count: PTE_DESCRIBE_IMAGE_BANK.length },
+    { key: 'bar', label: 'Bar', count: getPteQuestionsByCategory('bar').length },
+    { key: 'line', label: 'Line', count: getPteQuestionsByCategory('line').length },
+    { key: 'pie', label: 'Pie', count: getPteQuestionsByCategory('pie').length },
+    { key: 'process', label: 'Process', count: getPteQuestionsByCategory('process').length },
+    { key: 'map', label: 'Map', count: getPteQuestionsByCategory('map').length },
+    { key: 'table', label: 'Table', count: getPteQuestionsByCategory('table').length },
   ];
+
+  const renderPteCategoryIcon = (key: string) => {
+    const common = {
+      viewBox: '0 0 18 18',
+      className: 'w-3.5 h-3.5 shrink-0',
+      fill: 'none',
+      stroke: 'currentColor',
+      strokeWidth: 1.8,
+      strokeLinecap: 'round' as const,
+      strokeLinejoin: 'round' as const,
+      'aria-hidden': true,
+    };
+    if (key === 'bar') return <svg {...common}><path d="M3 15V9M8.5 15V4M14 15V7" /></svg>;
+    if (key === 'line') return <svg {...common}><polyline points="2.5 13 7 8.5 10.5 11 15.5 5" /></svg>;
+    if (key === 'pie') return <svg {...common}><circle cx="9" cy="9" r="6.5" /><path d="M9 2.5V9l4.6 4.6" /></svg>;
+    if (key === 'process') return <svg {...common}><path d="M4 6h9l-2-2M14 12H5l2 2" /></svg>;
+    if (key === 'map') return <svg {...common}><polygon points="2.5 4.5 6.8 3 11.2 4.5 15.5 3 15.5 13.5 11.2 15 6.8 13.5 2.5 15" /></svg>;
+    if (key === 'table') return <svg {...common}><rect x="2.5" y="3.5" width="13" height="11" rx="1.8" /><path d="M2.5 7.5h13M7.5 7.5v7" /></svg>;
+    return <svg {...common}><rect x="2.5" y="3" width="5.5" height="5.5" rx="1" /><rect x="10" y="3" width="5.5" height="5.5" rx="1" /><rect x="2.5" y="10" width="13" height="5" rx="1" /></svg>;
+  };
 
   return (
     <div className="space-y-3.5" data-testid="pte-describe-image-canvas">
@@ -1836,8 +1862,9 @@ export const PteDescribeImageCanvas: React.FC<{
             <span className="px-2.5 py-0.5 rounded-full bg-[#E6F4EA] text-[#1B5E34] text-[10.5px] font-extrabold uppercase tracking-wide">
               PTE Academic • Describe Image
             </span>
-            <span className="px-2 py-0.5 rounded-full bg-[#FEF3C7] text-[#92400E] text-[10px] font-bold">
-              🔥 {activeQuestion.examFrequency}
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#FEF3C7] text-[#92400E] text-[10px] font-bold">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#D97706]" />
+              <span>{activeQuestion.examFrequency}</span>
             </span>
           </div>
           <span className="text-[10px] text-[#8C7760] font-semibold">
@@ -1861,15 +1888,15 @@ export const PteDescribeImageCanvas: React.FC<{
                     handleSelectQuestion(newPool[0]);
                   }
                 }}
-                className={`px-2.5 py-1 rounded-xl text-[10.5px] font-bold transition-all cursor-pointer whitespace-nowrap flex items-center gap-1 ${
+                className={`px-2.5 py-1 rounded-xl text-[10.5px] font-bold transition-colors cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
                   isSelected
                     ? 'bg-[#FFFFFF] text-[#231A12] shadow-xs'
                     : 'text-[#8C7760] hover:text-[#5C4A38]'
                 }`}
               >
-                <span>{tab.icon}</span>
+                {renderPteCategoryIcon(tab.key)}
                 <span>{tab.label}</span>
-                <span className={`text-[9px] px-1 py-0.2 rounded-full ${isSelected ? 'bg-[#FAF4E8] text-[#B45309]' : 'text-[#A89480]'}`}>
+                <span className={`text-[9px] tabular-nums px-1 py-0.2 rounded-full ${isSelected ? 'bg-[#FAF4E8] text-[#B45309]' : 'text-[#A89480]'}`}>
                   {tab.count}
                 </span>
               </button>
@@ -1878,38 +1905,42 @@ export const PteDescribeImageCanvas: React.FC<{
         </div>
 
         {/* Question Navigator Toolbar */}
-        <div className="flex items-center justify-between gap-2 p-1.5 rounded-xl bg-[#FFFDF8] border border-[#EADBCE]">
+        <div className="flex flex-wrap items-center justify-between gap-2 p-1.5 rounded-xl bg-[#FFFDF8] border border-[#EADBCE]">
           <div className="flex items-center gap-1">
             <button
               type="button"
               onClick={handlePrevQuestion}
-              className="px-2.5 py-1 rounded-lg bg-[#FAF4E8] hover:bg-[#F3EBE0] text-[#5C4A38] text-[10.5px] font-extrabold cursor-pointer active:scale-95 transition-all"
-              title="Soal Sebelumnya"
+              className="px-2.5 py-1 rounded-lg bg-[#FAF4E8] hover:bg-[#F3EBE0] text-[#5C4A38] text-[10.5px] font-extrabold cursor-pointer active:scale-95 transition-transform"
+              title={wbT(locale, 'Previous Question', 'Soal Sebelumnya', 'ข้อก่อนหน้า')}
             >
-              ◀ Prev
+              Prev
             </button>
-            <span className="text-[11px] font-bold text-[#231A12] px-2 py-0.5">
-              Soal {currentIndex + 1} / {filteredQuestions.length}
+            <span className="text-[11px] font-bold text-[#231A12] px-2 py-0.5 tabular-nums whitespace-nowrap">
+              {wbT(locale, 'Item', 'Soal', 'ข้อ')} {currentIndex + 1} / {filteredQuestions.length}
             </span>
             <button
               type="button"
               data-testid="pte-di-next-question-btn"
               onClick={handleNextQuestion}
-              className="px-2.5 py-1 rounded-lg bg-[#FAF4E8] hover:bg-[#F3EBE0] text-[#5C4A38] text-[10.5px] font-extrabold cursor-pointer active:scale-95 transition-all flex items-center gap-1"
-              title="Soal Grafik Berikutnya"
+              className="px-2.5 py-1 rounded-lg bg-[#FAF4E8] hover:bg-[#F3EBE0] text-[#5C4A38] text-[10.5px] font-extrabold cursor-pointer active:scale-95 transition-transform flex items-center gap-1"
+              title={wbT(locale, 'Next Chart Item', 'Soal Grafik Berikutnya', 'กราฟข้อถัดไป')}
             >
-              <span>Soal Grafik Berikutnya</span>
-              <span>▶</span>
+              <span>{wbT(locale, 'Next Chart', 'Soal Berikutnya', 'ข้อถัดไป')}</span>
+              <span>›</span>
             </button>
           </div>
 
           <button
             type="button"
             onClick={handleRandomQuestion}
-            className="px-2.5 py-1 rounded-lg bg-[#B45309] hover:bg-[#92400E] text-white text-[10.5px] font-bold cursor-pointer active:scale-95 transition-all flex items-center gap-1"
+            className="px-2.5 py-1 rounded-lg bg-[#B45309] hover:bg-[#92400E] text-white text-[10.5px] font-bold cursor-pointer active:scale-95 transition-transform flex items-center gap-1.5"
           >
-            <span>🎲</span>
-            <span>Acak Soal Ujian Asli</span>
+            <svg viewBox="0 0 18 18" className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <polyline points="13 3 15.5 5.5 13 8" />
+              <path d="M2.5 5.5h13M5 15l-2.5-2.5L5 10" />
+              <path d="M15.5 12.5h-13" />
+            </svg>
+            <span>{wbT(locale, 'Shuffle Exam Item', 'Acak Soal Ujian', 'สุ่มข้อสอบจริง')}</span>
           </button>
         </div>
 
@@ -1918,7 +1949,7 @@ export const PteDescribeImageCanvas: React.FC<{
           <h4 className="text-xs font-extrabold text-[#231A12] leading-tight">
             {activeQuestion.title}
           </h4>
-          <span className="text-[9.5px] font-bold text-[#8C7760] bg-[#FAF6EE] px-1.5 py-0.5 rounded-md shrink-0">
+          <span className="text-[9.5px] font-mono font-bold text-[#8C7760] bg-[#FAF6EE] px-1.5 py-0.5 rounded-md shrink-0">
             ID: {activeQuestion.id}
           </span>
         </div>
@@ -1931,58 +1962,64 @@ export const PteDescribeImageCanvas: React.FC<{
            ========================================== */}
         <div className="flex flex-col gap-3">
           {/* SVG / DATA VISUALIZER CONTAINER (6 CATEGORIES) */}
-      <div className="p-3 rounded-2xl bg-[#FFFFFF] border border-[#EADBCE] shadow-2xs flex flex-col items-center justify-center min-h-[175px]">
-        {/* 1. BAR CHARTS */}
+      <div className="p-3 rounded-2xl bg-[#FFFFFF] border border-[#EADBCE] shadow-2xs flex flex-col items-center justify-center min-h-[185px]">
+        {/* 1. BAR CHARTS (Data-Driven niceScaleMax Y-Axis!) */}
         {activeQuestion.category === 'bar' && (
-          <svg viewBox="0 0 360 175" className="w-full h-auto max-h-[175px] select-none">
+          <svg viewBox="0 0 360 182" className="w-full h-auto max-h-[188px] select-none">
             <defs>
-              <linearGradient id="barGrad0" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#F59E0B" /><stop offset="100%" stopColor="#D97706" /></linearGradient>
+              <linearGradient id="barGrad0" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#D97706" /><stop offset="100%" stopColor="#B45309" /></linearGradient>
               <linearGradient id="barGrad1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#10B981" /><stop offset="100%" stopColor="#059669" /></linearGradient>
               <linearGradient id="barGrad2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#3B82F6" /><stop offset="100%" stopColor="#2563EB" /></linearGradient>
               <linearGradient id="barGrad3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#8B5CF6" /><stop offset="100%" stopColor="#7C3AED" /></linearGradient>
               <linearGradient id="barGrad4" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#EC4899" /><stop offset="100%" stopColor="#DB2777" /></linearGradient>
               <linearGradient id="barGrad5" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#06B6D4" /><stop offset="100%" stopColor="#0891B2" /></linearGradient>
             </defs>
-            {/* Grid lines */}
-            <line x1="45" y1="25" x2="345" y2="25" stroke="#F0E6D9" strokeDasharray="3 3" />
-            <text x="38" y="28" fontSize="8.5" fill="#8C7760" textAnchor="end">100%</text>
-            <line x1="45" y1="65" x2="345" y2="65" stroke="#F0E6D9" strokeDasharray="3 3" />
-            <text x="38" y="68" fontSize="8.5" fill="#8C7760" textAnchor="end">65%</text>
-            <line x1="45" y1="105" x2="345" y2="105" stroke="#F0E6D9" strokeDasharray="3 3" />
-            <text x="38" y="108" fontSize="8.5" fill="#8C7760" textAnchor="end">30%</text>
-            <line x1="45" y1="145" x2="345" y2="145" stroke="#D8CBB5" strokeWidth="1.5" />
-            <text x="38" y="148" fontSize="8.5" fill="#8C7760" textAnchor="end">0</text>
-
-            {/* Dynamic Bars */}
             {(() => {
               const labels = activeQuestion.renderData.labels || ['Cat A', 'Cat B', 'Cat C', 'Cat D'];
               const values = activeQuestion.renderData.values || [45, 30, 15, 10];
-              const maxVal = Math.max(...values, 1);
+              const rawMax = Math.max(...values, 10);
+              const niceMax = rawMax <= 20 ? 20 : rawMax <= 50 ? 50 : rawMax <= 100 ? 100 : Math.ceil(rawMax / 25) * 25;
+              const shortUnit = activeQuestion.renderData.unit && activeQuestion.renderData.unit.length <= 2 ? activeQuestion.renderData.unit : '';
+              const ticks = [niceMax, Math.round(niceMax * 0.66), Math.round(niceMax * 0.33), 0];
               const barCount = labels.length;
               const totalWidth = 285;
-              const barWidth = Math.min(48, Math.floor((totalWidth - (barCount - 1) * 12) / barCount));
-              const startX = 55 + Math.floor((totalWidth - (barCount * barWidth + (barCount - 1) * 12)) / 2);
+              const barWidth = Math.min(46, Math.floor((totalWidth - (barCount - 1) * 12) / barCount));
+              const startX = 52 + Math.floor((totalWidth - (barCount * barWidth + (barCount - 1) * 12)) / 2);
 
-              return labels.map((lbl, idx) => {
-                const val = values[idx] || 0;
-                const barHeight = Math.max(8, Math.round((val / maxVal) * 115));
-                const x = startX + idx * (barWidth + 12);
-                const y = 145 - barHeight;
-                const gradId = `url(#barGrad${idx % 6})`;
-                const unit = activeQuestion.renderData.unit ? ` ${activeQuestion.renderData.unit}` : '';
+              return (
+                <>
+                  {ticks.map((tk, tIdx) => {
+                    const gy = 25 + tIdx * 40;
+                    return (
+                      <g key={tIdx}>
+                        <line x1="46" y1={gy} x2="345" y2={gy} stroke={tIdx === 3 ? '#D8CBB5' : '#F0E6D9'} strokeWidth={tIdx === 3 ? '1.5' : '1'} strokeDasharray={tIdx === 3 ? undefined : '3 3'} />
+                        <text x="40" y={gy + 3} fontSize="8.5" fontWeight="600" fill="#8C7760" textAnchor="end">
+                          {tk}{tk > 0 ? shortUnit : ''}
+                        </text>
+                      </g>
+                    );
+                  })}
+                  {labels.map((lbl, idx) => {
+                    const val = values[idx] || 0;
+                    const barHeight = Math.max(8, Math.round((val / niceMax) * 120));
+                    const x = startX + idx * (barWidth + 12);
+                    const y = 145 - barHeight;
+                    const gradId = `url(#barGrad${idx % 6})`;
 
-                return (
-                  <g key={idx}>
-                    <rect x={x} y={y} width={barWidth} height={barHeight} rx="4" fill={gradId} />
-                    <text x={x + barWidth / 2} y={Math.max(18, y - 5)} fontSize="9" fontWeight="bold" fill="#231A12" textAnchor="middle">
-                      {val}{unit.length <= 3 ? unit : ''}
-                    </text>
-                    <text x={x + barWidth / 2} y="159" fontSize="8.5" fontWeight="600" fill="#5C4A38" textAnchor="middle">
-                      {lbl.length > 9 ? lbl.slice(0, 8) + '…' : lbl}
-                    </text>
-                  </g>
-                );
-              });
+                    return (
+                      <g key={idx}>
+                        <rect x={x} y={y} width={barWidth} height={barHeight} rx="5" fill={gradId} />
+                        <text x={x + barWidth / 2} y={Math.max(16, y - 5)} fontSize="9" fontWeight="800" fill="#231A12" textAnchor="middle">
+                          {val}{shortUnit}
+                        </text>
+                        <text x={x + barWidth / 2} y="161" fontSize="8.5" fontWeight="600" fill="#5C4A38" textAnchor="middle">
+                          {lbl.length > 10 ? lbl.slice(0, 9) + '…' : lbl}
+                        </text>
+                      </g>
+                    );
+                  })}
+                </>
+              );
             })()}
           </svg>
         )}
@@ -2092,14 +2129,14 @@ export const PteDescribeImageCanvas: React.FC<{
                 })()}
               </svg>
             </div>
-            <div className="flex-1 space-y-1.5 pr-2">
+            <div className="flex-1 min-w-0 space-y-1.5 pr-1">
               {(activeQuestion.renderData.segments || []).map((seg, sIdx) => (
-                <div key={sIdx} className="flex items-start gap-2 p-1.5 rounded-xl bg-[#FAF6EE] border border-[#EADBCE]">
+                <div key={sIdx} className="flex items-start gap-2 p-2 rounded-xl bg-[#FAF6EE] border border-[#EADBCE]">
                   <span className="w-3 h-3 rounded-md shrink-0 mt-0.5" style={{ backgroundColor: seg.color }} />
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between text-[11px] font-bold text-[#231A12]">
+                    <div className="flex items-center justify-between gap-2 text-[11px] font-bold text-[#231A12]">
                       <span className="truncate">{seg.label}</span>
-                      <span className="shrink-0 font-extrabold text-[#B45309]">{seg.pct}%</span>
+                      <span className="shrink-0 font-extrabold text-[#B45309] tabular-nums">{seg.pct}%</span>
                     </div>
                     {seg.desc && <p className="text-[9.5px] text-[#8C7760] truncate">{seg.desc}</p>}
                   </div>
@@ -2254,25 +2291,29 @@ export const PteDescribeImageCanvas: React.FC<{
             {/* Optimal Green Zone Indicator (Nakul Masterclass 25-28s Rule) */}
             <div className="p-2 rounded-xl bg-[#ECFDF5] border border-[#A7F3D0] flex items-center justify-between gap-2">
               <div className="flex items-center gap-1.5">
-                <span className="text-sm">⚡</span>
+                <span className="w-2 h-2 rounded-full bg-[#059669] shrink-0" />
                 <span className="text-[10.5px] font-bold text-[#065F46]">
-                  {wbT(locale, 'Ideal Stop Zone:', 'Zona Berhenti Ideal:')} <strong className="font-extrabold text-[#047857]">{wbT(locale, '25-28 Sec!', '25-28 Detik!')}</strong>
+                  {wbT(locale, 'Ideal Stop Zone:', 'Zona Berhenti Ideal:', 'ช่วงเวลาที่เหมาะสม:')} <strong className="font-extrabold text-[#047857]">{wbT(locale, '25-28 Sec!', '25-28 Detik!', '25-28 วินาที!')}</strong>
                 </span>
               </div>
-              <span className="px-2 py-0.5 rounded-md bg-[#059669] text-white text-[9px] font-extrabold uppercase">
+              <span className="px-2 py-0.5 rounded-md bg-[#059669] text-white text-[9px] font-extrabold uppercase shrink-0">
                 Oral Fluency 90
               </span>
             </div>
 
             {/* Pearson 3-Second Rule Warning Banner */}
-            <div className="p-2 rounded-xl bg-[#FEF2F2] border border-[#FCA5A5] flex items-start gap-1.5">
-              <span className="text-base select-none shrink-0 leading-none mt-0.5">⚠️</span>
+            <div className="p-2 rounded-xl bg-[#FEF2F2] border border-[#FCA5A5] flex items-start gap-2">
+              <svg viewBox="0 0 18 18" className="w-4 h-4 shrink-0 text-[#DC2626] mt-0.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M9 2.5L1.8 15h14.4L9 2.5Z" />
+                <path d="M9 7.2v3.8M9 13.2h.01" />
+              </svg>
               <p className="text-[10px] text-[#991B1B] font-semibold leading-snug">
-                <span className="font-bold">{wbT(locale, 'Pearson 3-Second Rule:', 'Aturan 3 Detik Pearson:')}</span>{' '}
+                <span className="font-bold">{wbT(locale, 'Pearson 3-Second Rule:', 'Aturan 3 Detik Pearson:', 'กฎ 3 วินาทีของ Pearson:')}</span>{' '}
                 {wbT(
                   locale,
                   'Never stay silent for >3 seconds! The microphone closes automatically and Fluency scores 0.',
-                  'Jangan hening >3 detik! Mikrofon akan otomatis tertutup dan skor Fluency dinilai 0.'
+                  'Jangan hening >3 detik! Mikrofon akan otomatis tertutup dan skor Fluency dinilai 0.',
+                  'ห้ามเงียบเกิน 3 วินาที! ไมโครโฟนจะปิดอัตโนมัติและคะแนนความคล่องแคล่วจะเป็น 0'
                 )}
               </p>
             </div>
@@ -2319,44 +2360,46 @@ export const PteDescribeImageCanvas: React.FC<{
           <div className="p-3.5 rounded-2xl bg-[#FFFDF8] border border-[#EADBCE] shadow-2xs space-y-2.5">
             <div className="flex items-center justify-between pb-1 border-b border-[#F0E6D9]">
               <div className="flex items-center gap-1.5">
-                <span className="text-sm">📐</span>
+                <svg viewBox="0 0 18 18" className="w-4 h-4 shrink-0 text-[#B45309]" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M3 14.5h12M3 14.5V3.5L15 14.5" />
+                </svg>
                 <span className="text-xs font-extrabold text-[#231A12]">
-                  Rumus Universal Nakul (5-Baris Anti-Pause)
+                  {wbT(locale, '5-Line Structured Speaking Frame', 'Kerangka 5-Baris Anti-Pause', 'โครงสร้างพูด 5 บรรทัด')}
                 </span>
               </div>
               <span className="px-2 py-0.5 rounded-full bg-[#E6F4EA] text-[#1B5E34] text-[9.5px] font-bold">
-                100% Fluency Guard
+                Fluency Guard
               </span>
             </div>
 
             <div className="space-y-2 text-[11px] leading-relaxed">
               <div className="p-2 rounded-xl bg-[#FAF6EE] border border-[#EADBCE]">
                 <span className="text-[10px] font-extrabold uppercase tracking-wide text-[#B45309] block mb-0.5">
-                  1. Introduction (Pembuka):
+                  1. Introduction:
                 </span>
                 <span className="text-[#231A12] font-semibold">{activeQuestion.universalTemplate.intro}</span>
               </div>
               <div className="p-2 rounded-xl bg-[#FAF6EE] border border-[#EADBCE]">
                 <span className="text-[10px] font-extrabold uppercase tracking-wide text-[#B45309] block mb-0.5">
-                  2. Key Elements (Fitur Utama):
+                  2. Key Elements:
                 </span>
                 <span className="text-[#231A12] font-semibold">{activeQuestion.universalTemplate.keyElements}</span>
               </div>
               <div className="p-2 rounded-xl bg-[#FAF6EE] border border-[#EADBCE]">
                 <span className="text-[10px] font-extrabold uppercase tracking-wide text-[#B45309] block mb-0.5">
-                  3. Maximum Figure (Tertinggi):
+                  3. Maximum Figure:
                 </span>
                 <span className="text-[#231A12] font-semibold">{activeQuestion.universalTemplate.maximum}</span>
               </div>
               <div className="p-2 rounded-xl bg-[#FAF6EE] border border-[#EADBCE]">
                 <span className="text-[10px] font-extrabold uppercase tracking-wide text-[#B45309] block mb-0.5">
-                  4. Minimum Figure (Terendah):
+                  4. Minimum Figure:
                 </span>
                 <span className="text-[#231A12] font-semibold">{activeQuestion.universalTemplate.minimum}</span>
               </div>
               <div className="p-2 rounded-xl bg-[#FAF6EE] border border-[#EADBCE]">
                 <span className="text-[10px] font-extrabold uppercase tracking-wide text-[#B45309] block mb-0.5">
-                  5. Conclusion (Kesimpulan):
+                  5. Conclusion:
                 </span>
                 <span className="text-[#231A12] font-semibold">{activeQuestion.universalTemplate.conclusion}</span>
               </div>
@@ -2368,8 +2411,11 @@ export const PteDescribeImageCanvas: React.FC<{
                 onClick={() => onSpeakPreview(fullSampleSpoken)}
                 className="w-full mt-1 py-2 px-3 rounded-xl bg-[#FAF4E8] hover:bg-[#F3EBE0] text-[#5C4A38] text-[11px] font-bold flex items-center justify-center gap-1.5 cursor-pointer transition-colors active:scale-95"
               >
-                <span>🔊</span>
-                <span>Dengarkan Contoh Lengkap 5-Baris (Native Model - 26d)</span>
+                <svg viewBox="0 0 18 18" className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <polygon points="3.5 6.8 6.8 6.8 11 3.5 11 14.5 6.8 11.2 3.5 11.2" />
+                  <path d="M13.5 6.5a3.5 3.5 0 0 1 0 5" />
+                </svg>
+                <span>{wbT(locale, 'Listen to Full 5-Line Model (26s)', 'Dengarkan Contoh Lengkap 5-Baris (26d)', 'ฟังตัวอย่างครบ 5 บรรทัด (26วิ)')}</span>
               </button>
             )}
           </div>
@@ -2377,28 +2423,31 @@ export const PteDescribeImageCanvas: React.FC<{
           {/* TRIK & TIPS RAHASIA LULUS PTE 42 (EXAMINER HACKS) */}
           <div className="p-3.5 rounded-2xl bg-[#EFF6FF] border border-[#BFDBFE] shadow-2xs space-y-2">
             <div className="flex items-center gap-1.5 pb-1 border-b border-[#DBEAFE]">
-              <span className="text-sm">💡</span>
+              <svg viewBox="0 0 18 18" className="w-4 h-4 shrink-0 text-[#1E40AF]" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <circle cx="9" cy="9" r="6.5" />
+                <path d="M9 5.8v3.4l2.2 1.4" />
+              </svg>
               <span className="text-xs font-extrabold text-[#1E40AF]">
-                Trik & Tips Rahasia Lulus PTE 42 (Dr. Julian Insider Hacks)
+                {wbT(locale, 'PTE Scoring Strategy & Examiner Notes', 'Strategi Skor & Catatan Penguji PTE', 'กลยุทธ์ทำคะแนน PTE')}
               </span>
             </div>
 
             <div className="space-y-1.5 text-[10.5px] text-[#1E3A8A] leading-snug">
               <div className="p-2 rounded-xl bg-[#DBEAFE]/40 border border-[#BFDBFE] flex items-start gap-1.5">
-                <span className="font-bold text-blue-700 shrink-0">⚡ Hack 25-28 Detik:</span>
-                <span>Jangan bicara sampai 40 detik! Selesaikan baris ke-5 pada detik 25-28 lalu langsung klik Next. Skor Oral Fluency akan di-cap maksimal (90)!</span>
+                <span className="font-bold text-blue-700 shrink-0">{wbT(locale, '25-28s Pace:', 'Target 25-28 Detik:')}</span>
+                <span>{wbT(locale, 'Finish line 5 around 25-28 seconds and advance cleanly for maximum Oral Fluency.', 'Selesaikan baris ke-5 pada detik 25-28 tanpa jeda panjang untuk menjaga Oral Fluency maksimal.')}</span>
               </div>
               <div className="p-2 rounded-xl bg-[#DBEAFE]/40 border border-[#BFDBFE] flex items-start gap-1.5">
-                <span className="font-bold text-blue-700 shrink-0">🎯 Nada Monoton:</span>
-                <span>Gunakan pitch suara datar stabil (135-145 Hz). Pearson AI menyukai irama konsisten tanpa lonjakan nada dramatis.</span>
+                <span className="font-bold text-blue-700 shrink-0">{wbT(locale, 'Steady Pitch:', 'Irama Stabil:')}</span>
+                <span>{wbT(locale, 'Keep a calm, even cadence without dramatic rises or filler sounds.', 'Gunakan irama suara tenang dan konsisten tanpa gumaman umm/err.')}</span>
               </div>
               <div className="p-2 rounded-xl bg-[#DBEAFE]/40 border border-[#BFDBFE] flex items-start gap-1.5">
-                <span className="font-bold text-blue-700 shrink-0">🚫 Pantangan Koreksi Diri:</span>
-                <span>Salah sebut kata atau angka? JANGAN BERHENTI atau minta maaf! Teruskan membaca tanpa ragu untuk menjaga skor kelancaran.</span>
+                <span className="font-bold text-blue-700 shrink-0">{wbT(locale, 'Zero Self-Correction:', 'Tanpa Koreksi Ulang:')}</span>
+                <span>{wbT(locale, 'If a word slips, keep moving forward smoothly without restarting.', 'Jika terucap kurang tepat, teruskan kalimat tanpa berhenti atau mengulang.')}</span>
               </div>
               {activeQuestion.examinerTips && (
                 <div className="p-2 rounded-xl bg-white/70 border border-[#BFDBFE] flex items-start gap-1.5 text-[#1E3A8A]">
-                  <span className="font-bold text-amber-700 shrink-0">📌 Tips Khusus Grafik Ini:</span>
+                  <span className="font-bold text-amber-700 shrink-0">{wbT(locale, 'Chart Focus:', 'Fokus Grafik:')}</span>
                   <span>{activeQuestion.examinerTips}</span>
                 </div>
               )}
@@ -2983,15 +3032,29 @@ export const PteScorecardCanvas: React.FC<{
 
       {/* Big Score Circle & Metric Summary */}
       <div className="p-4 rounded-2xl bg-[#FFFFFF] border border-[#EADBCE] shadow-2xs flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
-        <div
-          className={`relative w-20 h-20 rounded-full bg-[#FAF6EE] border-4 flex flex-col items-center justify-center shrink-0 ${
-            !hasSample ? 'border-[#D7C7B2]' : data.passed ? 'border-[#34D399]' : 'border-[#F59E0B]'
-          }`}
-        >
-          <span className="text-2xl font-extrabold text-[#231A12] leading-none">
-            {hasSample ? data.compositeScore : '--'}
-          </span>
-          <span className="text-[9px] font-bold text-[#8C7760]">/ 90</span>
+        <div className="relative w-22 h-22 flex items-center justify-center shrink-0">
+          <svg viewBox="0 0 88 88" className="w-22 h-22 -rotate-90" aria-hidden="true">
+            <circle cx="44" cy="44" r="36" fill="none" stroke="#F0E6D9" strokeWidth="7" />
+            <circle
+              cx="44"
+              cy="44"
+              r="36"
+              fill="none"
+              stroke={!hasSample ? '#D7C7B2' : data.passed ? '#10B981' : '#D97706'}
+              strokeWidth="7"
+              strokeLinecap="round"
+              strokeDasharray={String(Math.round(2 * Math.PI * 36))}
+              strokeDashoffset={String(
+                Math.round(2 * Math.PI * 36 * (1 - (hasSample ? Math.min(90, Math.max(10, data.compositeScore)) / 90 : 0)))
+              )}
+            />
+          </svg>
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <span className="text-2xl font-extrabold text-[#231A12] leading-none tabular-nums">
+              {hasSample ? data.compositeScore : '--'}
+            </span>
+            <span className="text-[9px] font-bold text-[#8C7760] tabular-nums">/ 90</span>
+          </div>
         </div>
         <div className="space-y-1.5">
           <h4 className="text-xs font-extrabold text-[#231A12]">Pearson Academic Concordance</h4>
@@ -3558,6 +3621,343 @@ export const SswTacticalBoardCanvas: React.FC<{
   );
 };
 
+/**
+ * Strips internal backend routing directives (e.g. `[REMEDIATION_DIFFERENT_ANGLE]`,
+ * `[WHITEBOARD_REQUEST]`) and ALL_CAPS_DEBUG prefixes from any learner-facing label
+ * while keeping the raw prompt intact for Worker/AI calls.
+ */
+function sanitizeVisibleBoardPrompt(raw?: string): string {
+  let text = String(raw || '').trim();
+  if (!text) return '';
+  text = text
+    .replace(/\[(?:REMEDIATION_DIFFERENT_ANGLE|WHITEBOARD_REQUEST|[A-Z0-9_]{3,})\]/g, ' ')
+    .replace(/^[A-Z0-9_]{3,}:\s*/g, '')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+  return text;
+}
+
+interface WhiteboardAdaptiveBufferingPopupProps {
+  locale: LearnerLocale;
+  persona: VoicePersona;
+  topicLabel: string;
+  mode: 'initial_compile' | 'initial_voice_sync' | 'followup_explain' | 'mid_audio_sync';
+  elapsedMs: number;
+  loaderProgress: number;
+  isReady: boolean;
+  isAudioPreparing: boolean;
+}
+
+const WhiteboardAdaptiveBufferingPopup: React.FC<WhiteboardAdaptiveBufferingPopupProps> = ({
+  locale,
+  persona,
+  topicLabel,
+  mode,
+  elapsedMs,
+  loaderProgress,
+  isReady,
+  isAudioPreparing,
+}) => {
+  const tier: 'compact' | 'elevated' = elapsedMs >= 2200 ? 'elevated' : 'compact';
+  const sanitizedTopic = sanitizeVisibleBoardPrompt(topicLabel);
+  const cleanTopic =
+    sanitizedTopic || wbT(locale, 'Interactive visual explanation', 'Penjelasan visual interaktif', 'คำอธิบายภาพเชิงโต้ตอบ');
+
+  const asymptoticPct = useMemo(() => {
+    const sec = Math.max(0, elapsedMs / 1000);
+    const timeCurve = 18 + 76 * (1 - Math.exp(-sec / 3.4));
+    const base =
+      mode === 'mid_audio_sync' || mode === 'initial_voice_sync'
+        ? Math.max(68, timeCurve)
+        : Math.max(loaderProgress, timeCurve);
+    return Math.max(14, Math.min(96, Math.round(base)));
+  }, [elapsedMs, loaderProgress, mode]);
+
+  const compactStatusText =
+    mode === 'followup_explain'
+      ? wbT(
+          locale,
+          'Preparing visual & voice walkthrough',
+          'Menyiapkan visual & suara penjelasan',
+          'กำลังเตรียมภาพและเสียงอธิบาย'
+        )
+      : mode === 'mid_audio_sync' || mode === 'initial_voice_sync'
+        ? wbT(
+            locale,
+            'Syncing tutor voice with board strokes',
+            'Menyelaraskan suara dengan goresan papan',
+            'กำลังซิงค์เสียงเข้ากับจังหวะบนกระดาน'
+          )
+        : wbT(
+            locale,
+            'Preparing interactive whiteboard',
+            'Menyiapkan papan penjelasan',
+            'กำลังเตรียมกระดานอธิบาย'
+          );
+
+  // TIER 1 (< 2.2s): Whisper-quiet Double-Bezel Dynamic Capsule Pill
+  if (tier === 'compact') {
+    return (
+      <div
+        data-testid="wb-buffering-popup"
+        data-buffering-tier="compact"
+        role="status"
+        aria-live="polite"
+        className="fz-buf-compact-card inline-flex max-w-[min(92vw,420px)] rounded-full p-1 bg-[#EEF2EF]/95 ring-1 ring-[#0F172A]/[0.08] shadow-[0_14px_34px_-10px_rgba(15,23,42,0.16),0_2px_6px_rgba(15,23,42,0.04)] backdrop-blur-md"
+      >
+        <div className="flex items-center gap-2.5 rounded-full bg-white ring-1 ring-[#0F172A]/[0.04] pl-1.5 pr-3.5 py-1.5 min-w-0">
+          <div className="relative w-7 h-7 rounded-full overflow-hidden ring-1 ring-[#0F172A]/10 bg-[#F8FAF9] shrink-0">
+            <img
+              src={persona.avatarUrl || './assets/brand/fiezel-icon.svg'}
+              alt={persona.name}
+              className="w-full h-full object-cover"
+            />
+          </div>
+
+          <p className="text-[12.5px] leading-none tracking-[-0.01em] text-[#0F172A] truncate">
+            <span className="hidden sm:inline font-medium text-[#64748B]">{persona.name} · </span>
+            <span className="font-semibold">{compactStatusText}</span>
+          </p>
+
+          <div className="flex items-center gap-[2.5px] h-3.5 pl-0.5 shrink-0" aria-hidden="true">
+            <span className="w-[2px] h-2 rounded-full bg-[#15803D]/70 fz-atelier-wave-bar" />
+            <span className="w-[2px] h-3.5 rounded-full bg-[#15803D] fz-atelier-wave-bar fz-atelier-wave-bar-2" />
+            <span className="w-[2px] h-2.5 rounded-full bg-[#15803D]/80 fz-atelier-wave-bar fz-atelier-wave-bar-3" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // TIER 2 (>= 2.2s): Precision Double-Bezel Studio Sheet (Pure White + Single Forest Emerald Accent)
+  const stageStep =
+    mode === 'mid_audio_sync' || mode === 'initial_voice_sync'
+      ? 3
+      : isReady && isAudioPreparing
+        ? 3
+        : elapsedMs < 3600
+          ? 1
+          : elapsedMs < 5400
+            ? 2
+            : 3;
+
+  const stages = [
+    {
+      label: wbT(locale, 'Structure concept', 'Struktur konsep', 'จัดโครงสร้างแนวคิด'),
+      done: stageStep > 0 || isReady,
+      active: stageStep === 0 && !isReady,
+    },
+    {
+      label: wbT(locale, 'Compose diagram', 'Gambar diagram', 'ร่างแผนภาพ'),
+      done: stageStep > 1 || isReady,
+      active: stageStep === 1 && !isReady,
+    },
+    {
+      label: wbT(locale, 'Place key highlights', 'Sorotan kata kunci', 'วางไฮไลต์คำสำคัญ'),
+      done: stageStep > 2 || isReady,
+      active: stageStep === 2 && !isReady,
+    },
+    {
+      label: wbT(locale, 'Lock voice timing', 'Sinkronisasi suara', 'ซิงค์จังหวะเสียง'),
+      done: isReady && !isAudioPreparing && mode !== 'mid_audio_sync' && mode !== 'initial_voice_sync',
+      active: stageStep >= 3 || isAudioPreparing || mode === 'mid_audio_sync' || mode === 'initial_voice_sync',
+    },
+  ];
+
+  const ringRadius = 24;
+  const ringCircumference = 2 * Math.PI * ringRadius;
+  const ringOffset = ringCircumference * (1 - asymptoticPct / 100);
+
+  return (
+    <div
+      data-testid="wb-buffering-popup"
+      data-buffering-tier="elevated"
+      role="status"
+      aria-live="polite"
+      className="fz-buf-elevated-card w-full max-w-[416px] rounded-[28px] p-1.5 bg-[#EBF0EC]/95 ring-1 ring-[#0F172A]/[0.08] shadow-[0_28px_64px_-16px_rgba(15,23,42,0.18),0_4px_12px_rgba(15,23,42,0.05)] backdrop-blur-md"
+    >
+      <div className="rounded-[22px] bg-white ring-1 ring-[#0F172A]/[0.05] p-5 sm:p-6 text-left">
+        {/* Clean Natural-Case Header */}
+        <div className="flex items-center justify-between gap-3">
+          <div className="inline-flex items-center gap-1.5 min-w-0">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#15803D] shrink-0" />
+            <span className="text-[11.5px] font-semibold text-[#15803D] tracking-[-0.005em] truncate">
+              {persona.name} ·{' '}
+              {wbT(locale, 'Live Whiteboard Studio', 'Studio Papan Tulis', 'สตูดิโอกระดานสด')}
+            </span>
+          </div>
+          <span className="text-[11.5px] font-semibold text-[#64748B] tabular-nums shrink-0">
+            {asymptoticPct}%
+          </span>
+        </div>
+
+        <h3 className="text-[16px] sm:text-[16.5px] font-bold tracking-[-0.02em] text-[#0F172A] leading-snug mt-1.5">
+          {mode === 'followup_explain'
+            ? wbT(
+                locale,
+                'Composing your visual & voice walkthrough',
+                'Menyusun diagram & penjelasan suaramu',
+                'กำลังเรียบเรียงแผนภาพและเสียงอธิบาย'
+              )
+            : mode === 'mid_audio_sync' || mode === 'initial_voice_sync'
+              ? wbT(
+                  locale,
+                  'Aligning voice narration with board strokes',
+                  'Menyelaraskan suara tutor dengan goresan papan',
+                  'กำลังซิงค์เสียงบรรยายเข้ากับกระดาน'
+                )
+              : wbT(
+                  locale,
+                  'Preparing your interactive lesson board',
+                  'Menyiapkan papan penjelasan interaktif',
+                  'กำลังเตรียมกระดานบทเรียนของคุณ'
+                )}
+        </h3>
+
+        <p className="text-[12.5px] text-[#64748B] leading-normal line-clamp-1 mt-0.5">
+          {cleanTopic}
+        </p>
+
+        {/* Architectural Miniature Live-Board Sheet + Radial Tutor Progress Ring */}
+        <div className="mt-4 rounded-[16px] bg-[#F7F9F8] ring-1 ring-[#0F172A]/[0.06] p-3.5 flex items-center justify-between gap-3.5">
+          <div className="flex-1 min-w-0">
+            <svg viewBox="0 0 228 74" className="w-full h-[66px] overflow-visible" aria-hidden="true">
+              {/* Miniature dot-grid board sheet */}
+              <rect x="1" y="1" width="226" height="72" rx="11" fill="#FFFFFF" stroke="#E2E8F0" strokeWidth="1" />
+              <g fill="#CBD5E1" opacity="0.55">
+                <circle cx="16" cy="14" r="0.9" />
+                <circle cx="36" cy="14" r="0.9" />
+                <circle cx="56" cy="14" r="0.9" />
+                <circle cx="172" cy="14" r="0.9" />
+                <circle cx="192" cy="14" r="0.9" />
+                <circle cx="212" cy="14" r="0.9" />
+                <circle cx="16" cy="60" r="0.9" />
+                <circle cx="36" cy="60" r="0.9" />
+                <circle cx="192" cy="60" r="0.9" />
+                <circle cx="212" cy="60" r="0.9" />
+              </g>
+
+              {/* Progressive emerald highlight sweep on title row */}
+              <rect
+                x="14"
+                y="12"
+                width="92"
+                height="9"
+                rx="4.5"
+                fill="#DCFCE7"
+                className="fz-buf-hl-sweep"
+              />
+              <line x1="18" y1="16.5" x2="98" y2="16.5" stroke="#0F172A" strokeWidth="2" strokeLinecap="round" />
+              <line x1="112" y1="16.5" x2="152" y2="16.5" stroke="#CBD5E1" strokeWidth="1.8" strokeLinecap="round" />
+
+              {/* Left Concept Frame */}
+              <rect x="14" y="30" width="84" height="32" rx="7" fill="#F8FAFC" stroke="#CBD5E1" strokeWidth="1.2" />
+              <line x1="23" y1="41" x2="66" y2="41" stroke="#334155" strokeWidth="1.8" strokeLinecap="round" />
+              <line x1="23" y1="50" x2="82" y2="50" stroke="#94A3B8" strokeWidth="1.5" strokeLinecap="round" />
+
+              {/* Right Synced Concept Frame */}
+              <rect x="130" y="30" width="84" height="32" rx="7" fill="#F0FDF4" stroke="#86EFAC" strokeWidth="1.2" />
+              <line x1="139" y1="41" x2="186" y2="41" stroke="#14532D" strokeWidth="1.8" strokeLinecap="round" />
+              <line x1="139" y1="50" x2="198" y2="50" stroke="#15803D" strokeOpacity="0.45" strokeWidth="1.5" strokeLinecap="round" />
+
+              {/* Live architectural connector curve */}
+              <path
+                d="M 98 46 C 109 46, 116 38, 130 46"
+                fill="none"
+                stroke="#15803D"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                className="fz-atelier-ink-path"
+              />
+
+              {/* Sleek monochrome drafting pen nib gliding across active card */}
+              <g className="fz-atelier-nib">
+                <circle cx="186" cy="41" r="6" fill="#15803D" opacity="0.14" />
+                <path
+                  d="M 186 41 L 195 30 L 199 34 Z"
+                  fill="#0F172A"
+                  stroke="#0F172A"
+                  strokeWidth="0.8"
+                  strokeLinejoin="round"
+                />
+                <circle cx="186" cy="41" r="1.8" fill="#15803D" />
+              </g>
+            </svg>
+          </div>
+
+          {/* Precision Radial Tutor Ring */}
+          <div className="relative w-14 h-14 flex items-center justify-center shrink-0">
+            <svg viewBox="0 0 56 56" className="absolute inset-0 w-full h-full -rotate-90" aria-hidden="true">
+              <circle cx="28" cy="28" r={ringRadius} fill="none" stroke="#E2E8F0" strokeWidth="2.5" />
+              <circle
+                cx="28"
+                cy="28"
+                r={ringRadius}
+                fill="none"
+                stroke="#15803D"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeDasharray={ringCircumference}
+                strokeDashoffset={ringOffset}
+                className="transition-[stroke-dashoffset] duration-300 ease-out"
+              />
+            </svg>
+            <div className="w-10 h-10 rounded-full overflow-hidden ring-1 ring-[#0F172A]/[0.08] bg-white">
+              <img
+                src={persona.avatarUrl || './assets/brand/fiezel-icon.svg'}
+                alt={persona.name}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Single-Accent Hairline Progress Track */}
+        <div className="mt-4 h-[3px] w-full rounded-full bg-[#EDF2EF] overflow-hidden" aria-hidden="true">
+          <div
+            className="h-full w-full rounded-full bg-[#15803D] fz-buf-progress-fill"
+            style={{ transform: `scaleX(${(asymptoticPct / 100).toFixed(3)})` }}
+          />
+        </div>
+
+        {/* Quiet Borderless Step Progression (Zero Rainbow Bordered Boxes) */}
+        <div className="mt-3.5 grid grid-cols-2 gap-x-4 gap-y-2">
+          {stages.map((st, idx) => (
+            <div key={idx} className="flex items-center gap-2 min-w-0">
+              {st.done ? (
+                <span className="w-4 h-4 rounded-full bg-[#15803D] text-white flex items-center justify-center shrink-0">
+                  <svg viewBox="0 0 12 12" className="w-2.5 h-2.5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M2.5 6.2 4.9 8.5 9.5 3.6" />
+                  </svg>
+                </span>
+              ) : st.active ? (
+                <span className="w-4 h-4 rounded-full bg-[#DCFCE7] flex items-center justify-center shrink-0">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#15803D] animate-pulse" />
+                </span>
+              ) : (
+                <span className="w-4 h-4 rounded-full bg-[#F1F5F9] flex items-center justify-center shrink-0">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#CBD5E1]" />
+                </span>
+              )}
+              <span
+                className={`text-[12px] truncate ${
+                  st.done
+                    ? 'font-medium text-[#334155]'
+                    : st.active
+                      ? 'font-semibold text-[#0F172A]'
+                      : 'font-normal text-[#94A3B8]'
+                }`}
+              >
+                {st.label}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 
 /**
  * KOMPONEN UTAMA KANVAS ADAPTIF KAWAN BICARA
@@ -3820,6 +4220,69 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
   const [loaderProgress, setLoaderProgress] = useState<number>(18);
   const boardContainerRef = useRef<HTMLDivElement | null>(null);
   const materialUploadInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Dedicated In-Whiteboard Voice Question Microphone (Prevents closing board when asking by voice!)
+  const [isBoardMicListening, setIsBoardMicListening] = useState<boolean>(false);
+  const [boardMicHint, setBoardMicHint] = useState<string | null>(null);
+  const boardSpeechRecRef = useRef<any>(null);
+  const boardMediaRecRef = useRef<MediaRecorder | null>(null);
+  const boardMicStreamRef = useRef<MediaStream | null>(null);
+  const boardMicTranscriptRef = useRef<string>('');
+  const boardMicStopTimerRef = useRef<number | null>(null);
+  const handleSubmitBoardQuestionRef = useRef<((rawQ: string, areaExcerpt?: string) => void) | null>(null);
+
+  const stopBoardVoiceCapture = (submitCollected = false) => {
+    if (boardMicStopTimerRef.current) {
+      window.clearTimeout(boardMicStopTimerRef.current);
+      boardMicStopTimerRef.current = null;
+    }
+    if (boardSpeechRecRef.current) {
+      const rec = boardSpeechRecRef.current;
+      boardSpeechRecRef.current = null;
+      try {
+        rec.onresult = null;
+        rec.onerror = null;
+        rec.onend = null;
+        rec.stop();
+      } catch {
+        // Ignore stop error
+      }
+    }
+    if (boardMediaRecRef.current) {
+      const mr = boardMediaRecRef.current;
+      boardMediaRecRef.current = null;
+      try {
+        if (mr.state !== 'inactive') mr.stop();
+      } catch {
+        // Ignore
+      }
+    }
+    if (boardMicStreamRef.current) {
+      const st = boardMicStreamRef.current;
+      boardMicStreamRef.current = null;
+      try {
+        st.getTracks().forEach((tr) => tr.stop());
+      } catch {
+        // Ignore
+      }
+    }
+    setIsBoardMicListening(false);
+    const collected = boardMicTranscriptRef.current.trim();
+    boardMicTranscriptRef.current = '';
+    if (submitCollected && collected.length >= 2) {
+      setBoardMicHint(null);
+      handleSubmitBoardQuestionRef.current?.(collected);
+    }
+  };
+
+  useEffect(() => {
+    if (!isOpen || isMinimized) {
+      stopBoardVoiceCapture(false);
+    }
+    return () => {
+      stopBoardVoiceCapture(false);
+    };
+  }, [isOpen, isMinimized]);
 
   useEffect(() => {
     if (initialMinimized !== undefined) {
@@ -4889,7 +5352,16 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
       let chunkRes: ChunkRes | null = resolvedChunkMap.has(chunkIdx)
         ? (resolvedChunkMap.get(chunkIdx) ?? null)
         : null;
+      let interChunkPrepTimer = 0;
       if (!resolvedChunkMap.has(chunkIdx)) {
+        if (chunkIdx > startChunkIdx) {
+          setIsStepAudioActive(false);
+          interChunkPrepTimer = window.setTimeout(() => {
+            if (!cancelled && lockstepSeqIdRef.current === seqId) {
+              setIsAudioPreparing(true);
+            }
+          }, 160);
+        }
         const chunkPromise = chunkPromiseMap.get(chunkIdx)!;
         const raceTimeoutMs = chunkIdx === startChunkIdx ? 11000 : 14000;
         let raceTimeoutId = 0;
@@ -4899,11 +5371,12 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
         chunkRes = await Promise.race([chunkPromise, raceTimeout]);
         window.clearTimeout(raceTimeoutId);
       }
+      window.clearTimeout(interChunkPrepTimer);
       if (cancelled || lockstepSeqIdRef.current !== seqId) return;
       if (chunkIdx === startChunkIdx) {
         window.clearTimeout(prepTimerId);
-        setIsAudioPreparing(false);
       }
+      setIsAudioPreparing(false);
       cancelAnimationFrame(rafId);
 
       // NEURAL-ONLY VOICE INVARIANT: Banned 100% browser window.speechSynthesis robotic TTS!
@@ -4958,6 +5431,9 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
         if (isLastChunk) {
           setIsStepAudioActive(false);
           setNeedsAudioUnlock(false);
+          if (decodedDurationSum > 0) {
+            setAudioClock({ elapsedSec: decodedDurationSum, totalSec: decodedDurationSum });
+          }
           publishAudioDebug({ isPlaying: false, completed: true, interChunkGapsMs: [...interChunkGapsMs], wordClockMatchedCount });
           applyTrackFraction(1, true);
         } else {
@@ -5015,12 +5491,33 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
       }
 
       const chunkDurSec = Math.max(0.4, chunkRes.durationSec);
-      const seekInChunkSec = Math.max(0, Math.min(chunkDurSec - 0.1, intraFrac * chunkDurSec));
       const chunkAlignment = chunkRes.alignment;
       const chunkWordMap = chunkWordMaps[chunkIdx];
       const useWordClock = Boolean(
         chunkAlignment && chunkWordMap && chunkAlignment.times.length === chunkWordMap.count && chunkWordMap.count > 0
       );
+      let seekInChunkSec = Math.max(0, Math.min(chunkDurSec - 0.1, intraFrac * chunkDurSec));
+      if (intraFrac > 0.005 && useWordClock && chunkAlignment && chunkWordMap) {
+        // Petakan balik fraksi prosodik ke stempel waktu kata nyata agar Resume/Seek mendarat presisi di suku kata terakhir
+        let wIdx = 0;
+        for (let wi = 0; wi < chunkWordMap.count; wi++) {
+          const fNext = chunkWordMap.fracs[wi + 1] ?? 1;
+          if (intraFrac <= fNext || wi === chunkWordMap.count - 1) {
+            wIdx = wi;
+            break;
+          }
+        }
+        const fA = chunkWordMap.fracs[wIdx] ?? 0;
+        const fB = chunkWordMap.fracs[wIdx + 1] ?? 1;
+        const wPart = fB > fA ? Math.max(0, Math.min(1, (intraFrac - fA) / (fB - fA))) : 0;
+        const tSpan = chunkAlignment.times[wIdx];
+        if (tSpan) {
+          seekInChunkSec = Math.max(
+            0,
+            Math.min(chunkDurSec - 0.08, tSpan.start + (tSpan.end - tSpan.start) * wPart)
+          );
+        }
+      }
       const leadTrim = Math.min(0.05, chunkDurSec * 0.02);
       const tailTrim = Math.min(0.07, chunkDurSec * 0.025);
       const speakWindow = Math.max(0.22, chunkDurSec - leadTrim - tailTrim);
@@ -5035,7 +5532,18 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
           }
           return Math.max(0, Math.min(0.996, fa + (fb - fa) * partial));
         }
-        return Math.max(0, Math.min(0.996, (audibleSec - leadTrim) / speakWindow));
+        const linRatio = Math.max(0, Math.min(0.996, (audibleSec - leadTrim) / speakWindow));
+        if (chunkWordMap && chunkWordMap.count > 0) {
+          let linWordIdx = chunkWordMap.count - 1;
+          for (let wi = 0; wi < chunkWordMap.count; wi++) {
+            if (linRatio < (chunkWordMap.fracs[wi + 1] ?? 1)) {
+              linWordIdx = wi;
+              break;
+            }
+          }
+          publishSpokenWord(chunkIdx, linWordIdx, Math.min(chunkDurSec, audibleSec));
+        }
+        return linRatio;
       };
 
       // Prioritas 1: Web Audio API AudioBufferSourceNode per-kalimat
@@ -5330,6 +5838,27 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
     }, 1000);
     return () => window.clearTimeout(tid);
   }, [isOpen, quizCoachReply?.status, quizCoachReply?.autoRemediateLeftSec]);
+
+  const isAnyBufferingActive = Boolean(
+    isOpen &&
+      !isMinimized &&
+      (!isReady ||
+        (!isSpecialCanvasModal && isInitialAudioGateActive) ||
+        isGeneratingTopic ||
+        (!isSpecialCanvasModal && isAudioPreparing && !needsAudioUnlock && isWritingPlaying))
+  );
+  const [bufferingElapsedMs, setBufferingElapsedMs] = useState<number>(0);
+  useEffect(() => {
+    if (!isAnyBufferingActive) {
+      setBufferingElapsedMs(0);
+      return;
+    }
+    const startedPerf = performance.now();
+    const tid = window.setInterval(() => {
+      setBufferingElapsedMs(Math.round(performance.now() - startedPerf));
+    }, 180);
+    return () => window.clearInterval(tid);
+  }, [isAnyBufferingActive]);
 
   if (!isOpen) return null;
 
@@ -5781,24 +6310,25 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
     pendingQuestionIdRef.current = qId;
     pendingQuestionActionSigRef.current = `${uiAction?.topicTitle || ''}::${uiAction?.explanationText || ''}::${uiAction?.coachSpokenScript || ''}`;
 
+    const visibleQ = sanitizeVisibleBoardPrompt(cleanQ) || cleanQ;
     setStudentQuestions((prev) => [
       ...prev.slice(-3),
       {
         id: qId,
-        text: cleanQ,
+        text: visibleQ,
         areaExcerpt,
         tutorAnswer: areaExcerpt
           ? wbT(
               locale,
-              `⏳ Preparing detailed explanation for "${areaExcerpt}"...`,
-              `⏳ Sedang menyiapkan penjelasan lanjutan khusus bagian "${areaExcerpt}"...`,
-              `⏳ กำลังเตรียมคำอธิบายเพิ่มเติมสำหรับ "${areaExcerpt}"...`
+              `Preparing detailed explanation for "${areaExcerpt}"...`,
+              `Menyiapkan penjelasan lanjutan khusus bagian "${areaExcerpt}"...`,
+              `กำลังเตรียมคำอธิบายเพิ่มเติมสำหรับ "${areaExcerpt}"...`
             )
           : wbT(
               locale,
-              '⏳ Preparing follow-up explanation and whiteboard diagram...',
-              '⏳ Sedang menyusun penjelasan lanjutan & diagram di papan tulis...',
-              '⏳ กำลังเรียบเรียงคำอธิบายและแผนภาพบนกระดาน...'
+              'Preparing follow-up explanation and whiteboard diagram...',
+              'Menyusun penjelasan lanjutan & diagram di papan tulis...',
+              'กำลังเรียบเรียงคำอธิบายและแผนภาพบนกระดาน...'
             ),
       },
     ]);
@@ -5813,9 +6343,179 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
       });
     }
 
-    setQuestionDraft('');
+      setQuestionDraft('');
     if (onRequestCustomTopic) {
       onRequestCustomTopic(cleanQ, 'custom_dynamic', followUpContext);
+    }
+  };
+  handleSubmitBoardQuestionRef.current = handleSubmitBoardQuestion;
+
+  const toggleBoardVoiceQuestionMic = async () => {
+    unlockSharedBoardAudioContext();
+    playFiezelSfx('button_tap');
+    if (isBoardMicListening) {
+      stopBoardVoiceCapture(true);
+      return;
+    }
+    // Pause board TTS immediately so speaker audio never leaks into learner microphone
+    stopLockstepAudio();
+    stopQuizCoachSpeech();
+    setIsWritingPlaying(false);
+    setBoardMicHint(null);
+    boardMicTranscriptRef.current = '';
+
+    const locCode = String(effectiveBoardLocale || locale || 'id').toLowerCase().split(/[-_]/)[0];
+    const srLangMap: Record<string, string> = {
+      id: 'id-ID',
+      en: 'en-US',
+      th: 'th-TH',
+      ja: 'ja-JP',
+      zh: 'zh-CN',
+      vi: 'vi-VN',
+      ms: 'ms-MY',
+      fil: 'fil-PH',
+      ko: 'ko-KR',
+      ru: 'ru-RU',
+    };
+    const recLang = srLangMap[locCode] || 'id-ID';
+    const SpeechRecCtor =
+      typeof window !== 'undefined'
+        ? (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
+        : null;
+
+    if (SpeechRecCtor) {
+      try {
+        const rec = new SpeechRecCtor();
+        rec.lang = recLang;
+        rec.interimResults = true;
+        rec.continuous = false;
+        rec.maxAlternatives = 1;
+        boardSpeechRecRef.current = rec;
+        setIsBoardMicListening(true);
+
+        rec.onresult = (ev: any) => {
+          let merged = '';
+          for (let i = 0; i < (ev.results?.length || 0); i++) {
+            merged += `${ev.results[i][0]?.transcript || ''} `;
+          }
+          const clean = merged.replace(/\s+/g, ' ').trim();
+          if (clean) {
+            boardMicTranscriptRef.current = clean;
+            setQuestionDraft(clean);
+          }
+        };
+
+        rec.onerror = (ev: any) => {
+          const errCode = String(ev?.error || '');
+          boardSpeechRecRef.current = null;
+          setIsBoardMicListening(false);
+          if (errCode === 'not-allowed' || errCode === 'service-not-allowed') {
+            setBoardMicHint(
+              wbT(
+                locale,
+                'Microphone permission is blocked in your browser.',
+                'Izin mikrofon diblokir oleh peramban. Aktifkan izin mikrofon lalu coba lagi.',
+                'เบราว์เซอร์บล็อกสิทธิ์ไมโครโฟน กรุณาอนุญาตไมโครโฟนก่อน'
+              )
+            );
+          }
+        };
+
+        rec.onend = () => {
+          boardSpeechRecRef.current = null;
+          setIsBoardMicListening(false);
+          const finalTxt = boardMicTranscriptRef.current.trim();
+          boardMicTranscriptRef.current = '';
+          if (finalTxt.length >= 2) {
+            handleSubmitBoardQuestionRef.current?.(finalTxt);
+          }
+        };
+
+        rec.start();
+        boardMicStopTimerRef.current = window.setTimeout(() => {
+          stopBoardVoiceCapture(true);
+        }, 11000);
+        return;
+      } catch {
+        boardSpeechRecRef.current = null;
+        setIsBoardMicListening(false);
+      }
+    }
+
+    // Fallback: MediaRecorder + Worker /api/voice/verify-speech ASR for WebViews/Firefox without Web Speech API
+    if (typeof navigator !== 'undefined' && navigator.mediaDevices?.getUserMedia && typeof MediaRecorder !== 'undefined') {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+        });
+        boardMicStreamRef.current = stream;
+        const chunks: BlobPart[] = [];
+        const mr = new MediaRecorder(stream);
+        boardMediaRecRef.current = mr;
+        setIsBoardMicListening(true);
+
+        mr.ondataavailable = (ev) => {
+          if (ev.data && ev.data.size > 0) chunks.push(ev.data);
+        };
+        mr.onstop = async () => {
+          try {
+            stream.getTracks().forEach((tr) => tr.stop());
+          } catch {}
+          boardMicStreamRef.current = null;
+          boardMediaRecRef.current = null;
+          setIsBoardMicListening(false);
+          const blob = new Blob(chunks, { type: mr.mimeType || 'audio/webm' });
+          if (blob.size < 400) return;
+          const reader = new FileReader();
+          reader.onloadend = async () => {
+            const b64 = String(reader.result || '').replace(/^data:[^;]+;base64,/, '');
+            if (!b64) return;
+            for (const base of resolveVoiceApiCandidateBases()) {
+              try {
+                await ensureVoiceWorkerSession(base).catch(() => false);
+                const res = await fetch(`${base}/api/voice/verify-speech`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  credentials: 'include',
+                  body: JSON.stringify({
+                    audioBase64: b64,
+                    mimeType: blob.type || 'audio/webm',
+                    targetLang: locCode,
+                  }),
+                });
+                if (res.ok) {
+                  const data = await res.json().catch(() => null);
+                  const transcript = String(data?.transcript || data?.text || '').trim();
+                  if (transcript.length >= 2) {
+                    setQuestionDraft(transcript);
+                    handleSubmitBoardQuestionRef.current?.(transcript);
+                    return;
+                  }
+                }
+              } catch {
+                // Ignore
+              }
+            }
+          };
+          reader.readAsDataURL(blob);
+        };
+        mr.start();
+        boardMicStopTimerRef.current = window.setTimeout(() => {
+          stopBoardVoiceCapture(false);
+        }, 8500);
+      } catch {
+        setIsBoardMicListening(false);
+        setBoardMicHint(
+          wbT(
+            locale,
+            'Could not access microphone. Please check browser mic permissions.',
+            'Mikrofon belum dapat diakses. Periksa izin mikrofon pada perambanmu.',
+            'ไม่สามารถเข้าถึงไมโครโฟนได้ กรุณาตรวจสอบสิทธิ์ของเบราว์เซอร์'
+          )
+        );
+      }
+    } else {
+      questionInputRef.current?.focus();
     }
   };
 
@@ -6024,37 +6724,37 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
           </div>
         </div>
       )}
-      <div className="flex items-center justify-between gap-2 border-b border-[#F0E6D9] pb-2.5">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#F0E6D9] pb-2.5">
         <div className="flex items-center gap-1 bg-[#FAF4E8] p-1 rounded-xl">
           <button
             type="button"
             onClick={() => { playFiezelSfx('button_tap'); setQuizMode('multiple_choice'); }}
             data-testid="mode-tab-multiple_choice"
-            className={`px-2 py-0.5 rounded-lg text-[10.5px] font-bold transition-all cursor-pointer ${
+            className={`px-2 py-0.5 rounded-lg text-[10.5px] font-bold transition-colors cursor-pointer ${
               quizMode === 'multiple_choice' ? 'bg-[#FFFFFF] text-[#231A12] shadow-xs' : 'text-[#8C7760] hover:text-[#5C4A38]'
             }`}
           >
-            Pilihan
+            {ui.modeChoice}
           </button>
           <button
             type="button"
             onClick={() => { playFiezelSfx('button_tap'); setQuizMode('cloze_gap'); }}
             data-testid="mode-tab-cloze_gap"
-            className={`px-2 py-0.5 rounded-lg text-[10.5px] font-bold transition-all cursor-pointer ${
+            className={`px-2 py-0.5 rounded-lg text-[10.5px] font-bold transition-colors cursor-pointer ${
               quizMode === 'cloze_gap' ? 'bg-[#FFFFFF] text-[#231A12] shadow-xs' : 'text-[#8C7760] hover:text-[#5C4A38]'
             }`}
           >
-            Isian Kata
+            {ui.modeCloze}
           </button>
           <button
             type="button"
             onClick={() => { playFiezelSfx('button_tap'); setQuizMode('sentence_blocks'); }}
             data-testid="mode-tab-sentence_blocks"
-            className={`px-2 py-0.5 rounded-lg text-[10.5px] font-bold transition-all cursor-pointer ${
+            className={`px-2 py-0.5 rounded-lg text-[10.5px] font-bold transition-colors cursor-pointer ${
               quizMode === 'sentence_blocks' ? 'bg-[#FFFFFF] text-[#231A12] shadow-xs' : 'text-[#8C7760] hover:text-[#5C4A38]'
             }`}
           >
-            Susun Balok
+            {ui.modeBlocks}
           </button>
         </div>
 
@@ -6063,10 +6763,10 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
           onClick={handleReRollQuestion}
           data-testid="wb-reroll-btn"
           className="px-2.5 py-1 rounded-xl bg-[#FAF4E8] hover:bg-[#F3EBE0] text-[#5C4A38] text-[10.5px] font-bold inline-flex items-center gap-1 cursor-pointer transition-transform active:scale-95"
-          title="Ganti Soal Baru Tanpa Terjawab Duluan"
+          title={wbT(locale, 'Generate a fresh question', 'Ganti Soal Baru Tanpa Terjawab Duluan', 'เปลี่ยนโจทย์ข้อใหม่')}
         >
           <span>↻</span>
-          <span>Ganti Soal</span>
+          <span>{ui.rerollBtn}</span>
         </button>
       </div>
 
@@ -6238,7 +6938,11 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                   {persona.name} · {quizCoachReply.headline}
                 </span>
                 {quizCoachReply.isSpeaking && (
-                  <span className="text-[10px] font-bold text-[#15803D] shrink-0">🔊</span>
+                  <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-[#15803D] shrink-0" aria-hidden="true">
+                    <span className="w-1 h-2.5 rounded-full bg-[#16A34A] fz-wb-mic-bar" />
+                    <span className="w-1 h-3.5 rounded-full bg-[#15803D] fz-wb-mic-bar" />
+                    <span className="w-1 h-2 rounded-full bg-[#16A34A] fz-wb-mic-bar" />
+                  </span>
                 )}
               </div>
               <p className="text-[11.5px] text-[#1E293B] leading-relaxed">
@@ -6259,22 +6963,27 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                       quizCoachReply.correctAnswer
                     )
                   }
-                  className="px-3 py-1.5 rounded-xl bg-[#D97706] hover:bg-[#B45309] text-white text-[11px] font-extrabold cursor-pointer shadow-xs active:scale-95 transition-all"
+                  className="px-3 py-1.5 rounded-xl bg-[#D97706] hover:bg-[#B45309] text-white text-[11px] font-extrabold cursor-pointer shadow-xs active:scale-95 transition-transform inline-flex items-center gap-1.5"
                 >
-                  🧠{' '}
-                  {quizCoachReply.autoRemediateLeftSec !== null && quizCoachReply.autoRemediateLeftSec > 0
-                    ? wbT(
-                        effectiveBoardLocale,
-                        `Re-explain Differently (${quizCoachReply.autoRemediateLeftSec}s)`,
-                        `Jelaskan Ulang Cara Beda (${quizCoachReply.autoRemediateLeftSec}d)`,
-                        `อธิบายใหม่แบบอื่น (${quizCoachReply.autoRemediateLeftSec} วิ)`
-                      )
-                    : wbT(
-                        effectiveBoardLocale,
-                        'Re-explain with Different Angle',
-                        'Jelaskan Ulang dengan Cara Berbeda',
-                        'อธิบายใหม่ด้วยวิธีที่ต่างออกไป'
-                      )}
+                  <svg viewBox="0 0 18 18" className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M9 2.5a4.5 4.5 0 0 0-2.6 8.2c.5.4.8 1 .8 1.6h3.6c0-.6.3-1.2.8-1.6A4.5 4.5 0 0 0 9 2.5Z" />
+                    <path d="M7.5 14.8h3" />
+                  </svg>
+                  <span>
+                    {quizCoachReply.autoRemediateLeftSec !== null && quizCoachReply.autoRemediateLeftSec > 0
+                      ? wbT(
+                          effectiveBoardLocale,
+                          `Re-explain Differently (${quizCoachReply.autoRemediateLeftSec}s)`,
+                          `Jelaskan Ulang Cara Beda (${quizCoachReply.autoRemediateLeftSec}d)`,
+                          `อธิบายใหม่แบบอื่น (${quizCoachReply.autoRemediateLeftSec} วิ)`
+                        )
+                      : wbT(
+                          effectiveBoardLocale,
+                          'Re-explain with Different Angle',
+                          'Jelaskan Ulang dengan Cara Berbeda',
+                          'อธิบายใหม่ด้วยวิธีที่ต่างออกไป'
+                        )}
+                  </span>
                 </button>
               )}
               <button
@@ -6288,9 +6997,9 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                   setPlacedBlocks([]);
                   setQuizCoachReply(null);
                 }}
-                className="px-2.5 py-1.5 rounded-xl bg-white hover:bg-[#FEF3C7] border border-[#F59E0B]/50 text-[#92400E] text-[11px] font-bold cursor-pointer active:scale-95 transition-all"
+                className="px-2.5 py-1.5 rounded-xl bg-white hover:bg-[#FEF3C7] border border-[#F59E0B]/50 text-[#92400E] text-[11px] font-bold cursor-pointer active:scale-95 transition-transform"
               >
-                🔄 {wbT(effectiveBoardLocale, 'Try Again First', 'Coba Jawab Lagi', 'ลองตอบอีกครั้ง')}
+                ↺ {wbT(effectiveBoardLocale, 'Try Again First', 'Coba Jawab Lagi', 'ลองตอบอีกครั้ง')}
               </button>
             </div>
           ) : (
@@ -6310,9 +7019,9 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                   setQuizMode(nextMode);
                   handleReRollQuestion();
                 }}
-                className="px-3 py-1.5 rounded-xl bg-[#15803D] hover:bg-[#166534] text-white text-[11px] font-extrabold cursor-pointer shadow-xs active:scale-95 transition-all"
+                className="px-3 py-1.5 rounded-xl bg-[#15803D] hover:bg-[#166534] text-white text-[11px] font-extrabold cursor-pointer shadow-xs active:scale-95 transition-transform"
               >
-                🎯 {wbT(effectiveBoardLocale, 'Next Practice (Same Topic)', 'Latihan Soal Berikutnya', 'ทำโจทย์ข้อถัดไป')}
+                {wbT(effectiveBoardLocale, 'Next Practice (Same Topic)', 'Latihan Soal Berikutnya', 'ทำโจทย์ข้อถัดไป')} ›
               </button>
               {onRequestCustomTopic && (
                 <button
@@ -6330,9 +7039,9 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                       boardState?.topicTitle
                     );
                   }}
-                  className="px-2.5 py-1.5 rounded-xl bg-white hover:bg-[#DCFCE7] border border-[#86EFAC] text-[#14532D] text-[11px] font-bold cursor-pointer active:scale-95 transition-all"
+                  className="px-2.5 py-1.5 rounded-xl bg-white hover:bg-[#DCFCE7] border border-[#86EFAC] text-[#14532D] text-[11px] font-bold cursor-pointer active:scale-95 transition-transform"
                 >
-                  🔎 {wbT(effectiveBoardLocale, 'Deeper Examples', 'Pendalaman Materi', 'เจาะลึกตัวอย่างเพิ่ม')}
+                  + {wbT(effectiveBoardLocale, 'Deeper Examples', 'Pendalaman Materi', 'เจาะลึกตัวอย่างเพิ่ม')}
                 </button>
               )}
               <button
@@ -6344,9 +7053,9 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                   questionInputRef.current?.focus();
                   questionInputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                 }}
-                className="px-2.5 py-1.5 rounded-xl bg-[#EFF6FF] hover:bg-[#DBEAFE] border border-[#93C5FD] text-[#1E40AF] text-[11px] font-bold cursor-pointer active:scale-95 transition-all"
+                className="px-2.5 py-1.5 rounded-xl bg-[#EFF6FF] hover:bg-[#DBEAFE] border border-[#93C5FD] text-[#1E40AF] text-[11px] font-bold cursor-pointer active:scale-95 transition-transform"
               >
-                ✨ {wbT(effectiveBoardLocale, 'Another Topic / Problem', 'Lanjut Masalah Lain', 'เปลี่ยนหัวข้ออื่น')}
+                {wbT(effectiveBoardLocale, 'Another Topic / Problem', 'Lanjut Masalah Lain', 'เปลี่ยนหัวข้ออื่น')}
               </button>
             </div>
           )}
@@ -6359,10 +7068,20 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
       data-testid="wb-offline-retry-card"
     >
       <p className="text-xs font-bold text-amber-950">
-        Koneksi Tutor AI sedang offline atau belum merespons untuk topik &ldquo;{boardState.topicTitle}&rdquo;.
+        {wbT(
+          locale,
+          `Tutor connection is currently offline or timed out for "${boardState.topicTitle}".`,
+          `Koneksi Tutor sedang offline atau belum merespons untuk topik "${boardState.topicTitle}".`,
+          `การเชื่อมต่อผู้สอนออฟไลน์หรือไม่ตอบสนองสำหรับหัวข้อ "${boardState.topicTitle}"`
+        )}
       </p>
       <p className="text-[11px] text-amber-900/90 leading-relaxed">
-        Papan tulis FIEZEL bebas template palsu dan meracik penjelasan serta kuis langsung sesuai pertanyaanmu. Hubungkan internet atau tambahkan Gemini API key lokal lalu muat ulang.
+        {wbT(
+          locale,
+          'FIEZEL Whiteboard builds live explanations and drills tailored to your exact question. Check your internet connection, then tap reload.',
+          'Papan tulis FIEZEL bebas template palsu dan meracik penjelasan serta kuis langsung sesuai pertanyaanmu. Periksa koneksi internetmu lalu ketuk muat ulang.',
+          'กระดาน FIEZEL สร้างคำอธิบายและแบบฝึกหัดสดตามคำถามของคุณ กรุณาตรวจสอบอินเทอร์เน็ตแล้วแตะโหลดใหม่'
+        )}
       </p>
       {onRequestCustomTopic && (
         <button
@@ -6371,7 +7090,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
           data-testid="wb-retry-realtime-btn"
           className="px-3 py-1.5 rounded-xl bg-[#15803D] hover:bg-[#166534] text-white text-xs font-bold cursor-pointer"
         >
-          ↻ Coba Muat Ulang Real-Time
+          ↻ {wbT(locale, 'Reload Real-Time Board', 'Coba Muat Ulang Real-Time', 'โหลดกระดานสดใหม่')}
         </button>
       )}
     </div>
@@ -6391,13 +7110,13 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
             : 'sm:max-w-[1260px] h-[94dvh] sm:h-[92dvh] bg-[#FAFBF9] border-[#DDE2DC]'
         } rounded-[24px] sm:rounded-[26px] border shadow-[0_24px_60px_rgba(28,22,17,0.25)] overflow-hidden flex flex-col`}
       >
-        {/* TOP HEADER BAR ALA SOLVELY + KONTROL KECEPATAN, EXPORT, MINIMIZE, AKHIRI */}
+        {/* TOP HEADER BAR ALA SOLVELY + KONTROL KECEPATAN, API KEY, EXPORT, MINIMIZE, AKHIRI */}
         <div
-          className={`px-3.5 sm:px-5 py-2 sm:py-2.5 border-b flex flex-wrap sm:flex-nowrap items-center justify-between gap-2 shrink-0 ${
+          className={`px-2.5 sm:px-5 py-2 border-b flex items-center justify-between gap-1.5 sm:gap-2 shrink-0 ${
             isPteModal ? 'bg-[#FBF8F1] border-[#F0E6D9]' : 'bg-white/95 border-[#E5E8E3]'
           }`}
         >
-          <div className="min-w-[200px] flex-1 flex items-center gap-2">
+          <div className="min-w-0 flex-1 flex items-center gap-1.5 sm:gap-2">
             {!showInitialBuffering && !isPteModal && isReady && (
               <button
                 type="button"
@@ -6406,43 +7125,38 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                   setIsSidebarOpen((v) => !v);
                 }}
                 data-testid="wb-toggle-sidebar-btn"
-                className="px-2.5 py-1 rounded-xl bg-[#F4F6F3] hover:bg-[#E7ECE6] border border-[#DCE2DA] text-[#334155] text-[11px] font-bold flex items-center gap-1 cursor-pointer shrink-0"
+                className="w-7 h-7 sm:w-auto sm:h-auto sm:px-2.5 sm:py-1 rounded-lg sm:rounded-xl bg-[#F4F6F3] hover:bg-[#E7ECE6] border border-[#DCE2DA] text-[#334155] text-[11px] font-bold flex items-center justify-center gap-1.5 cursor-pointer shrink-0"
                 title={wbT(locale, 'Toggle Source Materials', 'Buka / Tutup Materi Sumber', 'เปิด / ปิดสื่อประกอบ')}
               >
-                <span>📄</span>
+                <svg viewBox="0 0 18 18" className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <rect x="2.5" y="3" width="13" height="12" rx="2" />
+                  <path d="M6.5 3v12" />
+                </svg>
                 <span className="hidden sm:inline">{wbT(locale, 'Sources', 'Materi', 'สื่อ')}</span>
               </button>
             )}
-            <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full bg-[#DCFCE7] text-[#15803D] text-[10px] font-extrabold tracking-wide uppercase shrink-0">
-              {wbT(locale, '✦ AI Whiteboard', '✦ Papan Tulis AI', '✦ กระดานไวท์บอร์ด AI')}
+            <span className="hidden md:inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#DCFCE7] text-[#15803D] text-[10px] font-extrabold tracking-wide uppercase shrink-0">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#15803D]" />
+              <span>{wbT(locale, 'AI Whiteboard', 'Papan Tulis AI', 'กระดาน AI')}</span>
             </span>
             <h3
               className="text-xs sm:text-sm font-extrabold text-[#231A12] leading-tight truncate min-w-0"
               data-testid="workbench-topic-title"
             >
-              {boardState?.topicTitle || topicTitle || ui.badge.replace(/^✦\s*/, '')}
+              {sanitizeVisibleBoardPrompt(boardState?.topicTitle || topicTitle) || ui.badge.replace(/^✦\s*/, '')}
             </h3>
-            {!isPteModal && isReady && isGeneratingTopic && (
+            {!isPteModal && isSpecialCanvasModal && isReady && isGeneratingTopic && (
               <span
                 data-testid="wb-updating-indicator"
-                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#EFF6FF] border border-[#BFDBFE] text-[#1D4ED8] text-[10px] font-bold shrink-0 animate-pulse"
+                className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#F1F5F9] border border-[#E2E8F0] text-[#334155] text-[10px] font-semibold shrink-0"
               >
-                <span>⏳</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-[#15803D] animate-pulse" />
                 <span className="hidden sm:inline">{wbT(locale, 'Updating...', 'Menyusun lanjutan...', 'กำลังเรียบเรียง...')}</span>
-              </span>
-            )}
-            {!showInitialBuffering && !isPteModal && isReady && !isGeneratingTopic && isAudioPreparing && (
-              <span
-                data-testid="wb-audio-preparing-pill"
-                className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#FEF3C7] border border-[#FCD34D] text-[#92400E] text-[10px] font-extrabold shrink-0 animate-pulse"
-              >
-                <span>🎙️</span>
-                <span className="hidden sm:inline">{wbT(locale, 'Preparing natural voice...', 'Menyiapkan suara natural...', 'กำลังเตรียมเสียงธรรมชาติ...')}</span>
               </span>
             )}
           </div>
 
-          <div className="flex items-center gap-1.5 shrink-0 justify-end ml-auto sm:ml-0">
+          <div className="flex items-center gap-1 sm:gap-1.5 shrink-0 justify-end">
             {!showInitialBuffering && !isPteModal && isReady && (
               <>
                 {onChangeLocale && (
@@ -6459,24 +7173,24 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                         onRequestCustomTopic(boardState.topicTitle, 'custom_dynamic');
                       }
                     }}
-                    className="px-1.5 py-1 rounded-xl bg-[#F4F6F3] border border-[#DCE2DA] text-[10.5px] font-bold text-[#334155] cursor-pointer max-w-[82px]"
+                    className="px-1 sm:px-1.5 py-1 rounded-lg sm:rounded-xl bg-[#F4F6F3] border border-[#DCE2DA] text-[10px] sm:text-[10.5px] font-bold text-[#334155] cursor-pointer max-w-[46px] sm:max-w-[74px]"
                     title={wbT(locale, 'Explanation language (Native)', 'Bahasa Native Penjelasan', 'ภาษาอธิบาย')}
                   >
-                    <option value="id">🌐 ID</option>
-                    <option value="en">🌐 EN</option>
-                    <option value="th">🌐 TH</option>
-                    <option value="ja">🌐 JA</option>
-                    <option value="ru">🌐 RU</option>
-                    <option value="km">🌐 KM</option>
-                    <option value="fil">🌐 FIL</option>
-                    <option value="vi">🌐 VI</option>
-                    <option value="ko">🌐 KO</option>
-                    <option value="ms">🌐 MS</option>
-                    <option value="zh">🌐 ZH</option>
-                    <option value="ar">🌐 AR</option>
-                    <option value="es">🌐 ES</option>
-                    <option value="fr">🌐 FR</option>
-                    <option value="de">🌐 DE</option>
+                    <option value="id">ID</option>
+                    <option value="en">EN</option>
+                    <option value="th">TH</option>
+                    <option value="ja">JA</option>
+                    <option value="ru">RU</option>
+                    <option value="km">KM</option>
+                    <option value="fil">FIL</option>
+                    <option value="vi">VI</option>
+                    <option value="ko">KO</option>
+                    <option value="ms">MS</option>
+                    <option value="zh">ZH</option>
+                    <option value="ar">AR</option>
+                    <option value="es">ES</option>
+                    <option value="fr">FR</option>
+                    <option value="de">DE</option>
                   </select>
                 )}
                 <select
@@ -6484,7 +7198,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                   aria-label={wbT(locale, 'Board writing speed', 'Kecepatan menulis papan', 'ความเร็วการเขียนกระดาน')}
                   value={playbackSpeed}
                   onChange={(e) => setPlaybackSpeed(parseFloat(e.target.value) as 0.75 | 1 | 1.25 | 1.5)}
-                  className="px-2 py-1 rounded-xl bg-[#F4F6F3] border border-[#DCE2DA] text-[11px] font-bold text-[#334155] cursor-pointer"
+                  className="px-1 sm:px-2 py-1 rounded-lg sm:rounded-xl bg-[#F4F6F3] border border-[#DCE2DA] text-[10px] sm:text-[11px] font-bold text-[#334155] cursor-pointer max-w-[52px] sm:max-w-none"
                 >
                   <option value={0.75}>0.75x</option>
                   <option value={1}>1.0x</option>
@@ -6501,14 +7215,14 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                     setReplayNonce((n) => n + 1);
                     setIsWritingPlaying(true);
                   }}
-                  className="px-2.5 py-1 rounded-xl bg-[#F4F6F3] hover:bg-[#E7ECE6] border border-[#DCE2DA] text-[#334155] text-[11px] font-bold cursor-pointer hidden sm:inline-flex items-center gap-1"
+                  className="px-2.5 py-1 rounded-xl bg-[#F4F6F3] hover:bg-[#E7ECE6] border border-[#DCE2DA] text-[#334155] text-[11px] font-bold cursor-pointer hidden md:inline-flex items-center gap-1"
                   title={wbT(locale, 'Replay board strokes', 'Putar Ulang Goresan Papan', 'เล่นซ้ำขั้นตอนบนกระดาน')}
                 >
                   <span>↺</span>
                   <span>{wbT(locale, 'Replay', 'Ulangi', 'เล่นซ้ำ')}</span>
                 </button>
 
-                <div className="flex items-center bg-[#F4F6F3] border border-[#DCE2DA] rounded-xl overflow-hidden text-[10.5px] sm:text-[11px] font-bold text-[#334155]" data-testid="wb-zoom-controls">
+                <div className="hidden sm:flex items-center bg-[#F4F6F3] border border-[#DCE2DA] rounded-xl overflow-hidden text-[10.5px] sm:text-[11px] font-bold text-[#334155]" data-testid="wb-zoom-controls">
                   <button
                     type="button"
                     data-testid="wb-zoom-out"
@@ -6541,23 +7255,26 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                   type="button"
                   data-testid="wb-auto-spotlight-toggle"
                   onClick={() => setAutoSpotlight((v) => !v)}
-                  className={`hidden sm:inline-flex items-center gap-1 px-2.5 py-1 rounded-xl border text-[11px] font-bold transition-colors cursor-pointer ${
+                  className={`hidden lg:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl border text-[11px] font-bold transition-colors cursor-pointer ${
                     autoSpotlight
                       ? 'bg-[#DCFCE7] border-[#86EFAC] text-[#14532D]'
                       : 'bg-[#F4F6F3] border-[#DCE2DA] text-[#475569]'
                   }`}
                   title={wbT(locale, 'Auto-highlight & scroll to active step', 'Sorot & gulir otomatis ke langkah aktif')}
                 >
-                  <span>{autoSpotlight ? wbT(locale, '🎯 Auto Focus', '🎯 Fokus Auto', '🎯 โฟกัสอัตโนมัติ') : wbT(locale, '🎯 Manual Focus', '🎯 Fokus Manual', '🎯 โฟกัสเอง')}</span>
+                  <span className={`w-1.5 h-1.5 rounded-full ${autoSpotlight ? 'bg-[#15803D]' : 'bg-[#94A3B8]'}`} />
+                  <span>{autoSpotlight ? wbT(locale, 'Auto Focus', 'Fokus Auto', 'โฟกัสอัตโนมัติ') : wbT(locale, 'Manual Focus', 'Fokus Manual', 'โฟกัสเอง')}</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={handleExportBoardPng}
-                  className="px-2 py-1 rounded-xl bg-[#F4F6F3] hover:bg-[#E7ECE6] border border-[#DCE2DA] text-[#334155] text-[11px] font-bold cursor-pointer hidden sm:inline-flex items-center gap-1"
+                  className="px-2 py-1 rounded-xl bg-[#F4F6F3] hover:bg-[#E7ECE6] border border-[#DCE2DA] text-[#334155] text-[11px] font-bold cursor-pointer hidden md:inline-flex items-center gap-1"
                   title={wbT(locale, 'Save whiteboard note (PNG)', 'Simpan Catatan Papan Tulis (PNG)', 'บันทึกกระดานเป็นรูป PNG')}
                 >
-                  <span>⬇</span>
+                  <svg viewBox="0 0 18 18" className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M9 3v8.5M5.8 8.5L9 11.8l3.2-3.3M3.5 14.5h11" />
+                  </svg>
                   <span className="hidden lg:inline">{wbT(locale, 'Save', 'Simpan', 'บันทึก')}</span>
                 </button>
               </>
@@ -6570,7 +7287,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                 setIsMinimized(true);
               }}
               data-testid="workbench-minimize-btn"
-              className="w-8 h-8 rounded-full bg-[#F3EBE0] hover:bg-[#EADBCE] text-[#5C4A38] font-bold text-sm flex items-center justify-center cursor-pointer shrink-0 transition-transform active:scale-90"
+              className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#F3EBE0] hover:bg-[#EADBCE] text-[#5C4A38] font-bold text-sm flex items-center justify-center cursor-pointer shrink-0 transition-transform active:scale-90"
               title={ui.minimizeTitle}
             >
               −
@@ -6580,168 +7297,40 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
               type="button"
               onClick={onClose}
               data-testid="workbench-close-btn"
-              className="px-2.5 sm:px-3 py-1.5 rounded-full bg-[#FEE2E2] hover:bg-[#FECACA] text-[#B91C1C] font-bold text-[11px] flex items-center gap-1.5 cursor-pointer shrink-0 transition-transform active:scale-95"
+              className="w-7 h-7 sm:w-auto sm:h-auto sm:px-3 sm:py-1.5 rounded-full bg-[#FEE2E2] hover:bg-[#FECACA] text-[#B91C1C] font-bold text-[11px] flex items-center justify-center gap-1.5 cursor-pointer shrink-0 transition-transform active:scale-95"
               title={ui.closeTitle}
             >
-              <span className="w-2 h-2 rounded-full bg-[#DC2626]" />
+              <span className="hidden sm:inline-block w-2 h-2 rounded-full bg-[#DC2626]" />
               <span className="hidden sm:inline">{wbT(locale, 'End Board', 'Akhiri Papan', 'ปิดกระดาน')}</span>
-              <span className="sm:hidden">{wbT(locale, 'Close', 'Tutup', 'ปิด')}</span>
+              <span className="sm:hidden text-xs leading-none">✕</span>
             </button>
           </div>
         </div>
 
-        {/* STAGE PERSIAPAN EDITORIAL ANTI-SLOP: Menahan tirai sampai papan + suara awal siap serentak */}
+        {/* STAGE PERSIAPAN ADAPTIF 2-TAHAP: Nyaman untuk jeda singkat (<2.2d), Elegan & Beranimasi untuk render mendalam (>=2.2d) */}
         {showInitialBuffering && (
           <div
             data-testid="workbench-buffering-state"
             className="flex-1 p-5 sm:p-10 flex flex-col items-center justify-center text-center fz-solvely-dotgrid"
           >
-            <div className="w-full max-w-lg rounded-[26px] bg-[#FDFAF4] border border-[#E6DFD1] shadow-[0_22px_52px_rgba(28,22,17,0.10)] p-6 sm:p-7 space-y-5 relative overflow-hidden">
-              {/* Architectural Ink & Acoustic Waveform Slate */}
-              <div className="rounded-2xl bg-[#F7F3E9] border border-[#EAE2D2] px-4 py-3.5 sm:py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 relative overflow-hidden">
-                <div className="flex items-center justify-between sm:justify-start gap-3 min-w-0">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-14 h-11 sm:w-16 sm:h-12 rounded-xl bg-white/90 border border-[#E6DFD1] shadow-2xs flex items-center justify-center shrink-0 relative">
-                      <svg viewBox="0 0 80 44" className="w-12 h-8 sm:w-14 sm:h-9 overflow-visible" aria-hidden="true">
-                        <line x1="6" y1="35" x2="74" y2="35" stroke="#D6CEC0" strokeWidth="1.2" strokeDasharray="3 3" />
-                        <path
-                          d="M 8 32 C 20 8, 34 36, 48 16 C 56 6, 65 24, 72 15"
-                          fill="none"
-                          stroke="#DCFCE7"
-                          strokeWidth="6"
-                          strokeLinecap="round"
-                        />
-                        <path
-                          d="M 8 32 C 20 8, 34 36, 48 16 C 56 6, 65 24, 72 15"
-                          fill="none"
-                          stroke="#15803D"
-                          strokeWidth="2.6"
-                          strokeLinecap="round"
-                          className="fz-atelier-ink-path"
-                        />
-                        <g className="fz-atelier-nib">
-                          <circle cx="48" cy="16" r="3.4" fill="#D97706" />
-                          <circle cx="48" cy="16" r="6.5" fill="#F59E0B" opacity="0.22" />
-                        </g>
-                      </svg>
-                    </div>
-                    <span className="sm:hidden inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#DCFCE7] text-[#14532D] text-[10px] font-extrabold tracking-wide uppercase">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#16A34A] animate-pulse" />
-                      <span>{persona.name}</span>
-                    </span>
-                  </div>
-
-                  {/* Mobile Equalizer aligned cleanly on top row */}
-                  <div className="flex sm:hidden items-end gap-1 h-7 px-2.5 py-1.5 rounded-xl bg-white/85 border border-[#E6DFD1] shrink-0" aria-hidden="true">
-                    <span className="w-1 h-4 rounded-full bg-[#15803D] fz-atelier-wave-bar" />
-                    <span className="w-1 h-5 rounded-full bg-[#16A34A] fz-atelier-wave-bar fz-atelier-wave-bar-2" />
-                    <span className="w-1 h-3.5 rounded-full bg-[#22C55E] fz-atelier-wave-bar fz-atelier-wave-bar-3" />
-                    <span className="w-1 h-5 rounded-full bg-[#16A34A] fz-atelier-wave-bar fz-atelier-wave-bar-4" />
-                    <span className="w-1 h-3 rounded-full bg-[#D97706] fz-atelier-wave-bar fz-atelier-wave-bar-5" />
-                  </div>
-
-                  <div className="hidden sm:block text-left min-w-0">
-                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#DCFCE7] text-[#14532D] text-[10px] font-extrabold tracking-wide uppercase mb-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#16A34A] animate-pulse" />
-                      <span>{persona.name}</span>
-                    </span>
-                    <h3 className="text-[15px] font-extrabold text-[#1C1611] leading-snug">
-                      {wbT(
-                        locale,
-                        'Fiezel is preparing your explanation',
-                        'Fiezel sedang menyiapkan penjelasan untukmu',
-                        'Fiezel กำลังเตรียมคำอธิบายให้คุณ'
-                      )}
-                    </h3>
-                  </div>
-                </div>
-
-                {/* Mobile Full-Width Headline (Zero 5-line skinny squeeze) */}
-                <h3 className="sm:hidden text-left text-[15px] font-extrabold text-[#1C1611] leading-snug">
-                  {wbT(
-                    locale,
-                    'Fiezel is preparing your explanation',
-                    'Fiezel sedang menyiapkan penjelasan untukmu',
-                    'Fiezel กำลังเตรียมคำอธิบายให้คุณ'
-                  )}
-                </h3>
-
-                {/* Desktop Live Acoustic Calibrator Equalizer */}
-                <div className="hidden sm:flex items-end gap-1 h-7 px-2.5 py-1.5 rounded-xl bg-white/85 border border-[#E6DFD1] shrink-0" aria-hidden="true">
-                  <span className="w-1 h-4 rounded-full bg-[#15803D] fz-atelier-wave-bar" />
-                  <span className="w-1 h-5 rounded-full bg-[#16A34A] fz-atelier-wave-bar fz-atelier-wave-bar-2" />
-                  <span className="w-1 h-3.5 rounded-full bg-[#22C55E] fz-atelier-wave-bar fz-atelier-wave-bar-3" />
-                  <span className="w-1 h-5 rounded-full bg-[#16A34A] fz-atelier-wave-bar fz-atelier-wave-bar-4" />
-                  <span className="w-1 h-3 rounded-full bg-[#D97706] fz-atelier-wave-bar fz-atelier-wave-bar-5" />
-                </div>
-              </div>
-
-              <div className="text-left space-y-1.5 px-0.5">
-                <div className="text-[11px] font-bold text-[#8C6D1F] uppercase tracking-wider truncate">
-                  {topicTitle || (normalizeWbLocale(locale) === 'id' ? scenario.titleId : (scenario.titleTh && normalizeWbLocale(locale) === 'th' ? scenario.titleTh : wbPick('Learning Session', 'Sesi Belajar', 'บทเรียน', locale)))}
-                </div>
-                <p className="text-xs text-[#57534E] leading-relaxed">
-                  {!isReady
-                    ? wbT(
-                        locale,
-                        'Structuring concepts, visual analogies, and example sentences from scratch...',
-                        'Merangkai alur materi, analogi visual, dan contoh kalimat dari nol...',
-                        'กำลังจัดลำดับเนื้อหา แผนภาพเปรียบเทียบ และประโยคตัวอย่าง...'
-                      )
-                    : wbT(
-                        locale,
-                        'Board & diagrams ready, syncing natural tutor voice to begin right away...',
-                        'Papan & diagram siap, menyelaraskan suara tutor natural agar langsung bicara...',
-                        'กระดานและแผนภาพพร้อมแล้ว กำลังซิงค์เสียงติวเตอร์เพื่อเริ่มอธิบายทันที...'
-                      )}
-                </p>
-              </div>
-
-              {/* 3-Stage Tactile Pipeline Status */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-left">
-                {[
-                  {
-                    label: wbT(locale, 'Concepts & Formula', 'Konsep & Rumus', 'แนวคิดและสูตร'),
-                    done: isReady,
-                    active: !isReady,
-                  },
-                  {
-                    label: wbT(locale, 'Visual Diagram', 'Diagram Visual', 'แผนภาพประกอบ'),
-                    done: isReady,
-                    active: !isReady,
-                  },
-                  {
-                    label: wbT(locale, 'Natural Voice', 'Suara Natural', 'เสียงธรรมชาติ'),
-                    done: isReady && !isAudioPreparing,
-                    active: isReady && isAudioPreparing,
-                  },
-                ].map((stage, idx) => (
-                  <div
-                    key={idx}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-[11px] font-bold transition-colors ${
-                      stage.done
-                        ? 'bg-[#F0FDF4] border-[#BBF7D0] text-[#14532D]'
-                        : stage.active
-                          ? 'bg-white border-[#FCD34D] text-[#92400E] shadow-2xs'
-                          : 'bg-[#FAF7F0] border-[#EDE6D8] text-[#9A8F7E]'
-                    }`}
-                  >
-                    <span
-                      className={`w-4 h-4 rounded-full flex items-center justify-center text-[10px] shrink-0 ${
-                        stage.done
-                          ? 'bg-[#16A34A] text-white'
-                          : stage.active
-                            ? 'bg-[#FEF3C7] text-[#B45309]'
-                            : 'bg-[#EDE6D8] text-[#9A8F7E]'
-                      }`}
-                    >
-                      {stage.done ? '✓' : stage.active ? '●' : idx + 1}
-                    </span>
-                    <span className="truncate">{stage.label}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <WhiteboardAdaptiveBufferingPopup
+              locale={effectiveBoardLocale}
+              persona={persona}
+              topicLabel={
+                boardState?.topicTitle ||
+                topicTitle ||
+                (normalizeWbLocale(locale) === 'id'
+                  ? scenario.titleId
+                  : scenario.titleTh && normalizeWbLocale(locale) === 'th'
+                    ? scenario.titleTh
+                    : wbPick('Learning Session', 'Sesi Belajar', 'บทเรียน', locale))
+              }
+              mode={!isReady ? 'initial_compile' : 'initial_voice_sync'}
+              elapsedMs={bufferingElapsedMs}
+              loaderProgress={loaderProgress}
+              isReady={isReady}
+              isAudioPreparing={isAudioPreparing}
+            />
           </div>
         )}
 
@@ -6803,7 +7392,9 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                 data-testid="wb-talk-coach-btn"
                 className="flex-1 py-2.5 px-4 rounded-xl bg-[#231A12] hover:bg-[#3D2E20] text-white text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-sm active:scale-98 transition-all"
               >
-                <span>🎙️</span>
+                <svg viewBox="0 0 18 18" className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M14.8 12.2v2a1.3 1.3 0 0 1-1.4 1.3A12.8 12.8 0 0 1 2.5 4.6 1.3 1.3 0 0 1 3.8 3.2h2a1.3 1.3 0 0 1 1.3 1.1c.1.6.3 1.2.5 1.8a1.3 1.3 0 0 1-.3 1.4l-.9.9a10.4 10.4 0 0 0 4.3 4.3l.9-.9a1.3 1.3 0 0 1 1.4-.3c.6.2 1.2.4 1.8.5a1.3 1.3 0 0 1 1 1.2Z" />
+                </svg>
                 <span>{ui.talkBtn(persona.name)}</span>
               </button>
               <button
@@ -6928,10 +7519,43 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
           }
           const clockElapsedMs = audioClock ? (audioClock.elapsedSec * 1000) / Math.max(0.5, playbackSpeed) : elapsedBoardMs;
           const clockTotalMs = audioClock ? (audioClock.totalSec * 1000) / Math.max(0.5, playbackSpeed) : totalBoardMs;
+          const showLiveBoardBuffering =
+            Boolean(isGeneratingTopic) ||
+            Boolean(isAudioPreparing && !needsAudioUnlock && isWritingPlaying);
+          const isElevatedLiveBuffering = bufferingElapsedMs >= 2200;
+          const latestPendingStudentQ = studentQuestions[studentQuestions.length - 1]?.text;
 
           return (
             <>
             <div className="flex-1 min-h-0 flex overflow-hidden relative">
+              {/* 2-TIER ADAPTIVE BUFFERING OVERLAY SAAT USER MEMINTA AI MENJELASKAN LANJUTAN / MENYELARASKAN SUARA */}
+              {showLiveBoardBuffering && (
+                <div
+                  data-testid="wb-live-buffering-overlay"
+                  className={`absolute inset-0 z-45 flex p-4 transition-colors duration-200 ${
+                    isElevatedLiveBuffering
+                      ? 'items-center justify-center bg-[#FAFBF9]/82 sm:backdrop-blur-[4px] pointer-events-auto'
+                      : 'items-start justify-center pt-12 pointer-events-none'
+                  }`}
+                >
+                  <WhiteboardAdaptiveBufferingPopup
+                    locale={effectiveBoardLocale}
+                    persona={persona}
+                    topicLabel={
+                      (isGeneratingTopic && latestPendingStudentQ) ||
+                      boardState?.topicTitle ||
+                      topicTitle ||
+                      ''
+                    }
+                    mode={isGeneratingTopic ? 'followup_explain' : 'mid_audio_sync'}
+                    elapsedMs={bufferingElapsedMs}
+                    loaderProgress={loaderProgress}
+                    isReady={!isGeneratingTopic}
+                    isAudioPreparing={isAudioPreparing}
+                  />
+                </div>
+              )}
+
               {/* EXCLUSIVE TACTILE FLOATING STUDIO START POPUP (Anti-AI-Slop + Physical Spring Push-Button) */}
               {(needsAudioUnlock || isUnlockLaunching) && isWritingPlaying && !isGeneratingTopic && (
                 <div
@@ -7098,13 +7722,15 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                       <div className="text-[9.5px] font-extrabold uppercase tracking-widest text-[#64748B]">
                         COURSE SOURCE
                       </div>
-                      <div className="text-xs font-extrabold text-[#0F172A]">Materi Sesi Ini</div>
+                      <div className="text-xs font-extrabold text-[#0F172A]">
+                        {wbT(locale, 'Session Materials', 'Materi Sesi Ini', 'เนื้อหาในเซสชันนี้')}
+                      </div>
                     </div>
                     <button
                       type="button"
                       onClick={() => setIsSidebarOpen(false)}
                       className="w-6 h-6 rounded-lg hover:bg-[#E2E8F0] text-[#475569] text-xs font-bold flex items-center justify-center cursor-pointer"
-                      title="Tutup panel materi"
+                      title={wbT(locale, 'Close materials panel', 'Tutup panel materi', 'ปิดแผงเนื้อหา')}
                     >
                       ✕
                     </button>
@@ -7114,7 +7740,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                     {whiteboardPlan.sourcePages.map((pg) => (
                       <div
                         key={pg.id}
-                        className={`rounded-2xl border p-2.5 bg-white transition-all cursor-pointer hover:border-[#15803D] shadow-2xs ${
+                        className={`rounded-2xl border p-2.5 bg-white transition-colors cursor-pointer hover:border-[#15803D] shadow-2xs ${
                           selectedMaterialPage?.id === pg.id ? 'border-[#2563EB] ring-2 ring-[#BFDBFE]' : 'border-[#E2E8F0]'
                         }`}
                         onClick={() => {
@@ -7124,7 +7750,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                       >
                         <div className="flex items-center justify-between gap-1 mb-1">
                           <span className="text-[9px] font-extrabold tracking-wider uppercase text-[#64748B]">
-                            HALAMAN {pg.pageNumber}
+                            {wbT(locale, 'PAGE', 'HALAMAN', 'หน้า')} {pg.pageNumber}
                           </span>
                           <span className="px-1.5 py-0.5 rounded bg-[#DCFCE7] text-[#15803D] text-[9px] font-extrabold">
                             {pg.badge}
@@ -7155,9 +7781,10 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                             ev.stopPropagation();
                             handleSubmitBoardQuestion(pg.promptToExplain, pg.title);
                           }}
-                          className="mt-2 w-full py-1 px-2 rounded-lg bg-[#EFF6FF] hover:bg-[#DBEAFE] text-[#1D4ED8] text-[10.5px] font-bold cursor-pointer"
+                          className="mt-2 w-full py-1.5 px-2.5 rounded-lg bg-[#EFF6FF] hover:bg-[#DBEAFE] text-[#1D4ED8] text-[10.5px] font-bold cursor-pointer inline-flex items-center justify-center gap-1.5"
                         >
-                          ⭕ Jelaskan di Papan Tulis
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#2563EB]" />
+                          <span>{wbT(locale, 'Explain on Whiteboard', 'Jelaskan di Papan Tulis', 'อธิบายบนกระดาน')}</span>
                         </button>
                       </div>
                     ))}
@@ -7176,8 +7803,10 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                       onClick={() => materialUploadInputRef.current?.click()}
                       className="w-full py-2 px-3 rounded-xl border border-dashed border-[#94A3B8] hover:border-[#2563EB] bg-[#F8FAFC] hover:bg-[#EFF6FF] text-[#334155] hover:text-[#1D4ED8] text-[11px] font-bold cursor-pointer flex items-center justify-center gap-1.5"
                     >
-                      <span>📎</span>
-                      <span>Tambah Gambar / Catatan</span>
+                      <svg viewBox="0 0 18 18" className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <path d="M9 3.5v11M3.5 9h11" />
+                      </svg>
+                      <span>{wbT(locale, 'Add Image / Note', 'Tambah Gambar / Catatan', 'เพิ่มรูปภาพ / โน้ต')}</span>
                     </button>
                   </div>
                 </aside>
@@ -7194,7 +7823,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                     plan={whiteboardPlan}
                     targetLang={targetLang}
                     playbackSpeed={playbackSpeed}
-                    isPlaying={isWritingPlaying && !needsAudioUnlock}
+                    isPlaying={isWritingPlaying && !needsAudioUnlock && !isAudioPreparing && !isGeneratingTopic}
                     onPlayingChange={(playing) => {
                       setIsWritingPlaying(playing);
                       if (!playing && lockstepAudioRef.current) {
@@ -7255,11 +7884,11 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                   </WhiteboardErrorBoundary>
                 </div>
 
-                {/* BOTTOM FLOATING BAR ALA SOLVELY (AVATAR + SUBTITLE + PEN TOOL + INPUT + MIC) */}
-                <div className="px-3 sm:px-5 py-2.5 bg-white border-t border-[#E5E8E3] flex flex-col sm:flex-row sm:flex-wrap sm:items-center justify-between gap-2 shrink-0">
+                {/* BOTTOM FLOATING BAR ALA SOLVELY (AVATAR + SUBTITLE + PEN TOOL + IN-BOARD VOICE MIC + BACK TO CALL) */}
+                <div className="px-3 sm:px-5 py-2 bg-white border-t border-[#E5E8E3] flex flex-col lg:flex-row lg:items-center justify-between gap-2 shrink-0">
               {/* Kiri: Avatar Tutor + Kontrol Putar + Timer + CC Live Karaoke */}
-              <div className="flex items-center gap-2 min-w-0 w-full sm:w-auto sm:flex-1 sm:max-w-lg">
-                <div className="relative w-9 h-9 rounded-full overflow-hidden border-2 border-[#15803D] bg-[#FFF9EE] shrink-0">
+              <div className="flex items-center gap-2 min-w-0 w-full lg:w-auto lg:flex-1 lg:max-w-lg">
+                <div className="relative w-8 h-8 sm:w-9 sm:h-9 rounded-full overflow-hidden border-2 border-[#15803D] bg-[#FFF9EE] shrink-0">
                   <img
                     src={persona.avatarUrl || './assets/brand/fiezel-icon.svg'}
                     alt={persona.name}
@@ -7289,7 +7918,16 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                   className="w-8 h-8 rounded-full bg-[#F1F5F9] hover:bg-[#E2E8F0] text-[#0F172A] text-xs font-bold flex items-center justify-center cursor-pointer shrink-0"
                   title={isWritingPlaying ? wbT(locale, 'Pause Board', 'Jeda Menulis Papan') : wbT(locale, 'Resume Board', 'Lanjut Menulis Papan')}
                 >
-                  {isWritingPlaying ? '⏸' : '▶'}
+                  {isWritingPlaying ? (
+                    <svg viewBox="0 0 16 16" className="w-3.5 h-3.5 fill-current" aria-hidden="true">
+                      <rect x="3.5" y="3" width="3" height="10" rx="0.8" />
+                      <rect x="9.5" y="3" width="3" height="10" rx="0.8" />
+                    </svg>
+                  ) : (
+                    <svg viewBox="0 0 16 16" className="w-3.5 h-3.5 fill-current ml-0.5" aria-hidden="true">
+                      <polygon points="4 2.8 13 8 4 13.2" />
+                    </svg>
+                  )}
                 </button>
 
                 <button
@@ -7299,7 +7937,10 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                   className="w-8 h-8 rounded-full bg-[#F1F5F9] hover:bg-[#E2E8F0] text-[#0F172A] text-xs font-bold flex items-center justify-center cursor-pointer shrink-0"
                   title={wbT(locale, 'Replay board & audio from Step 1', 'Putar Ulang Papan & Suara dari Langkah 1')}
                 >
-                  🔊
+                  <svg viewBox="0 0 18 18" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <polygon points="3 6.8 6.5 6.8 10.5 3.5 10.5 14.5 6.5 11.2 3 11.2" />
+                    <path d="M13 6.5a3.5 3.5 0 0 1 0 5" />
+                  </svg>
                 </button>
 
                 <span
@@ -7324,7 +7965,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                 {showCaptions && (
                   <p
                     data-testid="wb-lockstep-caption"
-                    className="text-[11px] font-medium text-[#334155] line-clamp-2 leading-snug min-w-0"
+                    className="text-[11px] font-medium text-[#334155] line-clamp-1 sm:line-clamp-2 leading-snug min-w-0 flex-1"
                   >
                     {activeWordIdx >= 0
                       ? captionWords.map((w, wIdx) => (
@@ -7346,10 +7987,10 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                 )}
               </div>
 
-              {/* Tengah-Kanan: Pen Tool + Color Swatches + Input Pertanyaan + Mic Button */}
-              <div className="flex items-center gap-1.5 sm:gap-2 w-full sm:w-auto sm:flex-1 justify-between sm:justify-end min-w-0">
+              {/* Tengah-Kanan: Pen Tool + Input Pertanyaan (dengan Voice Mic di Papan!) + Tombol Kembali ke Telepon */}
+              <div className="flex items-center gap-1.5 sm:gap-2 w-full lg:w-auto lg:flex-1 justify-between lg:justify-end min-w-0">
                 {/* Pen Tool + Ink Colors */}
-                <div className="flex items-center gap-1 bg-[#F4F6F3] border border-[#DCE2DA] rounded-full px-2 py-1 shrink-0">
+                <div className="flex items-center gap-1 bg-[#F4F6F3] border border-[#DCE2DA] rounded-full px-1.5 py-1 shrink-0">
                   <button
                     type="button"
                     data-testid="wb-pen-toggle-btn"
@@ -7357,12 +7998,15 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                       playFiezelSfx('button_tap');
                       setIsPenActive((v) => !v);
                     }}
-                    className={`px-2 py-0.5 rounded-full text-[11px] font-bold cursor-pointer transition-all ${
+                    className={`px-2 py-0.5 rounded-full text-[11px] font-bold cursor-pointer transition-colors inline-flex items-center gap-1 ${
                       isPenActive ? 'bg-[#2563EB] text-white shadow-2xs' : 'text-[#334155] hover:bg-white'
                     }`}
                     title={wbT(locale, 'Use pen to circle on the board & ask', 'Pakai Spidol untuk Lingkari Papan & Tanya')}
                   >
-                    ✏️ {isPenActive ? wbT(locale, 'Pen On', 'Spidol On') : wbT(locale, 'Draw', 'Coret')}
+                    <svg viewBox="0 0 18 18" className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="M3 15l3-.7L14.5 5.8a1.6 1.6 0 0 0-2.3-2.3L3.7 12 3 15Z" />
+                    </svg>
+                    <span className="hidden xs:inline">{isPenActive ? wbT(locale, 'Pen On', 'Spidol On') : wbT(locale, 'Draw', 'Coret')}</span>
                   </button>
                   {isPenActive &&
                     (['#2563EB', '#DC2626', '#059669', '#D97706'] as PenColor[]).map((col) => (
@@ -7379,21 +8023,31 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                     ))}
                 </div>
 
-                {/* Form Tanya di Papan Tulis */}
+                {/* Form Tanya di Papan Tulis + In-Board Voice Dictation Mic */}
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
+                    if (isBoardMicListening) {
+                      stopBoardVoiceCapture(true);
+                      return;
+                    }
                     handleSubmitBoardQuestion(questionDraft);
                   }}
-                  className="flex items-center gap-1.5 flex-1 max-w-md bg-[#F8FAFC] border border-[#CBD5E1] focus-within:border-[#2563EB] rounded-full px-3 py-1"
+                  className={`flex items-center gap-1.5 flex-1 max-w-md border rounded-full pl-2.5 pr-1.5 py-1 transition-colors min-w-0 ${
+                    isBoardMicListening
+                      ? 'bg-[#FEF2F2] border-[#F87171]'
+                      : 'bg-[#F8FAFC] border-[#CBD5E1] focus-within:border-[#2563EB]'
+                  }`}
                 >
                   <button
                     type="button"
                     onClick={() => materialUploadInputRef.current?.click()}
-                    className="text-sm text-[#64748B] hover:text-[#0F172A] cursor-pointer shrink-0"
+                    className="text-[#64748B] hover:text-[#0F172A] cursor-pointer shrink-0 p-0.5"
                     title={wbT(locale, 'Attach image or note', 'Lampirkan gambar atau catatan')}
                   >
-                    📎
+                    <svg viewBox="0 0 18 18" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="M13.5 8.5l-5.2 5.2a3.2 3.2 0 0 1-4.5-4.5l5.6-5.6a2.1 2.1 0 0 1 3 3l-5.5 5.5a1 1 0 0 1-1.5-1.5l5-5" />
+                    </svg>
                   </button>
                   <input
                     ref={questionInputRef}
@@ -7401,30 +8055,70 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                     data-testid="wb-board-question-input"
                     value={questionDraft}
                     onChange={(e) => setQuestionDraft(e.target.value)}
-                    placeholder={wbT(locale, 'Ask a question or request another example...', 'Tulis pertanyaan atau minta contoh lain...', 'พิมพ์คำถามหรือขอตัวอย่างเพิ่ม...')}
-                    className="flex-1 min-w-0 bg-transparent text-xs text-[#0F172A] placeholder:text-[#94A3B8] focus:outline-none"
+                    placeholder={
+                      isBoardMicListening
+                        ? wbT(locale, 'Listening to your board question...', 'Mendengarkan pertanyaanmu di papan...', 'กำลังฟังคำถามของคุณ...')
+                        : wbT(locale, 'Ask or tap mic for board question...', 'Ketik atau ketuk mic tanya di papan...', 'พิมพ์หรือแตะไมค์เพื่อถามบนกระดาน...')
+                    }
+                    className="flex-1 min-w-0 bg-transparent text-xs text-[#0F172A] placeholder:text-[#64748B] focus:outline-none"
                   />
-                  {questionDraft.trim().length > 0 && (
+
+                  {/* Dedicated In-Board Voice Question Mic Button */}
+                  <button
+                    type="button"
+                    data-testid="wb-voice-question-mic-btn"
+                    onClick={() => void toggleBoardVoiceQuestionMic()}
+                    className={`h-7 px-2 rounded-full text-[11px] font-bold flex items-center justify-center gap-1 cursor-pointer shrink-0 transition-colors ${
+                      isBoardMicListening
+                        ? 'bg-[#DC2626] text-white shadow-xs'
+                        : 'bg-[#E2E8F0]/80 hover:bg-[#CBD5E1] text-[#1E293B]'
+                    }`}
+                    title={
+                      isBoardMicListening
+                        ? wbT(locale, 'Stop & send spoken question to board', 'Selesai bicara & kirim ke papan tulis', 'หยุดและส่งคำถามไปยังกระดาน')
+                        : wbT(locale, 'Speak a question directly onto this whiteboard', 'Tanya lewat suara langsung di papan tulis ini', 'พูดถามลงบนกระดานนี้โดยตรง')
+                    }
+                  >
+                    {isBoardMicListening ? (
+                      <>
+                        <span className="inline-flex items-center gap-0.5 h-3" aria-hidden="true">
+                          <span className="w-0.5 h-2.5 bg-white rounded-full fz-wb-mic-bar" />
+                          <span className="w-0.5 h-3.5 bg-white rounded-full fz-wb-mic-bar" />
+                          <span className="w-0.5 h-2 bg-white rounded-full fz-wb-mic-bar" />
+                        </span>
+                        <span className="text-[10px]">{wbT(locale, 'Send', 'Kirim', 'ส่ง')}</span>
+                      </>
+                    ) : (
+                      <svg viewBox="0 0 18 18" className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <rect x="6.5" y="2.2" width="5" height="8.5" rx="2.5" />
+                        <path d="M4 8.5a5 5 0 0 0 10 0M9 13.5v2.3M6.5 15.8h5" />
+                      </svg>
+                    )}
+                  </button>
+
+                  {questionDraft.trim().length > 0 && !isBoardMicListening && (
                     <button
                       type="submit"
                       data-testid="wb-board-question-submit"
-                      className="px-2.5 py-0.5 rounded-full bg-[#2563EB] text-white text-[11px] font-bold cursor-pointer shrink-0"
+                      className="px-2.5 py-1 rounded-full bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-[11px] font-bold cursor-pointer shrink-0"
                     >
                       {wbT(locale, 'Ask', 'Tanya', 'ถาม')}
                     </button>
                   )}
                 </form>
 
-                {/* Mic / Lanjut Bicara CTA */}
+                {/* Return to Live FaceTime Call CTA (Distinct Phone Icon so user never confuses it with board mic!) */}
                 <button
                   type="button"
                   onClick={handleResumeTalk}
                   data-testid="wb-talk-coach-btn"
-                  className="px-3.5 py-2 rounded-full bg-[#DC2626] hover:bg-[#B91C1C] text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95 transition-all shrink-0"
+                  className="px-3 py-2 rounded-full bg-[#15803D] hover:bg-[#166534] text-white text-[11px] font-bold flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95 transition-transform shrink-0"
                   title={ui.talkBtn(persona.name)}
                 >
-                  <span>🎙️</span>
-                  <span className="hidden sm:inline">{wbT(locale, 'Speak', 'Bicara', 'พูด')}</span>
+                  <svg viewBox="0 0 18 18" className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M14.8 12.2v2a1.3 1.3 0 0 1-1.4 1.3A12.8 12.8 0 0 1 2.5 4.6 1.3 1.3 0 0 1 3.8 3.2h2a1.3 1.3 0 0 1 1.3 1.1c.1.6.3 1.2.5 1.8a1.3 1.3 0 0 1-.3 1.4l-.9.9a10.4 10.4 0 0 0 4.3 4.3l.9-.9a1.3 1.3 0 0 1 1.4-.3c.6.2 1.2.4 1.8.5a1.3 1.3 0 0 1 1 1.2Z" />
+                  </svg>
+                  <span className="hidden sm:inline">{wbT(locale, 'Call', 'Telepon', 'โทร')}</span>
                 </button>
 
                 <button
@@ -7438,6 +8132,12 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                 </button>
               </div>
             </div>
+            {boardMicHint && (
+              <div className="px-4 py-1.5 bg-[#FEF2F2] border-t border-[#FECACA] text-[11px] font-semibold text-[#991B1B] flex items-center justify-between gap-2 shrink-0">
+                <span>{boardMicHint}</span>
+                <button type="button" onClick={() => setBoardMicHint(null)} className="font-bold cursor-pointer">✕</button>
+              </div>
+            )}
           </>
           );
         })()}

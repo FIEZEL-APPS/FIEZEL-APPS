@@ -405,43 +405,56 @@
     });
   }
 
-  function renderExamTopBar() {
-    var secTitles = {
-      speaking: 'Speaking',
-      writing: 'Writing',
-      reading: 'Reading',
-      listening: 'Listening'
+  function pteIcon(name) {
+    var paths = {
+      plan: '<rect x="3" y="4" width="18" height="17" rx="3"/><line x1="8" y1="2.5" x2="8" y2="6"/><line x1="16" y1="2.5" x2="16" y2="6"/><line x1="3" y1="9.5" x2="21" y2="9.5"/><polyline points="9 14.5 11.2 16.7 15.5 12.5"/>',
+      speaking: '<rect x="9" y="2.5" width="6" height="11" rx="3"/><path d="M5 10.5a7 7 0 0 0 14 0"/><line x1="12" y1="17.5" x2="12" y2="21.5"/><line x1="8.5" y1="21.5" x2="15.5" y2="21.5"/>',
+      writing: '<path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/>',
+      reading: '<path d="M2 4.5h6.5a3.5 3.5 0 0 1 3.5 3.5v12.5a3 3 0 0 0-3-3H2z"/><path d="M22 4.5h-6.5A3.5 3.5 0 0 0 12 8v12.5a3 3 0 0 1 3-3h7z"/>',
+      listening: '<path d="M4 13v-1a8 8 0 0 1 16 0v1"/><rect x="3" y="13" width="4" height="7" rx="1.8"/><rect x="17" y="13" width="4" height="7" rx="1.8"/>',
+      spark: '<path d="M9.5 18h5"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-3.8 10.6c.7.6 1.2 1.4 1.3 2.4h5c.1-1 .6-1.8 1.3-2.4A6 6 0 0 0 12 3z"/>',
+      volume: '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.8 5.8a9 9 0 0 1 0 12.4"/>',
+      play: '<polygon points="7 5 19 12 7 19 7 5" fill="currentColor" stroke="none"/>',
+      stop: '<rect x="6.5" y="6.5" width="11" height="11" rx="2" fill="currentColor" stroke="none"/>',
+      check: '<polyline points="20 6 9 17 4 12" stroke-width="2.5"/>',
+      chevronL: '<polyline points="15 18 9 12 15 6"/>',
+      chevronR: '<polyline points="9 18 15 12 9 6"/>',
+      chevronD: '<polyline points="6 9 12 15 18 9"/>',
+      chevronU: '<polyline points="18 15 12 9 6 15"/>',
+      layers: '<polygon points="12 3 2 8 12 13 22 8 12 3"/><polyline points="2 13 12 18 22 13"/><polyline points="2 17.5 12 22.5 22 17.5"/>',
+      keyboard: '<rect x="2" y="5" width="20" height="14" rx="2.5"/><line x1="6" y1="9.5" x2="6.01" y2="9.5"/><line x1="10" y1="9.5" x2="10.01" y2="9.5"/><line x1="14" y1="9.5" x2="14.01" y2="9.5"/><line x1="18" y1="9.5" x2="18.01" y2="9.5"/><line x1="7" y1="15" x2="17" y2="15"/>',
+      refresh: '<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><polyline points="3 3 3 8 8 8"/>',
+      arrowR: '<line x1="5" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/>',
+      alert: '<circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12.5"/><line x1="12" y1="16" x2="12.01" y2="16"/>',
+      award: '<circle cx="12" cy="9" r="6"/><polyline points="8.5 14 7 21 12 18.5 17 21 15.5 14"/>',
+      clock: '<circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/>',
+      phone: '<path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.4 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7A2 2 0 0 1 22 16.9z"/>'
     };
-    var modeTitles = {
-      ra: 'Read Aloud',
-      rs: 'Repeat Sentence',
-      di: 'Describe Image',
-      rl: 'Retell Lecture',
-      swt: 'Summarize Text',
-      essay: 'Write Essay',
-      wfd: 'Write Dictation',
-      rwFib: 'R&W Dropdown FIB',
-      rDd: 'Reading Drag & Drop',
-      ro: 'Re-order Paragraphs',
-      sst: 'Spoken Summary',
-      lf: 'Listening FIB',
-      hiw: 'Highlight Incorrect Words'
-    };
-    var secName = secTitles[state.section] || 'PTE Exam';
-    var modeName = modeTitles[state.mode] || (state.mode ? state.mode.toUpperCase() : 'Practice');
-    var bank = BANKS[state.mode] || [];
-    var totalCount = bank.length || 1;
-    var currentNum = Math.min(totalCount, state.itemIndex + 1);
+    return '<svg class="fz-pte-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (paths[name] || paths.award) + '</svg>';
+  }
 
-    var out = ['  <div class="fz-pte-exam-header">'];
-    out.push('    <button type="button" class="fz-pte-back-btn" onclick="FiezelPteUi.switchSection(\'plan\')">‹ Hub</button>');
-    out.push('    <div class="fz-pte-exam-center">');
-    out.push('      <span class="fz-pte-mode-title">' + esc(modeName) + '</span>');
-    out.push('      <span class="fz-pte-exam-count">#' + currentNum + ' / ' + totalCount + '</span>');
-    out.push('    </div>');
-    out.push('    <span class="fz-pte-target-chip">Target 42 🎯</span>');
-    out.push('  </div>');
-    return out.join('\n');
+  function resolveItemTitle(item) {
+    if (item && item.title && !/^[a-z]+[-_]\d+$/i.test(String(item.title).trim())) {
+      return String(item.title);
+    }
+    var fallbackByMode = {
+      ra: 'Academic Read Aloud Passage',
+      rs: 'Academic Sentence Repetition',
+      di: 'Statistical Chart Description',
+      rl: 'Academic Lecture Retelling',
+      swt: 'Single-Sentence Written Summary',
+      essay: 'Argumentative Academic Essay',
+      wfd: 'Academic Dictation Prompt',
+      rwFib: 'Contextual Reading & Writing FIB',
+      rDd: 'Academic Collocation Drag & Drop',
+      ro: 'Cohesive Paragraph Sequence',
+      sst: 'Spoken Lecture Summary',
+      lf: 'Academic Listening Transcription',
+      hiw: 'Transcript Discrepancy Audit'
+    };
+    var base = fallbackByMode[state.mode] || 'PTE Academic Drill';
+    var sub = item && (item.category || item.domain);
+    return sub ? (base + ' · ' + String(sub)) : (base + ' #' + (state.itemIndex + 1));
   }
 
   /**
@@ -451,61 +464,61 @@
     var el = containerEl || (typeof document !== 'undefined' ? document.getElementById('app') : null);
     if (!el) return;
 
-    var out = ['<section class="fz-pte-hub fade">'];
+    var out = ['<section id="fzPteHub" class="fz-pte-hub fade">'];
 
-    if (state.section === 'plan') {
-      // 1. Hero Card with Target 42 Benchmark
-      out.push('  <div class="fz-pte-hero-card">');
-      out.push('    <div class="fz-pte-badge-row">');
-      out.push('      <span class="fz-pte-target-badge">★ PEARSON TARGET 42 · AUSTRALIA VISA</span>');
-      out.push('      <span style="font-size:0.8rem; font-weight:800; background:rgba(255,255,255,0.2); padding:3px 8px; border-radius:6px;">VOCATIONAL BENCHMARK</span>');
-      out.push('    </div>');
-      out.push('    <h2 class="fz-pte-title">PTE Academic Comprehensive Hub</h2>');
-      out.push('    <p class="fz-pte-lead">Official preparation for all 4 Pearson sections (Speaking, Writing, Reading, Listening) with authentic test banks and deep pedagogical feedback.</p>');
-
-      out.push('    <div class="fz-pte-benchmark-meter">');
-      out.push('      <div class="fz-pte-meter-bar-wrap">');
-      var progressPercent = Math.min(100, Math.round((state.overallEstimate / 90) * 100));
-      out.push('        <div class="fz-pte-meter-bar" style="width:' + progressPercent + '%;"></div>');
-      out.push('        <div class="fz-pte-meter-target-marker" title="Target Visa: PTE 42"></div>');
-      out.push('      </div>');
-      out.push('      <div class="fz-pte-meter-label">Estimasi: <b style="color:#fcd34d;">' + state.overallEstimate + '</b> / 90</div>');
-      out.push('    </div>');
-      out.push('  </div>');
-    } else {
-      // EXAM PRACTICE MODE: ZERO GIANT BANNER, COMPACT EXAM HEADER + TASK MODE PILLS
-      out.push(renderExamTopBar());
-    }
-
-    // 2. Section Selector Tabs (Level 1 Navigation - Always Present)
-    out.push('  <div class="fz-pte-section-bar">');
+    // 1. Level-1 Segmented Section Navigation (Always anchored at top for instant orientation)
+    out.push('  <div class="fz-pte-section-bar" role="tablist" aria-label="PTE Academic Sections">');
     var sections = [
-      { id: 'plan', label: '🎯 30-Day Plan' },
-      { id: 'speaking', label: '🗣️ Speaking' },
-      { id: 'writing', label: '✍️ Writing' },
-      { id: 'reading', label: '📖 Reading' },
-      { id: 'listening', label: '🎧 Listening' }
+      { id: 'plan', icon: 'plan', label: '30-Day Plan' },
+      { id: 'speaking', icon: 'speaking', label: 'Speaking' },
+      { id: 'writing', icon: 'writing', label: 'Writing' },
+      { id: 'reading', icon: 'reading', label: 'Reading' },
+      { id: 'listening', icon: 'listening', label: 'Listening' }
     ];
     sections.forEach(function (s) {
       var act = state.section === s.id ? ' active' : '';
-      out.push('    <button type="button" class="fz-pte-section-tab' + act + '" onclick="FiezelPteUi.switchSection(\'' + s.id + '\')">' + s.label + '</button>');
+      var ariaSel = state.section === s.id ? 'true' : 'false';
+      out.push('    <button type="button" role="tab" aria-selected="' + ariaSel + '" class="fz-pte-section-tab fz-plain' + act + '" onclick="FiezelPteUi.switchSection(\'' + s.id + '\')">' + pteIcon(s.icon) + '<span>' + s.label + '</span></button>');
     });
     out.push('  </div>');
 
     if (state.speechErrorNotice) {
-      out.push('  <div style="background:#fef3c7; border:1.5px solid #fcd34d; color:#92400e; padding:8px 12px; border-radius:8px; margin:8px 0; font-size:0.82rem; font-weight:600; display:flex; justify-content:space-between; align-items:center;">');
-      out.push('    <span>⚠️ ' + esc(state.speechErrorNotice) + '</span>');
-      out.push('    <button type="button" style="background:none; border:none; color:#92400e; font-weight:bold; cursor:pointer;" onclick="FiezelPteUi.clearSpeechError()">✕</button>');
+      out.push('  <div class="fz-pte-secret-tip" style="justify-content:space-between; align-items:center;">');
+      out.push('    <span style="display:inline-flex; align-items:center; gap:8px;">' + pteIcon('alert') + '<span>' + esc(state.speechErrorNotice) + '</span></span>');
+      out.push('    <button type="button" class="fz-pte-text-link-btn fz-plain" onclick="FiezelPteUi.clearSpeechError()">Dismiss</button>');
       out.push('  </div>');
     }
 
-    // 3. Section Content
+    // 2. Section Surface
     if (state.section === 'plan') {
-      // 30-Day Guided Plan
+      // Signature Obsidian Hero Card (only in Plan view so practice views stay focused)
+      var progressPercent = Math.min(100, Math.round((state.overallEstimate / 90) * 100));
+      out.push('  <div class="fz-pte-hero-card">');
+      out.push('    <div class="fz-pte-badge-row">');
+      out.push('      <span class="fz-pte-target-badge">' + pteIcon('award') + '<span>Pearson Target 42+</span></span>');
+      out.push('      <span class="fz-pte-hero-kicker-right">10–90 Scale</span>');
+      out.push('    </div>');
+      out.push('    <h2 class="fz-pte-title">PTE Academic Studio</h2>');
+      out.push('    <p class="fz-pte-lead">Structured preparation across all 4 official Pearson sections (Speaking, Writing, Reading, Listening) with real-time acoustic fluency scoring and academic collocation feedback.</p>');
+      out.push('    <div class="fz-pte-benchmark-meter">');
+      out.push('      <div class="fz-pte-meter-col">');
+      out.push('        <div class="fz-pte-meter-meta"><span>Readiness Trajectory</span><span>Target 42 Benchmark</span></div>');
+      out.push('        <div class="fz-pte-meter-bar-wrap">');
+      out.push('          <div class="fz-pte-meter-bar" style="width:' + progressPercent + '%;"></div>');
+      out.push('          <div class="fz-pte-meter-target-marker" title="Target Benchmark: PTE 42"></div>');
+      out.push('        </div>');
+      out.push('      </div>');
+      out.push('      <div class="fz-pte-meter-score-box">');
+      out.push('        <span class="fz-pte-meter-score-num">' + state.overallEstimate + ' <small>/ 90</small></span>');
+      out.push('        <span class="fz-pte-meter-score-cap">Current Estimate</span>');
+      out.push('      </div>');
+      out.push('    </div>');
+      out.push('  </div>');
+
       if (BANKS.roadmap) {
         out.push(renderGuidedCoachCard(BANKS.roadmap));
       } else {
-        out.push('  <div class="card" style="padding:20px; text-align:center;"><p>Loading 30-Day Guided Plan...</p></div>');
+        out.push('  <div class="fz-pte-daily-card" style="text-align:center; padding:28px;"><p style="margin:0; color:#64748B; font-weight:600;">Loading 30-Day Guided Plan...</p></div>');
       }
     } else {
       out.push(renderModePills());
@@ -516,7 +529,7 @@
       } else if (item) {
         out.push(renderPracticeCard(item));
       } else {
-        out.push('  <div class="card" style="padding:20px; text-align:center;"><p>Loading PTE Academic data banks...</p></div>');
+        out.push('  <div class="fz-pte-practice-card" style="text-align:center; padding:28px;"><p style="margin:0; color:#64748B; font-weight:600;">Loading PTE Academic question bank...</p></div>');
       }
     }
 
@@ -525,12 +538,12 @@
   }
 
   function renderModePills() {
-    var out = ['  <div class="fz-pte-tabs">'];
+    var out = ['  <div class="fz-pte-tabs" role="tablist" aria-label="Task Modes">'];
     var modeMap = {
       speaking: [
         { id: 'ra', code: 'RA', name: 'Read Aloud' },
-        { id: 'rs', code: 'RS', name: 'Repeat Sent.' },
-        { id: 'di', code: 'DI', name: 'Describe Img' },
+        { id: 'rs', code: 'RS', name: 'Repeat Sentence' },
+        { id: 'di', code: 'DI', name: 'Describe Image' },
         { id: 'rl', code: 'RL', name: 'Retell Lecture' }
       ],
       writing: [
@@ -539,13 +552,13 @@
         { id: 'wfd', code: 'WFD', name: 'Write Dictation' }
       ],
       reading: [
-        { id: 'rwFib', code: 'R&W FIB', name: 'Dropdown Blanks' },
+        { id: 'rwFib', code: 'R&W FIB', name: 'Dropdown FIB' },
         { id: 'rDd', code: 'R-FIB', name: 'Drag & Drop' },
         { id: 'ro', code: 'RO', name: 'Re-order' }
       ],
       listening: [
         { id: 'sst', code: 'SST', name: 'Spoken Summary' },
-        { id: 'lf', code: 'L-FIB', name: 'Listening Blanks' },
+        { id: 'lf', code: 'L-FIB', name: 'Listening FIB' },
         { id: 'hiw', code: 'HIW', name: 'Incorrect Words' }
       ]
     };
@@ -553,7 +566,7 @@
     var currentPills = modeMap[state.section] || [];
     currentPills.forEach(function (t) {
       var act = state.mode === t.id ? ' active' : '';
-      out.push('    <button type="button" class="fz-pte-tab-btn' + act + '" onclick="FiezelPteUi.switchMode(\'' + t.id + '\')">');
+      out.push('    <button type="button" class="fz-pte-tab-btn fz-plain' + act + '" onclick="FiezelPteUi.switchMode(\'' + t.id + '\')">');
       out.push('      <span class="fz-pte-tab-code">' + t.code + '</span>');
       out.push('      <span class="fz-pte-tab-name">' + t.name + '</span>');
       out.push('    </button>');
@@ -580,21 +593,21 @@
     var progress = engine && typeof engine.calculateDailyProgress === 'function'
       ? engine.calculateDailyProgress(tasks, state.completedTaskIds)
       : { completedCount: 0, totalCount: tasks.length, percent: 0, isDayCompleted: false };
+    var weekNum = Math.min(4, Math.ceil(currentDay / 7.5));
 
     var out = ['  <div class="fz-pte-daily-card">'];
 
-    // Header with Day selector & Progress
+    // Header with clean Day Jump select on right
     out.push('    <div class="fz-pte-daily-header">');
-    out.push('      <div>');
-    out.push('        <div class="fz-pte-daily-pill">30-DAY TARGET 42 ROADMAP</div>');
+    out.push('      <div class="fz-pte-daily-head-main">');
+    out.push('        <div class="fz-pte-daily-pill">Week ' + weekNum + ' · Day ' + dayData.day + ' of ' + (rm.totalDays || 30) + '</div>');
     var cleanDayTitle = dayData.title ? dayData.title.replace(/^Day\s+\d+:\s*/i, '') : '';
-    out.push('        <h3 class="fz-pte-daily-title">Day ' + dayData.day + ': ' + esc(cleanDayTitle) + '</h3>');
-    out.push('        <div class="fz-pte-daily-focus">Focus: <b>' + esc(dayData.focus) + '</b> (' + dayData.targetMinutes + ' min target)</div>');
+    out.push('        <h3 class="fz-pte-daily-title">' + esc(cleanDayTitle) + '</h3>');
+    out.push('        <div class="fz-pte-daily-focus">Focus: <b>' + esc(dayData.focus) + '</b> · ' + dayData.targetMinutes + ' min session</div>');
     out.push('      </div>');
 
-    // Day Selector Carousel
     out.push('      <div class="fz-pte-day-picker">');
-    out.push('        <select id="fzPteDaySelect" class="fz-pte-select" onchange="FiezelPteUi.selectDay(this.value)">');
+    out.push('        <select id="fzPteDaySelect" class="fz-pte-select" aria-label="Select Study Day" onchange="FiezelPteUi.selectDay(this.value)">');
     for (var d = 1; d <= (rm.totalDays || 30); d++) {
       var sel = d === currentDay ? ' selected' : '';
       out.push('          <option value="' + d + '"' + sel + '>Day ' + d + '</option>');
@@ -603,57 +616,71 @@
     out.push('      </div>');
     out.push('    </div>');
 
-    // Horizontal Day Pills Carousel for Fast Navigation
+    // Compact Day Strip for quick neighbor day switching
     out.push('    <div class="fz-pte-days-carousel-wrap">');
     out.push('      <div class="fz-pte-days-carousel">');
     for (var d2 = 1; d2 <= (rm.totalDays || 30); d2++) {
-      var isDayAct = d2 === currentDay ? ' active' : '';
-      out.push('        <button type="button" class="fz-pte-day-pill' + isDayAct + '" onclick="FiezelPteUi.selectDay(' + d2 + ')">Day ' + d2 + '</button>');
+      var dObj = rm.days ? rm.days[d2 - 1] : null;
+      var dDone = dObj && Array.isArray(dObj.tasks) && dObj.tasks.length > 0 && dObj.tasks.every(function (tk) { return state.completedTaskIds.indexOf(tk.id) !== -1; });
+      var cls = (d2 === currentDay ? ' active' : '') + (dDone ? ' completed' : '');
+      out.push('        <button type="button" class="fz-pte-day-pill fz-plain' + cls + '" onclick="FiezelPteUi.selectDay(' + d2 + ')">D' + d2 + (dDone ? ' ✓' : '') + '</button>');
     }
     out.push('      </div>');
     out.push('    </div>');
 
-    // Daily Progress Bar
+    // Daily Progress Strip
     out.push('    <div class="fz-pte-daily-progress-wrap">');
     out.push('      <div class="fz-pte-daily-progress-label">');
-    out.push('        <span>Daily Target Progress</span>');
-    out.push('        <b>' + progress.completedCount + ' / ' + progress.totalCount + ' Tasks (' + progress.percent + '%)</b>');
+    out.push('        <span>Daily Checklist</span>');
+    out.push('        <b>' + progress.completedCount + ' / ' + progress.totalCount + ' Completed (' + progress.percent + '%)</b>');
     out.push('      </div>');
-    out.push('      <div class="fz-pte-meter-bar-wrap" style="height:8px; background:#e2e8f0;">');
-    out.push('        <div class="fz-pte-meter-bar" style="width:' + progress.percent + '%; background:#10b981;"></div>');
+    out.push('      <div class="fz-pte-daily-track">');
+    out.push('        <div class="fz-pte-daily-fill" style="width:' + progress.percent + '%;"></div>');
     out.push('      </div>');
     out.push('    </div>');
 
-    // Nakul Master Secret Callout
+    // Examiner Strategy Callout
     if (dayData.nakulSecret) {
       out.push('    <div class="fz-pte-nakul-callout">');
-      out.push('      <div class="fz-pte-nakul-callout-title">💡 Nakul 7-Hour Master Rule (Secret Protocol)</div>');
-      out.push('      <p class="fz-pte-nakul-callout-body">' + esc(dayData.nakulSecret) + '</p>');
+      out.push('      <div class="fz-pte-callout-icon">' + pteIcon('spark') + '</div>');
+      out.push('      <div>');
+      out.push('        <div class="fz-pte-nakul-callout-title">Examiner Strategy Note</div>');
+      out.push('        <p class="fz-pte-nakul-callout-body">' + esc(dayData.nakulSecret) + '</p>');
+      out.push('      </div>');
       out.push('    </div>');
     }
 
     // Task Checklist
+    var typeTagMap = {
+      read_aloud: 'RA',
+      repeat_sentence: 'RS',
+      describe_image: 'DI',
+      write_from_dictation: 'WFD',
+      kawan_bicara: 'LIVE AI'
+    };
     out.push('    <div class="fz-pte-tasks-list">');
     tasks.forEach(function (t) {
       var isChecked = state.completedTaskIds.indexOf(t.id) !== -1;
       var rowClass = isChecked ? ' done' : '';
       var checkClass = isChecked ? ' checked' : '';
+      var tagCode = typeTagMap[t.type] || 'DRILL';
+      var tagExtra = t.type === 'kawan_bicara' ? ' is-voice' : '';
 
       out.push('      <div class="fz-pte-task-row' + rowClass + '">');
       out.push('        <div class="fz-pte-task-left">');
-      out.push('          <button type="button" class="fz-pte-checkbox-btn' + checkClass + '" onclick="FiezelPteUi.toggleTaskComplete(\'' + esc(t.id) + '\')">' + (isChecked ? '✓' : '') + '</button>');
+      out.push('          <button type="button" class="fz-pte-checkbox-btn fz-plain' + checkClass + '" aria-label="Toggle task completion" onclick="FiezelPteUi.toggleTaskComplete(\'' + esc(t.id) + '\')">' + (isChecked ? pteIcon('check') : '') + '</button>');
       out.push('          <div class="fz-pte-task-details">');
-      out.push('            <div class="fz-pte-task-name">' + esc(t.title) + '</div>');
+      out.push('            <div class="fz-pte-task-title-line"><span class="fz-pte-task-code-tag' + tagExtra + '">' + tagCode + '</span><span class="fz-pte-task-name">' + esc(t.title) + '</span></div>');
       out.push('            <div class="fz-pte-task-instruction">' + esc(t.instructions) + '</div>');
       out.push('          </div>');
       out.push('        </div>');
 
       if (t.type === 'kawan_bicara') {
-        out.push('        <button type="button" class="fz-pte-task-action-btn" onclick="FiezelPteUi.openVoiceStudio(' + currentDay + ')">Call Coach 🎙</button>');
+        out.push('        <button type="button" class="fz-pte-task-action-btn is-voice-cta fz-plain" onclick="FiezelPteUi.openVoiceStudio(' + currentDay + ')">' + pteIcon('phone') + '<span>Call Coach</span></button>');
       } else {
         var modeMap = { read_aloud: 'ra', repeat_sentence: 'rs', describe_image: 'di', write_from_dictation: 'wfd' };
         var targetMode = modeMap[t.type] || 'ra';
-        out.push('        <button type="button" class="fz-pte-task-action-btn" onclick="FiezelPteUi.launchTask(\'' + targetMode + '\', ' + JSON.stringify(t.itemIds || []).replace(/"/g, '&quot;') + ')">Practice ➔</button>');
+        out.push('        <button type="button" class="fz-pte-task-action-btn fz-plain" onclick="FiezelPteUi.launchTask(\'' + targetMode + '\', ' + JSON.stringify(t.itemIds || []).replace(/"/g, '&quot;') + ')"><span>Start</span>' + pteIcon('chevronR') + '</button>');
       }
 
       out.push('      </div>');
@@ -671,80 +698,87 @@
     var closeBtnLabel = ptePick('✕ Close', '✕ Tutup');
     var out = ['  <div class="fz-pte-grammar-guide-card fade">'];
     out.push('    <div class="fz-pte-guide-header">');
-    out.push('      <h4>' + ptePick('💡 6 Three-Second Grammar Formulas (PTE FIB Cheat-Sheet)', '💡 6 Rumus Grammar 3 Detik (PTE FIB Cheat-Sheet)') + '</h4>');
-    out.push('      <button type="button" class="fz-pte-close-guide" onclick="FiezelPteUi.toggleGrammarGuide()">' + closeBtnLabel + '</button>');
+    out.push('      <h4>' + ptePick('6 Three-Second Grammar Formulas (FIB Cheat-Sheet)', '6 Rumus Grammar 3 Detik (FIB Cheat-Sheet)') + '</h4>');
+    out.push('      <button type="button" class="fz-pte-close-guide fz-plain" onclick="FiezelPteUi.toggleGrammarGuide()">' + closeBtnLabel + '</button>');
     out.push('    </div>');
 
     out.push('    <div class="fz-pte-rules-grid">');
 
-    // Rule 1
     out.push('      <div class="fz-pte-rule-item">');
-    out.push('        <b>' + ptePick('Formula 1: Modal Auxiliary + Base Verb (V1)', 'Rumus 1: Modal Auxiliary + V1') + '</b>');
+    out.push('        <b>' + ptePick('1. Modal Auxiliary + Base Verb (V1)', '1. Modal Auxiliary + V1') + '</b>');
     out.push('        <p>' + ptePick(
-      'After modal verbs (<code>can</code>, <code>could</code>, <code>will</code>, <code>would</code>, <code>must</code>, <code>should</code>, <code>may</code>), always use the bare infinitive (V1 with no -s/-ed/-ing).<br>Example: <i>will <b>provide</b></i>, <i>must <b>ensure</b></i>.',
-      'Setelah modal (<code>can</code>, <code>could</code>, <code>will</code>, <code>would</code>, <code>must</code>, <code>should</code>, <code>may</code>), kata kerja wajib berbentuk dasar (V1 tanpa -s/-ed/-ing).<br>Contoh: <i>will <b>provide</b></i>, <i>must <b>ensure</b></i>.'
+      'After modal verbs (<code>can</code>, <code>will</code>, <code>must</code>, <code>should</code>), use the bare infinitive (V1).<br>Example: <i>will <b>provide</b></i>, <i>must <b>ensure</b></i>.',
+      'Setelah modal (<code>can</code>, <code>will</code>, <code>must</code>, <code>should</code>), wajib gunakan V1 dasar.<br>Contoh: <i>will <b>provide</b></i>, <i>must <b>ensure</b></i>.'
     ) + '</p>');
     out.push('      </div>');
 
-    // Rule 2
     out.push('      <div class="fz-pte-rule-item">');
-    out.push('        <b>' + ptePick('Formula 2: Passive Voice (to be + V3)', 'Rumus 2: Passive Voice (to be + V3)') + '</b>');
+    out.push('        <b>' + ptePick('2. Passive Voice (be + V3)', '2. Passive Voice (be + V3)') + '</b>');
     out.push('        <p>' + ptePick(
-      'After <code>is / are / was / were / been / being</code> when the subject receives the action, use the Past Participle (V3).<br>Example: <i>was <b>conducted</b></i>, <i>is widely <b>regarded</b></i>.',
-      'Setelah <code>is / are / was / were / been / being</code> jika subjek menerima aksi (di-/ter-), wajib gunakan Verb 3 (Past Participle).<br>Contoh: <i>was <b>conducted</b></i>, <i>is widely <b>regarded</b></i>.'
+      'After <code>is / are / was / were / been</code> when passive, use Past Participle (V3).<br>Example: <i>was <b>conducted</b></i>, <i>is widely <b>regarded</b></i>.',
+      'Setelah <code>is / are / was / were / been</code> untuk makna pasif, wajib Verb 3.<br>Contoh: <i>was <b>conducted</b></i>, <i>is widely <b>regarded</b></i>.'
     ) + '</p>');
     out.push('      </div>');
 
-    // Rule 3
     out.push('      <div class="fz-pte-rule-item">');
-    out.push('        <b>' + ptePick('Formula 3: Perfect Aspect (have/has/had + V3)', 'Rumus 3: Perfect Aspect (have/has/had + V3)') + '</b>');
+    out.push('        <b>' + ptePick('3. Perfect Aspect (have/has/had + V3)', '3. Perfect Aspect (have/has/had + V3)') + '</b>');
     out.push('        <p>' + ptePick(
-      'After <code>has / have / had</code>, use the Past Participle (V3).<br>Example: <i>has <b>developed</b></i>, <i>have <b>demonstrated</b></i>.',
-      'Setelah <code>has / have / had</code>, kata kerja wajib Verb 3 (Past Participle).<br>Contoh: <i>has <b>developed</b></i>, <i>have <b>demonstrated</b></i>.'
+      'After <code>has / have / had</code>, always use Past Participle (V3).<br>Example: <i>has <b>developed</b></i>, <i>have <b>demonstrated</b></i>.',
+      'Setelah <code>has / have / had</code>, kata kerja wajib Verb 3.<br>Contoh: <i>has <b>developed</b></i>, <i>have <b>demonstrated</b></i>.'
     ) + '</p>');
     out.push('      </div>');
 
-    // Rule 4
     out.push('      <div class="fz-pte-rule-item">');
-    out.push('        <b>' + ptePick('Formula 4: Adjective before Noun', 'Rumus 4: Adjective before Noun') + '</b>');
+    out.push('        <b>' + ptePick('4. Determiner + Adjective + Noun', '4. Determiner + Adjective + Noun') + '</b>');
     out.push('        <p>' + ptePick(
-      'When the blank sits between a Determiner (<code>a / an / the / their</code>) and a Noun, fill it with an Adjective.<br>Example: <i>a <b>vital</b> role</i>, <i><b>significant</b> impact</i>.',
-      'Jika titik-titik berada di antara Determiner (<code>a / an / the / their</code>) dan Noun (kata benda), wajib diisi Adjective (kata sifat).<br>Contoh: <i>a <b>vital</b> role</i>, <i><b>significant</b> impact</i>.'
+      'Between a Determiner (<code>a / the / their</code>) and a Noun, place an Adjective.<br>Example: <i>a <b>vital</b> role</i>, <i><b>significant</b> impact</i>.',
+      'Titik-titik di antara <code>a / an / the / their</code> dan Noun wajib diisi Adjective.<br>Contoh: <i>a <b>vital</b> role</i>, <i><b>significant</b> impact</i>.'
     ) + '</p>');
     out.push('      </div>');
 
-    // Rule 5
     out.push('      <div class="fz-pte-rule-item">');
-    out.push('        <b>' + ptePick('Formula 5: Adverb modifies Verb or Adjective', 'Rumus 5: Adverb modifies Verb or Adjective') + '</b>');
+    out.push('        <b>' + ptePick('5. Adverb (-ly) + Verb / Adjective', '5. Adverb (-ly) + Verb / Adjective') + '</b>');
     out.push('        <p>' + ptePick(
-      'Adverbs ending in <code>-ly</code> modify verbs or adjectives.<br>Example: <i>increased <b>dramatically</b></i>, <i><b>substantially</b> more cost-effective</i>.',
-      'Adverb berakhiran <code>-ly</code> menjelaskan cara kerja (Verb) atau kadar (Adjective).<br>Contoh: <i>increased <b>dramatically</b></i>, <i><b>substantially</b> more cost-effective</i>.'
+      'Adverbs ending in <code>-ly</code> modify verbs or adjectives.<br>Example: <i>increased <b>dramatically</b></i>.',
+      'Adverb berakhiran <code>-ly</code> menjelaskan Verb atau Adjective.<br>Contoh: <i>increased <b>dramatically</b></i>.'
     ) + '</p>');
     out.push('      </div>');
 
-    // Rule 6
     out.push('      <div class="fz-pte-rule-item">');
-    out.push('        <b>' + ptePick('Formula 6: Preposition + Gerund (V-ing) / Noun', 'Rumus 6: Preposition + Gerund (V-ing) / Noun') + '</b>');
+    out.push('        <b>' + ptePick('6. Preposition + V-ing / Noun', '6. Preposition + V-ing / Noun') + '</b>');
     out.push('        <p>' + ptePick(
-      'After prepositions (<code>by</code>, <code>in</code>, <code>of</code>, <code>for</code>, <code>through</code>, <code>without</code>), use a Gerund (<code>V-ing</code>) or Noun.<br>Example: <i>by <b>analyzing</b></i>, <i>in <b>determining</b></i>.',
-      'Setelah preposisi (<code>by</code>, <code>in</code>, <code>of</code>, <code>for</code>, <code>through</code>, <code>without</code>), kata kerja wajib berbentuk <code>V-ing</code> (Gerund) atau Noun.<br>Contoh: <i>by <b>analyzing</b></i>, <i>in <b>determining</b></i>.'
+      'After prepositions (<code>by</code>, <code>in</code>, <code>of</code>, <code>for</code>, <code>without</code>), use <code>V-ing</code>.<br>Example: <i>by <b>analyzing</b></i>.',
+      'Setelah preposisi (<code>by</code>, <code>in</code>, <code>of</code>, <code>for</code>, <code>without</code>), wajib <code>V-ing</code>.<br>Contoh: <i>by <b>analyzing</b></i>.'
     ) + '</p>');
     out.push('      </div>');
 
     out.push('    </div>');
 
-    // Collocation and Linking Words Quick Summary
     out.push('    <div class="fz-pte-collocation-summary">');
-    out.push('      <b>🤝 Top Academic Collocation Pairs (ACL):</b><br>');
-    out.push('      <code>play a key/vital role in</code> · <code>conduct research</code> · <code>take into account</code> · <code>wide range of</code> · <code>pose a serious threat to</code> · <code>meet the criteria</code> · <code>pave the way for</code>');
-    out.push('    </div>');
-
-    out.push('    <div class="fz-pte-collocation-summary" style="margin-top:8px;">');
-    out.push('      <b>🧭 Linking Words &amp; Logic Connectors:</b><br>');
-    out.push('      <b>Contrast:</b> <code>However,</code>, <code>Although</code>, <code>In contrast,</code>, <code>Conversely,</code> | <b>Addition:</b> <code>Furthermore,</code>, <code>Moreover,</code>, <code>In addition,</code> | <b>Cause &amp; Effect:</b> <code>Therefore,</code>, <code>Consequently,</code>, <code>As a result,</code>');
+    out.push('      <b>High-Frequency Academic Collocations:</b> ');
+    out.push('      <code>play a vital role in</code> · <code>conduct research</code> · <code>take into account</code> · <code>wide range of</code> · <code>pose a serious threat to</code> · <code>meet the criteria</code>');
     out.push('    </div>');
 
     out.push('  </div>');
+    return out.join('\n');
+  }
+
+  function renderStudioAudioBar(title, subtitle, onClickExpr, isWarnSub) {
+    var playCls = state.isAudioPlaying ? ' is-playing' : '';
+    var subCls = isWarnSub ? ' is-warn' : '';
+    var out = ['    <div class="fz-pte-audio-player-box">'];
+    out.push('      <button type="button" class="fz-pte-play-btn fz-plain' + playCls + '" aria-label="' + (state.isAudioPlaying ? 'Stop audio' : 'Play audio') + '" onclick="' + onClickExpr + '">' + (state.isAudioPlaying ? pteIcon('stop') : pteIcon('play')) + '</button>');
+    out.push('      <div class="fz-pte-audio-meta">');
+    out.push('        <div class="fz-pte-audio-title">' + esc(title) + '</div>');
+    out.push('        <div class="fz-pte-audio-sub' + subCls + '">' + esc(subtitle) + '</div>');
+    out.push('      </div>');
+    out.push('      <div class="fz-pte-audio-waveform" aria-hidden="true">');
+    for (var w = 0; w < 16; w++) {
+      var hClass = state.isAudioPlaying ? ' active' : '';
+      out.push('        <div class="fz-pte-wave-bar' + hClass + '" style="animation-delay:' + (w * 0.04) + 's;"></div>');
+    }
+    out.push('      </div>');
+    out.push('    </div>');
     return out.join('\n');
   }
 
@@ -752,190 +786,172 @@
    * Render individual practice card tailored to active mode.
    */
   function renderPracticeCard(item) {
+    var bankList = BANKS[state.mode] || [];
+    var totalItems = Math.max(1, bankList.length);
+    var curNum = Math.min(totalItems, state.itemIndex + 1);
     var out = ['  <div class="fz-pte-practice-card">'];
 
-    // Header info
+    var cross = (state.mode === 'ra' ? 'Speaking + Reading' :
+                 state.mode === 'rs' ? 'Speaking + Listening' :
+                 state.mode === 'di' ? 'Speaking · Visual Fluency' :
+                 state.mode === 'rl' ? 'Speaking + Listening' :
+                 state.mode === 'swt' ? 'Reading + Writing' :
+                 state.mode === 'essay' ? 'Writing · Argumentation' :
+                 state.mode === 'wfd' ? 'Listening + Writing · High Weight' :
+                 state.mode === 'rwFib' ? 'Reading + Writing · Collocations' :
+                 state.mode === 'rDd' ? 'Reading · Lexical Context' :
+                 state.mode === 'ro' ? 'Reading · Discourse Cohesion' :
+                 state.mode === 'sst' ? 'Listening + Writing' :
+                 state.mode === 'lf' ? 'Listening + Writing' :
+                 'Listening + Reading · Negative Marking');
+
+    // Clean Single Workbench Header
     out.push('    <div class="fz-pte-card-header">');
     out.push('      <div class="fz-pte-task-info">');
-    out.push('        <div class="fz-pte-task-title">' + esc(item.title || item.id) + '</div>');
-    var cross = (state.mode === 'ra' ? 'Speaking & Reading' :
-                 state.mode === 'rs' ? 'Speaking & Listening' :
-                 state.mode === 'di' ? 'Speaking (Fluency & Keywords)' :
-                 state.mode === 'rl' ? 'Speaking & Listening' :
-                 state.mode === 'swt' ? 'Reading & Writing' :
-                 state.mode === 'essay' ? 'Writing (Structure & Vocabulary)' :
-                 state.mode === 'wfd' ? 'Listening & Writing (Kingmaker)' :
-                 state.mode === 'rwFib' ? 'Reading & Writing (Grammar & Collocations)' :
-                 state.mode === 'rDd' ? 'Reading (Parts of Speech & Logic)' :
-                 state.mode === 'ro' ? 'Reading (Adjacent Cohesion & Paragraph Pairs)' :
-                 state.mode === 'sst' ? 'Listening & Writing' :
-                 state.mode === 'lf' ? 'Listening & Writing' :
-                 'Listening & Reading (Negative Marking Active)');
-    out.push('        <div class="fz-pte-task-cross-skills">Points to: ' + cross + '</div>');
+    out.push('        <span class="fz-pte-task-cross-skills">' + esc(cross) + '</span>');
+    out.push('        <div class="fz-pte-task-title">' + esc(resolveItemTitle(item)) + '</div>');
     out.push('      </div>');
-    out.push('      <div style="text-align:right; display:flex; flex-direction:column; align-items:flex-end; gap:3px;">');
-    out.push('        <div style="font-size:0.78rem; font-weight:800; color:#64748b;">#' + (state.itemIndex + 1) + ' / ' + (BANKS[state.mode] || []).length + '</div>');
+    out.push('      <div class="fz-pte-header-right">');
+    out.push('        <div class="fz-pte-stepper">');
+    out.push('          <button type="button" class="fz-pte-step-btn fz-plain" aria-label="Previous question" onclick="FiezelPteUi.prevItem()"' + (state.itemIndex <= 0 ? ' disabled' : '') + '>' + pteIcon('chevronL') + '</button>');
+    out.push('          <span class="fz-pte-step-count">' + curNum + ' / ' + totalItems + '</span>');
+    out.push('          <button type="button" class="fz-pte-step-btn fz-plain" aria-label="Next question" onclick="FiezelPteUi.nextItem()">' + pteIcon('chevronR') + '</button>');
+    out.push('        </div>');
     if (['ra', 'rs', 'di', 'rl'].indexOf(state.mode) !== -1 && state.timerState === 'idle') {
-      var timingInfo = state.mode === 'rs' ? 'Listen & Repeat' : (state.mode === 'di' ? 'Prep 25s • Rec 40s' : 'Prep 35s • Rec 40s');
-      out.push('        <span class="fz-pte-prep-pill">⏱ ' + timingInfo + '</span>');
+      var timingInfo = state.mode === 'rs' ? '15s Response' : (state.mode === 'di' ? 'Prep 25s · Rec 40s' : 'Prep 35s · Rec 40s');
+      out.push('        <span class="fz-pte-prep-pill">' + pteIcon('clock') + '<span>' + timingInfo + '</span></span>');
     }
     out.push('      </div>');
     out.push('    </div>');
 
-    // Official Pearson Status Box (Timer/Recording for audio modes - active only when running)
+    // Acoustic Status Telemetry Strip (active during prep / recording / processing)
     if (['ra', 'rs', 'di', 'rl'].indexOf(state.mode) !== -1 && state.timerState !== 'idle') {
       out.push('    <div class="fz-pte-pearson-status-box">');
-      var statusTitle = 'Current State:';
-      var statusVal = 'Ready to begin';
+      var statusVal = 'Ready';
+      var statusCls = '';
       var barClass = 'ready-bar';
       var progressPct = 0;
 
       if (state.timerState === 'preparing') {
-        statusVal = 'Beginning in ' + state.timerRemainingSec + ' seconds...';
+        statusVal = 'Preparation · Starts in ' + state.timerRemainingSec + 's';
+        statusCls = ' is-prep';
         barClass = 'prep-bar';
         var totalPrep = state.timerTotalSec || 35;
         progressPct = Math.round(((totalPrep - state.timerRemainingSec) / totalPrep) * 100);
       } else if (state.timerState === 'recording') {
-        statusVal = 'Recording... Speak now!';
+        statusVal = 'Recording Live · ' + state.timerRemainingSec + 's remaining';
+        statusCls = ' is-rec';
         barClass = 'rec-bar';
         var totalRec = state.timerTotalSec || 40;
         progressPct = Math.round(((totalRec - state.timerRemainingSec) / totalRec) * 100);
       } else if (state.timerState === 'completed') {
-        statusVal = 'Completed. Processing scoring...';
+        statusVal = 'Evaluating Acoustic Cadence...';
         barClass = 'ready-bar';
         progressPct = 100;
       }
 
-      out.push('      <div class="fz-pte-status-text"><span>' + statusTitle + '</span> <b>' + esc(statusVal) + '</b></div>');
+      out.push('      <div class="fz-pte-status-text"><span>Current State</span><b class="' + statusCls + '">' + esc(statusVal) + '</b></div>');
       out.push('      <div class="fz-pte-progress-rail">');
       out.push('        <div class="fz-pte-progress-fill ' + barClass + '" style="width:' + progressPct + '%;"></div>');
       if (state.mode === 'di') {
-        out.push('        <div class="fz-pte-green-zone-marker" title="Optimal Duration Zone (25-28s)"></div>');
-        out.push('        <div class="fz-pte-green-zone-label">Optimal 25-28s</div>');
+        out.push('        <div class="fz-pte-green-zone-marker" title="Optimal Duration Zone (25–28s)"></div>');
+        out.push('        <div class="fz-pte-green-zone-label">Optimal 25–28s</div>');
       }
       out.push('      </div>');
       out.push('    </div>');
 
       if (state.timerState === 'recording') {
         out.push('    <div class="fz-pte-live-bubble">');
-        out.push('      <span class="fz-pte-live-mic-pulse">🎙️</span>');
-        out.push('      <div style="flex:1;">');
-        out.push('        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">');
-        out.push('          <span style="font-size:0.75rem; font-weight:800; text-transform:uppercase; color:#15803d; letter-spacing:0.04em;">Live Speech Recognition</span>');
-        out.push('          <span style="font-size:0.72rem; font-weight:700; color:#16a34a;">● Live Mic Level</span>');
+        out.push('      <span class="fz-pte-live-mic-pulse">' + pteIcon('speaking') + '</span>');
+        out.push('      <div style="flex:1; min-width:0;">');
+        out.push('        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">');
+        out.push('          <span style="font-size:0.72rem; font-weight:800; text-transform:uppercase; color:#15803D; letter-spacing:0.05em;">Live ASR Stream</span>');
+        out.push('          <span style="font-size:0.7rem; font-weight:700; color:#16A34A;">● Voice Gate Active</span>');
         out.push('        </div>');
-        out.push('        <div class="fz-pte-mic-meter-bar" style="background:#dcfce7; height:6px; border-radius:999px; overflow:hidden; margin-bottom:6px;">');
-        out.push('          <div id="fzPteMicMeterFill" style="width:0%; height:100%; background:#10b981; transition:width 0.08s ease, background-color 0.15s ease;"></div>');
+        out.push('        <div style="background:#DCFCE7; height:6px; border-radius:999px; overflow:hidden; margin-bottom:7px;">');
+        out.push('          <div id="fzPteMicMeterFill" style="width:0%; height:100%; background:#10B981; transition:width 0.08s ease, background-color 0.15s ease;"></div>');
         out.push('        </div>');
-        out.push('        <div id="fzPteLiveSpeechText" style="font-size:0.92rem; font-weight:600; color:#166534; min-height:22px; word-break:break-word;">' + esc(state.speechTranscript || 'Listening to your voice... Speak now!') + '</div>');
+        out.push('        <div id="fzPteLiveSpeechText" style="font-size:0.9rem; font-weight:600; color:#14532D; min-height:20px; word-break:break-word;">' + esc(state.speechTranscript || 'Speak clearly at a natural pace...') + '</div>');
         out.push('      </div>');
         out.push('    </div>');
       }
     }
 
-    // BODY CANVAS PER MODE
+    // TASK CANVAS PER MODE
     if (state.mode === 'ra') {
       out.push('    <div class="fz-pte-prompt-box">');
+      out.push('      <div class="fz-pte-prompt-toolbar">');
+      out.push('        <span class="fz-pte-prompt-label">Pause only at ‖ markers</span>');
+      out.push('        <button type="button" class="fz-pte-inline-audio-btn fz-plain' + (state.isAudioPlaying ? ' is-playing' : '') + '" onclick="FiezelPteUi.playAudioPrompt()">' + (state.isAudioPlaying ? pteIcon('stop') : pteIcon('volume')) + '<span>' + (state.isAudioPlaying ? 'Stop' : 'Model Audio') + '</span></button>');
+      out.push('      </div>');
       out.push('      <div class="fz-pte-chunked-text">' + formatChunkedText(item.chunking || item.text) + '</div>');
       out.push('    </div>');
-      out.push('    <div style="display:flex; justify-content:flex-end; margin-top:8px;">');
-      out.push('      <button type="button" class="fz-pte-play-btn" style="width:auto; padding:6px 14px; border-radius:20px; font-size:0.8rem; gap:6px; display:inline-flex; align-items:center;" onclick="FiezelPteUi.playAudioPrompt()">' + (state.isAudioPlaying ? '■ Stop Audio' : '🔊 Listen Model Pronunciation') + '</button>');
-      out.push('    </div>');
-      out.push('    <div class="fz-pte-secret-tip">');
-      out.push('      <b>💡 Nakul 7-Hour Secret:</b> ' + ptePick('Read at a steady 12–14s pace. Do not rush or drop pitch prematurely at periods—pause only at double slashes (//).', 'Baca dengan tempo stabil 12-14 detik. Jangan terburu-buru, jangan ubah nada saat tanda titik! Bernafas hanya di tanda jeda ganda (//).'));
-      out.push('    </div>');
+      out.push('    <div class="fz-pte-secret-tip">' + pteIcon('spark') + '<div><b>Cadence Tip:</b> ' + ptePick('Read smoothly in 12–14s (120–145 WPM). Never self-correct mid-sentence—keep flowing to protect Oral Fluency.', 'Baca dengan tempo stabil 12–14 detik (120–145 WPM). Jangan mengulang kata jika salah ucap—lanjutkan terus untuk menjaga skor Oral Fluency.') + '</div></div>');
     } else if (state.mode === 'rs') {
-      out.push('    <div class="fz-pte-audio-prompt-card">');
-      out.push('      <div style="display:flex; align-items:center; gap:12px;">');
-      out.push('        <button type="button" class="fz-pte-play-btn" onclick="FiezelPteUi.playRsAudioAndListen()">' + (state.isAudioPlaying ? '■' : '▶') + '</button>');
-      out.push('        <div style="flex:1;">');
-      out.push('          <div style="font-weight:800; font-size:0.92rem; color:#0f172a;">Repeat Sentence (Pearson Audio)</div>');
-      out.push('          <div style="font-size:0.78rem; color:#64748b;">' + (state.isAudioPlaying ? '🔊 Playing prompt sentence...' : 'Click Play to hear prompt') + '</div>');
-      out.push('        </div>');
-      out.push('        <div class="fz-pte-audio-waveform">');
-      for (var w = 0; w < 12; w++) {
-        var hClass = state.isAudioPlaying ? ' active' : '';
-        out.push('          <div class="fz-pte-wave-bar' + hClass + '" style="animation-delay:' + (w * 0.05) + 's;"></div>');
-      }
-      out.push('        </div>');
-      out.push('      </div>');
-      out.push('      <div class="fz-pte-rs-rule-note">🎧 <b>Pearson Rule:</b> Prompt text is hidden. Listen carefully and speak immediately after the tone.</div>');
-      out.push('    </div>');
-      out.push('    <div class="fz-pte-secret-tip">');
-      out.push('      <b>💡 Nakul 50% Rule:</b> ' + ptePick('Capture the first 50–60% of words smoothly without hesitating. Never self-correct mid-sentence!', 'Tangkap 50-60% kata awal dengan lancar tanpa jeda. Jangan mengoreksi diri sendiri!') + '');
-      out.push('    </div>');
+      out.push(renderStudioAudioBar(
+        'Repeat Sentence Audio Prompt',
+        state.isAudioPlaying ? 'Playing academic sentence — listen closely...' : 'Transcript hidden per Pearson rules. Press Play, then repeat verbatim.',
+        'FiezelPteUi.playRsAudioAndListen()',
+        false
+      ));
+      out.push('    <div class="fz-pte-secret-tip">' + pteIcon('spark') + '<div><b>50% Sequence Rule:</b> ' + ptePick('Capture at least 50–60% of words in exact sequence with smooth oral delivery and zero hesitation.', 'Tangkap minimal 50–60% kata secara berurutan dengan irama mulus tanpa jeda "um/uh".') + '</div></div>');
     } else if (state.mode === 'di') {
       if (item.svg) {
         out.push('    <div class="fz-pte-svg-frame">' + item.svg + '</div>');
       }
       out.push('    <div class="fz-pte-template-accord">');
-      out.push('      <button type="button" class="fz-pte-accord-toggle" onclick="FiezelPteUi.toggleTemplate()">');
-      out.push('        <span>📋 Nakul 5-Line Universal Template</span>');
-      out.push('        <span>' + (state.templateOpen ? '▲ Hide' : '▼ View Scaffold') + '</span>');
+      out.push('      <button type="button" class="fz-pte-accord-toggle fz-plain" onclick="FiezelPteUi.toggleTemplate()">');
+      out.push('        <span class="fz-pte-accord-left">' + pteIcon('layers') + '<span>5-Sentence Speaking Structure</span></span>');
+      out.push('        <span class="fz-pte-accord-action">' + (state.templateOpen ? 'Hide ▲' : 'Show Framework ▼') + '</span>');
       out.push('      </button>');
       if (state.templateOpen) {
         var tpl = (BANKS.templates && BANKS.templates.templates && BANKS.templates.templates.describe_image) || {};
+        var rawLines = String(tpl.text || 'The given image represents [Title].\nAccording to the chart, we can see [Categories].\nThe highest figure is observed in [Max].\nConversely, the lowest figure is seen in [Min].\nIn conclusion, this chart provides significant academic data.').split(/\n+/).filter(Boolean);
         out.push('      <div class="fz-pte-accord-body">');
-        out.push('        <pre class="fz-pte-template-text">' + esc(tpl.text || 'The given image represents...') + '</pre>');
+        out.push('        <div class="fz-pte-template-lines">');
+        rawLines.forEach(function (ln, li) {
+          out.push('          <div class="fz-pte-tpl-row"><span class="fz-pte-tpl-num">' + (li + 1) + '</span><span>' + esc(ln) + '</span></div>');
+        });
+        out.push('        </div>');
         out.push('      </div>');
       }
       out.push('    </div>');
     } else if (state.mode === 'rl') {
-      out.push('    <div class="fz-pte-audio-player-box">');
-      out.push('      <button type="button" class="fz-pte-play-btn" onclick="FiezelPteUi.playAudioPrompt()">' + (state.isAudioPlaying ? '■' : '▶') + '</button>');
-      out.push('      <div style="flex:1; margin-left:12px;">');
-      out.push('        <div style="font-weight:700; font-size:0.9rem; color:#1e293b;">Listen to Academic Lecture</div>');
-      out.push('        <div style="font-size:0.78rem; color:#64748b;">' + (state.isAudioPlaying ? '🔊 Playing academic lecture...' : 'Domain: ' + esc(item.domain || 'Academic')) + '</div>');
-      out.push('      </div>');
-      out.push('      <div class="fz-pte-audio-waveform">');
-      for (var wRl = 0; wRl < 16; wRl++) {
-        var hClassRl = state.isAudioPlaying ? ' active' : '';
-        out.push('        <div class="fz-pte-wave-bar' + hClassRl + '" style="animation-delay:' + (wRl * 0.05) + 's;"></div>');
-      }
-      out.push('      </div>');
-      out.push('    </div>');
-      out.push('    <div class="fz-pte-prompt-box" style="margin-top:12px;">');
-      out.push('      <div style="font-weight:700; font-size:0.85rem; color:#334155; margin-bottom:6px;">Key Noun Chunks to Capture:</div>');
-      out.push('      <div style="display:flex; flex-wrap:wrap; gap:6px;">');
+      out.push(renderStudioAudioBar(
+        'Academic Lecture Audio',
+        state.isAudioPlaying ? 'Playing lecture — note 4 key noun phrases...' : ('Domain: ' + (item.domain || 'University Seminar') + ' · Take brief keyword notes'),
+        'FiezelPteUi.playAudioPrompt()',
+        false
+      ));
+      out.push('    <div class="fz-pte-prompt-box">');
+      out.push('      <div class="fz-pte-prompt-label">Target Key Noun Chunks</div>');
+      out.push('      <div class="fz-pte-chip-cloud">');
       (item.keyNounChunks || []).forEach(function (chunk) {
-        out.push('        <span style="background:#e0f2fe; color:#0369a1; padding:3px 8px; border-radius:12px; font-size:0.78rem; font-weight:700;">' + esc(chunk) + '</span>');
+        out.push('        <span class="fz-pte-kw-chip">' + esc(chunk) + '</span>');
       });
       out.push('      </div>');
       out.push('    </div>');
-      out.push('    <div class="fz-pte-secret-tip">');
-      out.push('      <b>💡 Nakul 4-Sentence Rule:</b> "The lecture primarily discussed [Chunk 1]. He highlighted [Chunk 2]. Furthermore, he explained [Chunk 3]. Finally, the speaker concluded [Chunk 4]." Speak smoothly without pausing for 25-28 seconds!');
-      out.push('    </div>');
+      out.push('    <div class="fz-pte-secret-tip">' + pteIcon('spark') + '<div><b>4-Sentence Connector Flow:</b> Link four key noun phrases using <i>"The lecture discussed..."</i>, <i>"Furthermore, the speaker highlighted..."</i>, and <i>"In conclusion..."</i> for 25–28s.</div></div>');
     } else if (state.mode === 'wfd') {
-      out.push('    <div class="fz-pte-audio-player-box">');
-      out.push('      <button type="button" class="fz-pte-play-btn" onclick="FiezelPteUi.playAudioPrompt()">' + (state.isAudioPlaying ? '■' : '▶') + '</button>');
-      out.push('      <div style="flex:1; margin-left:12px;">');
-      out.push('        <div style="font-weight:700; font-size:0.9rem; color:#1e293b;">Listen to Sentence (Dictation Prompt)</div>');
-      out.push('        <div style="font-size:0.78rem; color:#64748b;">Click Play to listen. Type exactly what you hear.</div>');
-      out.push('      </div>');
-      out.push('      <div class="fz-pte-audio-waveform">');
-      for (var w2 = 0; w2 < 16; w2++) {
-        var hClass2 = state.isAudioPlaying ? ' active' : '';
-        out.push('        <div class="fz-pte-wave-bar' + hClass2 + '" style="animation-delay:' + (w2 * 0.05) + 's;"></div>');
-      }
-      out.push('      </div>');
-      out.push('    </div>');
-      out.push('    <div style="margin-top:12px;">');
-      out.push('      <textarea id="fzPteDictationInput" class="fz-pte-dictation-editor" placeholder="Type the sentence you hear here (check keyword spelling)..." oninput="FiezelPteUi.updateWfdCount()">' + esc(state.wfdText || '') + '</textarea>');
+      out.push(renderStudioAudioBar(
+        'Dictation Audio Prompt',
+        state.isAudioPlaying ? 'Playing sentence — focus on plurals & tense endings...' : 'Press Play to hear the sentence once, then type every word accurately.',
+        'FiezelPteUi.playAudioPrompt()',
+        false
+      ));
+      out.push('    <div>');
+      out.push('      <textarea id="fzPteDictationInput" class="fz-pte-dictation-editor" placeholder="Type the exact sentence you hear (capitalize first word and end with a period)..." oninput="FiezelPteUi.updateWfdCount()">' + esc(state.wfdText || '') + '</textarea>');
       out.push('      <div class="fz-pte-dictation-stats">');
       var wfdWordCount = state.wfdText ? state.wfdText.trim().split(/\s+/).filter(Boolean).length : 0;
-      out.push('        <span id="fzPteWordCountLabel">' + wfdWordCount + ' words</span>');
-      out.push('        <span>1 point for each correct word (Listening + Writing)</span>');
+      out.push('        <span id="fzPteWordCountLabel" class="fz-pte-word-pill">' + wfdWordCount + ' words</span>');
+      out.push('        <span>1 point per exact word (Listening + Writing)</span>');
       out.push('      </div>');
-      out.push('      <div class="fz-pte-hack-badge">💡 <b>Nakul Extra Words Hack:</b> Unsure of singular or plural? Write both (e.g. <code>student students</code>). Pearson AI does not penalize extra words!</div>');
       out.push('    </div>');
+      out.push('    <div class="fz-pte-hack-badge">' + pteIcon('spark') + '<div><b>Singular / Plural Tip:</b> Unsure whether you heard singular or plural? Including both variants (e.g. <code>student students</code>) secures word match credit in practice drills.</div></div>');
     } else if (state.mode === 'rwFib') {
-      var guideToggleTxt = state.showGrammarGuide
-        ? ptePick('▲ Close Guide', '▲ Tutup Panduan')
-        : ptePick('💡 6 Three-Second Grammar Formulas & Collocations', '💡 6 Rumus Grammar 3 Detik & Collocations');
-      out.push('    <div style="display:flex; justify-content:flex-end;">');
-      out.push('      <button type="button" class="fz-pte-guide-toggle-btn" onclick="FiezelPteUi.toggleGrammarGuide()">');
-      out.push('        <span>' + guideToggleTxt + '</span>');
-      out.push('      </button>');
+      out.push('    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">');
+      out.push('      <span style="font-size:0.78rem; color:#64748B; font-weight:600;">Select the best academic word for each blank:</span>');
+      out.push('      <button type="button" class="fz-pte-guide-toggle-btn fz-plain" onclick="FiezelPteUi.toggleGrammarGuide()">' + pteIcon('spark') + '<span>' + (state.showGrammarGuide ? ptePick('Hide Cheat-Sheet', 'Tutup Panduan') : ptePick('6 Quick Grammar Rules', '6 Rumus Grammar 3 Detik')) + '</span></button>');
       out.push('    </div>');
       if (state.showGrammarGuide) {
         out.push(renderGrammarQuickGuide());
@@ -944,10 +960,9 @@
       out.push('      <div class="fz-pte-reading-passage">' + renderRwFibPassage(item) + '</div>');
       out.push('    </div>');
     } else if (state.mode === 'rDd') {
-      out.push('    <div style="display:flex; justify-content:flex-end;">');
-      out.push('      <button type="button" class="fz-pte-guide-toggle-btn" onclick="FiezelPteUi.toggleGrammarGuide()">');
-      out.push('        <span>' + (state.showGrammarGuide ? ptePick('▲ Close Guide', '▲ Tutup Panduan') : ptePick('💡 6 Three-Second Grammar Formulas & Collocations', '💡 6 Rumus Grammar 3 Detik & Collocations')) + '</span>');
-      out.push('      </button>');
+      out.push('    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">');
+      out.push('      <span style="font-size:0.78rem; color:#64748B; font-weight:600;">Tap a word chip below to fill the next empty slot (tap slot to clear):</span>');
+      out.push('      <button type="button" class="fz-pte-guide-toggle-btn fz-plain" onclick="FiezelPteUi.toggleGrammarGuide()">' + pteIcon('spark') + '<span>' + (state.showGrammarGuide ? ptePick('Hide Cheat-Sheet', 'Tutup Panduan') : ptePick('6 Quick Grammar Rules', '6 Rumus Grammar 3 Detik')) + '</span></button>');
       out.push('    </div>');
       if (state.showGrammarGuide) {
         out.push(renderGrammarQuickGuide());
@@ -956,110 +971,91 @@
       out.push('      <div class="fz-pte-reading-passage">' + renderReadingDdPassage(item) + '</div>');
       out.push('    </div>');
       out.push('    <div class="fz-pte-word-pool-wrap">');
-      out.push('      <div style="font-size:0.8rem; font-weight:800; color:#475569; margin-bottom:6px;">Word Pool (Click to assign):</div>');
+      out.push('      <div class="fz-pte-word-pool-label">Word Bank</div>');
       out.push('      <div class="fz-pte-word-pool">');
       state.rDdWordPool.forEach(function (word) {
-        out.push('        <button type="button" class="fz-pte-pool-chip" onclick="FiezelPteUi.assignDdWord(\'' + esc(word) + '\')">' + esc(word) + '</button>');
+        out.push('        <button type="button" class="fz-pte-pool-chip fz-plain" onclick="FiezelPteUi.assignDdWord(\'' + esc(word) + '\')">' + esc(word) + '</button>');
       });
       out.push('      </div>');
       out.push('    </div>');
     } else if (state.mode === 'ro') {
       out.push('    <div class="fz-pte-prompt-box">');
-      out.push('      <div style="font-size:0.82rem; color:#64748b; margin-bottom:8px;">Use ▲ and ▼ to reorder paragraphs into the correct sequence. Scored by official Pearson adjacent pairs.</div>');
+      out.push('      <div class="fz-pte-prompt-label" style="margin-bottom:10px;">Arrange into logical academic order · Scored by adjacent pairs</div>');
       out.push('      <div class="fz-pte-ro-list">' + renderRoParagraphs(item) + '</div>');
       out.push('    </div>');
     } else if (state.mode === 'swt') {
       out.push('    <div class="fz-pte-prompt-box">');
-      out.push('      <div style="max-height:220px; overflow-y:auto; line-height:1.6; font-size:0.92rem; color:#1e293b; padding-right:8px;">' + esc(item.text) + '</div>');
+      out.push('      <div class="fz-pte-prompt-label" style="margin-bottom:8px;">Source Reading Passage</div>');
+      out.push('      <div style="max-height:220px; overflow-y:auto; line-height:1.68; font-size:0.93rem; color:#1E293B; padding-right:6px;">' + esc(item.text) + '</div>');
       out.push('    </div>');
-      out.push('    <div style="margin-top:12px;">');
-      out.push('      <textarea id="fzPteSwtInput" class="fz-pte-dictation-editor" placeholder="Write exactly ONE single sentence summary (35-45 words recommended, max 75 words)..." oninput="FiezelPteUi.updateSwtCount()">' + esc(state.swtText) + '</textarea>');
+      out.push('    <div>');
+      out.push('      <textarea id="fzPteSwtInput" class="fz-pte-dictation-editor" placeholder="Write ONE single complex sentence summarizing the passage (target 35–45 words, strict 5–75 word limit)..." oninput="FiezelPteUi.updateSwtCount()">' + esc(state.swtText) + '</textarea>');
       out.push('      <div class="fz-pte-dictation-stats">');
-      out.push('        <span id="fzPteSwtCountLabel">0 words</span>');
-      out.push('        <span>Strict Pearson Rule: Exactly 1 single sentence</span>');
+      out.push('        <span id="fzPteSwtCountLabel" class="fz-pte-word-pill">0 words</span>');
+      out.push('        <span>Rule: Exactly 1 sentence ending with a single period</span>');
       out.push('      </div>');
       out.push('    </div>');
     } else if (state.mode === 'essay') {
       out.push('    <div class="fz-pte-prompt-box">');
-      out.push('      <div style="font-weight:700; font-size:0.95rem; color:#0f172a; line-height:1.5;">' + esc(item.prompt) + '</div>');
+      out.push('      <div class="fz-pte-prompt-label" style="margin-bottom:6px;">Official Essay Prompt</div>');
+      out.push('      <div style="font-weight:700; font-size:0.96rem; color:#0F172A; line-height:1.58;">' + esc(item.prompt) + '</div>');
       out.push('    </div>');
-      out.push('    <div class="fz-pte-template-accord" style="margin-top:8px;">');
-      out.push('      <button type="button" class="fz-pte-accord-toggle" onclick="FiezelPteUi.toggleEssayScaffold()">');
-      out.push('        <span>📋 4-Paragraph Structure &amp; Scaffolding</span>');
-      out.push('        <span>' + (state.templateOpen ? '▲ Hide' : '▼ View Structure') + '</span>');
+      out.push('    <div class="fz-pte-template-accord">');
+      out.push('      <button type="button" class="fz-pte-accord-toggle fz-plain" onclick="FiezelPteUi.toggleEssayScaffold()">');
+      out.push('        <span class="fz-pte-accord-left">' + pteIcon('layers') + '<span>4-Paragraph Essay Blueprint</span></span>');
+      out.push('        <span class="fz-pte-accord-action">' + (state.templateOpen ? 'Hide ▲' : 'Show Plan ▼') + '</span>');
       out.push('      </button>');
       if (state.templateOpen) {
         var plan = item.fourParagraphPlan || {};
         out.push('      <div class="fz-pte-accord-body">');
-        out.push('        <div style="font-size:0.8rem; line-height:1.5; color:#334155;">');
-        out.push('          <div><b>Para 1 (Introduction):</b> ' + esc(plan.introduction) + '</div>');
-        out.push('          <div style="margin-top:4px;"><b>Para 2 (Body 1):</b> ' + esc(plan.bodyParagraph1) + '</div>');
-        out.push('          <div style="margin-top:4px;"><b>Para 3 (Body 2):</b> ' + esc(plan.bodyParagraph2) + '</div>');
-        out.push('          <div style="margin-top:4px;"><b>Para 4 (Conclusion):</b> ' + esc(plan.conclusion) + '</div>');
+        out.push('        <div class="fz-pte-template-lines">');
+        out.push('          <div class="fz-pte-tpl-row"><span class="fz-pte-tpl-num">P1</span><span><b>Introduction:</b> ' + esc(plan.introduction) + '</span></div>');
+        out.push('          <div class="fz-pte-tpl-row"><span class="fz-pte-tpl-num">P2</span><span><b>Body 1:</b> ' + esc(plan.bodyParagraph1) + '</span></div>');
+        out.push('          <div class="fz-pte-tpl-row"><span class="fz-pte-tpl-num">P3</span><span><b>Body 2:</b> ' + esc(plan.bodyParagraph2) + '</span></div>');
+        out.push('          <div class="fz-pte-tpl-row"><span class="fz-pte-tpl-num">P4</span><span><b>Conclusion:</b> ' + esc(plan.conclusion) + '</span></div>');
         out.push('        </div>');
         out.push('      </div>');
       }
       out.push('    </div>');
-      out.push('    <div style="margin-top:10px;">');
-      out.push('      <textarea id="fzPteEssayInput" class="fz-pte-dictation-editor" style="min-height:160px;" placeholder="Type your 4-paragraph academic essay here (target 200-300 words)..." oninput="FiezelPteUi.updateEssayCount()">' + esc(state.essayText) + '</textarea>');
+      out.push('    <div>');
+      out.push('      <textarea id="fzPteEssayInput" class="fz-pte-dictation-editor" style="min-height:165px;" placeholder="Compose your 4-paragraph academic essay here (target 200–300 words)..." oninput="FiezelPteUi.updateEssayCount()">' + esc(state.essayText) + '</textarea>');
       out.push('      <div class="fz-pte-dictation-stats">');
-      out.push('        <span id="fzPteEssayCountLabel">0 words</span>');
-      out.push('        <span>Target: 200-300 words · 4 paragraphs</span>');
+      out.push('        <span id="fzPteEssayCountLabel" class="fz-pte-word-pill">0 words</span>');
+      out.push('        <span>Target: 200–300 words · 4 paragraphs</span>');
       out.push('      </div>');
       out.push('    </div>');
     } else if (state.mode === 'sst') {
-      out.push('    <div class="fz-pte-audio-player-box">');
-      out.push('      <button type="button" class="fz-pte-play-btn" onclick="FiezelPteUi.playAudioPrompt()">' + (state.isAudioPlaying ? '■' : '▶') + '</button>');
-      out.push('      <div style="flex:1; margin-left:12px;">');
-      out.push('        <div style="font-weight:700; font-size:0.9rem; color:#1e293b;">Listen to Spoken Lecture</div>');
-      out.push('        <div style="font-size:0.78rem; color:#64748b;">' + (state.isAudioPlaying ? '🔊 Playing lecture audio...' : 'Target: 50-70 words summary strictly') + '</div>');
-      out.push('      </div>');
-      out.push('      <div class="fz-pte-audio-waveform">');
-      for (var wSst = 0; wSst < 16; wSst++) {
-        var hClassSst = state.isAudioPlaying ? ' active' : '';
-        out.push('        <div class="fz-pte-wave-bar' + hClassSst + '" style="animation-delay:' + (wSst * 0.05) + 's;"></div>');
-      }
-      out.push('      </div>');
-      out.push('    </div>');
-      out.push('    <div style="margin-top:12px;">');
-      out.push('      <textarea id="fzPteSstInput" class="fz-pte-dictation-editor" placeholder="Write your 50-70 word summary here (capture main points)..." oninput="FiezelPteUi.updateSstCount()">' + esc(state.sstText) + '</textarea>');
+      out.push(renderStudioAudioBar(
+        'Spoken Lecture Audio',
+        state.isAudioPlaying ? 'Playing lecture — capture main thesis & supporting evidence...' : 'Listen to the lecture, then write a concise 50–70 word summary.',
+        'FiezelPteUi.playAudioPrompt()',
+        false
+      ));
+      out.push('    <div>');
+      out.push('      <textarea id="fzPteSstInput" class="fz-pte-dictation-editor" placeholder="Write your 50–70 word summary here..." oninput="FiezelPteUi.updateSstCount()">' + esc(state.sstText) + '</textarea>');
       out.push('      <div class="fz-pte-dictation-stats">');
-      out.push('        <span id="fzPteSstCountLabel">0 words</span>');
-      out.push('        <span>Strict Pearson Limit: 50-70 words</span>');
+      out.push('        <span id="fzPteSstCountLabel" class="fz-pte-word-pill">0 words</span>');
+      out.push('        <span>Strict Pearson Limit: 50–70 words</span>');
       out.push('      </div>');
       out.push('    </div>');
     } else if (state.mode === 'lf') {
-      out.push('    <div class="fz-pte-audio-player-box">');
-      out.push('      <button type="button" class="fz-pte-play-btn" onclick="FiezelPteUi.playAudioPrompt()">' + (state.isAudioPlaying ? '■' : '▶') + '</button>');
-      out.push('      <div style="flex:1; margin-left:12px;">');
-      out.push('        <div style="font-weight:700; font-size:0.9rem; color:#1e293b;">Listening Fill in the Blanks</div>');
-      out.push('        <div style="font-size:0.78rem; color:#64748b;">' + (state.isAudioPlaying ? '🔊 Playing audio passage...' : 'Type the exact missing words as spoken.') + '</div>');
-      out.push('      </div>');
-      out.push('      <div class="fz-pte-audio-waveform">');
-      for (var wLf = 0; wLf < 16; wLf++) {
-        var hClassLf = state.isAudioPlaying ? ' active' : '';
-        out.push('        <div class="fz-pte-wave-bar' + hClassLf + '" style="animation-delay:' + (wLf * 0.05) + 's;"></div>');
-      }
-      out.push('      </div>');
-      out.push('    </div>');
-      out.push('    <div class="fz-pte-prompt-box" style="margin-top:12px;">');
+      out.push(renderStudioAudioBar(
+        'Listening Fill-in-the-Blanks Audio',
+        state.isAudioPlaying ? 'Playing passage — type each missing word in order...' : 'Press Play and type the exact missing words into the inline boxes below.',
+        'FiezelPteUi.playAudioPrompt()',
+        false
+      ));
+      out.push('    <div class="fz-pte-prompt-box">');
       out.push('      <div class="fz-pte-reading-passage">' + renderListeningFibPassage(item) + '</div>');
       out.push('    </div>');
     } else if (state.mode === 'hiw') {
-      out.push('    <div class="fz-pte-audio-player-box">');
-      out.push('      <button type="button" class="fz-pte-play-btn" onclick="FiezelPteUi.playAudioPrompt()">' + (state.isAudioPlaying ? '■' : '▶') + '</button>');
-      out.push('      <div style="flex:1; margin-left:12px;">');
-      out.push('        <div style="font-weight:700; font-size:0.9rem; color:#1e293b;">Highlight Incorrect Words</div>');
-      out.push('        <div style="font-size:0.78rem; color:' + (state.isAudioPlaying ? '#0284c7' : '#b91c1c') + '; font-weight:700;">' + (state.isAudioPlaying ? '🔊 Audio is playing — tap words that differ from speech!' : '⚠ Negative Marking Active: +1 correct error, -1 false alarm!') + '</div>');
-      out.push('      </div>');
-      out.push('      <div class="fz-pte-audio-waveform">');
-      for (var wHiw = 0; wHiw < 16; wHiw++) {
-        var hClassHiw = state.isAudioPlaying ? ' active' : '';
-        out.push('        <div class="fz-pte-wave-bar' + hClassHiw + '" style="animation-delay:' + (wHiw * 0.05) + 's;"></div>');
-      }
-      out.push('      </div>');
-      out.push('    </div>');
-      out.push('    <div class="fz-pte-prompt-box" style="margin-top:12px;">');
+      out.push(renderStudioAudioBar(
+        'Highlight Incorrect Words Audio',
+        state.isAudioPlaying ? 'Audio playing — tap any word below that differs from speech.' : 'Negative Marking: +1 per real discrepancy, -1 per wrong click.',
+        'FiezelPteUi.playAudioPrompt()',
+        !state.isAudioPlaying
+      ));
+      out.push('    <div class="fz-pte-prompt-box">');
       out.push('      <div class="fz-pte-hiw-tokens">' + renderHiwTokens(item) + '</div>');
       out.push('    </div>');
     }
@@ -1067,51 +1063,50 @@
     // Speech recognition & manual transcript helper for speaking modes
     if (['ra', 'rs', 'di', 'rl'].indexOf(state.mode) !== -1) {
       out.push('    <div class="fz-pte-vad-status-row">');
-      out.push('      <span style="font-size:0.75rem; color:#64748b; font-weight:700;">🎙️ Live VAD Active</span>');
-      out.push('      <button type="button" class="fz-pte-text-link-btn" onclick="FiezelPteUi.toggleManualSpeechInput()">' + (state.showManualSpeechInput ? '▲ Hide Input' : '⌨️ Type / Edit Transcript') + '</button>');
+      out.push('      <span class="fz-pte-vad-badge"><span class="fz-pte-vad-dot"></span><span>Acoustic VAD Ready</span></span>');
+      out.push('      <button type="button" class="fz-pte-text-link-btn fz-plain" onclick="FiezelPteUi.toggleManualSpeechInput()">' + pteIcon('keyboard') + '<span>' + (state.showManualSpeechInput ? 'Hide Text Input' : 'Manual Transcript') + '</span></button>');
       out.push('    </div>');
       if (state.showManualSpeechInput) {
-        out.push('    <div style="margin-top:6px; display:flex; gap:6px;">');
-        out.push('      <input type="text" id="fzPteManualSpeechInput" style="flex:1; height:34px; padding:4px 10px; border-radius:8px; border:1.5px solid #cbd5e1; font-size:0.85rem;" value="' + esc(state.speechTranscript || '') + '" placeholder="Type spoken words..." oninput="FiezelPteUi.setManualSpeech(this.value)">');
-        out.push('      <button type="button" style="padding:4px 12px; background:#0284c7; color:#fff; border:none; border-radius:8px; font-weight:700; font-size:0.82rem; cursor:pointer;" onclick="FiezelPteUi.evaluateManualSpeech()">Score</button>');
+        out.push('    <div class="fz-pte-manual-row">');
+        out.push('      <input type="text" id="fzPteManualSpeechInput" class="fz-pte-manual-input" value="' + esc(state.speechTranscript || '') + '" placeholder="Paste or type spoken response..." oninput="FiezelPteUi.setManualSpeech(this.value)">');
+        out.push('      <button type="button" class="fz-pte-manual-score-btn fz-plain" onclick="FiezelPteUi.evaluateManualSpeech()">Score</button>');
         out.push('    </div>');
       }
     }
 
-    // Action Dock per mode
+    // Tactile Action Dock
     out.push('    <div class="fz-pte-action-dock">');
     if (state.mode === 'wfd') {
-      out.push('      <button type="button" class="fz-pte-btn-primary" onclick="FiezelPteUi.submitWfd()">Check Spelling &amp; Score</button>');
+      out.push('      <button type="button" class="fz-pte-btn-primary fz-plain" onclick="FiezelPteUi.submitWfd()">' + pteIcon('check') + '<span>Check Dictation</span></button>');
     } else if (state.mode === 'rwFib') {
-      out.push('      <button type="button" class="fz-pte-btn-primary" onclick="FiezelPteUi.checkRwFib()">Check Answers &amp; Learn Formula</button>');
+      out.push('      <button type="button" class="fz-pte-btn-primary fz-plain" onclick="FiezelPteUi.checkRwFib()">' + pteIcon('check') + '<span>Check Answers</span></button>');
     } else if (state.mode === 'rDd') {
-      out.push('      <button type="button" class="fz-pte-btn-primary" onclick="FiezelPteUi.checkReadingDd()">Verify Placement</button>');
+      out.push('      <button type="button" class="fz-pte-btn-primary fz-plain" onclick="FiezelPteUi.checkReadingDd()">' + pteIcon('check') + '<span>Verify Blanks</span></button>');
     } else if (state.mode === 'ro') {
-      out.push('      <button type="button" class="fz-pte-btn-primary" onclick="FiezelPteUi.checkReorder()">Verify Sequence</button>');
+      out.push('      <button type="button" class="fz-pte-btn-primary fz-plain" onclick="FiezelPteUi.checkReorder()">' + pteIcon('check') + '<span>Verify Sequence</span></button>');
     } else if (state.mode === 'swt') {
-      out.push('      <button type="button" class="fz-pte-btn-primary" onclick="FiezelPteUi.checkSwt()">Evaluate Summary</button>');
+      out.push('      <button type="button" class="fz-pte-btn-primary fz-plain" onclick="FiezelPteUi.checkSwt()">' + pteIcon('check') + '<span>Evaluate Summary</span></button>');
     } else if (state.mode === 'essay') {
-      out.push('      <button type="button" class="fz-pte-btn-primary" onclick="FiezelPteUi.checkEssay()">Score Essay</button>');
+      out.push('      <button type="button" class="fz-pte-btn-primary fz-plain" onclick="FiezelPteUi.checkEssay()">' + pteIcon('check') + '<span>Score Essay</span></button>');
     } else if (state.mode === 'sst') {
-      out.push('      <button type="button" class="fz-pte-btn-primary" onclick="FiezelPteUi.checkSst()">Check Spoken Summary</button>');
+      out.push('      <button type="button" class="fz-pte-btn-primary fz-plain" onclick="FiezelPteUi.checkSst()">' + pteIcon('check') + '<span>Evaluate Summary</span></button>');
     } else if (state.mode === 'lf') {
-      out.push('      <button type="button" class="fz-pte-btn-primary" onclick="FiezelPteUi.checkListeningFib()">Check Spelling</button>');
+      out.push('      <button type="button" class="fz-pte-btn-primary fz-plain" onclick="FiezelPteUi.checkListeningFib()">' + pteIcon('check') + '<span>Check Spelling</span></button>');
     } else if (state.mode === 'hiw') {
-      out.push('      <button type="button" class="fz-pte-btn-primary" onclick="FiezelPteUi.checkHiw()">Submit Selections</button>');
+      out.push('      <button type="button" class="fz-pte-btn-primary fz-plain" onclick="FiezelPteUi.checkHiw()">' + pteIcon('check') + '<span>Submit Audit</span></button>');
     } else {
-      // Audio Recording modes: RA, RS, DI, RL
       var isRec = state.timerState === 'recording';
       var recBtnClass = isRec ? ' recording' : '';
-      var recBtnLabel = isRec ? '■ Finish Speaking (Submit)' :
-                        (state.timerState === 'preparing' ? '▶ Record Now' :
-                        (state.mode === 'rs' ? (state.isAudioPlaying ? '■ Stop Audio' : '▶ Play Prompt & Repeat') : '● Start Preparation'));
+      var recIcon = isRec ? pteIcon('stop') : (state.timerState === 'preparing' ? pteIcon('speaking') : pteIcon('play'));
+      var recBtnLabel = isRec ? 'Finish & Score' :
+                        (state.timerState === 'preparing' ? 'Record Now' :
+                        (state.mode === 'rs' ? (state.isAudioPlaying ? 'Stop Prompt' : 'Play & Repeat') : 'Start Preparation'));
       var clickAction = (state.mode === 'rs' && state.timerState === 'idle') ? 'FiezelPteUi.playRsAudioAndListen()' : 'FiezelPteUi.handleMicAction()';
-      out.push('      <button type="button" class="fz-pte-btn-primary' + recBtnClass + '" onclick="' + clickAction + '">' + esc(recBtnLabel) + '</button>');
+      out.push('      <button type="button" class="fz-pte-btn-primary fz-plain' + recBtnClass + '" onclick="' + clickAction + '">' + recIcon + '<span>' + esc(recBtnLabel) + '</span></button>');
     }
-    out.push('      <button type="button" class="fz-pte-btn-secondary" onclick="FiezelPteUi.nextItem()">Next Question ➔</button>');
+    out.push('      <button type="button" class="fz-pte-btn-secondary fz-plain" onclick="FiezelPteUi.nextItem()"><span>Next</span>' + pteIcon('arrowR') + '</button>');
     out.push('    </div>');
 
-    // Deep Pedagogical Feedback Drawer (if present)
     if (state.activeDeepFeedback) {
       out.push(renderDeepFeedbackDrawer(state.activeDeepFeedback));
     }
@@ -1122,7 +1117,7 @@
 
   function formatChunkedText(raw) {
     if (!raw) return '';
-    return esc(raw).replace(/\/\//g, '<span class="fz-pte-breath-mark">//</span>');
+    return esc(raw).replace(/\/\//g, '<span class="fz-pte-breath-mark" title="Natural breath pause">‖</span>');
   }
 
   function renderRwFibPassage(item) {
@@ -1142,7 +1137,7 @@
         statusClass = ' is-selected';
       }
       var selHtml = '<select class="fz-pte-fib-select' + statusClass + '" onchange="FiezelPteUi.selectRwFibOption(\'' + esc(b.id) + '\', this.value)">';
-      selHtml += '<option value="">-- select --</option>';
+      selHtml += '<option value="">Choose...</option>';
       (b.options || []).forEach(function (opt) {
         var isSel = chosen === opt ? ' selected' : '';
         selHtml += '<option value="' + esc(opt) + '"' + isSel + '>' + esc(opt) + '</option>';
@@ -1170,7 +1165,7 @@
       } else if (assigned) {
         statusClass = ' filled';
       }
-      var slotHtml = '<span class="fz-pte-drop-slot' + statusClass + '" onclick="FiezelPteUi.clearDdBlank(\'' + esc(k) + '\')">' + (assigned ? esc(assigned) : '[' + (idx + 1) + ']') + '</span>';
+      var slotHtml = '<span class="fz-pte-drop-slot' + statusClass + '" onclick="FiezelPteUi.clearDdBlank(\'' + esc(k) + '\')">' + (assigned ? esc(assigned) : 'Blank ' + (idx + 1)) + '</span>';
       text = text.replace('{' + k + '}', slotHtml);
       text = text.replace('[' + k + ']', slotHtml);
     });
@@ -1192,8 +1187,8 @@
       out.push('      <div class="fz-pte-ro-text">' + esc(p.text) + '</div>');
       out.push('    </div>');
       out.push('    <div class="fz-pte-ro-controls">');
-      out.push('      <button type="button" class="fz-pte-ro-btn" onclick="FiezelPteUi.moveRoParagraph(' + idx + ', -1)"' + (idx === 0 ? ' disabled' : '') + '>▲</button>');
-      out.push('      <button type="button" class="fz-pte-ro-btn" onclick="FiezelPteUi.moveRoParagraph(' + idx + ', 1)"' + (idx === state.roOrder.length - 1 ? ' disabled' : '') + '>▼</button>');
+      out.push('      <button type="button" class="fz-pte-ro-btn fz-plain" aria-label="Move paragraph up" onclick="FiezelPteUi.moveRoParagraph(' + idx + ', -1)"' + (idx === 0 ? ' disabled' : '') + '>' + pteIcon('chevronU') + '</button>');
+      out.push('      <button type="button" class="fz-pte-ro-btn fz-plain" aria-label="Move paragraph down" onclick="FiezelPteUi.moveRoParagraph(' + idx + ', 1)"' + (idx === state.roOrder.length - 1 ? ' disabled' : '') + '>' + pteIcon('chevronD') + '</button>');
       out.push('    </div>');
       out.push('  </div>');
     });
@@ -1206,7 +1201,7 @@
     var fbMap = {};
     fbItems.forEach(function (fb) { fbMap[fb.id] = fb; });
 
-    (item.blanks || []).forEach(function (b) {
+    (item.blanks || []).forEach(function (b, idx) {
       var typed = state.lfAnswers[b.id] || '';
       var fb = fbMap[b.id];
       var statusClass = '';
@@ -1215,7 +1210,7 @@
       } else if (typed) {
         statusClass = ' has-value';
       }
-      var inputHtml = '<input type="text" class="fz-pte-lf-input' + statusClass + '" value="' + esc(typed) + '" oninput="FiezelPteUi.setLfAnswer(\'' + esc(b.id) + '\', this.value)" placeholder="(' + esc(b.id) + ')">';
+      var inputHtml = '<input type="text" class="fz-pte-lf-input' + statusClass + '" value="' + esc(typed) + '" oninput="FiezelPteUi.setLfAnswer(\'' + esc(b.id) + '\', this.value)" placeholder="Blank ' + (idx + 1) + '">';
       text = text.replace('{' + b.id + '}', inputHtml);
       text = text.replace('[' + b.id + ']', inputHtml);
     });
@@ -1239,51 +1234,54 @@
    */
   function renderDeepFeedbackDrawer(data) {
     var out = ['  <div class="fz-pte-deep-feedback-card">'];
-    out.push('    <div class="fz-pte-deep-feedback-title">🧠 Deep Pedagogical Feedback (Formula &amp; Collocations)</div>');
+    out.push('    <div class="fz-pte-deep-feedback-title">' + pteIcon('spark') + '<span>Diagnostic Breakdown &amp; Formula Rationale</span></div>');
 
     if (Array.isArray(data.items)) {
       data.items.forEach(function (d, idx) {
-        out.push('    <div class="fz-pte-feedback-blank-box">');
-        out.push('      <div style="font-weight:800; font-size:0.9rem; color:#0f172a; margin-bottom:4px;">Blank ' + (idx + 1) + ': <span style="color:' + (d.isCorrect ? '#10b981' : '#ef4444') + ';">' + (d.isCorrect ? '✓ Correct' : '✗ Incorrect') + '</span> (Target: <b>' + esc(d.correct) + '</b>)</div>');
+        var boxCls = d.isCorrect ? '' : ' is-miss';
+        out.push('    <div class="fz-pte-feedback-blank-box' + boxCls + '">');
+        out.push('      <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:0.86rem; font-weight:800; color:#0F172A;">');
+        out.push('        <span>Blank ' + (idx + 1) + ' · Target: <span style="color:#0F766E;">' + esc(d.correct) + '</span></span>');
+        out.push('        <span style="color:' + (d.isCorrect ? '#15803D' : '#DC2626') + ';">' + (d.isCorrect ? '✓ Correct' : '✗ Missed') + '</span>');
+        out.push('      </div>');
         if (d.feedback) {
           if (d.feedback.formula || d.feedback.grammarFormula) {
-            out.push('      <div class="fz-pte-formula-line">💡 <b>3-Second Grammar Formula:</b> ' + esc(d.feedback.formula || d.feedback.grammarFormula) + '</div>');
+            out.push('      <div class="fz-pte-fb-row"><span class="fz-pte-fb-tag is-amber">Formula</span>' + esc(d.feedback.formula || d.feedback.grammarFormula) + '</div>');
           }
           if (d.feedback.collocation) {
-            out.push('      <div class="fz-pte-collocation-line">🤝 <b>Collocation Pair:</b> <code>' + esc(d.feedback.collocation) + '</code></div>');
+            out.push('      <div class="fz-pte-fb-row"><span class="fz-pte-fb-tag is-teal">Collocation</span><code>' + esc(d.feedback.collocation) + '</code></div>');
           }
           if (d.feedback.linkingWordType) {
-            out.push('      <div class="fz-pte-linking-line">🧭 <b>Linking Word &amp; Logic Map:</b> ' + esc(d.feedback.linkingWordType) + '</div>');
+            out.push('      <div class="fz-pte-fb-row"><span class="fz-pte-fb-tag">Discourse</span>' + esc(d.feedback.linkingWordType) + '</div>');
           }
           if (d.feedback.distractorAnalysis || d.feedback.distractorTip) {
-            out.push('      <div class="fz-pte-distractor-line">❌ <b>Distractor Analysis:</b> ' + esc(d.feedback.distractorAnalysis || d.feedback.distractorTip) + '</div>');
+            out.push('      <div class="fz-pte-fb-row"><span class="fz-pte-fb-tag is-red">Why Others Fail</span>' + esc(d.feedback.distractorAnalysis || d.feedback.distractorTip) + '</div>');
           }
-          if (d.feedback.translation) {
-            out.push('      <div class="fz-pte-translation-line">📖 <b>' + ptePick('Meaning:', 'Arti:') + '</b> <i>"' + esc(d.feedback.translation) + '"</i></div>');
+          if (d.feedback.translation && pteIsId()) {
+            out.push('      <div class="fz-pte-fb-row" style="padding-top:4px; border-top:1px dashed #E2E8F0; color:#475569;"><b>' + ptePick('Meaning:', 'Arti:') + '</b> <i>"' + esc(d.feedback.translation) + '"</i></div>');
           }
         }
         if (d.spellingTip) {
-          out.push('      <div class="fz-pte-formula-line">✍ <b>Official Spelling Rule:</b> ' + esc(d.spellingTip) + '</div>');
+          out.push('      <div class="fz-pte-fb-row"><span class="fz-pte-fb-tag is-amber">Spelling Rule</span>' + esc(d.spellingTip) + '</div>');
         }
         out.push('    </div>');
       });
     } else if (data.reorderClues) {
       out.push('    <div class="fz-pte-feedback-blank-box">');
-      out.push('      <div class="fz-pte-formula-line">👑 <b>Independent Sentence:</b> ' + esc(data.reorderClues.independentSentence) + '</div>');
+      out.push('      <div class="fz-pte-fb-row"><span class="fz-pte-fb-tag is-teal">Topic Opener</span>' + esc(data.reorderClues.independentSentence) + '</div>');
       if (Array.isArray(data.reorderClues.pairingClues)) {
-        out.push('      <div style="font-weight:700; margin-top:8px; font-size:0.85rem; color:#1e293b;">Pairing Clues:</div>');
-        data.reorderClues.pairingClues.forEach(function (clue) {
-          out.push('      <div class="fz-pte-collocation-line" style="margin-top:4px;">🔗 ' + esc(clue) + '</div>');
+        data.reorderClues.pairingClues.forEach(function (clue, ci) {
+          out.push('      <div class="fz-pte-fb-row"><span class="fz-pte-fb-tag">Pair ' + (ci + 1) + '</span>' + esc(clue) + '</div>');
         });
       }
       out.push('    </div>');
     } else if (data.generalFeedback) {
       out.push('    <div class="fz-pte-feedback-blank-box">');
       (data.generalFeedback || []).forEach(function (line) {
-        out.push('      <div class="fz-pte-formula-line">• ' + esc(line) + '</div>');
+        out.push('      <div class="fz-pte-fb-row">• ' + esc(line) + '</div>');
       });
       if (data.modelSummary) {
-        out.push('      <div class="fz-pte-translation-line" style="margin-top:8px;">★ <b>Model Pearson 90 Summary:</b> "' + esc(data.modelSummary) + '"</div>');
+        out.push('      <div class="fz-pte-fb-row" style="padding-top:6px; border-top:1px dashed #E2E8F0;"><span class="fz-pte-fb-tag is-teal">Model Reference</span>"' + esc(data.modelSummary) + '"</div>');
       }
       out.push('    </div>');
     }
@@ -1298,56 +1296,65 @@
 
     var pScore = typeof res.pearsonScore === 'number' ? res.pearsonScore : Math.round((res.score / (res.maxScore || 1)) * 90);
     var pass = pScore >= 42;
-    var circleClass = pass ? ' passed' : '';
-    var verdictLabel = pass ? '✓ Meets Australian Visa Benchmark (PTE 42+)' : '▲ Below Target 42 Benchmark';
+    var strokeCol = pass ? '#10B981' : '#D97706';
+    var ringCirc = 232.5; // 2 * pi * 37
+    var ringDash = Math.max(8, Math.round((Math.min(90, Math.max(10, pScore)) / 90) * ringCirc));
+    var verdictCls = pass ? 'is-pass' : 'is-warn';
+    var verdictLabel = pass ? '✓ Qualified · Target 42+ Met' : 'Below Target 42 Benchmark';
+
     var scoreDetail = '';
     if (res.content && typeof res.content.score === 'number') {
-      scoreDetail = 'Content: ' + res.content.score + ' / ' + res.content.max + ' points';
+      scoreDetail = 'Raw Content Credit: ' + res.content.score + ' / ' + res.content.max + ' pts';
     } else if (typeof res.score === 'number' && typeof res.maxScore === 'number') {
-      scoreDetail = 'Score: ' + res.score + ' / ' + res.maxScore + ' points (' + (res.percentage || Math.round((res.score / res.maxScore) * 100)) + '%)';
+      scoreDetail = 'Score: ' + res.score + ' / ' + res.maxScore + ' pts (' + (res.percentage || Math.round((res.score / res.maxScore) * 100)) + '%)';
     }
 
-    out.push('    <div class="fz-pte-score-circle-row" style="margin-top:0; padding-bottom:10px; border-bottom:1px solid #f1f5f9;">');
-    out.push('      <div class="fz-pte-score-circle' + circleClass + '">');
-    out.push('        <span class="fz-pte-score-num">' + pScore + '</span>');
-    out.push('        <span class="fz-pte-score-scale">Pearson / 90</span>');
-    out.push('      </div>');
-    out.push('      <div style="flex:1;">');
-    out.push('        <div style="display:flex; align-items:center; justify-content:space-between; gap:6px;">');
-    out.push('          <span style="font-weight:800; font-size:0.95rem; color:#0f172a;">' + esc(res.task || state.mode.toUpperCase()) + ' Evaluation</span>');
-    out.push('          <span class="fz-pte-target-badge" style="background:' + (pass ? '#10b981' : '#0284c7') + '; color:#fff; font-size:0.7rem; padding:2px 8px;">TARGET 42 🎯</span>');
+    out.push('    <div class="fz-pte-score-hero">');
+    out.push('      <div class="fz-pte-score-gauge">');
+    out.push('        <svg viewBox="0 0 88 88" aria-hidden="true">');
+    out.push('          <circle cx="44" cy="44" r="37" fill="none" stroke="#E2E8F0" stroke-width="7"/>');
+    out.push('          <circle cx="44" cy="44" r="37" fill="none" stroke="' + strokeCol + '" stroke-width="7" stroke-linecap="round" stroke-dasharray="' + ringDash + ' ' + ringCirc + '"/>');
+    out.push('        </svg>');
+    out.push('        <div class="fz-pte-score-gauge-center">');
+    out.push('          <span class="fz-pte-score-num">' + pScore + '</span>');
+    out.push('          <span class="fz-pte-score-scale">/ 90</span>');
     out.push('        </div>');
-    out.push('        <div style="font-weight:800; font-size:0.9rem; color:' + (pass ? '#10b981' : '#f59e0b') + '; margin-top:2px;">' + esc(verdictLabel) + '</div>');
+    out.push('      </div>');
+    out.push('      <div class="fz-pte-score-summary">');
+    out.push('        <div class="fz-pte-score-top-row">');
+    out.push('          <span class="fz-pte-score-task-label">' + esc(res.task || state.mode.toUpperCase()) + ' Score</span>');
+    out.push('        </div>');
+    out.push('        <span class="fz-pte-verdict-pill ' + verdictCls + '">' + esc(verdictLabel) + '</span>');
     if (scoreDetail) {
-      out.push('        <div style="font-size:0.8rem; color:#64748b; margin-top:2px;">' + esc(scoreDetail) + '</div>');
+      out.push('        <div style="font-size:0.78rem; color:#64748B; font-weight:600;">' + esc(scoreDetail) + '</div>');
     }
     out.push('      </div>');
     out.push('    </div>');
 
     if (res.noSpeechDetected) {
-      out.push('    <div style="background:#fee2e2; border:1.5px solid #fca5a5; color:#991b1b; padding:10px 12px; border-radius:10px; margin-top:10px; font-weight:700; font-size:0.84rem; line-height:1.45;">');
-      out.push('      ⚠️ <b>No speech detected.</b> Please check your microphone, click "Retry Question", and speak clearly.');
-      out.push('      <div style="margin-top:8px; font-weight:500; font-size:0.8rem; color:#7f1d1d;">Did your browser mic fail to record? <button type="button" class="fz-pte-text-link-btn" style="text-decoration:underline; font-weight:700; color:#b91c1c; cursor:pointer;" onclick="FiezelPteUi.toggleManualSpeechInput()">Click here to type/paste your transcript and score</button></div>');
+      out.push('    <div class="fz-pte-rs-rule-badge fail">');
+      out.push('      ' + pteIcon('alert'));
+      out.push('      <div><b>No vocal input captured.</b> Check microphone permissions and retry, or <button type="button" class="fz-pte-text-link-btn fz-plain" style="padding:0; text-decoration:underline;" onclick="FiezelPteUi.retryItem()">return to type a manual transcript</button>.</div>');
       out.push('    </div>');
     }
 
-    // Enabling Skills Breakdown
+    // Enabling Skills Telemetry
     if (res.fluency || res.pronunciation || (res.content && typeof res.content.score === 'number')) {
-      out.push('    <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px; margin-top:14px;">');
-      out.push('      <div style="font-size:0.82rem; font-weight:800; color:#475569; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.04em;">Enabling Skills Breakdown</div>');
+      out.push('    <div class="fz-pte-skills-panel">');
+      out.push('      <div class="fz-pte-skills-heading">Enabling Skills Telemetry</div>');
 
       if (res.content && typeof res.content.score === 'number') {
         var cPct = Math.min(100, Math.round((res.content.score / (res.content.max || 3)) * 100));
-        out.push('      <div style="margin-bottom:8px;">');
-        out.push('        <div style="display:flex; justify-content:space-between; font-size:0.8rem; font-weight:700; color:#334155;"><span>Content:</span> <span>' + res.content.score + ' / ' + res.content.max + ' (' + cPct + '%)</span></div>');
-        out.push('        <div style="width:100%; height:6px; background:#e2e8f0; border-radius:999px; overflow:hidden; margin-top:3px;"><div style="width:' + cPct + '%; height:100%; background:#0284c7;"></div></div>');
+        out.push('      <div class="fz-pte-skill-bar-row">');
+        out.push('        <div class="fz-pte-skill-bar-head"><span>Content Accuracy</span><span>' + res.content.score + ' / ' + res.content.max + ' (' + cPct + '%)</span></div>');
+        out.push('        <div class="fz-pte-skill-track"><div class="fz-pte-skill-fill" style="width:' + cPct + '%; background:#0F172A;"></div></div>');
         out.push('      </div>');
       }
 
       if (res.fluency) {
         var fDisplay = typeof res.fluency.exactScore === 'number' ? res.fluency.exactScore.toFixed(1) : String(res.fluency.score);
         var fPct = Math.min(100, Math.round(((typeof res.fluency.exactScore === 'number' ? res.fluency.exactScore : res.fluency.score) / 5) * 100));
-        var fBarColor = res.fluency.score >= 4 ? '#10b981' : (res.fluency.score >= 3 ? '#f59e0b' : '#ef4444');
+        var fBarColor = res.fluency.score >= 4 ? '#0F766E' : (res.fluency.score >= 3 ? '#D97706' : '#DC2626');
         var fMetaParts = [];
         if (res.fluency.wpm > 0) fMetaParts.push(res.fluency.wpm + ' WPM');
         if (typeof res.fluency.activeSpeechSec === 'number' && typeof res.fluency.spanDurationSec === 'number' && res.fluency.activeSpeechSec > 0 && !res.fluency.isEstimatedTiming) {
@@ -1357,91 +1364,87 @@
         if (!res.fluency.isEstimatedTiming && typeof res.fluency.pausesCount === 'number') {
           fMetaParts.push(ptePick('{count} pauses >=0.7s', '{count} jeda >=0.7d', { count: (fNoticeablePauses > 0 ? fNoticeablePauses : res.fluency.pausesCount) }));
         }
-        if (res.fluency.disfluencyCount > 0) fMetaParts.push(res.fluency.disfluencyCount + ' filler');
-        if (res.fluency.selfCorrectionCount > 0) fMetaParts.push(ptePick('{count} corrections', '{count} koreksi', { count: res.fluency.selfCorrectionCount }));
+        if (res.fluency.disfluencyCount > 0) fMetaParts.push(res.fluency.disfluencyCount + ' fillers');
+        if (res.fluency.selfCorrectionCount > 0) fMetaParts.push(ptePick('{count} restarts', '{count} koreksi', { count: res.fluency.selfCorrectionCount }));
         var fReasonText = Array.isArray(res.fluency.reasons) && res.fluency.reasons.length > 0
           ? res.fluency.reasons.slice(0, 2).join(' · ')
           : '';
-        out.push('      <div style="margin-bottom:8px;">');
-        out.push('        <div style="display:flex; justify-content:space-between; font-size:0.8rem; font-weight:700; color:#334155;"><span>Oral Fluency:</span> <span>' + fDisplay + ' / 5 (' + esc(res.fluency.label || '') + ')</span></div>');
-        out.push('        <div style="width:100%; height:6px; background:#e2e8f0; border-radius:999px; overflow:hidden; margin-top:3px;"><div style="width:' + fPct + '%; height:100%; background:' + fBarColor + ';"></div></div>');
+        out.push('      <div class="fz-pte-skill-bar-row">');
+        out.push('        <div class="fz-pte-skill-bar-head"><span>Oral Fluency</span><span>' + fDisplay + ' / 5 · ' + esc(res.fluency.label || '') + '</span></div>');
+        out.push('        <div class="fz-pte-skill-track"><div class="fz-pte-skill-fill" style="width:' + fPct + '%; background:' + fBarColor + ';"></div></div>');
         if (fMetaParts.length > 0 || fReasonText) {
-          out.push('        <div style="font-size:0.72rem; color:#64748b; margin-top:3px;">' + esc(fMetaParts.join(' · ')) + (fReasonText ? ' — ' + esc(fReasonText) : '') + '</div>');
+          out.push('        <div class="fz-pte-skill-meta">' + esc(fMetaParts.join(' · ')) + (fReasonText ? ' — ' + esc(fReasonText) : '') + '</div>');
         }
         out.push('      </div>');
       }
 
       if (res.pronunciation) {
         var pPct = Math.min(100, Math.round((res.pronunciation.score / 5) * 100));
-        out.push('      <div>');
-        out.push('        <div style="display:flex; justify-content:space-between; font-size:0.8rem; font-weight:700; color:#334155;"><span>Pronunciation:</span> <span>' + res.pronunciation.score + ' / 5 (' + esc(res.pronunciation.label || '') + ')</span></div>');
-        out.push('        <div style="width:100%; height:6px; background:#e2e8f0; border-radius:999px; overflow:hidden; margin-top:3px;"><div style="width:' + pPct + '%; height:100%; background:#8b5cf6;"></div></div>');
+        out.push('      <div class="fz-pte-skill-bar-row">');
+        out.push('        <div class="fz-pte-skill-bar-head"><span>Pronunciation</span><span>' + res.pronunciation.score + ' / 5 · ' + esc(res.pronunciation.label || '') + '</span></div>');
+        out.push('        <div class="fz-pte-skill-track"><div class="fz-pte-skill-fill" style="width:' + pPct + '%; background:#0284C7;"></div></div>');
         out.push('      </div>');
       }
       out.push('    </div>');
     }
 
-    // Repeat Sentence (RS) Insight
     if (state.mode === 'rs') {
       var meets50 = res.content && res.content.meets50PercentRule;
       out.push('    <div class="fz-pte-rs-rule-badge ' + (meets50 ? 'pass' : 'fail') + '">');
-      out.push('      <span>' + (meets50 ? '✅ Nakul 50% Rule Satisfied:' : '⚠️ Below 50% Rule Target:') + '</span>');
-      out.push('      <span>' + (meets50 ? 'Repeated ≥50% words with smooth delivery. 2/3 Content + Fluency marks secured!' : 'Aim to capture at least first 5-6 words fluently without pausing!') + '</span>');
+      out.push('      <span>' + (meets50 ? '✓ 50% Sequence Rule Met — ' : 'Below 50% Sequence Target — ') + (meets50 ? 'Smooth delivery secured key oral fluency & listening marks.' : 'Aim to capture the first 5–6 words fluently without pausing.') + '</span>');
       out.push('    </div>');
-
-      out.push('    <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:10px 12px; margin-top:10px; font-size:0.84rem; line-height:1.5;">');
-      out.push('      <div style="margin-bottom:4px;"><b>Original Sentence:</b> <span style="color:#0369a1;">' + esc((item && item.sentence) || '') + '</span></div>');
-      out.push('      <div><b>You Spoke:</b> <span style="color:' + (res.studentTranscript ? '#0f172a' : '#ef4444') + ';">' + esc(res.studentTranscript || '(no speech detected)') + '</span></div>');
+      out.push('    <div class="fz-pte-transcript-card">');
+      out.push('      <div><b>Reference Prompt:</b> <span style="color:#0F766E;">' + esc((item && item.sentence) || '') + '</span></div>');
+      out.push('      <div><b>Your Speech:</b> <span>' + esc(res.studentTranscript || '(no speech detected)') + '</span></div>');
       out.push('    </div>');
     }
 
-    // Write from Dictation (WFD) Insight
     if (state.mode === 'wfd') {
       if (res.extraWordsHackDetected) {
-        out.push('    <div class="fz-pte-hack-badge">💡 <b>Nakul Extra Words Hack Active:</b> Detected pairs: ' + esc((res.variantPairs || []).join(', ')) + '. Pearson awards matching words without penalizing extras!</div>');
+        out.push('    <div class="fz-pte-hack-badge">' + pteIcon('spark') + '<div><b>Variant Pair Detected:</b> ' + esc((res.variantPairs || []).join(', ')) + '</div></div>');
       }
-      out.push('    <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:10px 12px; margin-top:10px; font-size:0.84rem; line-height:1.5;">');
-      out.push('      <div style="margin-bottom:4px;"><b>Target Sentence:</b> <span style="color:#0369a1;">' + esc((item && item.sentence) || '') + '</span></div>');
-      out.push('      <div style="margin-bottom:6px;"><b>Your Submission:</b> <span style="color:#0f172a;">' + esc(res.studentAnswer || '') + '</span></div>');
+      out.push('    <div class="fz-pte-transcript-card">');
+      out.push('      <div><b>Target Sentence:</b> <span style="color:#0F766E;">' + esc((item && item.sentence) || '') + '</span></div>');
+      out.push('      <div><b>Your Submission:</b> <span>' + esc(res.studentAnswer || '') + '</span></div>');
       if (res.content && Array.isArray(res.content.matchedWords) && res.content.matchedWords.length > 0) {
-        out.push('      <div style="color:#15803d; font-size:0.8rem;"><b>Matched Words (' + res.content.matchedWords.length + '):</b> ' + esc(res.content.matchedWords.join(', ')) + '</div>');
+        out.push('      <div style="color:#15803D; font-size:0.78rem;"><b>Matched (' + res.content.matchedWords.length + '):</b> ' + esc(res.content.matchedWords.join(', ')) + '</div>');
       }
       if (res.content && Array.isArray(res.content.missedWords) && res.content.missedWords.length > 0) {
-        out.push('      <div style="color:#b91c1c; font-size:0.8rem; margin-top:2px;"><b>Missed Words (' + res.content.missedWords.length + '):</b> ' + esc(res.content.missedWords.join(', ')) + '</div>');
+        out.push('      <div style="color:#DC2626; font-size:0.78rem;"><b>Missed (' + res.content.missedWords.length + '):</b> ' + esc(res.content.missedWords.join(', ')) + '</div>');
       }
       out.push('    </div>');
     }
 
-    // Describe Image (DI) Insight
     if (state.mode === 'di') {
       var dSec = res.durationSec || 0;
       var inZone = dSec >= 25 && dSec <= 28;
       out.push('    <div class="fz-pte-rs-rule-badge ' + (inZone ? 'pass' : 'fail') + '">');
-      out.push('      <span>' + (inZone ? '✅ Optimal Duration Zone Hit:' : '⏱ Duration Report:') + '</span>');
-      out.push('      <span>Spoke for ' + dSec + 's. (Nakul Optimal Zone: 25–28 seconds).</span>');
+      out.push('      <span>' + (inZone ? '✓ Optimal Duration Zone Hit (' + dSec + 's)' : 'Spoke for ' + dSec + 's · Aim for 25–28s optimal fluency window') + '</span>');
       out.push('    </div>');
-      if (Array.isArray(res.matchedKeywords) && res.matchedKeywords.length > 0) {
-        out.push('    <div style="font-size:0.8rem; color:#0369a1; margin-top:8px;"><b>Keywords Captured:</b> ' + esc(res.matchedKeywords.join(', ')) + '</div>');
-      }
-      if (Array.isArray(res.templateMarkersDetected) && res.templateMarkersDetected.length > 0) {
-        out.push('    <div style="font-size:0.8rem; color:#15803d; margin-top:4px;"><b>Template Lines Detected:</b> ' + esc(res.templateMarkersDetected.join(', ')) + '</div>');
+      if ((Array.isArray(res.matchedKeywords) && res.matchedKeywords.length > 0) || (Array.isArray(res.templateMarkersDetected) && res.templateMarkersDetected.length > 0)) {
+        out.push('    <div class="fz-pte-transcript-card">');
+        if (Array.isArray(res.matchedKeywords) && res.matchedKeywords.length > 0) {
+          out.push('      <div><b>Keywords Captured:</b> <span style="color:#0F766E;">' + esc(res.matchedKeywords.join(', ')) + '</span></div>');
+        }
+        if (Array.isArray(res.templateMarkersDetected) && res.templateMarkersDetected.length > 0) {
+          out.push('      <div><b>Structure Markers:</b> <span>' + esc(res.templateMarkersDetected.join(', ')) + '</span></div>');
+        }
+        out.push('    </div>');
       }
     }
 
-    // Read Aloud (RA) Insight
     if (state.mode === 'ra') {
-      out.push('    <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:10px 12px; margin-top:10px; font-size:0.84rem; line-height:1.5;">');
-      out.push('      <div><b>Word Error Rate (WER):</b> ' + (typeof res.wer === 'number' ? Math.round(res.wer * 100) + '%' : '0%') + '</div>');
-      out.push('      <div><b>Pace:</b> ' + (res.durationSec || 0) + 's (Target: 12–14s steady rhythm)</div>');
+      out.push('    <div class="fz-pte-transcript-card">');
+      out.push('      <div style="display:flex; gap:16px; flex-wrap:wrap;"><span><b>Word Error Rate:</b> ' + (typeof res.wer === 'number' ? Math.round(res.wer * 100) + '%' : '0%') + '</span><span><b>Duration:</b> ' + (res.durationSec || 0) + 's (Target 12–14s)</span></div>');
       if (res.studentTranscript) {
-        out.push('      <div style="margin-top:6px;"><b>Transcribed Speech:</b> <span style="color:#334155;">' + esc(res.studentTranscript) + '</span></div>');
+        out.push('      <div><b>Transcribed Speech:</b> <span style="color:#475569;">' + esc(res.studentTranscript) + '</span></div>');
       }
       out.push('    </div>');
     }
 
-    out.push('    <div class="fz-pte-action-dock" style="margin-top:16px;">');
-    out.push('      <button type="button" class="fz-pte-btn-primary" onclick="FiezelPteUi.retryItem()">Retry Question ↺</button>');
-    out.push('      <button type="button" class="fz-pte-btn-secondary" onclick="FiezelPteUi.nextItem()">Next Question ➔</button>');
+    out.push('    <div class="fz-pte-action-dock">');
+    out.push('      <button type="button" class="fz-pte-btn-primary fz-plain" onclick="FiezelPteUi.retryItem()">' + pteIcon('refresh') + '<span>Retry Question</span></button>');
+    out.push('      <button type="button" class="fz-pte-btn-secondary fz-plain" onclick="FiezelPteUi.nextItem()"><span>Next</span>' + pteIcon('arrowR') + '</button>');
     out.push('    </div>');
 
     out.push('  </div>');

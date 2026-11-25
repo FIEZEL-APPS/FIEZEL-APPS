@@ -107,21 +107,6 @@ export interface WhiteboardScenePlan {
   sourcePages: SourceMaterialPage[];
 }
 
-function readLocalGeminiApiKey(): string {
-  try {
-    if (typeof window === 'undefined') return '';
-    return (
-      localStorage.getItem('GEMINI_API_KEY') ||
-      localStorage.getItem('gemini_api_key') ||
-      localStorage.getItem('fiezel_gemini_api_key') ||
-      localStorage.getItem('GOOGLE_API_KEY') ||
-      ''
-    ).trim();
-  } catch {
-    return '';
-  }
-}
-
 function cleanBoardDisplayText(val: unknown): string {
   return cleanBoardDisplayTextSsot(val);
 }
@@ -180,10 +165,9 @@ function normalizeTableRows(rawRows: unknown): string[][] | undefined {
 
 /**
  * Compiler real-time Client/Worker untuk papan tulis zero-template.
- * Prioritas:
- * 1. Backend Worker `/api/voice/partner-turn` (candidate bases: localhost same-origin atau api.fiezel.my.id)
- * 2. Fallback lokal langsung ke Gemini REST API (`gemini-3.5-flash-lite`) jika user menyimpan GEMINI_API_KEY lokal
- * 3. Fallback ke `https://api.fiezel.my.id/api/voice/partner-turn` apabila server statis localhost tanpa API proxy
+ * Seluruh kredensial AI dikelola terpusat di backend Worker FIEZEL:
+ * 1. Backend Worker `/api/voice/whiteboard-stream` (SSE real-time opener + full board)
+ * 2. Fallback JSON `/api/voice/partner-turn` melalui kandidat endpoint resmi FIEZEL
  */
 export interface WhiteboardFollowUpContext {
   topicTitle?: string;
@@ -293,86 +277,7 @@ export async function requestRealtimeWhiteboardAction(params: {
     }
   }
 
-  // 2. Di mode lokal tanpa backend proxy: coba kunci Gemini lokal user jika tersedia
-  const localGeminiKey = readLocalGeminiApiKey();
-  if (localGeminiKey.length > 10) {
-    try {
-      const LOCALE_LABELS: Record<string, string> = {
-    en: 'English',
-    id: 'Indonesian',
-    th: 'Thai',
-    ja: 'Japanese',
-    vi: 'Vietnamese',
-    ms: 'Malay',
-    fil: 'Filipino',
-    km: 'Khmer',
-    ru: 'Russian',
-    zh: 'Chinese',
-  };
-  const targetLocaleName = LOCALE_LABELS[locale] || 'English';
-      const wantsVisualSwitch = isVisualSwitchRequestText(cleanQuestion);
-      const activeVisualDesc = boardContext?.currentVisualKinds?.length
-        ? `${boardContext.currentVisualKinds.join(', ')}${boardContext.currentVisualSummary ? ` (${boardContext.currentVisualSummary})` : ''}`
-        : '';
-      const followUpHint = boardContext
-        ? [
-            `FOLLOW-UP CONTEXT ON OPEN WHITEBOARD: Learner was studying "${boardContext.topicTitle || ''}"${boardContext.patternFormula ? ` (${boardContext.patternFormula})` : ''}.`,
-            boardContext.summary ? `Prior explanation: "${boardContext.summary}".` : '',
-            activeVisualDesc ? `Currently shown visuals on board: ${activeVisualDesc}.` : '',
-            boardContext.areaExcerpt ? `Learner circled specifically: "${boardContext.areaExcerpt}".` : '',
-            wantsVisualSwitch
-              ? `MANDATORY VISUAL SWITCH: Learner explicitly asked for a DIFFERENT visual! You MUST NOT reuse the previous layout (${activeVisualDesc || 'same diagram'}). Switch to a genuinely DIFFERENT, crystal-clear visual representation (e.g., timeline_track, mind_map, contrast_scale, formula_blocks, syntax_flow, or multi-zone rough_scene with full labels, explanations, and examples).`
-              : `Bridge directly to why they are still confused and explain clearly from zero with concrete examples and unambiguous diagram labels.`,
-          ].filter(Boolean).join(' ')
-        : '';
-      const prompt = [
-        `You are ${personaName}, a patient interactive beginner tutor drawing live on a whiteboard in ${targetLocaleName}.`,
-        `Course: ${targetLang.toUpperCase()}. Exact learner question: "${question}".`,
-        followUpHint,
-        `AUDIO-FIRST, ZERO-AMBIGUITY & VISUAL-FIRST RULE: Never output vague placeholder labels ("Pola Pertama", "Pola Kedua", "Sisi A", "Visualisasi Lokasi") or oversimplified slogans ("to be hanya kata sifat"). Every box/panel/branch in step[2] MUST have a real rule title, a plain beginner explanation (10-20 words telling WHEN & WHY), and a real example phrase with translation! Keep Step 1 bullets complete and unambiguous (3-4 rules, 15-25 words each). For To Be vs Verb, explicitly teach Adj, Noun/Lokasi, Verb ing, and Verb 3 vs Verb 1. Match Step 2 "spokenNarration" (3-5 calm sentences, ~55-85 words) 1:1 left-to-right to every visual element drawn on Step 2.`,
-        `SHAPE & BOX HYGIENE: NEVER put empty parentheses "()" or unlabeled empty boxes in shapes. Every rect/circle/ellipse MUST have a clear short label (1-4 words) + sublabel inside roomy non-overlapping coords (x:24..536, y:20..225 of width:560 height:250, >=24px gaps).`,
-        `Produce a 100% UNIQUE, ZERO-TEMPLATE JSON teaching board tailored ONLY to "${question}".`,
-        `Must include "whiteboardSteps" (5-6 steps across "left" and "right", phaseIndex 0..4) with calm natural multi-sentence "spokenNarration" per step, AND "phaseLabels" (5 labels), sampleTarget, trapWrongSentence, trapWrongReason, drillMeaningPrompt, drillTargetSentence, drillTrapSentence, plus "drillDistractors" (2-3 plausible wrong word forms for the key word of drillTargetSentence).`,
-        `Step kinds: step[0] "heading" (title, text, spokenNarration), step[1] "note" (title, bullets[3-4]), step[2] ONE visual (pick exactly one kind: contrast_scale | syntax_flow | mind_map | timeline_track | formula_blocks | rough_scene, filling only that kind's fields), step[3] "table" (tableHeaders, tableRows), step[4] "trap_vs_fix" (wrongText, rightText, reason), step[5] "highlight_callout" (highlightPhrase).`,
-        `Return ONLY valid JSON shaped like: {"aiReply":"...","uiAction":{"actionType":"open_learning_popup","topicTitle":"...","focusType":"grammar","patternFormula":"...","coachSpokenScript":"...","explanationText":"...","sampleTarget":"...","trapWrongSentence":"...","trapWrongReason":"...","drillMeaningPrompt":"...","drillTargetSentence":"...","drillTrapSentence":"...","drillDistractors":["...","..."],"phaseLabels":["0 Mulai","1 Logika","2 Visual","3 Contoh","4 Latihan"],"whiteboardSteps":[{"id":"s0","kind":"heading","column":"left","phaseIndex":0,"title":"...","text":"...","spokenNarration":"..."},{"id":"s1","kind":"note","column":"left","phaseIndex":1,"title":"...","bullets":["...","...","..."],"spokenNarration":"..."}]}} and continue whiteboardSteps through step[5]. NEVER return an empty whiteboardSteps array.`,
-      ].filter(Boolean).join('\n');
-
-      const controller = new AbortController();
-      const t = window.setTimeout(() => controller.abort(), 24000);
-      const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${encodeURIComponent(localGeminiKey)}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ role: 'user', parts: [{ text: prompt }] }],
-            generationConfig: { responseMimeType: 'application/json', temperature: 0.35, thinkingConfig: { thinkingBudget: 0 } },
-          }),
-          signal: controller.signal,
-        }
-      );
-      window.clearTimeout(t);
-      if (res.ok) {
-        const json = await res.json();
-        const rawText = json?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-        const parsed = JSON.parse(rawText);
-        if (parsed?.uiAction) {
-          return {
-            uiAction: {
-              ...parsed.uiAction,
-              actionType: 'open_learning_popup',
-              sourceLayer: 'ai_dynamic',
-            },
-            aiReply: parsed.aiReply || parsed.uiAction?.explanationText || '',
-          };
-        }
-      }
-    } catch {
-      // Abaikan jika gagal
-    }
-  }
-
-  // 3. Jika running lokal tanpa server proxy (/api/* 404) & tanpa GEMINI_API_KEY, coba api.fiezel.my.id jika online
+  // 2. Jika running lokal tanpa server proxy (/api/* 404), coba api.fiezel.my.id melalui sesi Worker resmi (tanpa pernah menaruh API key di browser!)
   if (isLocalHost) {
     try {
       const prodBase = 'https://api.fiezel.my.id';
@@ -1571,7 +1476,14 @@ function synthesizeTopicSpecificScene(
         subtitle: /am|is|are|to\s*be|sifat|status|kondisi/i.test(leftTerm)
           ? 'Untuk kondisi, sifat, profesi, atau Verb ing / Verb 3'
           : cleanBoardDisplayText(boardState.patternFormula || `Aturan penggunaan "${leftTerm}" secara tepat dalam kalimat.`),
-        example: wrongSentence || sampleSentence || undefined,
+        example: /hindari|salah|keliru|trap|wrong|✕|×/i.test(leftTerm)
+          ? wrongSentence
+            ? `✕ ${wrongSentence}`
+            : undefined
+          : boardState.pairData?.exampleA ||
+            (sampleSentence && /,\s*(?:so|and|but)\s+/i.test(sampleSentence)
+              ? `${sampleSentence.split(/,\s*(?:so|and|but)\s+/i)[0].trim().replace(/[.,]+$/, '')}.`
+              : sampleSentence || undefined),
         icon: isCamVid ? 'camera' : theme === 'key_and_lock' ? 'key' : 'star',
         accentColor: '#0369A1',
         bgColor: '#E0F2FE',
@@ -1582,7 +1494,14 @@ function synthesizeTopicSpecificScene(
         subtitle: /do|does|did|aksi|aktivitas|kerja/i.test(rightTerm)
           ? 'Memakai kata kerja aktif (Verb 1) untuk kebiasaan atau aksi'
           : cleanBoardDisplayText(sampleSentence || `Pola pembanding "${rightTerm}" beserta konteks pemakaiannya.`),
-        example: sampleSentence || undefined,
+        example:
+          boardState.pairData?.exampleB ||
+          (sampleSentence && /,\s*(?:so|and|but)\s+/i.test(sampleSentence)
+            ? (() => {
+                const rhs = sampleSentence.split(/,\s*(?:so|and|but)\s+/i)[1]?.trim() || '';
+                return rhs ? rhs.charAt(0).toUpperCase() + rhs.slice(1) : sampleSentence;
+              })()
+            : sampleSentence || undefined),
         icon: isCamVid ? 'video' : theme === 'key_and_lock' ? 'lock' : 'bolt',
         accentColor: '#15803D',
         bgColor: '#DCFCE7',
@@ -1634,31 +1553,60 @@ function synthesizeTopicSpecificScene(
     const rawBullets = splitExplanationIntoBullets(boardState.coachExplanation, boardState.patternFormula).slice(0, 4);
     const branchColors = ['#0EA5E9', '#10B981', '#F59E0B', '#EC4899'];
     const branchIcons = ['star', 'bolt', 'chat', 'target'];
+    const splitBulletHeadingAndBody = (bullet: string, idx: number): { label: string; sublabel: string } => {
+      const normalized = cleanBoardDisplayText(bullet).replace(/([A-Za-z])-([A-Za-z])/g, '$1 — $2');
+      const colonIdx = normalized.indexOf(':');
+      if (colonIdx > 2 && colonIdx <= 28) {
+        const head = truncateDiagramLabel(normalized.slice(0, colonIdx), 28);
+        const body = normalized.slice(colonIdx + 1).trim();
+        if (head && body) {
+          return {
+            label: head,
+            sublabel: truncateDiagramLabel(body.charAt(0).toUpperCase() + body.slice(1), 115),
+          };
+        }
+      }
+      const words = normalized.split(/\s+/).filter(Boolean);
+      const rawLead = words
+        .slice(0, 3)
+        .join(' ')
+        .replace(/[.,;!?]+$/, '')
+        .replace(/\s+\b(?:tanpa|dengan|untuk|pada|dari|dalam|ke|di|oleh|yang|dan|atau|without|with|for|from|into|and|or)$/i, '')
+        .trim();
+      const shortLead = truncateDiagramLabel(rawLead, 26);
+      return {
+        label: shortLead || wbPick(`Point ${idx + 1}`, `Poin ${idx + 1}`),
+        sublabel: truncateDiagramLabel(normalized, 115),
+      };
+    };
     const branches =
       rawBullets.length >= 2
-        ? rawBullets.map((b, i) => ({
-            label: truncateDiagramLabel(b.split(/[:—–-]/)[0] || `Cabang ${i + 1}`, 22),
-            sublabel: truncateDiagramLabel(b, 48),
-            example: i === 0 && sampleSentence ? sampleSentence : undefined,
-            icon: branchIcons[i % branchIcons.length],
-            color: branchColors[i % branchColors.length],
-          }))
+        ? rawBullets.map((b, i) => {
+            const pair = splitBulletHeadingAndBody(b, i);
+            return {
+              label: pair.label,
+              sublabel: pair.sublabel,
+              example: i === 0 && sampleSentence ? sampleSentence : undefined,
+              icon: branchIcons[i % branchIcons.length],
+              color: branchColors[i % branchColors.length],
+            };
+          })
         : [
             {
-              label: 'Kapan Dipakai',
-              sublabel: truncateDiagramLabel(boardState.patternFormula || cleanBoardDisplayText(title), 44),
+              label: wbPick('When to Use', 'Kapan Dipakai'),
+              sublabel: truncateDiagramLabel(boardState.patternFormula || cleanBoardDisplayText(title), 88),
               icon: 'clock',
               color: '#0EA5E9',
             },
             {
-              label: 'Contoh Alami',
+              label: wbPick('Natural Example', 'Contoh Alami'),
               sublabel: sampleSentence || cleanBoardDisplayText(title),
               icon: 'check',
               color: '#10B981',
             },
             {
-              label: 'Hindari Jebakan',
-              sublabel: wrongSentence || 'Cek subjek & kata kerja',
+              label: wbPick('Avoid Traps', 'Hindari Jebakan'),
+              sublabel: wrongSentence || wbPick('Check subject & verb form', 'Cek subjek & kata kerja'),
               icon: 'warn',
               color: '#EF4444',
             },
@@ -1668,9 +1616,9 @@ function synthesizeTopicSpecificScene(
       kind: 'mind_map',
       column: 'left',
       phaseIndex: 2,
-      title: `Peta Pikiran: ${cleanBoardDisplayText(title).slice(0, 38)}`,
+      title: `${wbPick('Concept Map', 'Peta Pikiran')}: ${truncateDiagramLabel(cleanBoardDisplayText(title), 44)}`,
       caption: cleanBoardDisplayText(boardState.patternFormula || title),
-      metaphorCenterLabel: truncateDiagramLabel(cleanBoardDisplayText(title), 24) || 'Topik Inti',
+      metaphorCenterLabel: truncateDiagramLabel(cleanBoardDisplayText(title).replace(/^[A-Za-z]+:\s*/, ''), 28) || wbPick('Core Topic', 'Topik Inti'),
       highlightTerms: [sampleSentence, cleanBoardDisplayText(title)].filter(Boolean),
       branches,
     };
@@ -1951,9 +1899,26 @@ function truncateDiagramLabel(text: string, maxLen = 28): string {
   const cleaned = cleanBoardDisplayText(text).replace(/\s+/g, ' ').trim();
   if (!cleaned) return '';
   if (cleaned.length <= maxLen) return cleaned;
-  const sliced = cleaned.slice(0, maxLen - 1).trim();
-  const lastSpace = sliced.lastIndexOf(' ');
-  return (lastSpace > Math.floor(maxLen * 0.55) ? sliced.slice(0, lastSpace) : sliced).trim();
+  // Never slice inside a word: build whole words up to maxLen and strip dangling connectors/symbols
+  const words = cleaned.split(' ');
+  let out = '';
+  for (const w of words) {
+    const next = out ? `${out} ${w}` : w;
+    if (next.length <= maxLen) {
+      out = next;
+    } else {
+      break;
+    }
+  }
+  if (!out) {
+    out = words[0].slice(0, maxLen);
+  }
+  out = out
+    .replace(/[\s&+•,:;—–/\\-]+$/g, '')
+    .replace(/\s+\b(?:dan|atau|yang|untuk|di|ke|dari|dengan|tanpa|tentang|seperti|agar|supaya|saat|ketika|pada|oleh|and|or|to|of|in|for|with|without|about|from|by|a|an|the)$/i, '')
+    .replace(/[\s&+•,:;—–/\\-]+$/g, '')
+    .trim();
+  return out || words[0].slice(0, maxLen);
 }
 
 function synthesizeAlternativeVisualStep(params: {
@@ -2876,7 +2841,7 @@ export function buildWhiteboardScenePlan(params: {
             kind: 'checkpoint',
             column: rightCount <= leftCount ? 'right' : 'left',
             phaseIndex: Math.max(3, phaseLabels.length - 1),
-            title: `Uji Pemahaman: ${shortTitle.slice(0, 36)}`,
+            title: `${wbPick('Quick Check', 'Uji Pemahaman')}: ${truncateDiagramLabel(shortTitle, 38)}`,
             text: boardState.quiz.prompt,
           },
           steps.length
@@ -3016,7 +2981,7 @@ export function buildWhiteboardScenePlan(params: {
             kind: 'highlight_callout',
             column: 'left',
             phaseIndex: 3,
-            title: `Poin Penting: ${shortTitle.slice(0, 34)}`,
+            title: `${wbPick('Key Point', 'Poin Penting')}: ${truncateDiagramLabel(shortTitle, 38)}`,
             text: boardState.pairData?.keyAnalogy || boardState.patternFormula,
             highlightPhrase: boardState.pairData?.keyAnalogy || boardState.patternFormula,
             highlightColor: 'rgba(125, 211, 252, 0.45)',
@@ -3417,7 +3382,7 @@ export function buildWhiteboardScenePlan(params: {
       const palette = ['#0EA5E9', '#10B981', '#8B5CF6', '#F59E0B'];
       const icons: Array<'star' | 'bolt' | 'check' | 'target'> = ['star', 'bolt', 'check', 'target'];
       const branches = tableStepForEnrich.tableRows.slice(0, 4).map((r, rIdx) => ({
-        label: cleanBoardDisplayText(r[0] || `Poin ${rIdx + 1}`).slice(0, 32),
+        label: truncateDiagramLabel(cleanBoardDisplayText(r[0] || `Poin ${rIdx + 1}`), 32),
         sublabel: cleanBoardDisplayText(r[2] || r[1] || noteStepForEnrich?.bullets?.[rIdx] || ''),
         example: cleanBoardDisplayText(r[1] || sampleSentenceGlobal || ''),
         color: palette[rIdx % palette.length],
@@ -3427,8 +3392,8 @@ export function buildWhiteboardScenePlan(params: {
         ...st,
         kind: 'mind_map' as const,
         sceneTheme: undefined,
-        metaphorCenterLabel: cleanBoardDisplayText(shortTitle).slice(0, 28) || 'Peta Konsep Inti',
-        title: `Peta Konsep: ${cleanBoardDisplayText(shortTitle).slice(0, 38)}`,
+        metaphorCenterLabel: truncateDiagramLabel(cleanBoardDisplayText(shortTitle), 28) || wbPick('Core Concept', 'Peta Konsep Inti'),
+        title: `${wbPick('Concept Map', 'Peta Konsep')}: ${truncateDiagramLabel(cleanBoardDisplayText(shortTitle), 40)}`,
         branches,
         spokenNarration: '',
       };
@@ -3451,14 +3416,14 @@ export function buildWhiteboardScenePlan(params: {
       const icons: Array<'star' | 'bolt' | 'check' | 'target'> = ['star', 'bolt', 'check', 'target'];
       const branches =
         tableStepForEnrich?.tableRows?.slice(0, 4).map((r, rIdx) => ({
-          label: cleanBoardDisplayText(r[0] || `Poin ${rIdx + 1}`).slice(0, 28),
+          label: truncateDiagramLabel(cleanBoardDisplayText(r[0] || `Poin ${rIdx + 1}`), 30),
           sublabel: cleanBoardDisplayText(r[2] || r[1] || noteStepForEnrich?.bullets?.[rIdx] || ''),
           example: cleanBoardDisplayText(r[1] || sampleSentenceGlobal || ''),
           color: palette[rIdx % palette.length],
           icon: icons[rIdx % icons.length],
         })).filter((b) => b.label) ||
         noteStepForEnrich?.bullets?.slice(0, 4).map((b, bIdx) => ({
-          label: `Aturan ${bIdx + 1}`,
+          label: wbPick(`Rule ${bIdx + 1}`, `Aturan ${bIdx + 1}`),
           sublabel: cleanBoardDisplayText(b),
           example: bIdx === 0 ? cleanBoardDisplayText(sampleSentenceGlobal) : undefined,
           color: palette[bIdx % palette.length],
@@ -3469,8 +3434,8 @@ export function buildWhiteboardScenePlan(params: {
           ...st,
           kind: 'mind_map' as const,
           sceneTheme: undefined,
-          metaphorCenterLabel: cleanBoardDisplayText(shortTitle).slice(0, 28) || 'Peta Konsep Inti',
-          title: `Peta Konsep Jelas: ${cleanBoardDisplayText(shortTitle).slice(0, 36)}`,
+          metaphorCenterLabel: truncateDiagramLabel(cleanBoardDisplayText(shortTitle), 28) || wbPick('Core Concept', 'Peta Konsep Inti'),
+          title: `${wbPick('Concept Map', 'Peta Konsep Jelas')}: ${truncateDiagramLabel(cleanBoardDisplayText(shortTitle), 38)}`,
           branches,
           spokenNarration: '',
         };
@@ -3505,9 +3470,12 @@ export function buildWhiteboardScenePlan(params: {
         repaired = true;
       }
       if (!st.leftPanel.example) {
+        const isLeftTrap = /hindari|salah|keliru|trap|wrong|✕|×/i.test(
+          `${st.leftPanel.badge || ''} ${st.leftPanel.title || ''}`
+        );
         const exA = cleanBoardDisplayText(
           tableStepForEnrich?.tableRows?.[0]?.[1] ||
-          trapStepForEnrich?.wrongText ||
+          (isLeftTrap && trapStepForEnrich?.wrongText ? `✕ ${trapStepForEnrich.wrongText}` : '') ||
           sampleSentenceGlobal
         );
         if (exA) {

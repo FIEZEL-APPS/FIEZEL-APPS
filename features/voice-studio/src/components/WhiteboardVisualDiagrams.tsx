@@ -222,16 +222,20 @@ const ZoomInspectButton: React.FC<{ onClick?: () => void }> = ({ onClick }) => {
         onClick();
       }}
       className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-white/95 hover:bg-[#EFF6FF] border border-[#CBD5E1] text-[10.5px] font-bold text-[#1E40AF] shadow-xs transition-transform active:scale-95 cursor-pointer"
-      title={wbPick('Enlarge diagram for a closer view', 'Perbesar visual ini untuk melihat lebih jelas')}
+      title={wbPick('Enlarge diagram for a closer view', 'Perbesar visual ini untuk melihat lebih jelas', 'ขยายแผนภาพให้ชัดเจนขึ้น')}
     >
-      <span>🔍</span>
-      <span>{wbPick('Zoom', 'Perbesar')}</span>
+      <svg viewBox="0 0 20 20" className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <circle cx="8.5" cy="8.5" r="5.2" />
+        <path d="M12.5 12.5L16.8 16.8M8.5 6.3v4.4M6.3 8.5h4.4" />
+      </svg>
+      <span>{wbPick('Zoom', 'Perbesar', 'ขยาย')}</span>
     </button>
   );
 };
 
 function formatHeroSvgLabel(raw: string, maxChars = 19): string {
   const cleaned = (raw || '')
+    .replace(/^(?:speaking|grammar|vocab|listening|reading|writing):\s*/i, '')
     .replace(/^(?:bedah tuntas|membedah|kupas tuntas|perbedaan|bedanya|dari nol)\s+/i, '')
     .replace(/\s+(?:dari nol|untuk pemula|secara lengkap)$/i, '')
     .replace(/\s+/g, ' ')
@@ -247,7 +251,12 @@ function formatHeroSvgLabel(raw: string, maxChars = 19): string {
       break;
     }
   }
-  return acc || cleaned.slice(0, maxChars);
+  const safe = (acc || words[0].slice(0, maxChars))
+    .replace(/[\s&+•,:;—–/\\-]+$/g, '')
+    .replace(/\s+\b(?:dan|atau|yang|untuk|and|or|to|of|in|for|with|vs\.?)$/i, '')
+    .replace(/[\s&+•,:;—–/\\-]+$/g, '')
+    .trim();
+  return safe || words[0].slice(0, maxChars);
 }
 
 /**
@@ -301,7 +310,7 @@ const MetaphorThemeHeroSvg: React.FC<{
                 {svgLeft}
               </text>
               <text x="105" y="122" textAnchor="middle" fontSize="9.5" fontWeight="700" fill="#0369A1">
-                FOTO KONDISI
+                {wbPick('STATIC STATE', 'FOTO KONDISI', 'สภาพคงที่')}
               </text>
             </g>
 
@@ -322,7 +331,7 @@ const MetaphorThemeHeroSvg: React.FC<{
                 {svgRight}
               </text>
               <text x="455" y="122" textAnchor="middle" fontSize="9.5" fontWeight="700" fill="#15803D">
-                VIDEO AKSI
+                {wbPick('ACTIVE MOTION', 'VIDEO AKSI', 'การกระทำ')}
               </text>
             </g>
           </g>
@@ -351,7 +360,7 @@ const MetaphorThemeHeroSvg: React.FC<{
               0% {svgLeft}
             </text>
             <text x="270" y="122" textAnchor="middle" fontSize="11" fontWeight="700" fill="#B45309">
-              Skala Kekuatan / Frekuensi
+              {wbPick('Intensity / Frequency Scale', 'Skala Kekuatan / Frekuensi', 'ระดับความถี่ / ความเข้ม')}
             </text>
             <text x="496" y="122" textAnchor="end" fontSize="12" fontWeight="800" fill="#047857">
               100% {svgRight}
@@ -367,44 +376,52 @@ const MetaphorThemeHeroSvg: React.FC<{
             {[160, 220, 280, 340, 400].map((px) => (
               <line key={px} x1={px} y1="64" x2={px} y2="108" stroke="#64748B" strokeWidth="2" />
             ))}
-            <rect x="26" y="34" width="144" height="50" rx="14" fill="#FEF3C7" stroke="#D97706" strokeWidth="2.4" />
-            <text x="98" y="56" textAnchor="middle" fontSize={leftFontSize} fontWeight="800" fill="#92400E">
-              {svgLeft}
-            </text>
-            <text x="98" y="73" textAnchor="middle" fontSize="9.5" fontWeight="700" fill="#B45309">
-              Titik Masa Lalu
-            </text>
-            <rect x="390" y="34" width="144" height="50" rx="14" fill="#DCFCE7" stroke="#15803D" strokeWidth="2.4" />
-            <text x="462" y="56" textAnchor="middle" fontSize={rightFontSize} fontWeight="800" fill="#14532D">
-              {svgRight}
-            </text>
-            <text x="462" y="73" textAnchor="middle" fontSize="9.5" fontWeight="700" fill="#15803D">
-              Efek Hingga Kini
-            </text>
+            <g style={{ opacity: leftOpacity, transition: 'opacity 220ms ease' }}>
+              <rect x="26" y="34" width="144" height="50" rx="14" fill="#FEF3C7" stroke={focusSide === 'left' ? '#B45309' : '#D97706'} strokeWidth={focusSide === 'left' ? 3.2 : 2.4} />
+              <text x="98" y="56" textAnchor="middle" fontSize={leftFontSize} fontWeight="800" fill="#92400E">
+                {svgLeft}
+              </text>
+              <text x="98" y="73" textAnchor="middle" fontSize="9.5" fontWeight="700" fill="#B45309">
+                {wbPick('Past Point', 'Titik Masa Lalu', 'จุดในอดีต')}
+              </text>
+            </g>
+            <g style={{ opacity: rightOpacity, transition: 'opacity 220ms ease' }}>
+              <rect x="390" y="34" width="144" height="50" rx="14" fill="#DCFCE7" stroke={focusSide === 'right' ? '#14532D' : '#15803D'} strokeWidth={focusSide === 'right' ? 3.2 : 2.4} />
+              <text x="462" y="56" textAnchor="middle" fontSize={rightFontSize} fontWeight="800" fill="#14532D">
+                {svgRight}
+              </text>
+              <text x="462" y="73" textAnchor="middle" fontSize="9.5" fontWeight="700" fill="#15803D">
+                {wbPick('Effect Until Now', 'Efek Hingga Kini', 'ผลถึงปัจจุบัน')}
+              </text>
+            </g>
           </g>
         )}
 
         {theme === 'stage_spotlight' && (
           <g>
-            <polygon points="150,18 68,134 232,134" fill={`url(#beam_${theme})`} />
-            <polygon points="410,18 328,134 492,134" fill="#DCFCE7" fillOpacity="0.65" />
-            <circle cx="150" cy="22" r="10" fill="#1E293B" />
-            <circle cx="410" cy="22" r="10" fill="#1E293B" />
-            <ellipse cx="150" cy="126" rx="78" ry="16" fill="#E0F2FE" stroke="#0284C7" strokeWidth="2" />
-            <ellipse cx="410" cy="126" rx="78" ry="16" fill="#DCFCE7" stroke="#15803D" strokeWidth="2" />
-            <text x="150" y="96" textAnchor="middle" fontSize={leftFontSize} fontWeight="800" fill="#0C4A6E">
-              {svgLeft}
-            </text>
-            <text x="410" y="96" textAnchor="middle" fontSize={rightFontSize} fontWeight="800" fill="#14532D">
-              {svgRight}
-            </text>
+            <g style={{ opacity: leftOpacity, transition: 'opacity 220ms ease' }}>
+              <polygon points="150,18 68,134 232,134" fill={`url(#beam_${theme})`} />
+              <circle cx="150" cy="22" r="10" fill="#1E293B" />
+              <ellipse cx="150" cy="126" rx="78" ry="16" fill="#E0F2FE" stroke={focusSide === 'left' ? '#0369A1' : '#0284C7'} strokeWidth={focusSide === 'left' ? 3 : 2} />
+              <text x="150" y="96" textAnchor="middle" fontSize={leftFontSize} fontWeight="800" fill="#0C4A6E">
+                {svgLeft}
+              </text>
+            </g>
+            <g style={{ opacity: rightOpacity, transition: 'opacity 220ms ease' }}>
+              <polygon points="410,18 328,134 492,134" fill="#DCFCE7" fillOpacity="0.65" />
+              <circle cx="410" cy="22" r="10" fill="#1E293B" />
+              <ellipse cx="410" cy="126" rx="78" ry="16" fill="#DCFCE7" stroke={focusSide === 'right' ? '#14532D' : '#15803D'} strokeWidth={focusSide === 'right' ? 3 : 2} />
+              <text x="410" y="96" textAnchor="middle" fontSize={rightFontSize} fontWeight="800" fill="#14532D">
+                {svgRight}
+              </text>
+            </g>
           </g>
         )}
 
         {theme === 'key_and_lock' && (
           <g>
             {/* Left Key Card */}
-            <g style={{ opacity: leftOpacity, transition: 'opacity 320ms ease' }}>
+            <g style={{ opacity: leftOpacity, transition: 'opacity 220ms ease' }}>
               <rect x="24" y="24" width="194" height="108" rx="18" fill="#FEF3C7" stroke={focusSide === 'left' ? '#B45309' : '#D97706'} strokeWidth={focusSide === 'left' ? 3.2 : 2.4} />
               <circle cx="72" cy="61" r="13" fill="#FFFFFF" stroke="#B45309" strokeWidth="2.4" />
               <circle cx="72" cy="61" r="4.8" fill="#D97706" />
@@ -424,7 +441,7 @@ const MetaphorThemeHeroSvg: React.FC<{
             </text>
 
             {/* Right Padlock Card (cleanly padded inside border with zero clipping) */}
-            <g style={{ opacity: rightOpacity, transition: 'opacity 320ms ease' }}>
+            <g style={{ opacity: rightOpacity, transition: 'opacity 220ms ease' }}>
               <rect x="342" y="24" width="194" height="108" rx="18" fill="#E0F2FE" stroke={focusSide === 'right' ? '#0369A1' : '#0284C7'} strokeWidth={focusSide === 'right' ? 3.2 : 2.4} />
               <path d="M 428 56 V 47 A 11 11 0 0 1 450 47 V 56" fill="none" stroke="#0369A1" strokeWidth="3" />
               <rect x="421" y="56" width="36" height="22" rx="5" fill="#FFFFFF" stroke="#0284C7" strokeWidth="2.2" />
@@ -447,68 +464,78 @@ const MetaphorThemeHeroSvg: React.FC<{
               <line key={rx} x1={rx} y1="128" x2={rx - 6} y2="136" stroke="#94A3B8" strokeWidth="2.2" />
             ))}
             {/* Train Car 1 (Engine) */}
-            <rect x="36" y="34" width="204" height="78" rx="16" fill="#DBEAFE" stroke="#1D4ED8" strokeWidth="2.5" />
-            <rect x="52" y="18" width="28" height="16" rx="4" fill="#93C5FD" stroke="#1D4ED8" strokeWidth="2" />
-            <circle cx="82" cy="116" r="11" fill="#1E293B" />
-            <circle cx="194" cy="116" r="11" fill="#1E293B" />
-            <text x="138" y="68" textAnchor="middle" fontSize={leftFontSize} fontWeight="800" fill="#1E3A8A">
-              {svgLeft}
-            </text>
-            <text x="138" y="90" textAnchor="middle" fontSize="10" fontWeight="700" fill="#1D4ED8">
-              {wbPick('Lead Car', 'Gerbong Awal')}
-            </text>
+            <g style={{ opacity: leftOpacity, transition: 'opacity 220ms ease' }}>
+              <rect x="36" y="34" width="204" height="78" rx="16" fill="#DBEAFE" stroke={focusSide === 'left' ? '#1E3A8A' : '#1D4ED8'} strokeWidth={focusSide === 'left' ? 3.2 : 2.5} />
+              <rect x="52" y="18" width="28" height="16" rx="4" fill="#93C5FD" stroke="#1D4ED8" strokeWidth="2" />
+              <circle cx="82" cy="116" r="11" fill="#1E293B" />
+              <circle cx="194" cy="116" r="11" fill="#1E293B" />
+              <text x="138" y="68" textAnchor="middle" fontSize={leftFontSize} fontWeight="800" fill="#1E3A8A">
+                {svgLeft}
+              </text>
+              <text x="138" y="90" textAnchor="middle" fontSize="10" fontWeight="700" fill="#1D4ED8">
+                {wbPick('Lead Car', 'Gerbong Awal')}
+              </text>
+            </g>
             {/* Coupler */}
             <line x1="242" y1="78" x2="314" y2="78" stroke="#0F172A" strokeWidth="4" />
             <polygon points="274,71 288,78 274,85" fill="#F59E0B" />
             {/* Train Car 2 */}
-            <rect x="316" y="34" width="208" height="78" rx="16" fill="#DCFCE7" stroke="#15803D" strokeWidth="2.5" />
-            <circle cx="362" cy="116" r="11" fill="#1E293B" />
-            <circle cx="478" cy="116" r="11" fill="#1E293B" />
-            <text x="420" y="68" textAnchor="middle" fontSize={rightFontSize} fontWeight="800" fill="#14532D">
-              {svgRight}
-            </text>
-            <text x="420" y="90" textAnchor="middle" fontSize="10" fontWeight="700" fill="#15803D">
-              {wbPick('Right Link', 'Sambungan Tepat')}
-            </text>
+            <g style={{ opacity: rightOpacity, transition: 'opacity 220ms ease' }}>
+              <rect x="316" y="34" width="208" height="78" rx="16" fill="#DCFCE7" stroke={focusSide === 'right' ? '#14532D' : '#15803D'} strokeWidth={focusSide === 'right' ? 3.2 : 2.5} />
+              <circle cx="362" cy="116" r="11" fill="#1E293B" />
+              <circle cx="478" cy="116" r="11" fill="#1E293B" />
+              <text x="420" y="68" textAnchor="middle" fontSize={rightFontSize} fontWeight="800" fill="#14532D">
+                {svgRight}
+              </text>
+              <text x="420" y="90" textAnchor="middle" fontSize="10" fontWeight="700" fill="#15803D">
+                {wbPick('Right Link', 'Sambungan Tepat')}
+              </text>
+            </g>
           </g>
         )}
 
         {theme === 'traffic_light' && (
           <g>
-            <rect x="26" y="28" width="184" height="100" rx="18" fill="#FEF2F2" stroke="#DC2626" strokeWidth="2.4" />
-            <text x="118" y="72" textAnchor="middle" fontSize={leftFontSize} fontWeight="800" fill="#991B1B">
-              {svgLeft}
-            </text>
-            <text x="118" y="96" textAnchor="middle" fontSize="10" fontWeight="700" fill="#DC2626">
-              {wbPick('Check Context', 'Cek Situasi')}
-            </text>
+            <g style={{ opacity: leftOpacity, transition: 'opacity 220ms ease' }}>
+              <rect x="26" y="28" width="184" height="100" rx="18" fill="#FEF2F2" stroke={focusSide === 'left' ? '#991B1B' : '#DC2626'} strokeWidth={focusSide === 'left' ? 3.2 : 2.4} />
+              <text x="118" y="72" textAnchor="middle" fontSize={leftFontSize} fontWeight="800" fill="#991B1B">
+                {svgLeft}
+              </text>
+              <text x="118" y="96" textAnchor="middle" fontSize="10" fontWeight="700" fill="#DC2626">
+                {wbPick('Check Context', 'Cek Situasi')}
+              </text>
+            </g>
             <rect x="252" y="18" width="56" height="120" rx="16" fill="#1E293B" />
-            <circle cx="280" cy="44" r="13" fill="#EF4444" />
-            <circle cx="280" cy="78" r="13" fill="#F59E0B" />
-            <circle cx="280" cy="112" r="13" fill="#22C55E" />
-            <rect x="350" y="28" width="184" height="100" rx="18" fill="#DCFCE7" stroke="#15803D" strokeWidth="2.4" />
-            <text x="442" y="72" textAnchor="middle" fontSize={rightFontSize} fontWeight="800" fill="#14532D">
-              {svgRight}
-            </text>
-            <text x="442" y="96" textAnchor="middle" fontSize="10" fontWeight="700" fill="#15803D">
-              {wbPick('Safe to Use', 'Aman Dipakai')}
-            </text>
+            <circle cx="280" cy="44" r="13" fill="#EF4444" opacity={focusSide === 'left' ? 1 : 0.45} />
+            <circle cx="280" cy="78" r="13" fill="#F59E0B" opacity={focusSide === 'none' ? 0.95 : 0.45} />
+            <circle cx="280" cy="112" r="13" fill="#22C55E" opacity={focusSide === 'right' ? 1 : 0.45} />
+            <g style={{ opacity: rightOpacity, transition: 'opacity 220ms ease' }}>
+              <rect x="350" y="28" width="184" height="100" rx="18" fill="#DCFCE7" stroke={focusSide === 'right' ? '#14532D' : '#15803D'} strokeWidth={focusSide === 'right' ? 3.2 : 2.4} />
+              <text x="442" y="72" textAnchor="middle" fontSize={rightFontSize} fontWeight="800" fill="#14532D">
+                {svgRight}
+              </text>
+              <text x="442" y="96" textAnchor="middle" fontSize="10" fontWeight="700" fill="#15803D">
+                {wbPick('Safe to Use', 'Aman Dipakai')}
+              </text>
+            </g>
           </g>
         )}
 
         {theme === 'rpg_stats' && (
           <g>
             {/* Left RPG Status Shield */}
-            <rect x="26" y="24" width="190" height="106" rx="18" fill="#E0F2FE" stroke="#0284C7" strokeWidth="2.5" />
-            <path d="M 60 40 L 82 40 L 82 58 C 82 69 71 75 71 75 C 71 75 60 69 60 58 Z" fill="#38BDF8" stroke="#0369A1" strokeWidth="2" />
-            <rect x="94" y="47" width="100" height="12" rx="6" fill="#BAE6FD" />
-            <rect x="94" y="47" width="78" height="12" rx="6" fill="#0284C7" />
-            <text x="121" y="96" textAnchor="middle" fontSize={leftFontSize} fontWeight="800" fill="#0C4A6E">
-              {svgLeft}
-            </text>
-            <text x="121" y="114" textAnchor="middle" fontSize="9.5" fontWeight="700" fill="#0369A1">
-              KARAKTER / STATUS
-            </text>
+            <g style={{ opacity: leftOpacity, transition: 'opacity 220ms ease' }}>
+              <rect x="26" y="24" width="190" height="106" rx="18" fill="#E0F2FE" stroke={focusSide === 'left' ? '#0369A1' : '#0284C7'} strokeWidth={focusSide === 'left' ? 3.2 : 2.5} />
+              <path d="M 60 40 L 82 40 L 82 58 C 82 69 71 75 71 75 C 71 75 60 69 60 58 Z" fill="#38BDF8" stroke="#0369A1" strokeWidth="2" />
+              <rect x="94" y="47" width="100" height="12" rx="6" fill="#BAE6FD" />
+              <rect x="94" y="47" width="78" height="12" rx="6" fill="#0284C7" />
+              <text x="121" y="96" textAnchor="middle" fontSize={leftFontSize} fontWeight="800" fill="#0C4A6E">
+                {svgLeft}
+              </text>
+              <text x="121" y="114" textAnchor="middle" fontSize="9.5" fontWeight="700" fill="#0369A1">
+                {wbPick('TRAIT / STATE', 'KARAKTER / STATUS', 'สถานะ / คุณลักษณะ')}
+              </text>
+            </g>
 
             <rect x="228" y="58" width="104" height="36" rx="18" fill="#FEF3C7" stroke="#D97706" strokeWidth="2.2" />
             <text x="280" y="80" textAnchor="middle" fontSize={centerBadge.length > 14 ? 9.5 : 11} fontWeight="800" fill="#92400E">
@@ -516,28 +543,28 @@ const MetaphorThemeHeroSvg: React.FC<{
             </text>
 
             {/* Right RPG Skill / Verb Card */}
-            <rect x="344" y="24" width="190" height="106" rx="18" fill="#DCFCE7" stroke="#15803D" strokeWidth="2.5" />
-            <polygon points="384,38 368,62 380,62 376,78 396,54 384,54" fill="#22C55E" stroke="#14532D" strokeWidth="1.6" />
-            <rect x="406" y="47" width="106" height="12" rx="6" fill="#BBF7D0" />
-            <rect x="406" y="47" width="92" height="12" rx="6" fill="#16A34A" />
-            <text x="439" y="96" textAnchor="middle" fontSize={rightFontSize} fontWeight="800" fill="#14532D">
-              {svgRight}
-            </text>
-            <text x="439" y="114" textAnchor="middle" fontSize="9.5" fontWeight="700" fill="#15803D">
-              FUNGSI UTAMA
-            </text>
+            <g style={{ opacity: rightOpacity, transition: 'opacity 220ms ease' }}>
+              <rect x="344" y="24" width="190" height="106" rx="18" fill="#DCFCE7" stroke={focusSide === 'right' ? '#14532D' : '#15803D'} strokeWidth={focusSide === 'right' ? 3.2 : 2.5} />
+              <polygon points="384,38 368,62 380,62 376,78 396,54 384,54" fill="#22C55E" stroke="#14532D" strokeWidth="1.6" />
+              <rect x="406" y="47" width="106" height="12" rx="6" fill="#BBF7D0" />
+              <rect x="406" y="47" width="92" height="12" rx="6" fill="#16A34A" />
+              <text x="439" y="96" textAnchor="middle" fontSize={rightFontSize} fontWeight="800" fill="#14532D">
+                {svgRight}
+              </text>
+              <text x="439" y="114" textAnchor="middle" fontSize="9.5" fontWeight="700" fill="#15803D">
+                {wbPick('CORE ACTION', 'FUNGSI UTAMA', 'หน้าที่หลัก')}
+              </text>
+            </g>
           </g>
         )}
       </svg>
 
-      {/* Smooth gliding SVG pen cursor during active drawing - floats cleanly above labels */}
+      {/* Smooth GPU-composited gliding SVG pen cursor during active drawing */}
       {isWritingActive && (
         <div
-          className="pointer-events-none absolute transition-all duration-150 ease-out"
+          className="pointer-events-none absolute inset-x-0 top-2 flex justify-start transition-transform duration-150 ease-out"
           style={{
-            left: `${penX}%`,
-            top: `${Math.max(10, Math.min(26, penY - 38))}%`,
-            transform: 'translate(-50%, -50%)',
+            transform: `translate3d(${Math.round(penX * 0.72)}%, ${Math.round(Math.max(0, Math.min(18, penY - 40)))}px, 0)`,
           }}
         >
           <AnimatedTutorPenSvg />
@@ -778,8 +805,12 @@ export const MetaphorSceneDiagram: React.FC<{
     <div className="space-y-3" data-testid="wb-metaphor-scene">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#FEF3C7] border border-[#F59E0B]/40 text-[10.5px] font-extrabold text-[#92400E]">
-          <span>🎨</span>
-          <span>{step.metaphorCenterLabel || 'Analogi Visual Interaktif'}</span>
+          <svg viewBox="0 0 20 20" className="w-3.5 h-3.5 shrink-0 text-[#B45309]" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <rect x="2.5" y="4" width="6.5" height="12" rx="1.8" />
+            <rect x="11" y="4" width="6.5" height="12" rx="1.8" />
+            <path d="M9 10h2" />
+          </svg>
+          <span>{step.metaphorCenterLabel || wbPick('Interactive Visual Analogy', 'Analogi Visual Interaktif', 'ภาพเปรียบเทียบแบบโต้ตอบ')}</span>
         </div>
         {!isLightbox && <ZoomInspectButton onClick={onZoomInspect} />}
       </div>
@@ -798,7 +829,7 @@ export const MetaphorSceneDiagram: React.FC<{
         {/* Panel Kiri */}
         <div
           data-wb-panel-focus={focusSide === 'left' ? 'zoom-in' : focusSide === 'right' ? 'dim' : 'idle'}
-          className="relative rounded-2xl border-2 p-3.5 transition-all duration-500 ease-out"
+          className="relative rounded-2xl border-2 p-3.5 transition-[transform,opacity,box-shadow,border-color] duration-500 ease-out"
           style={{
             backgroundColor: lp.bgColor || '#E0F2FE',
             borderColor: focusSide === 'left' ? lp.accentColor || '#0284C7' : `${lp.accentColor || '#0284C7'}55`,
@@ -830,8 +861,9 @@ export const MetaphorSceneDiagram: React.FC<{
                 {lp.badge || wbPick('CONCEPT 1', 'KONSEP 1')}
               </span>
               {focusSide === 'left' && (
-                <span className="px-1.5 py-0.5 rounded-full bg-white/95 text-[#0369A1] text-[9px] font-extrabold shadow-2xs">
-                  {wbPick('🔎 Focus', '🔎 Fokus')}
+                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-white/95 text-[#0369A1] text-[9px] font-extrabold shadow-2xs">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#0284C7]" />
+                  <span>{wbPick('Focus', 'Fokus', 'โฟกัส')}</span>
                 </span>
               )}
             </div>
@@ -846,8 +878,11 @@ export const MetaphorSceneDiagram: React.FC<{
             </p>
           )}
           {lp.example && (
-            <div className="mt-2.5 px-2.5 py-1.5 rounded-xl bg-white/90 border border-black/10 text-[12px] font-bold text-[#0F172A]">
-              💬 <HighlightText text={lp.example} terms={terms} active={effProgress >= 0.35} emphasize={focusSide === 'left'} />
+            <div className="mt-2.5 px-2.5 py-1.5 rounded-xl bg-white/90 border border-black/10 text-[12px] font-bold text-[#0F172A] flex items-start gap-1.5">
+              <SmpVectorIcon name="chat" color={lp.accentColor || '#0284C7'} size={14} />
+              <span className="min-w-0 flex-1">
+                <HighlightText text={lp.example} terms={terms} active={effProgress >= 0.35} emphasize={focusSide === 'left'} />
+              </span>
             </div>
           )}
         </div>
@@ -855,7 +890,7 @@ export const MetaphorSceneDiagram: React.FC<{
         {/* Panel Kanan */}
         <div
           data-wb-panel-focus={focusSide === 'right' ? 'zoom-in' : focusSide === 'left' ? 'dim' : 'idle'}
-          className="relative rounded-2xl border-2 p-3.5 transition-all duration-500 ease-out"
+          className="relative rounded-2xl border-2 p-3.5 transition-[transform,opacity,box-shadow,border-color] duration-500 ease-out"
           style={{
             backgroundColor: rp.bgColor || '#DCFCE7',
             borderColor: focusSide === 'right' ? rp.accentColor || '#15803D' : `${rp.accentColor || '#15803D'}55`,
@@ -887,8 +922,9 @@ export const MetaphorSceneDiagram: React.FC<{
                 {rp.badge || wbPick('CONCEPT 2', 'KONSEP 2')}
               </span>
               {focusSide === 'right' && (
-                <span className="px-1.5 py-0.5 rounded-full bg-white/95 text-[#15803D] text-[9px] font-extrabold shadow-2xs">
-                  {wbPick('🔎 Focus', '🔎 Fokus')}
+                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-white/95 text-[#15803D] text-[9px] font-extrabold shadow-2xs">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#15803D]" />
+                  <span>{wbPick('Focus', 'Fokus', 'โฟกัส')}</span>
                 </span>
               )}
             </div>
@@ -903,8 +939,11 @@ export const MetaphorSceneDiagram: React.FC<{
             </p>
           )}
           {rp.example && (
-            <div className="mt-2.5 px-2.5 py-1.5 rounded-xl bg-white/90 border border-black/10 text-[12px] font-bold text-[#0F172A]">
-              💬 <HighlightText text={rp.example} terms={terms} active={effProgress >= 0.6} emphasize={focusSide === 'right'} />
+            <div className="mt-2.5 px-2.5 py-1.5 rounded-xl bg-white/90 border border-black/10 text-[12px] font-bold text-[#0F172A] flex items-start gap-1.5">
+              <SmpVectorIcon name="chat" color={rp.accentColor || '#15803D'} size={14} />
+              <span className="min-w-0 flex-1">
+                <HighlightText text={rp.example} terms={terms} active={effProgress >= 0.6} emphasize={focusSide === 'right'} />
+              </span>
             </div>
           )}
         </div>
@@ -922,7 +961,10 @@ export const MetaphorSceneDiagram: React.FC<{
               : undefined,
           }}
         >
-          <span className="shrink-0 text-sm">💡</span>
+          <svg viewBox="0 0 20 20" className="w-4 h-4 shrink-0 text-[#D97706] mt-0.5" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M10 2.5a5 5 0 0 0-3 9c.6.5 1 1.2 1 2h4c0-.8.4-1.5 1-2a5 5 0 0 0-3-9Z" fill="#FEF08A" />
+            <path d="M8.2 16h3.6M9 18h2" />
+          </svg>
           <span>
             <HighlightText text={step.analogy} terms={terms} active={effProgress >= 0.55} emphasize={analogyZoomed} />
           </span>
@@ -961,22 +1003,40 @@ export const MindMapDiagram: React.FC<{
   });
   const isMobileLite = isMobileLowMemoryDevice();
 
+  const safeCenterText = formatHeroSvgLabel(centerLabel, 28);
+  const pillWidth = Math.max(196, Math.min(340, safeCenterText.length * 8.6 + 44));
+  const pillX = Math.round(280 - pillWidth / 2);
+
   return (
     <div className="space-y-3" data-testid="wb-mind-map">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#EEF2FF] border border-[#818CF8]/40 text-[10.5px] font-extrabold text-[#3730A3]">
-          <span>🧠</span>
-          <span>Peta Pikiran Bercabang</span>
+          <svg viewBox="0 0 20 20" className="w-3.5 h-3.5 shrink-0 text-[#4F46E5]" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <circle cx="10" cy="4.5" r="2.2" fill="#E0E7FF" />
+            <circle cx="4.5" cy="15" r="2.2" fill="#E0E7FF" />
+            <circle cx="15.5" cy="15" r="2.2" fill="#E0E7FF" />
+            <path d="M10 6.8v3.2M10 10L5.5 13M10 10l4.5 3" />
+          </svg>
+          <span>{wbPick('Concept Mind Map', 'Peta Pikiran Bercabang', 'แผนผังความคิด')}</span>
         </span>
         <div className="flex items-center gap-2">
-          {isWritingNow && <AnimatedTutorPenSvg label="Menggambar cabang..." />}
+          {isWritingNow && <AnimatedTutorPenSvg label={wbPick('Drawing branches...', 'Menggambar cabang...', 'กำลังวาดกิ่ง...')} />}
           {!isLightbox && <ZoomInspectButton onClick={onZoomInspect} />}
         </div>
       </div>
 
       {/* Organic Hub Banner */}
       <div className="relative rounded-2xl bg-[#FFFDF7] border border-[#CBD5E1] p-3.5 overflow-visible">
-        <svg viewBox="0 0 560 76" className="w-full h-auto block mb-2" aria-hidden="true">
+        {/* Mobile Compact Hub Header (avoids floating horizontal dots above single-column cards) */}
+        <div className="sm:hidden flex flex-col items-center mb-2.5">
+          <div className="px-4 py-1.5 rounded-full bg-[#DBEAFE] border-2 border-[#1D4ED8] text-[12.5px] font-extrabold text-[#1E3A8A] text-center shadow-2xs">
+            {safeCenterText}
+          </div>
+          <div className="w-0.5 h-3 bg-[#93C5FD]" aria-hidden="true" />
+        </div>
+
+        {/* Tablet/Desktop Multi-Branch Bezier Connector Hub */}
+        <svg viewBox="0 0 560 76" className="hidden sm:block w-full h-auto mb-2" aria-hidden="true">
           {branches.map((br, idx) => {
             const cols = Math.max(2, Math.min(branches.length, 4));
             const endX = 70 + ((idx % cols) * 420) / Math.max(1, cols - 1);
@@ -987,7 +1047,7 @@ export const MindMapDiagram: React.FC<{
             return (
               <g key={idx}>
                 <path
-                  d={`M 280 28 C 280 54, ${endX} 42, ${endX} 70`}
+                  d={`M 280 34 C 280 56, ${endX} 44, ${endX} 70`}
                   fill="none"
                   stroke={c}
                   strokeWidth={isBranchFocused ? 3.8 : 2.6}
@@ -1006,14 +1066,14 @@ export const MindMapDiagram: React.FC<{
                   stroke={c}
                   strokeWidth="2.2"
                   opacity={branchReveal > 0.7 ? 1 : 0.3}
-                  style={{ transition: 'r 200ms ease, opacity 200ms ease' }}
+                  style={{ transition: 'opacity 200ms ease' }}
                 />
               </g>
             );
           })}
-          <rect x="155" y="4" width="250" height="38" rx="19" fill="#DBEAFE" stroke="#1D4ED8" strokeWidth="2.5" />
-          <text x="280" y="28" textAnchor="middle" fontSize="13.5" fontWeight="800" fill="#1E3A8A">
-            {centerLabel.slice(0, 26)}
+          <rect x={pillX} y="4" width={pillWidth} height="38" rx="19" fill="#DBEAFE" stroke="#1D4ED8" strokeWidth="2.4" />
+          <text x="280" y="28" textAnchor="middle" fontSize={safeCenterText.length > 22 ? 12 : 13.5} fontWeight="800" fill="#1E3A8A">
+            {safeCenterText}
           </text>
         </svg>
 
@@ -1026,7 +1086,7 @@ export const MindMapDiagram: React.FC<{
               <div
                 key={idx}
                 data-wb-panel-focus={isFocused ? 'zoom-in' : activeBranchIdx >= 0 ? 'dim' : 'idle'}
-                className="relative rounded-2xl border-2 bg-white p-3 transition-all duration-200 shadow-xs"
+                className="relative rounded-2xl border-2 bg-white p-3 transition-[transform,opacity,box-shadow,border-color] duration-200 shadow-xs"
                 style={{
                   borderColor: isFocused ? c : `${c}66`,
                   opacity: activeBranchIdx >= 0 && !isFocused ? 0.46 : visible ? 1 : 0.16,
@@ -1055,17 +1115,17 @@ export const MindMapDiagram: React.FC<{
                     <SmpVectorIcon name={br.icon || 'star'} color={c} size={17} />
                   </span>
                   <span className="font-extrabold text-[13.5px] text-[#0F172A] fz-handwriting-heading">
-                    <HighlightText text={br.label} terms={terms} active={visible} />
+                    <HighlightText text={br.label} terms={terms} active={visible} emphasize={isFocused} />
                   </span>
                 </div>
                 {br.sublabel && (
                   <p className="text-[12px] text-[#334155] leading-snug">
-                    <HighlightText text={br.sublabel} terms={terms} active={visible} />
+                    <HighlightText text={br.sublabel} terms={terms} active={visible} emphasize={isFocused} />
                   </p>
                 )}
                 {br.example && (
                   <div className="mt-1.5 px-2 py-1 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] text-[11.5px] font-bold text-[#0F172A]">
-                    <HighlightText text={br.example} terms={terms} active={visible} />
+                    <HighlightText text={br.example} terms={terms} active={visible} emphasize={isFocused} />
                   </div>
                 )}
               </div>
@@ -1109,11 +1169,14 @@ export const TimelineTrackDiagram: React.FC<{
     <div className="space-y-3" data-testid="wb-timeline-track">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#E0F2FE] border border-[#0284C7]/35 text-[10.5px] font-extrabold text-[#0369A1]">
-          <span>⏱️</span>
-          <span>Garis Waktu & Tahapan</span>
+          <svg viewBox="0 0 20 20" className="w-3.5 h-3.5 shrink-0 text-[#0284C7]" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <circle cx="10" cy="10" r="7.2" />
+            <polyline points="10 6 10 10 13 11.8" />
+          </svg>
+          <span>{wbPick('Timeline & Stages', 'Garis Waktu & Tahapan', 'เส้นเวลาและขั้นตอน')}</span>
         </span>
         <div className="flex items-center gap-2">
-          {isWritingNow && <AnimatedTutorPenSvg label="Melacak waktu..." />}
+          {isWritingNow && <AnimatedTutorPenSvg label={wbPick('Tracing timeline...', 'Melacak waktu...', 'กำลังไล่เส้นเวลา...')} />}
           {!isLightbox && <ZoomInspectButton onClick={onZoomInspect} />}
         </div>
       </div>
@@ -1121,10 +1184,10 @@ export const TimelineTrackDiagram: React.FC<{
       <div className="rounded-2xl bg-[#FFFDF7] border border-[#CBD5E1] p-3.5 space-y-3">
         {/* Progress Time Rail */}
         <div className="relative flex items-center justify-between px-4 py-2">
-          <div className="absolute left-6 right-6 top-1/2 -translate-y-1/2 h-1.5 rounded-full bg-[#E2E8F0]">
+          <div className="absolute left-6 right-6 top-1/2 -translate-y-1/2 h-1.5 rounded-full bg-[#E2E8F0] overflow-hidden">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-[#0EA5E9] via-[#10B981] to-[#F59E0B] transition-all duration-300"
-              style={{ width: `${Math.round(Math.max(12, effProgress * 100))}%` }}
+              className="h-full w-full rounded-full bg-gradient-to-r from-[#0EA5E9] via-[#10B981] to-[#F59E0B] origin-left transition-transform duration-300"
+              style={{ transform: `scaleX(${Math.max(0.12, Math.min(1, effProgress)).toFixed(3)})` }}
             />
           </div>
           {events.map((ev, i) => (
@@ -1156,7 +1219,7 @@ export const TimelineTrackDiagram: React.FC<{
               <div
                 key={i}
                 data-wb-panel-focus={isFocused ? 'zoom-in' : activeEventIdx >= 0 ? 'dim' : 'idle'}
-                className="relative rounded-2xl border-2 p-2.5 transition-all duration-200"
+                className="relative rounded-2xl border-2 p-2.5 transition-[transform,opacity,box-shadow,border-color,background-color] duration-200"
                 style={{
                   backgroundColor: isFocused || ev.isActive ? '#ECFDF5' : '#FFFFFF',
                   borderColor: isFocused ? c : ev.isActive ? '#10B981' : '#E2E8F0',
@@ -1180,11 +1243,11 @@ export const TimelineTrackDiagram: React.FC<{
                   {ev.timeLabel}
                 </div>
                 <div className="mt-0.5 text-[13px] font-extrabold text-[#0F172A] fz-handwriting-heading">
-                  <HighlightText text={ev.title} terms={terms} active={visible} />
+                  <HighlightText text={ev.title} terms={terms} active={visible} emphasize={isFocused} />
                 </div>
                 {ev.example && (
                   <div className="mt-1.5 px-2 py-1 rounded-lg bg-[#F8FAFC] border border-[#E2E8F0] text-[11.5px] font-bold text-[#1E293B]">
-                    <HighlightText text={ev.example} terms={terms} active={visible} />
+                    <HighlightText text={ev.example} terms={terms} active={visible} emphasize={isFocused} />
                   </div>
                 )}
               </div>
@@ -1228,11 +1291,15 @@ export const FormulaBlocksDiagram: React.FC<{
     <div className="space-y-3" data-testid="wb-formula-blocks">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#DCFCE7] border border-[#16A34A]/35 text-[10.5px] font-extrabold text-[#14532D]">
-          <span>🧩</span>
-          <span>{wbPick('Sentence Pattern Blocks', 'Rakit Puzzle Pola Kalimat')}</span>
+          <svg viewBox="0 0 20 20" className="w-3.5 h-3.5 shrink-0 text-[#15803D]" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <rect x="2.5" y="4.5" width="6.5" height="6.5" rx="1.5" fill="#BBF7D0" />
+            <rect x="11" y="4.5" width="6.5" height="6.5" rx="1.5" fill="#DCFCE7" />
+            <rect x="6.8" y="11" width="6.5" height="6.5" rx="1.5" fill="#86EFAC" />
+          </svg>
+          <span>{wbPick('Sentence Pattern Blocks', 'Rakit Puzzle Pola Kalimat', 'บล็อกโครงสร้างประโยค')}</span>
         </span>
         <div className="flex items-center gap-2">
-          {isWritingNow && <AnimatedTutorPenSvg label={wbPick('Arranging blocks...', 'Menyusun blok...')} />}
+          {isWritingNow && <AnimatedTutorPenSvg label={wbPick('Arranging blocks...', 'Menyusun blok...', 'กำลังเรียงบล็อก...')} />}
           {!isLightbox && <ZoomInspectButton onClick={onZoomInspect} />}
         </div>
       </div>
@@ -1256,7 +1323,7 @@ export const FormulaBlocksDiagram: React.FC<{
                   <React.Fragment key={idx}>
                     <div
                       data-wb-panel-focus={isFocused ? 'zoom-in' : activeBlockIdx >= 0 ? 'dim' : 'idle'}
-                      className="relative rounded-2xl border-2 px-3 py-2 text-center shadow-xs transition-all duration-200"
+                      className="relative rounded-2xl border-2 px-3 py-2 text-center shadow-xs transition-[transform,opacity,box-shadow,border-color,background-color] duration-200"
                       style={{
                         borderColor: c,
                         backgroundColor: isFocused ? `${c}26` : `${c}15`,
@@ -1282,7 +1349,7 @@ export const FormulaBlocksDiagram: React.FC<{
                         {bl.role}
                       </div>
                       <div className="text-[15px] font-extrabold text-[#0F172A] fz-handwriting-heading">
-                        <HighlightText text={bl.token} terms={terms} active={visible} />
+                        <HighlightText text={bl.token} terms={terms} active={visible} emphasize={isFocused} />
                       </div>
                       {bl.note && (
                         <div className="mt-0.5 text-[10.5px] font-medium text-[#475569] leading-snug">{bl.note}</div>
@@ -1368,9 +1435,12 @@ export const VisualZoomLightbox: React.FC<{
       >
         <div className="px-4 py-3 bg-[#F8FAFC] border-b border-[#E2E8F0] flex flex-wrap items-center justify-between gap-2 shrink-0">
           <div className="flex items-center gap-2 min-w-0">
-            <span className="text-base">🔍</span>
+            <svg viewBox="0 0 20 20" className="w-4 h-4 shrink-0 text-[#1E40AF]" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <circle cx="8.5" cy="8.5" r="5.2" />
+              <path d="M12.5 12.5L16.8 16.8M8.5 6.3v4.4M6.3 8.5h4.4" />
+            </svg>
             <h4 className="font-extrabold text-[14px] text-[#0F172A] truncate">
-              {step.title || wbPick('Whiteboard Visual Detail', 'Detail Visual Papan Belajar')}
+              {step.title || wbPick('Whiteboard Visual Detail', 'Detail Visual Papan Belajar', 'รายละเอียดภาพบนกระดาน')}
             </h4>
           </div>
           <div className="flex items-center gap-2">
@@ -1380,7 +1450,7 @@ export const VisualZoomLightbox: React.FC<{
                 data-testid="wb-lightbox-zoom-out"
                 onClick={() => setScale((s) => Math.max(0.8, Number((s - 0.15).toFixed(2))))}
                 className="px-2.5 py-1 hover:bg-[#F1F5F9] cursor-pointer"
-                title={wbPick('Zoom Out', 'Perkecil')}
+                title={wbPick('Zoom Out', 'Perkecil', 'ย่อ')}
               >
                 −
               </button>
@@ -1398,7 +1468,7 @@ export const VisualZoomLightbox: React.FC<{
                 data-testid="wb-lightbox-zoom-in"
                 onClick={() => setScale((s) => Math.min(2.2, Number((s + 0.15).toFixed(2))))}
                 className="px-2.5 py-1 hover:bg-[#F1F5F9] cursor-pointer"
-                title={wbPick('Zoom In', 'Perbesar')}
+                title={wbPick('Zoom In', 'Perbesar', 'ขยาย')}
               >
                 +
               </button>
@@ -1409,7 +1479,7 @@ export const VisualZoomLightbox: React.FC<{
               onClick={onClose}
               className="px-3 py-1 rounded-xl bg-[#0F172A] text-white text-[11px] font-bold hover:bg-[#1E293B] cursor-pointer"
             >
-              Tutup
+              {wbPick('Close', 'Tutup', 'ปิด')}
             </button>
           </div>
         </div>
