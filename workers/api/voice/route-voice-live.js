@@ -1427,31 +1427,56 @@ async function runGeminiJsonWithPool(keys, promptText, temperature = 0.5, maxOut
   }
 }
 
+function stripMetaStepPrefix(raw) {
+  return String(raw || '')
+    .replace(/^(?:Langkah|Step|Tahap|Beat|Fase)\s*\d+\s*(?:[:.\-–—]+\s*|$)/i, '')
+    .trim();
+}
+
+function stripRoboticSelfIntro(raw) {
+  const s = String(raw || '').trim();
+  if (!s) return '';
+  const stripped = s
+    .replace(
+      /^(?:(?:Halo|Hai|Hi|Hello|Selamat\s+(?:pagi|siang|sore|malam))[,!.\s]+)?(?:(?:saya|aku|ini|bersama|nama\s+saya)\s+(?:Coach\s+|Sensei\s+|Dr\.\s+|Examiner\s+|Xiao\s+)?[A-Z][a-z]+(?:\s+[A-Z][a-z]+)?|(?:Coach|Sensei)\s+[A-Z][a-z]+\s+di\s+sini)(?:\s+di\s+sini)?[,!.\s]*(?:dan\s+)?/i,
+      ''
+    )
+    .replace(
+      /^(?:(?:Halo|Hai|Hi|Hello)[!.,\s]+)?(?:mari\s+kita\s+(?:perbaiki|pelajari|bahas|bedah|lihat|pahami)\s+[^.!?]{3,75}[.!?]\s+)/i,
+      ''
+    )
+    .trim();
+  if (!stripped) return s;
+  return stripped.charAt(0).toUpperCase() + stripped.slice(1);
+}
+
 async function runFastOpenerOnly({ keys, userText, targetLang, targetLocaleName, personaName }) {
   const openerPrompt = [
     `[FAST STAGE-1 WHITEBOARD OPENER JSON ONLY - Zero emojis, zero em-dash]`,
     `Course: ${targetLang.toUpperCase()}, Mandatory explanation language: ${targetLocaleName}, Mentor: ${personaName}.`,
     `Question: "${userText}"`,
     `IMPORTANT: Even if the learner wrote or spoke in ${targetLang.toUpperCase()}, write topicTitle, text, and spokenNarration 100% in ${targetLocaleName} (quoting only short ${targetLang.toUpperCase()} example words).`,
-    `Write ONLY Step 0 header + 1 warm, clear, complete opening hook sentence ("spokenNarration", 12-18 words in ${targetLocaleName}) immediately answering the question.`,
-    `JSON: {"topicTitle":"...","patternFormula":"...","headingStep":{"kind":"heading","title":"...","text":"1 concise takeaway line","spokenNarration":"..."}}`,
+    `NEVER write "Langkah 0" or "Step 0" in the title, and NEVER introduce yourself ("Halo saya Alex"). Jump straight into the core concept!`,
+    `Write ONLY the opening concept header + 1 crisp, direct opening hook sentence ("spokenNarration", 12-18 words in ${targetLocaleName}) immediately answering the question.`,
+    `JSON: {"topicTitle":"...","patternFormula":"...","headingStep":{"kind":"heading","title":"...","text":"1 concise <=6-word takeaway","spokenNarration":"..."}}`,
   ].join('\n');
   const gen = await runGeminiJsonWithPool(keys, openerPrompt, 0.2, 260);
   if (!gen.ok || !gen.parsed || typeof gen.parsed !== 'object') return null;
   const p = gen.parsed;
   const st0 = p.headingStep && typeof p.headingStep === 'object' ? p.headingStep : {};
-  const title = cleanSpokenText(p.topicTitle || st0.title || '');
-  const spoken = cleanSpokenText(st0.spokenNarration || '');
+  const title = stripMetaStepPrefix(cleanSpokenText(p.topicTitle || st0.title || ''));
+  const headingTitle = stripMetaStepPrefix(cleanSpokenText(st0.title || title)) || title;
+  const spoken = stripRoboticSelfIntro(cleanSpokenText(st0.spokenNarration || ''));
   if (!title && !spoken) return null;
   return {
-    topicTitle: title,
+    topicTitle: title || headingTitle,
     patternFormula: cleanSpokenText(p.patternFormula || ''),
     headingStep: {
       id: 'ai_step_0',
       kind: 'heading',
       column: 'left',
       phaseIndex: 0,
-      title: cleanSpokenText(st0.title || title),
+      title: headingTitle,
       text: cleanSpokenText(st0.text || ''),
       spokenNarration: spoken,
     },
@@ -2291,7 +2316,7 @@ async function executePartnerTurnCore(ctx, streamHooks = null) {
   if (isCacheableStandaloneBoard) {
     boardCacheKey = await sha256Hex(
       JSON.stringify({
-        v: 'wb-v5-socratic-live',
+        v: 'wb-v6-socratic-live',
         q: userText.trim().toLowerCase(),
         targetLang,
         locale,
@@ -2395,7 +2420,7 @@ async function executePartnerTurnCore(ctx, streamHooks = null) {
         `Act as a razor-sharp, intellectual real-world classroom Polymath Mentor teaching "${userText}" interactively on an open dot-grid whiteboard.`,
         `UNIVERSAL POLYMATH & SOCRATIC MICRO-BEAT PROTOCOL (ZERO WALLS OF TEXT, ZERO PASSIVE LECTURES, ZERO ROBOT INTROS!):`,
         `1) THE 6-WORD CHALK RULE & PEDAGOGICAL PRECISION:`,
-        `   - NEVER introduce yourself ("Halo, saya Alex", "Hai teman-teman", "Mari kita bedah"). Jump straight into the core intuition in sentence 1!`,
+        `   - NEVER introduce yourself ("Halo, saya Alex", "Hai teman-teman", "Mari kita bedah") and NEVER write "Langkah 0" or "Step 0" in any title. Jump straight into the core intuition in sentence 1!`,
         `   - NEVER write full paragraphs or long prose on the board! Every visual label, block note, subtitle, or callout MUST be <= 6 words of crisp shorthand.`,
         `   - LATEX HYGIENE: Wrap "$...$" ONLY around genuine mathematical/scientific notation containing operators/subscripts/fractions (e.g. "$3x - 5 = 16$", "$\\frac{2}{3} + \\frac{1}{4}$", "$F = m \\cdot a$"). NEVER wrap plain words or grammar formulas in "$...$" (write "Subjek + To Be + Verb 3" as plain text without "$", NEVER "$Subjek + To Be + Verb 3$")!`,
         `   - Deliver 100% of the deep intuition, real-world logic, exact boundary conditions, and Socratic invitation through each step's "spokenNarration" (2-3 sharp spoken sentences, ~20-36 words per beat). Every "spokenNarration" MUST name the exact words/numbers shown in that step's visual!`,
@@ -2553,7 +2578,7 @@ JSON only: {"aiReply":"...","aiReplyTranslation":"...","diagnosis":{"ok":true,"m
     if (isOffTopicToBeDrift || !Array.isArray(firstSteps) || firstSteps.length < 4) {
       const boardOnlyFallbackKey = await sha256Hex(
         JSON.stringify({
-          v: 'wb-v5-socratic',
+          v: 'wb-v6-socratic',
           q: userText.trim().toLowerCase(),
           targetLang,
           locale,
@@ -2650,7 +2675,7 @@ JSON only: {"aiReply":"...","aiReplyTranslation":"...","diagnosis":{"ok":true,"m
     return { status: 503, payload: { ok: false, fallback: true, reason: gen.reason } };
   }
 
-  let aiReply = cleanSpokenText(gen.parsed.aiReply || '');
+  let aiReply = stripRoboticSelfIntro(cleanSpokenText(gen.parsed.aiReply || ''));
   // Strip any stiff corporate apology phrases if a model ever slips one in
   aiReply = aiReply
     .replace(/\b(I apologize|I am sorry, as an AI|As an AI language model)\b[^.?!]*[.?!]\s*/gi, '')
@@ -2743,12 +2768,16 @@ JSON only: {"aiReply":"...","aiReplyTranslation":"...","diagnosis":{"ok":true,"m
       : '';
 
   const bankTopicId = cleanSpokenText(rawAction?.bankTopicId || '').slice(0, 48);
-  const resolvedCoachScript = cleanSpokenText(
-    rawAction?.coachSpokenScript || (actionType === 'open_learning_popup' && isExplanationTurn ? aiReply : '')
+  const resolvedCoachScript = stripRoboticSelfIntro(
+    cleanSpokenText(
+      rawAction?.coachSpokenScript || (actionType === 'open_learning_popup' && isExplanationTurn ? aiReply : '')
+    )
   ).slice(0, 2800);
   if (actionType === 'open_learning_popup' && isExplanationTurn && resolvedCoachScript && !aiReply) {
     aiReply = resolvedCoachScript;
   }
+
+  const cleanTopicTitle = stripMetaStepPrefix(cleanSpokenText(rawAction?.topicTitle || '')).slice(0, 140);
 
   const uiAction =
     actionType === 'none'
@@ -2766,12 +2795,14 @@ JSON only: {"aiReply":"...","aiReplyTranslation":"...","diagnosis":{"ok":true,"m
             bankTopicId,
             sourceLayer:
               bankTopicId && bankTopicId !== 'custom_dynamic' ? 'bank' : 'ai_dynamic',
-            topicTitle: cleanSpokenText(rawAction?.topicTitle || '').slice(0, 140),
+            topicTitle: cleanTopicTitle,
             focusType: cleanSpokenText(rawAction?.focusType || 'grammar')
               .toLowerCase()
               .slice(0, 24),
             coachSpokenScript: resolvedCoachScript,
-            explanationText: cleanSpokenText(rawAction?.explanationText || resolvedCoachScript).slice(0, 2800),
+            explanationText: stripRoboticSelfIntro(
+              cleanSpokenText(rawAction?.explanationText || resolvedCoachScript)
+            ).slice(0, 2800),
             patternFormula: cleanSpokenText(rawAction?.patternFormula || '').slice(0, 240),
             drillInstruction: cleanSpokenText(rawAction?.drillInstruction || '').slice(0, 360),
             sampleTarget: resolvedSampleTarget,
@@ -2828,6 +2859,93 @@ JSON only: {"aiReply":"...","aiReplyTranslation":"...","diagnosis":{"ok":true,"m
                       'traffic_light',
                       'key_and_lock',
                     ]);
+                    const ALLOWED_MECHANICS = new Set([
+                      'balance_seesaw',
+                      'scratch_reveal',
+                      'venn_bucket_sorter',
+                      'wire_node_connector',
+                      'rotary_dial_gauge',
+                      'fraction_slice_shader',
+                      'direct_2d_canvas_lab',
+                      'magnetic_slot_builder',
+                      'wave_pendulum_oscillator',
+                      'surgical_ink_strike',
+                      'step_derivation',
+                    ]);
+                    const ALLOWED_PALETTES = new Set([
+                      'cobalt_blueprint',
+                      'terracotta_atelier',
+                      'violet_prism',
+                      'crimson_scalpel',
+                      'amber_fulcrum',
+                      'teal_oscillator',
+                      'indigo_constellation',
+                      'emerald_botanical',
+                    ]);
+                    const ALLOWED_HATCHES = new Set([
+                      'hachure',
+                      'cross-hatch',
+                      'zigzag',
+                      'dots',
+                      'dashed',
+                    ]);
+                    const ALLOWED_DOMAINS = new Set([
+                      'language',
+                      'math',
+                      'physics',
+                      'science',
+                      'character',
+                      'exam',
+                    ]);
+                    const ALLOWED_SKETCH_KINDS = new Set([
+                      'arch_bridge',
+                      'prism_split',
+                      'vector_burst',
+                      'venn_core',
+                    ]);
+                    const ALLOWED_SLIDER_DOMAINS = new Set([
+                      'tense_timeline',
+                      'math_graph',
+                      'physics_vector',
+                      'degree_scale',
+                    ]);
+                    const ALLOWED_MATH_FN_TYPES = new Set([
+                      'linear',
+                      'quadratic',
+                      'pythagoras',
+                      'circle_area',
+                    ]);
+                    const rawKindStr = String(st.kind || '').trim();
+                    const isDirectMechanicKind =
+                      rawKindStr !== 'step_derivation' && ALLOWED_MECHANICS.has(rawKindStr);
+                    const resolvedKind = isDirectMechanicKind ? 'interactive_mechanic' : rawKindStr;
+                    const explicitMechanic =
+                      typeof st.mechanic === 'string' && ALLOWED_MECHANICS.has(st.mechanic.trim())
+                        ? st.mechanic.trim()
+                        : isDirectMechanicKind
+                          ? rawKindStr
+                          : undefined;
+                    const inferredMechanic =
+                      explicitMechanic ||
+                      (resolvedKind === 'interactive_mechanic'
+                        ? Array.isArray(st.bucketZones) && st.bucketZones.length >= 2
+                          ? 'venn_bucket_sorter'
+                          : Array.isArray(st.wirePairs) && st.wirePairs.length >= 2
+                            ? 'wire_node_connector'
+                            : Array.isArray(st.magnetTargetTokens) && st.magnetTargetTokens.length >= 2
+                              ? 'magnetic_slot_builder'
+                              : typeof st.scratchHiddenFormula === 'string' || typeof st.scratchClueHeader === 'string'
+                                ? 'scratch_reveal'
+                                : Array.isArray(st.seesawTokens) && st.seesawTokens.length >= 2
+                                  ? 'balance_seesaw'
+                                  : Array.isArray(st.dialStops) && st.dialStops.length >= 2
+                                    ? 'rotary_dial_gauge'
+                                    : typeof st.sliceTotal === 'number'
+                                      ? 'fraction_slice_shader'
+                                      : typeof st.waveTargetLevel === 'number'
+                                        ? 'wave_pendulum_oscillator'
+                                        : undefined
+                        : undefined);
                     const normPanel = (p) =>
                       p && typeof p === 'object' && typeof p.title === 'string' && p.title.trim()
                         ? {
@@ -2840,12 +2958,285 @@ JSON only: {"aiReply":"...","aiReplyTranslation":"...","diagnosis":{"ok":true,"m
                             ...(typeof p.bgColor === 'string' && /^#[0-9a-f]{3,8}$/i.test(p.bgColor.trim()) ? { bgColor: p.bgColor.trim() } : {}),
                           }
                         : undefined;
+                    const strippedStepTitle =
+                      typeof st.title === 'string' ? stripMetaStepPrefix(cleanSpokenText(st.title)).slice(0, 160) : '';
+                    const finalStepTitle =
+                      strippedStepTitle || (resolvedKind === 'heading' && cleanTopicTitle ? cleanTopicTitle : undefined);
                     return {
                       id: typeof st.id === 'string' ? st.id.slice(0, 48) : `ai_step_${sIdx}`,
-                      kind: st.kind,
+                      kind: resolvedKind,
                       column: st.column === 'right' ? 'right' : 'left',
                       phaseIndex: typeof st.phaseIndex === 'number' ? Math.max(0, Math.min(4, st.phaseIndex)) : undefined,
-                      title: typeof st.title === 'string' ? cleanSpokenText(st.title).slice(0, 160) : undefined,
+                      domainType:
+                        typeof st.domainType === 'string' && ALLOWED_DOMAINS.has(st.domainType.trim())
+                          ? st.domainType.trim()
+                          : undefined,
+                      mechanic: inferredMechanic,
+                      inkPalette:
+                        typeof st.inkPalette === 'string' && ALLOWED_PALETTES.has(st.inkPalette.trim())
+                          ? st.inkPalette.trim()
+                          : undefined,
+                      roughHatch:
+                        typeof st.roughHatch === 'string' && ALLOWED_HATCHES.has(st.roughHatch.trim())
+                          ? st.roughHatch.trim()
+                          : undefined,
+                      variantSeed: typeof st.variantSeed === 'number' ? st.variantSeed : undefined,
+                      pauseForInteraction:
+                        typeof st.pauseForInteraction === 'boolean' ? st.pauseForInteraction : undefined,
+                      socraticPrompt:
+                        typeof st.socraticPrompt === 'string' && st.socraticPrompt.trim()
+                          ? cleanSpokenText(st.socraticPrompt).slice(0, 320)
+                          : undefined,
+                      successVoiceFeedback:
+                        typeof st.successVoiceFeedback === 'string' && st.successVoiceFeedback.trim()
+                          ? cleanSpokenText(st.successVoiceFeedback).slice(0, 420)
+                          : undefined,
+                      wrongTapHint:
+                        typeof st.wrongTapHint === 'string' && st.wrongTapHint.trim()
+                          ? cleanSpokenText(st.wrongTapHint).slice(0, 260)
+                          : undefined,
+                      quickChoices: Array.isArray(st.quickChoices)
+                        ? st.quickChoices
+                            .filter((qc) => qc && typeof qc === 'object' && typeof qc.label === 'string' && qc.label.trim())
+                            .slice(0, 4)
+                            .map((qc, qIdx) => ({
+                              id: typeof qc.id === 'string' && qc.id.trim() ? qc.id.slice(0, 32) : `qc_${qIdx}`,
+                              label: cleanSpokenText(qc.label).slice(0, 96),
+                              isCorrect: Boolean(qc.isCorrect),
+                              ...(typeof qc.socraticHint === 'string' && qc.socraticHint.trim()
+                                ? { socraticHint: cleanSpokenText(qc.socraticHint).slice(0, 220) }
+                                : {}),
+                            }))
+                        : undefined,
+                      bucketLayout:
+                        st.bucketLayout === 'concentric' || st.bucketLayout === 'dual_rings' || st.bucketLayout === 'triple_bins'
+                          ? st.bucketLayout
+                          : undefined,
+                      bucketZones: Array.isArray(st.bucketZones)
+                        ? st.bucketZones
+                            .filter((bz) => bz && typeof bz === 'object' && typeof bz.label === 'string' && bz.label.trim())
+                            .slice(0, 4)
+                            .map((bz, zIdx) => ({
+                              id: typeof bz.id === 'string' && bz.id.trim() ? bz.id.slice(0, 32) : `z_${zIdx + 1}`,
+                              label: cleanSpokenText(bz.label).slice(0, 80),
+                              ...(typeof bz.sublabel === 'string' && bz.sublabel.trim()
+                                ? { sublabel: cleanSpokenText(bz.sublabel).slice(0, 120) }
+                                : {}),
+                            }))
+                        : undefined,
+                      bucketChips: Array.isArray(st.bucketChips)
+                        ? st.bucketChips
+                            .filter(
+                              (bc) =>
+                                bc &&
+                                typeof bc === 'object' &&
+                                typeof bc.label === 'string' &&
+                                bc.label.trim() &&
+                                typeof bc.targetZoneId === 'string' &&
+                                bc.targetZoneId.trim()
+                            )
+                            .slice(0, 6)
+                            .map((bc, cIdx) => ({
+                              id: typeof bc.id === 'string' && bc.id.trim() ? bc.id.slice(0, 32) : `c_${cIdx + 1}`,
+                              label: cleanSpokenText(bc.label).slice(0, 96),
+                              targetZoneId: bc.targetZoneId.trim().slice(0, 32),
+                              ...(typeof bc.hint === 'string' && bc.hint.trim()
+                                ? { hint: cleanSpokenText(bc.hint).slice(0, 180) }
+                                : {}),
+                            }))
+                        : undefined,
+                      wirePairs: Array.isArray(st.wirePairs)
+                        ? st.wirePairs
+                            .filter(
+                              (wp) =>
+                                wp &&
+                                typeof wp === 'object' &&
+                                typeof (wp.leftLabel || wp.left) === 'string' &&
+                                (wp.leftLabel || wp.left).trim() &&
+                                typeof (wp.rightLabel || wp.right) === 'string' &&
+                                (wp.rightLabel || wp.right).trim()
+                            )
+                            .slice(0, 5)
+                            .map((wp, wIdx) => ({
+                              id: typeof wp.id === 'string' && wp.id.trim() ? wp.id.slice(0, 32) : `wp_${wIdx + 1}`,
+                              leftLabel: cleanSpokenText(wp.leftLabel || wp.left).slice(0, 96),
+                              rightLabel: cleanSpokenText(wp.rightLabel || wp.right).slice(0, 96),
+                            }))
+                        : undefined,
+                      seesawLeftFixedLabel:
+                        typeof st.seesawLeftFixedLabel === 'string' && st.seesawLeftFixedLabel.trim()
+                          ? cleanSpokenText(st.seesawLeftFixedLabel).slice(0, 96)
+                          : undefined,
+                      seesawLeftWeight: typeof st.seesawLeftWeight === 'number' ? st.seesawLeftWeight : undefined,
+                      seesawRightFixedLabel:
+                        typeof st.seesawRightFixedLabel === 'string'
+                          ? cleanSpokenText(st.seesawRightFixedLabel).slice(0, 96)
+                          : undefined,
+                      seesawRightBaseWeight:
+                        typeof st.seesawRightBaseWeight === 'number' ? st.seesawRightBaseWeight : undefined,
+                      seesawTokens: Array.isArray(st.seesawTokens)
+                        ? st.seesawTokens
+                            .filter(
+                              (tk) =>
+                                tk &&
+                                typeof tk === 'object' &&
+                                typeof tk.label === 'string' &&
+                                tk.label.trim() &&
+                                typeof tk.weight === 'number'
+                            )
+                            .slice(0, 5)
+                            .map((tk, tIdx) => ({
+                              id: typeof tk.id === 'string' && tk.id.trim() ? tk.id.slice(0, 32) : `st_${tIdx + 1}`,
+                              label: cleanSpokenText(tk.label).slice(0, 96),
+                              weight: tk.weight,
+                            }))
+                        : undefined,
+                      scratchClueHeader:
+                        typeof st.scratchClueHeader === 'string' && st.scratchClueHeader.trim()
+                          ? cleanSpokenText(st.scratchClueHeader).slice(0, 140)
+                          : undefined,
+                      scratchHiddenFormula:
+                        typeof st.scratchHiddenFormula === 'string' && st.scratchHiddenFormula.trim()
+                          ? cleanSpokenText(st.scratchHiddenFormula).slice(0, 160)
+                          : undefined,
+                      scratchHiddenSubnote:
+                        typeof st.scratchHiddenSubnote === 'string' && st.scratchHiddenSubnote.trim()
+                          ? cleanSpokenText(st.scratchHiddenSubnote).slice(0, 200)
+                          : undefined,
+                      scratchSketchKind:
+                        typeof st.scratchSketchKind === 'string' && ALLOWED_SKETCH_KINDS.has(st.scratchSketchKind.trim())
+                          ? st.scratchSketchKind.trim()
+                          : undefined,
+                      dialTargetDeg: typeof st.dialTargetDeg === 'number' ? st.dialTargetDeg : undefined,
+                      dialInitialDeg: typeof st.dialInitialDeg === 'number' ? st.dialInitialDeg : undefined,
+                      dialUnit: typeof st.dialUnit === 'string' ? cleanSpokenText(st.dialUnit).slice(0, 24) : undefined,
+                      dialStops: Array.isArray(st.dialStops)
+                        ? st.dialStops
+                            .filter(
+                              (ds) =>
+                                ds &&
+                                typeof ds === 'object' &&
+                                typeof ds.angleDeg === 'number' &&
+                                typeof ds.label === 'string' &&
+                                ds.label.trim()
+                            )
+                            .slice(0, 5)
+                            .map((ds) => ({
+                              angleDeg: ds.angleDeg,
+                              label: cleanSpokenText(ds.label).slice(0, 64),
+                              expression: cleanSpokenText(ds.expression || ds.example || ds.label).slice(0, 140),
+                              ...(typeof ds.note === 'string' && ds.note.trim()
+                                ? { note: cleanSpokenText(ds.note).slice(0, 120) }
+                                : {}),
+                            }))
+                        : undefined,
+                      sliceTotal: typeof st.sliceTotal === 'number' ? st.sliceTotal : undefined,
+                      sliceTargetCount: typeof st.sliceTargetCount === 'number' ? st.sliceTargetCount : undefined,
+                      sliceCaptionUnit:
+                        typeof st.sliceCaptionUnit === 'string' && st.sliceCaptionUnit.trim()
+                          ? cleanSpokenText(st.sliceCaptionUnit).slice(0, 48)
+                          : undefined,
+                      magnetTargetTokens: Array.isArray(st.magnetTargetTokens)
+                        ? st.magnetTargetTokens
+                            .map((t) => cleanSpokenText(t).slice(0, 64))
+                            .filter(Boolean)
+                            .slice(0, 6)
+                        : undefined,
+                      magnetDistractors: Array.isArray(st.magnetDistractors)
+                        ? st.magnetDistractors
+                            .map((t) => cleanSpokenText(t).slice(0, 64))
+                            .filter(Boolean)
+                            .slice(0, 4)
+                        : undefined,
+                      magnetSlotRoles: Array.isArray(st.magnetSlotRoles)
+                        ? st.magnetSlotRoles
+                            .map((t) => cleanSpokenText(t).slice(0, 40))
+                            .filter(Boolean)
+                            .slice(0, 6)
+                        : undefined,
+                      waveTargetLevel: typeof st.waveTargetLevel === 'number' ? st.waveTargetLevel : undefined,
+                      waveInitialLevel: typeof st.waveInitialLevel === 'number' ? st.waveInitialLevel : undefined,
+                      waveUnitLabel:
+                        typeof st.waveUnitLabel === 'string' && st.waveUnitLabel.trim()
+                          ? cleanSpokenText(st.waveUnitLabel).slice(0, 40)
+                          : undefined,
+                      sliderDomain:
+                        typeof st.sliderDomain === 'string' && ALLOWED_SLIDER_DOMAINS.has(st.sliderDomain.trim())
+                          ? st.sliderDomain.trim()
+                          : undefined,
+                      mathFnType:
+                        typeof st.mathFnType === 'string' && ALLOWED_MATH_FN_TYPES.has(st.mathFnType.trim())
+                          ? st.mathFnType.trim()
+                          : undefined,
+                      sliderLabel:
+                        typeof st.sliderLabel === 'string' && st.sliderLabel.trim()
+                          ? cleanSpokenText(st.sliderLabel).slice(0, 64)
+                          : undefined,
+                      sliderMin: typeof st.sliderMin === 'number' ? st.sliderMin : undefined,
+                      sliderMax: typeof st.sliderMax === 'number' ? st.sliderMax : undefined,
+                      sliderStep: typeof st.sliderStep === 'number' ? st.sliderStep : undefined,
+                      sliderInitial: typeof st.sliderInitial === 'number' ? st.sliderInitial : undefined,
+                      sliderTarget: typeof st.sliderTarget === 'number' ? st.sliderTarget : undefined,
+                      sliderUnit:
+                        typeof st.sliderUnit === 'string' ? cleanSpokenText(st.sliderUnit).slice(0, 24) : undefined,
+                      sliderStops: Array.isArray(st.sliderStops)
+                        ? st.sliderStops
+                            .filter((ss) => ss && typeof ss === 'object' && typeof ss.value === 'number')
+                            .slice(0, 5)
+                            .map((ss) => ({
+                              value: ss.value,
+                              ...(typeof ss.tag === 'string' && ss.tag.trim() ? { tag: cleanSpokenText(ss.tag).slice(0, 48) } : {}),
+                              ...(typeof ss.label === 'string' && ss.label.trim() ? { label: cleanSpokenText(ss.label).slice(0, 64) } : {}),
+                              ...(typeof ss.expression === 'string' && ss.expression.trim()
+                                ? { expression: cleanSpokenText(ss.expression).slice(0, 140) }
+                                : {}),
+                              ...(typeof ss.example === 'string' && ss.example.trim()
+                                ? { example: cleanSpokenText(ss.example).slice(0, 140) }
+                                : {}),
+                              ...(typeof ss.formula === 'string' && ss.formula.trim()
+                                ? { formula: cleanSpokenText(ss.formula).slice(0, 120) }
+                                : {}),
+                              ...(typeof ss.subnote === 'string' && ss.subnote.trim()
+                                ? { subnote: cleanSpokenText(ss.subnote).slice(0, 140) }
+                                : {}),
+                              ...(typeof ss.spokenHint === 'string' && ss.spokenHint.trim()
+                                ? { spokenHint: cleanSpokenText(ss.spokenHint).slice(0, 160) }
+                                : {}),
+                            }))
+                        : undefined,
+                      strikeTokens: Array.isArray(st.strikeTokens)
+                        ? st.strikeTokens
+                            .map((tk) => cleanSpokenText(tk).slice(0, 64))
+                            .filter(Boolean)
+                            .slice(0, 14)
+                        : undefined,
+                      bugTokenIndex: typeof st.bugTokenIndex === 'number' ? st.bugTokenIndex : undefined,
+                      fixedToken:
+                        typeof st.fixedToken === 'string' ? cleanSpokenText(st.fixedToken).slice(0, 80) : undefined,
+                      derivationSteps: Array.isArray(st.derivationSteps)
+                        ? st.derivationSteps
+                            .filter((ds) => ds && typeof ds === 'object' && (ds.latex || ds.expr))
+                            .slice(0, 6)
+                            .map((ds) => ({
+                              ...(typeof ds.expr === 'string' && ds.expr.trim() ? { expr: cleanSpokenText(ds.expr).slice(0, 160) } : {}),
+                              ...(typeof ds.latex === 'string' && ds.latex.trim() ? { latex: String(ds.latex).trim().slice(0, 220) } : {}),
+                              ...(typeof ds.sideOp === 'string' && ds.sideOp.trim() ? { sideOp: cleanSpokenText(ds.sideOp).slice(0, 96) } : {}),
+                              ...(typeof ds.isInteractiveBlank === 'boolean' ? { isInteractiveBlank: ds.isInteractiveBlank } : {}),
+                              ...(typeof ds.expectedValue === 'string' && ds.expectedValue.trim()
+                                ? { expectedValue: cleanSpokenText(ds.expectedValue).slice(0, 80) }
+                                : {}),
+                              ...(Array.isArray(ds.choices)
+                                ? {
+                                    choices: ds.choices
+                                      .map((c) => cleanSpokenText(c).slice(0, 80))
+                                      .filter(Boolean)
+                                      .slice(0, 4),
+                                  }
+                                : {}),
+                              ...(typeof ds.hint === 'string' && ds.hint.trim() ? { hint: cleanSpokenText(ds.hint).slice(0, 200) } : {}),
+                            }))
+                        : undefined,
+                      title: finalStepTitle,
                       text: typeof st.text === 'string' ? cleanSpokenText(st.text).slice(0, 900) : undefined,
                       bullets: Array.isArray(st.bullets)
                         ? st.bullets.map((b) => cleanSpokenText(b).slice(0, 420)).filter(Boolean).slice(0, 6)
@@ -2986,7 +3377,7 @@ JSON only: {"aiReply":"...","aiReplyTranslation":"...","diagnosis":{"ok":true,"m
                       strokeCount: typeof st.strokeCount === 'number' ? st.strokeCount : undefined,
                       spokenNarration:
                         typeof (st.spokenNarration || st.spoken_narration) === 'string'
-                          ? cleanSpokenText(st.spokenNarration || st.spoken_narration).slice(0, 1100)
+                          ? stripRoboticSelfIntro(cleanSpokenText(st.spokenNarration || st.spoken_narration)).slice(0, 1100)
                           : undefined,
                       mnemonic:
                         typeof st.mnemonic === 'string'
@@ -3187,7 +3578,7 @@ JSON only: {"aiReply":"...","aiReplyTranslation":"...","diagnosis":{"ok":true,"m
               kind: 'formula_blocks',
               sceneTheme: undefined,
               title: 'Peta 4 Slot Sah: Verb 1 vs To Be',
-              caption: 'To Be hanya sah untuk Sifat/Benda, Verb ing (sedang), atau Verb 3 (pasif) — BUKAN Verb 1 aktif!',
+              caption: 'To Be hanya sah untuk Sifat/Benda, Verb ing (sedang), atau Verb 3 (pasif), BUKAN Verb 1 aktif!',
               rightText: cleanSample,
               wrongText: cleanWrong,
               highlightTerms: ['Verb 1', 'To Be', 'Verb ing', 'Verb 3', 'Adjective', cleanSample].filter(Boolean),

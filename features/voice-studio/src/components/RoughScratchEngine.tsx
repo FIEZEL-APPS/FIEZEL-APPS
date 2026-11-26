@@ -403,8 +403,8 @@ export const ScratchRevealFoilLab: React.FC<MechanicWidgetProps> = ({
       data-solved={solved ? '1' : '0'}
       className="py-2 space-y-2.5"
     >
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2 min-w-0">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-2 flex-1 min-w-0 pr-1">
           <span
             className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider shrink-0"
             style={{ backgroundColor: pal.wash, color: pal.ink }}
@@ -521,8 +521,8 @@ export const BalanceSeesawLab: React.FC<MechanicWidgetProps> = ({
     if (Array.isArray(step.seesawTokens) && step.seesawTokens.length >= 2) {
       return step.seesawTokens;
     }
-    const rightAns = step.rightText || step.highlightPhrase || pickL(locale, 'Matching Form', 'Pasangan Tepat');
-    const wrongAns = step.wrongText || pickL(locale, 'Mismatched Form', 'Bentuk Keliru');
+    const rightAns = step.rightText || step.highlightPhrase || pickL(locale, 'Balancing Value', 'Nilai Penyeimbang');
+    const wrongAns = step.wrongText || pickL(locale, 'Distractor Value', 'Nilai Pengalih');
     const needW = Math.max(1, targetWeight - rightBaseWeight);
     return [
       { id: 't_match', label: rightAns, weight: needW },
@@ -609,8 +609,8 @@ export const BalanceSeesawLab: React.FC<MechanicWidgetProps> = ({
       data-solved={solved ? '1' : '0'}
       className="py-2 space-y-2.5"
     >
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2 min-w-0">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-2 flex-1 min-w-0 pr-1">
           <span
             className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider shrink-0"
             style={{ backgroundColor: pal.wash, color: pal.ink }}
@@ -819,10 +819,10 @@ export const VennBucketSorterLab: React.FC<MechanicWidgetProps> = ({
       return step.bucketZones.slice(0, 3);
     }
     return [
-      { id: 'z_a', label: step.termA || pickL(locale, 'Valid Pattern', 'Pola Tepat'), sublabel: step.descA || '' },
-      { id: 'z_b', label: step.termB || pickL(locale, 'Contrast / Trap', 'Pembanding'), sublabel: step.descB || '' },
+      { id: 'z_a', label: step.termA || step.title || pickL(locale, 'Category A', 'Kategori Utama'), sublabel: step.descA || '' },
+      { id: 'z_b', label: step.termB || pickL(locale, 'Category B', 'Kategori Kontras'), sublabel: step.descB || '' },
     ];
-  }, [step.bucketZones, step.termA, step.descA, step.termB, step.descB, locale]);
+  }, [step.bucketZones, step.termA, step.descA, step.termB, step.descB, step.title, locale]);
 
   const chips: BucketSortableChip[] = useMemo(() => {
     if (Array.isArray(step.bucketChips) && step.bucketChips.length >= 2) {
@@ -898,8 +898,8 @@ export const VennBucketSorterLab: React.FC<MechanicWidgetProps> = ({
       data-solved={solved ? '1' : '0'}
       className="py-2 space-y-3"
     >
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2 min-w-0">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-2 flex-1 min-w-0 pr-1">
           <span
             className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider shrink-0"
             style={{ backgroundColor: pal.wash, color: pal.ink }}
@@ -994,11 +994,11 @@ export const WireNodeConnectorLab: React.FC<MechanicWidgetProps> = ({
     if (Array.isArray(step.wirePairs) && step.wirePairs.length >= 2) {
       return step.wirePairs.slice(0, 4);
     }
-    const rightAns = step.rightText || step.text || pickL(locale, 'Accurate Form', 'Bentuk Tepat');
-    const wrongAns = step.wrongText || pickL(locale, 'Common Trap', 'Jebakan Umum');
+    const rightAns = step.rightText || step.text || pickL(locale, 'Natural Expression', 'Ungkapan Alami');
+    const wrongAns = step.wrongText || pickL(locale, 'Common Mistake', 'Jebakan Umum');
     return [
-      { id: 'w1', leftLabel: pickL(locale, 'Use This', 'Gunakan Ini'), rightLabel: rightAns },
-      { id: 'w2', leftLabel: pickL(locale, 'Avoid Trap', 'Hindari Ini'), rightLabel: wrongAns },
+      { id: 'w1', leftLabel: pickL(locale, 'Natural ✓', 'Kalimat Alami ✓'), rightLabel: rightAns },
+      { id: 'w2', leftLabel: pickL(locale, 'Watch Out ✕', 'Jebakan Umum ✕'), rightLabel: wrongAns },
     ];
   }, [step.wirePairs, step.rightText, step.text, step.wrongText, locale]);
 
@@ -1067,10 +1067,10 @@ export const WireNodeConnectorLab: React.FC<MechanicWidgetProps> = ({
     <div
       data-testid="wb-wire-connector-lab"
       data-solved={solved ? '1' : '0'}
-      className="py-2 space-y-2.5"
+      className="py-2 space-y-2.5 w-full max-w-full overflow-x-hidden"
     >
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2 min-w-0">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-2 flex-1 min-w-0 pr-1">
           <span
             className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider shrink-0"
             style={{ backgroundColor: pal.wash, color: pal.ink }}
@@ -1200,13 +1200,13 @@ export const RotaryDialGaugeLab: React.FC<MechanicWidgetProps> = ({
     if (Array.isArray(step.dialStops) && step.dialStops.length >= 2) {
       return step.dialStops;
     }
-    const lowExpr = step.wrongText || pickL(locale, 'Starting State', 'Kondisi Awal');
-    const midExpr = step.text || step.caption || step.title || pickL(locale, 'Core Rule', 'Kunci Aturan');
-    const topExpr = step.rightText || step.highlightPhrase || step.title || pickL(locale, 'Target Form', 'Bentuk Tepat');
+    const lowExpr = step.wrongText || pickL(locale, 'Low Intensity', 'Tingkat Dasar');
+    const midExpr = step.text || step.caption || step.title || pickL(locale, 'Mid Intensity', 'Tingkat Menengah');
+    const topExpr = step.rightText || step.highlightPhrase || step.title || pickL(locale, 'Peak Target', 'Target Utama');
     return [
-      { angleDeg: 28, label: pickL(locale, 'Step 1', 'Awal'), expression: lowExpr },
-      { angleDeg: 90, label: pickL(locale, 'Step 2', 'Tengah'), expression: midExpr },
-      { angleDeg: 152, label: pickL(locale, 'Target', 'Target'), expression: topExpr },
+      { angleDeg: 28, label: pickL(locale, 'Low', 'Rendah'), expression: lowExpr },
+      { angleDeg: 90, label: pickL(locale, 'Mid', 'Sedang'), expression: midExpr },
+      { angleDeg: 152, label: pickL(locale, 'High', 'Tinggi'), expression: topExpr },
     ];
   }, [step.dialStops, step.wrongText, step.text, step.caption, step.title, step.rightText, step.highlightPhrase, locale]);
 
@@ -1291,8 +1291,8 @@ export const RotaryDialGaugeLab: React.FC<MechanicWidgetProps> = ({
       data-solved={solved ? '1' : '0'}
       className="py-2 space-y-2.5"
     >
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2 min-w-0">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-2 flex-1 min-w-0 pr-1">
           <span
             className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider shrink-0"
             style={{ backgroundColor: pal.wash, color: pal.ink }}
@@ -1460,8 +1460,8 @@ export const FractionSliceShaderLab: React.FC<MechanicWidgetProps> = ({
       data-solved={solved ? '1' : '0'}
       className="py-2 space-y-2.5"
     >
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2 min-w-0">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-2 flex-1 min-w-0 pr-1">
           <span
             className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider shrink-0"
             style={{ backgroundColor: pal.wash, color: pal.ink }}
@@ -1563,7 +1563,7 @@ export const MagneticSlotBuilderLab: React.FC<MechanicWidgetProps> = ({
     if (parts.length >= 2) return parts.slice(0, 4);
     const words = rawSource.split(/\s+/).filter(Boolean);
     if (words.length >= 2) return words.slice(0, 5);
-    return [pickL(locale, 'Part 1', 'Bagian 1'), pickL(locale, 'Part 2', 'Bagian 2')];
+    return [pickL(locale, 'Element 1', 'Unsur 1'), pickL(locale, 'Element 2', 'Unsur 2')];
   }, [step.magnetTargetTokens, step.rightText, step.text, step.title, locale]);
 
   const pool = useMemo(() => {
@@ -1619,8 +1619,8 @@ export const MagneticSlotBuilderLab: React.FC<MechanicWidgetProps> = ({
       data-solved={solved ? '1' : '0'}
       className="py-2 space-y-2.5"
     >
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2 min-w-0">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-2 flex-1 min-w-0 pr-1">
           <span
             className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider shrink-0"
             style={{ backgroundColor: pal.wash, color: pal.ink }}
@@ -1775,8 +1775,8 @@ export const WavePendulumOscillatorLab: React.FC<MechanicWidgetProps> = ({
       data-solved={solved ? '1' : '0'}
       className="py-2 space-y-2.5"
     >
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2 min-w-0">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-2 flex-1 min-w-0 pr-1">
           <span
             className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider shrink-0"
             style={{ backgroundColor: pal.wash, color: pal.ink }}

@@ -21,6 +21,7 @@ import {
   cleanStepCaptionAndSpokenText,
   deriveHeadingSpokenNarration,
   openerSpokenText,
+  stripMetaStepTitle,
   type OpenerPacketLike,
 } from './boardSpeechText';
 import { layoutGraphToShapes } from './dagreLayout';
@@ -463,7 +464,7 @@ export function isTrivialFillerBullet(val: string): boolean {
     /^(perhatikan baik[- ]?baik|dengar(?:kan)? baik[- ]?baik(?:\s+kawan)?|simak baik[- ]?baik|lihat contoh ini|pelajari ini|catat baik[- ]?baik(?:\s+aturan\s+ini)?|ayo kita pelajari|yuk simak)$/i.test(
       t
     ) ||
-    /^(halo(?:\s+[\w\s,]{1,24})?|hai(?:\s+kawan|\s+semuanya)?|coach\s+\w+\s+di\s+sini|selamat\s+datang\s+di\s+papan\s+(?:belajar|penjelasan)(?:\s+[\w\s]{0,24})?|mari\s+kita\s+(?:mulai|bedah|pelajari)(?:\s+dari\s+(?:awal|pertanyaanmu|nol))?)$/i.test(
+    /^(halo(?:\s+[\w\s,]{1,24})?|hai(?:\s+kawan|\s+semuanya)?|coach\s+\w+\s+di\s+sini|selamat\s+datang\s+di\s+papan\s+(?:belajar|penjelasan)(?:\s+[\w\s]{0,24})?|mari\s+kita\s+(?:mulai|bedah|pelajari|perbaiki|bahas|pahami)(?:\s+[\w\s-]{1,56})?)$/i.test(
       t
     )
   );
@@ -585,9 +586,10 @@ function sanitizeSceneShape(sh: WhiteboardVectorShape): WhiteboardVectorShape {
 }
 
 function sanitizeStepVisualFields(step: WhiteboardStepCommand): WhiteboardStepCommand {
+  const cleanedTitle = step.title ? stripMetaStepTitle(cleanBoardDisplayText(step.title)) : step.title;
   const next: WhiteboardStepCommand = {
     ...step,
-    title: step.title ? cleanBoardDisplayText(step.title) : step.title,
+    title: cleanedTitle,
     text: step.text ? cleanBoardDisplayText(step.text) : step.text,
     caption: step.caption ? cleanBoardDisplayText(step.caption) : step.caption,
     highlightPhrase: step.highlightPhrase ? cleanBoardDisplayText(step.highlightPhrase) : step.highlightPhrase,
@@ -1484,7 +1486,7 @@ function synthesizePolymathStemBeats(
           column: 'left',
           phaseIndex: 1,
           pauseForInteraction: true,
-          title: 'Eliminasi Cepat Sistem Persamaan Linear',
+          title: `Eliminasi: $x + y = ${sumXY}$ & $x - y = ${diffXY}$`,
           wirePairs: [
             { id: 'sp1', leftLabel: `1. Jumlahkan kedua persamaan (+y dan -y habis)`, rightLabel: `$2x = ${sumXY + diffXY}$` },
             { id: 'sp2', leftLabel: '2. Bagi dua untuk mendapat nilai x', rightLabel: `$x = ${xVal}$` },
@@ -2029,6 +2031,369 @@ function synthesizePolymathStemBeats(
         },
       ];
     }
+  }
+
+  // 5F. Statistics: Mean, Median, Modus (`data 4, 7, 7, 9, 13`, Q174)!
+  if (/\b(?:mean|rata-rata|median|modus)\b/i.test(blob)) {
+    const dataListMatch = extraContextText.match(/\d+(?:\s*,\s*\d+){2,}/) || queryAndTitleBlob.match(/\d+(?:\s*,\s*\d+){2,}/);
+    const nums = dataListMatch
+      ? dataListMatch[0].split(',').map((s) => Number(s.trim())).filter((n) => Number.isFinite(n))
+      : [4, 7, 7, 9, 13];
+    if (nums.length >= 3) {
+      const sorted = [...nums].sort((a, b) => a - b);
+      const sum = sorted.reduce((acc, v) => acc + v, 0);
+      const meanVal = sum / sorted.length;
+      const meanStr = Number.isInteger(meanVal) ? String(meanVal) : meanVal.toFixed(1);
+      const midIdx = Math.floor(sorted.length / 2);
+      const medianVal = sorted.length % 2 === 1 ? sorted[midIdx] : (sorted[midIdx - 1] + sorted[midIdx]) / 2;
+      const medianStr = Number.isInteger(medianVal) ? String(medianVal) : medianVal.toFixed(1);
+      const freq = new Map<number, number>();
+      sorted.forEach((n) => freq.set(n, (freq.get(n) || 0) + 1));
+      let modeVal = sorted[0];
+      let maxF = 0;
+      freq.forEach((f, k) => {
+        if (f > maxF) {
+          maxF = f;
+          modeVal = k;
+        }
+      });
+      return [
+        {
+          id: 'wb_dyn_stats_wires',
+          kind: 'interactive_mechanic',
+          mechanic: 'wire_node_connector',
+          inkPalette: 'cobalt_blueprint',
+          roughHatch: 'hachure',
+          domainType: 'math',
+          column: 'left',
+          phaseIndex: 1,
+          pauseForInteraction: true,
+          title: `Bedah Data: ${sorted.join(', ')}`,
+          wirePairs: [
+            { id: 'st1', leftLabel: 'Mean (Jumlah ÷ Banyak data)', rightLabel: `${sum} ÷ ${sorted.length} = ${meanStr}` },
+            { id: 'st2', leftLabel: 'Median (Nilai tengah terurut)', rightLabel: `Posisi tengah = ${medianStr}` },
+            { id: 'st3', leftLabel: 'Modus (Paling sering muncul)', rightLabel: `Angka ${modeVal} (${maxF}× muncul)` },
+          ],
+          socraticPrompt: `Hubungkan ukuran Mean, Median, dan Modus dengan hasil dari data ${sorted.join(', ')}!`,
+          successVoiceFeedback: `Lengkap! Dari data ${sorted.join(', ')}, rata-ratanya ${meanStr}, nilai tengahnya ${medianStr}, dan modusnya ${modeVal}!`,
+          spokenNarration: `Pastikan datanya sudah urut dari terkecil dulu yaitu ${sorted.join(', ')}: Mean menjumlahkan semuanya lalu dibagi ${sorted.length}, Median mengambil angka tepat di tengah, dan Modus mencari angka yang paling sering muncul. Sambungkan ketiganya di kiri!`,
+        },
+        {
+          id: 'wb_dyn_stats_deriv',
+          kind: 'step_derivation',
+          inkPalette: 'amber_fulcrum',
+          roughHatch: 'cross-hatch',
+          domainType: 'math',
+          column: 'right',
+          phaseIndex: 2,
+          pauseForInteraction: true,
+          title: `Hitung Rata-Rata ($\\bar{x}$)`,
+          derivationSteps: [
+            { latex: `\\bar{x} = \\frac{${sorted.join(' + ')}}{${sorted.length}}`, sideOp: 'Jumlahkan seluruh data' },
+            {
+              latex: `\\bar{x} = \\frac{${sum}}{${sorted.length}} = ?`,
+              isInteractiveBlank: true,
+              expectedValue: meanStr,
+              choices: Array.from(new Set([meanStr, String(sum), String(modeVal + 2)])),
+              hint: `Bagi total ${sum} dengan banyaknya data (${sorted.length})!`,
+            },
+          ],
+          socraticPrompt: `Berapa hasil akhir rata-rata (Mean) dari ${sum} dibagi ${sorted.length}?`,
+          successVoiceFeedback: `Tepat! ${sum} dibagi ${sorted.length} menghasilkan Mean ${meanStr}!`,
+        },
+      ];
+    }
+  }
+
+  // 5G. Arithmetic Sequence (`barisan aritmatika`, `3, 7, 11, 15`, `suku ke-10`, Q176)!
+  if (/barisan\s*aritmatika|deret\s*aritmatika|suku\s*ke-\d+/i.test(blob)) {
+    const seqMatch = queryAndTitleBlob.match(/(-?\d+)\s*,\s*(-?\d+)\s*,\s*(-?\d+)/);
+    const nthMatch = queryAndTitleBlob.match(/suku\s*ke[- ]?(\d+)/i);
+    if (seqMatch) {
+      const a1 = Number(seqMatch[1]);
+      const a2 = Number(seqMatch[2]);
+      const b = a2 - a1;
+      const n = nthMatch ? Math.max(4, Number(nthMatch[1])) : 10;
+      const unVal = a1 + (n - 1) * b;
+      const bSign = b >= 0 ? `+${b}` : `${b}`;
+      return [
+        {
+          id: 'wb_dyn_arith_wires',
+          kind: 'interactive_mechanic',
+          mechanic: 'wire_node_connector',
+          inkPalette: 'indigo_constellation',
+          roughHatch: 'dots',
+          domainType: 'math',
+          column: 'left',
+          phaseIndex: 1,
+          pauseForInteraction: true,
+          title: `Pola Loncatan: ${a1}, ${a2}, ${Number(seqMatch[3])}, ...`,
+          wirePairs: [
+            { id: 'ar1', leftLabel: 'Suku pertama (a)', rightLabel: `Mulai dari ${a1}` },
+            { id: 'ar2', leftLabel: 'Beda tiap langkah (b)', rightLabel: `Loncat tetap ${bSign}` },
+            { id: 'ar3', leftLabel: `Menuju suku ke-${n} (${n - 1} loncatan)`, rightLabel: `${a1} + ${n - 1} × ${b} = ${unVal}` },
+          ],
+          socraticPrompt: `Hubungkan suku awal, beda loncatan, dan banyak loncatan menuju suku ke-${n}!`,
+          successVoiceFeedback: `Tepat! Karena dari suku ke-1 ke suku ke-${n} ada ${n - 1} kali loncatan sebesar ${b}, nilainya adalah ${unVal}!`,
+          spokenNarration: `Rahasia rumus barisan aritmatika sangat logis: untuk mencapai suku ke-${n}, kita mulai dari angka pertama ${a1} lalu melompat sebanyak ${n - 1} kali dengan beda ${b}. Hubungkan ketiga unsurnya di kiri!`,
+        },
+        {
+          id: 'wb_dyn_arith_deriv',
+          kind: 'step_derivation',
+          inkPalette: 'teal_oscillator',
+          roughHatch: 'hachure',
+          domainType: 'math',
+          column: 'right',
+          phaseIndex: 2,
+          pauseForInteraction: true,
+          title: `Hitung Suku ke-${n} ($U_{${n}}$)`,
+          derivationSteps: [
+            { latex: `U_{${n}} = a + (${n} - 1)b = ${a1} + ${n - 1} \\cdot ${b}`, sideOp: `${n - 1} kali loncatan` },
+            {
+              latex: `U_{${n}} = ${a1} + ${(n - 1) * b} = ?`,
+              isInteractiveBlank: true,
+              expectedValue: String(unVal),
+              choices: Array.from(new Set([String(unVal), String(a1 + n * b), String(a1 * n)])),
+              hint: `Jumlahkan suku awal ${a1} dengan ${(n - 1) * b}!`,
+            },
+          ],
+          socraticPrompt: `Berapa nilai suku ke-${n} ($U_{${n}}$) dari barisan tersebut?`,
+          successVoiceFeedback: `Persis! ${a1} ditambah ${(n - 1) * b} menghasilkan suku ke-${n} sebesar ${unVal}!`,
+        },
+      ];
+    }
+  }
+
+  // 5H. Triangle Area (`luas segitiga`, `setengah alas kali tinggi`, Q180)!
+  if (/luas\s*segitiga|setengah\s*alas\s*kali\s*tinggi/i.test(queryAndTitleBlob)) {
+    const alasM = queryAndTitleBlob.match(/alas(?:nya)?\s*(\d+)/i);
+    const tinggiM = queryAndTitleBlob.match(/tinggi(?:nya)?\s*(\d+)/i);
+    const a = alasM ? Number(alasM[1]) : 12;
+    const t = tinggiM ? Number(tinggiM[1]) : 8;
+    const rectArea = a * t;
+    const triArea = rectArea / 2;
+    return [
+      {
+        id: 'wb_dyn_tri_wires',
+        kind: 'interactive_mechanic',
+        mechanic: 'wire_node_connector',
+        inkPalette: 'emerald_botanical',
+        roughHatch: 'hachure',
+        domainType: 'math',
+        column: 'left',
+        phaseIndex: 1,
+        pauseForInteraction: true,
+        title: `Segitiga = Belahan Persegi Panjang (${a} × ${t})`,
+        wirePairs: [
+          { id: 'tg1', leftLabel: `1. Persegi panjang utuh (${a} × ${t})`, rightLabel: `Luas penuh = ${rectArea}` },
+          { id: 'tg2', leftLabel: '2. Potong miring diagonal', rightLabel: 'Terbelah jadi 2 segitiga kembar' },
+          { id: 'tg3', leftLabel: '3. Luas 1 segitiga (½ × alas × tinggi)', rightLabel: `½ × ${rectArea} = ${triArea}` },
+        ],
+        socraticPrompt: 'Hubungkan alasan geometris kenapa rumus luas segitiga selalu memiliki pengali ½!',
+        successVoiceFeedback: `Tepat! Setiap segitiga adalah tepat separuh dari persegi panjang beralas ${a} dan bertinggi ${t}, sehingga luasnya setengah dari ${rectArea} yaitu ${triArea}!`,
+        spokenNarration: `Kenapa luas segitiga ada angka setengahnya? Karena kalau dua segitiga siku-siku digabung menyilang, bentuknya menjadi satu persegi panjang utuh beralas kali tinggi! Sambungkan buktinya di kiri!`,
+      },
+      {
+        id: 'wb_dyn_tri_deriv',
+        kind: 'step_derivation',
+        inkPalette: 'amber_fulcrum',
+        roughHatch: 'cross-hatch',
+        domainType: 'math',
+        column: 'right',
+        phaseIndex: 2,
+        pauseForInteraction: true,
+        title: `Hitung Luas Segitiga ($a=${a}, t=${t}$)`,
+        derivationSteps: [
+          { latex: `L = \\frac{1}{2} \\cdot a \\cdot t = \\frac{1}{2} \\cdot ${a} \\cdot ${t}`, sideOp: 'Separuh persegi panjang' },
+          {
+            latex: `L = \\frac{${rectArea}}{2} = ?`,
+            isInteractiveBlank: true,
+            expectedValue: String(triArea),
+            choices: [String(triArea), String(rectArea), String(a + t)],
+            hint: `Bagi luas persegi panjang ${rectArea} menjadi dua!`,
+          },
+        ],
+        socraticPrompt: `Berapa luas segitiga dengan alas ${a} dan tinggi ${t}?`,
+        successVoiceFeedback: `Mantap! Setengah dari ${a} dikali ${t} adalah ${triArea}!`,
+      },
+    ];
+  }
+
+  // 5I. Cylinder Volume (`volume tabung`, `jari-jari 7`, `tinggi 10`, Q181)!
+  if (/volume\s*tabung/i.test(queryAndTitleBlob)) {
+    const rM = queryAndTitleBlob.match(/jari[- ]?jari(?:nya)?\s*(\d+)|\br\s*=\s*(\d+)/i);
+    const tM = queryAndTitleBlob.match(/tinggi(?:nya)?\s*(\d+)|\bt\s*=\s*(\d+)/i);
+    const r = rM ? Number(rM[1] || rM[2]) : 7;
+    const h = tM ? Number(tM[1] || tM[2]) : 10;
+    const isM7 = r % 7 === 0;
+    const baseNum = isM7 ? (22 / 7) * r * r : Number((3.14 * r * r).toFixed(2));
+    const volNum = Number((baseNum * h).toFixed(2));
+    return [
+      {
+        id: 'wb_dyn_cyl_wires',
+        kind: 'interactive_mechanic',
+        mechanic: 'wire_node_connector',
+        inkPalette: 'teal_oscillator',
+        roughHatch: 'dots',
+        domainType: 'math',
+        column: 'left',
+        phaseIndex: 1,
+        pauseForInteraction: true,
+        title: `Volume Tabung ($r = ${r}\\text{ cm}, t = ${h}\\text{ cm}$)`,
+        wirePairs: [
+          { id: 'cy1', leftLabel: `1. Luas lingkaran alas ($\\pi r^2$)`, rightLabel: `${baseNum} cm²` },
+          { id: 'cy2', leftLabel: `2. Tumpuk setinggi $t = ${h}\\text{ cm}$`, rightLabel: `Kalikan dengan ${h} cm` },
+          { id: 'cy3', leftLabel: '3. Volume penuh tabung', rightLabel: `${volNum} cm³` },
+        ],
+        socraticPrompt: `Hubungkan tahapan menghitung volume tabung dari luas alas lingkaran hingga dikalikan tinggi!`,
+        successVoiceFeedback: `Presisi! Tabung hanyalah kepingan lingkaran seluas ${baseNum} cm² yang ditumpuk setinggi ${h} cm menjadi ${volNum} cm³!`,
+        spokenNarration: `Bayangkan tabung seperti tumpukan koin: hitung dulu luas satu lingkaran alasnya dengan pi r kuadrat yaitu ${baseNum} cm persegi, lalu kalikan dengan tingginya ${h} cm! Sambungkan ketiganya di kiri!`,
+      },
+      {
+        id: 'wb_dyn_cyl_deriv',
+        kind: 'step_derivation',
+        inkPalette: 'cobalt_blueprint',
+        roughHatch: 'hachure',
+        domainType: 'math',
+        column: 'right',
+        phaseIndex: 2,
+        pauseForInteraction: true,
+        title: 'Hitung Volume Akhir ($V = \\pi r^2 t$)',
+        derivationSteps: [
+          {
+            latex: isM7
+              ? `L_{\\text{alas}} = \\frac{22}{7} \\cdot ${r} \\cdot ${r} = ${baseNum}\\text{ cm}^2`
+              : `L_{\\text{alas}} = 3.14 \\cdot ${r}^2 = ${baseNum}\\text{ cm}^2`,
+            sideOp: 'Luas lingkaran bawah',
+          },
+          {
+            latex: `V = ${baseNum} \\cdot ${h} = ?`,
+            isInteractiveBlank: true,
+            expectedValue: `${volNum} cm³`,
+            choices: [`${volNum} cm³`, `${baseNum + h} cm³`, `${2 * (isM7 ? (22 / 7) * r : Number((3.14 * r).toFixed(1))) * h} cm³`],
+            hint: `Kalikan luas alas ${baseNum} cm² dengan tinggi ${h} cm!`,
+          },
+        ],
+        socraticPrompt: `Berapa volume tabung tersebut dalam cm³?`,
+        successVoiceFeedback: `Tepat sekali! ${baseNum} dikali ${h} menghasilkan volume ${volNum} cm³!`,
+      },
+    ];
+  }
+
+  // 5J. Inverse Proportion (`perbandingan berbalik nilai` / `pekerja ... hari`, Q184)!
+  if (/berbalik\s*nilai|(\d+)\s*pekerja.{1,25}?(\d+)\s*hari/i.test(queryAndTitleBlob)) {
+    const nums = (queryAndTitleBlob.match(/\d+/g) || []).map(Number).filter((n) => n > 0);
+    if (nums.length >= 3) {
+      const [p1, h1, p2] = nums;
+      const totalWork = p1 * h1;
+      const h2 = totalWork / p2;
+      if (Number.isFinite(h2) && Number.isInteger(h2)) {
+        const wrongDirect = Math.round((h1 * p2) / p1);
+        return [
+          {
+            id: 'wb_dyn_invprop_seesaw',
+            kind: 'interactive_mechanic',
+            mechanic: 'balance_seesaw',
+            inkPalette: 'amber_fulcrum',
+            roughHatch: 'hachure',
+            domainType: 'math',
+            column: 'left',
+            phaseIndex: 1,
+            pauseForInteraction: true,
+            title: `Timbangan Beban Kerja Tetap ($p_1 \\times h_1 = p_2 \\times h_2$)`,
+            seesawLeftFixedLabel: `${p1} orang × ${h1} hari (${totalWork} unit)`,
+            seesawLeftWeight: totalWork,
+            seesawRightBaseWeight: 0,
+            seesawRightFixedLabel: '',
+            seesawTokens: [
+              { id: 'ip_ok', label: `${p2} orang × ${h2} hari`, weight: totalWork },
+              { id: 'ip_trap', label: `${p2} orang × ${wrongDirect} hari`, weight: p2 * wrongDirect },
+              { id: 'ip_lo', label: `${p2} orang × ${Math.max(1, h2 - 2)} hari`, weight: p2 * Math.max(1, h2 - 2) },
+            ],
+            socraticPrompt: `Pekerja bertambah jadi ${p2} orang, otomatis hari makin cepat! Ketuk pasangan yang total bebannya sama (${totalWork})!`,
+            successVoiceFeedback: `Seimbang di ${totalWork} unit kerja! Karena pekerja naik dari ${p1} ke ${p2} orang, waktunya turun menjadi ${h2} hari!`,
+            spokenNarration: `Hati-hati jebakan kali silang biasa! Pada perbandingan berbalik nilai, makin banyak pekerja justru makin cepat selesai karena hasil kali orang dikali hari selalu tetap ${totalWork}. Seimbangkan timbangan di kiri!`,
+          },
+          {
+            id: 'wb_dyn_invprop_deriv',
+            kind: 'step_derivation',
+            inkPalette: 'violet_prism',
+            roughHatch: 'cross-hatch',
+            domainType: 'math',
+            column: 'right',
+            phaseIndex: 2,
+            pauseForInteraction: true,
+            title: 'Hitung Waktu Selesai ($h_2$)',
+            derivationSteps: [
+              { latex: `${p1} \\cdot ${h1} = ${p2} \\cdot h_2 \\implies ${totalWork} = ${p2} \\cdot h_2`, sideOp: 'Total kerja tetap' },
+              {
+                latex: `h_2 = \\frac{${totalWork}}{${p2}} = ?`,
+                isInteractiveBlank: true,
+                expectedValue: `${h2} hari`,
+                choices: Array.from(new Set([`${h2} hari`, `${wrongDirect} hari`, `${totalWork} hari`])),
+                hint: `Bagi total beban ${totalWork} dengan ${p2} pekerja!`,
+              },
+            ],
+            socraticPrompt: `Berapa hari proyek selesai jika dikerjakan oleh ${p2} pekerja?`,
+            successVoiceFeedback: `Tepat! ${totalWork} dibagi ${p2} orang selesai dalam ${h2} hari!`,
+          },
+        ];
+      }
+    }
+  }
+
+  // 5K. Order of Operations / KuKaBaTaKu (`6 + 4 × 3`, `perkalian didahulukan`, Q185)!
+  const orderOpMatch = queryAndTitleBlob.match(/(\d+)\s*\+\s*(\d+)\s*(?:×|\*|x|kali)\s*(\d+)/i);
+  if (orderOpMatch || /kukabataku|perkalian\s+didahulukan|operasi\s+hitung\s+campuran/i.test(blob)) {
+    const a = orderOpMatch ? Number(orderOpMatch[1]) : 6;
+    const b = orderOpMatch ? Number(orderOpMatch[2]) : 4;
+    const c = orderOpMatch ? Number(orderOpMatch[3]) : 3;
+    const mul = b * c;
+    const ans = a + mul;
+    const wrongSeq = (a + b) * c;
+    return [
+      {
+        id: 'wb_dyn_orderop_slots',
+        kind: 'interactive_mechanic',
+        mechanic: 'magnetic_slot_builder',
+        inkPalette: 'crimson_scalpel',
+        roughHatch: 'hachure',
+        domainType: 'math',
+        column: 'left',
+        phaseIndex: 1,
+        pauseForInteraction: true,
+        title: `Prioritas KuKaBaTaKu: $${a} + ${b} \\times ${c}$`,
+        magnetSlotRoles: ['1. Kali Duluan', '2. Baru Tambah', '3. Hasil Akhir'],
+        magnetTargetTokens: [`${b} × ${c} = ${mul}`, `${a} + ${mul}`, `= ${ans}`],
+        magnetDistractors: [`(${a}+${b}) × ${c} = ${wrongSeq}`],
+        socraticPrompt: `Rakit urutan pengerjaan $${a} + ${b} \\times ${c}$ sesuai hierarki operasi hitung!`,
+        successVoiceFeedback: `Tepat! Perkalian adalah penjumlahan berulang (${b} × ${c} = ${mul}) sehingga wajib dikerjakan sebelum menjumlahkan ${a}, menghasilkan ${ans}!`,
+        spokenNarration: `Kenapa ${a} tambah ${b} kali ${c} hasilnya ${ans} dan bukan ${wrongSeq}? Karena ${b} kali ${c} adalah satu paket penjumlahan berulang bernilai ${mul} yang tidak boleh dipecah! Susun prioritasnya di kiri!`,
+      },
+      {
+        id: 'wb_dyn_orderop_deriv',
+        kind: 'step_derivation',
+        inkPalette: 'cobalt_blueprint',
+        roughHatch: 'dots',
+        domainType: 'math',
+        column: 'right',
+        phaseIndex: 2,
+        pauseForInteraction: true,
+        title: 'Evaluasi Bertahap',
+        derivationSteps: [
+          { latex: `${a} + (${b} \\times ${c}) = ${a} + ${mul}`, sideOp: 'Hitung perkalian dulu' },
+          {
+            latex: `${a} + ${mul} = ?`,
+            isInteractiveBlank: true,
+            expectedValue: String(ans),
+            choices: [String(ans), String(wrongSeq), String(a * b + c)],
+            hint: `Jumlahkan ${a} dengan hasil perkalian ${mul}!`,
+          },
+        ],
+        socraticPrompt: `Ketuk hasil akhir yang tepat dari $${a} + ${b} \\times ${c}$!`,
+        successVoiceFeedback: `Persis! ${a} ditambah ${mul} hasilnya ${ans}, bukan ${wrongSeq}!`,
+      },
+    ];
   }
 
   // 6. Trigonometry (`sin cos tan` / `demi sami desa`, Q39)!
@@ -3035,7 +3400,14 @@ function splitTitleIntoPair(title: string): [string, string] | null {
   const cleaned = stripComparisonFluff(title);
   const m = cleaned.match(/^(.{2,34}?)\s+(?:vs\.?|versus|sama|dengan|lawan|dibanding)\s+(.{2,34})$/i);
   if (!m) return null;
-  return [stripComparisonFluff(m[1]), stripComparisonFluff(m[2])];
+  const left = stripComparisonFluff(m[1]);
+  let right = stripComparisonFluff(m[2]);
+  // Inherit headword for bare suffix contrasts like "Adjective -ing vs -ed" -> ["Adjective -ing", "Adjective -ed"]
+  const leftHeadMatch = left.match(/^([A-Za-z\s]{3,20}?)\s+(-[a-z]+)$/i);
+  if (leftHeadMatch && /^-[a-z]+$/i.test(right)) {
+    right = `${leftHeadMatch[1].trim()} ${right}`;
+  }
+  return [left, right];
 }
 
 function upgradePlainTwoBoxToRichVisual(
@@ -3317,7 +3689,7 @@ function synthesizeAlternativeVisualStep(params: {
           color: '#0EA5E9',
         },
         {
-          label: 'Contoh Tepat',
+          label: 'Kalimat Alami',
           sublabel: truncateDiagramLabel(rightExpr, 38),
           example: rightExpr,
           icon: 'check',
@@ -3351,7 +3723,7 @@ function synthesizeAlternativeVisualStep(params: {
     const blocks =
       rawTokens.length >= 2
         ? rawTokens.slice(0, 4).map((tok, i) => ({
-            role: i === 0 ? 'Pembuka' : i === rawTokens.slice(0, 4).length - 1 ? 'Hasil / Akhir' : `Kunci ${i + 1}`,
+            role: i === 0 ? 'Pembuka' : i === rawTokens.slice(0, 4).length - 1 ? 'Hasil / Akhir' : `Tahap ${i + 1}`,
             token: truncateDiagramLabel(tok, 18),
             note: i === 1 ? 'Penentu pola' : undefined,
             color: palette[i % palette.length],
@@ -3477,7 +3849,7 @@ function synthesizeAlternativeVisualStep(params: {
       kind: 'contrast_scale',
       column: 'left',
       phaseIndex: 2,
-      title: `Timbangan Perbandingan: ${truncateDiagramLabel(shortTitle, 30) || 'Bentuk Tepat vs Keliru'}`,
+      title: `Timbangan Perbandingan: ${truncateDiagramLabel(shortTitle, 30) || 'Perbandingan Pola'}`,
       termA: truncateDiagramLabel(wrongExpr, 32) || 'Pola Kurang Tepat',
       descA: wrongReason || 'Sering dipakai terburu-buru tanpa cek konteks kalimat.',
       termB: truncateDiagramLabel(rightExpr, 32) || 'Pola Tepat',
@@ -3672,6 +4044,102 @@ function safeMathOrTruncate(raw: string, maxLen: number): string {
   return truncateDiagramLabel(s, maxLen);
 }
 
+function looksIndonesianExplanationProse(raw: string): boolean {
+  const s = String(raw || '').toLowerCase();
+  if (!s) return false;
+  const idMarkers =
+    s.match(
+      /\b(?:adalah|berarti|sedangkan|sementara|digunakan|menghasilkan|memilih|diucapkan|untuk|yang|atau|jika|urutan|huruf|angka|persegi|segitiga|kalimat|sebagai|pada|dalam|karena|dengan|tanpa)\b/g
+    ) || [];
+  return idMarkers.length >= 2;
+}
+
+function buildMinimalSurgicalStrikeStep(params: {
+  id: string;
+  title: string;
+  wrongEx: string;
+  rightEx: string;
+  reasonNote: string;
+  pal: DirectorInkPaletteId;
+  hatch: DirectorRoughHatchKind;
+  seed: number;
+}): WhiteboardStepCommand | null {
+  const { id, title, wrongEx, rightEx, reasonNote, pal, hatch, seed } = params;
+  if (!wrongEx || !rightEx || looksIndonesianExplanationProse(wrongEx)) return null;
+  const cleanW = cleanBoardDisplayText(wrongEx).replace(/^✕\s*/, '').replace(/[.!?]+$/, '').trim();
+  const cleanR = cleanBoardDisplayText(rightEx).replace(/^✓\s*/, '').replace(/[.!?]+$/, '').trim();
+  const wToks = cleanW.split(/\s+/).filter(Boolean);
+  const rToks = cleanR.split(/\s+/).filter(Boolean);
+  if (wToks.length < 2 || wToks.length > 12 || rToks.length < 2 || cleanW.toLowerCase() === cleanR.toLowerCase()) {
+    return null;
+  }
+  let p = 0;
+  while (p < wToks.length && p < rToks.length && wToks[p].toLowerCase() === rToks[p].toLowerCase()) {
+    p += 1;
+  }
+  let s = 0;
+  while (
+    s < wToks.length - p &&
+    s < rToks.length - p &&
+    wToks[wToks.length - 1 - s].toLowerCase() === rToks[rToks.length - 1 - s].toLowerCase()
+  ) {
+    s += 1;
+  }
+  const wrongMid = wToks.slice(p, wToks.length - s);
+  const rightMid = rToks.slice(p, rToks.length - s);
+  let strikeTokens: string[] = [];
+  let bugTokenIndex = 0;
+  let fixedToken = '';
+  if (wrongMid.length === 1) {
+    strikeTokens = wToks;
+    bugTokenIndex = p;
+    fixedToken = rightMid.join(' ');
+  } else if (wrongMid.length === 0 && rightMid.length >= 1 && p < wToks.length) {
+    strikeTokens = wToks;
+    bugTokenIndex = p;
+    fixedToken = `${rightMid.join(' ')} ${wToks[p]}`.trim();
+  } else if (wrongMid.length >= 2 && wrongMid.length <= 3) {
+    strikeTokens = [...wToks.slice(0, p), wrongMid.join(' '), ...wToks.slice(wToks.length - s)];
+    bugTokenIndex = p;
+    fixedToken = rightMid.join(' ');
+  } else {
+    return null;
+  }
+  return {
+    id,
+    kind: 'surgical_strike',
+    inkPalette: pal,
+    roughHatch: hatch,
+    variantSeed: seed,
+    column: 'right',
+    phaseIndex: 2,
+    pauseForInteraction: true,
+    title: wbPick('Tap the Flawed Word to Fix It', 'Ketuk Kata yang Keliru untuk Mengoreksi'),
+    wrongText: cleanW,
+    rightText: cleanR,
+    strikeTokens,
+    bugTokenIndex,
+    fixedToken,
+    reason: reasonNote,
+    socraticPrompt: wbPick(
+      'Tap the single flawed part on the board to fix this sentence!',
+      'Ketuk bagian kata yang membuat kalimat ini keliru agar terkoreksi!'
+    ),
+    successVoiceFeedback: wbFmt(
+      'Spot on! Replacing "{bug}" gives "{right}".',
+      'Tajam! Begitu "{bug}" dikoreksi, kalimatnya menjadi "{right}".',
+      undefined,
+      { bug: strikeTokens[bugTokenIndex], right: cleanR }
+    ),
+    spokenNarration: wbFmt(
+      'Now test your eye for {t} on the right: look at "{wrong}" and tap the single flawed part!',
+      'Sekarang uji ketelitianmu untuk {t} di sebelah kanan: amati kalimat "{wrong}", lalu ketuk satu bagian yang keliru!',
+      undefined,
+      { t: title, wrong: cleanW }
+    ),
+  };
+}
+
 function buildDynamicTopicRemixPair(params: {
   shortTitle: string;
   boardState: BoardDynamicDataSubset;
@@ -3682,18 +4150,19 @@ function buildDynamicTopicRemixPair(params: {
   existingSteps?: WhiteboardStepCommand[];
 }): [WhiteboardStepCommand, WhiteboardStepCommand] {
   const { shortTitle, boardState, uiAction, sampleSentenceGlobal, seed, variantNonce, existingSteps = [] } = params;
-  const cleanTitle = cleanBoardDisplayText(shortTitle || 'Konsep Inti').slice(0, 44);
+  const cleanTitle = stripMetaStepTitle(cleanBoardDisplayText(shortTitle || 'Topik Pertanyaan')).slice(0, 52);
   const rawFormulaText = String(boardState.patternFormula || '').trim();
   const cleanFormula = /\$|\\frac|\\sqrt|\\implies|\\cdot/.test(rawFormulaText)
     ? rawFormulaText
-    : cleanBoardDisplayText(rawFormulaText || cleanTitle).slice(0, 48);
+    : cleanBoardDisplayText(rawFormulaText || cleanTitle).slice(0, 68);
 
-  const bulletPool = splitExplanationIntoBullets(boardState.coachExplanation || '', rawFormulaText);
+  const explanationFull = cleanBoardDisplayText(boardState.coachExplanation || '');
+  const bulletPool = splitExplanationIntoBullets(explanationFull, rawFormulaText);
   const tblStep = existingSteps.find((s) => s.kind === 'table' && Array.isArray(s.tableRows) && s.tableRows.length >= 2);
   const mmStep = existingSteps.find((s) => s.kind === 'mind_map' && Array.isArray(s.branches) && s.branches.length >= 2);
   const fbStep = existingSteps.find((s) => s.kind === 'formula_blocks' && Array.isArray(s.blocks) && s.blocks.length >= 2);
   const tlStep = existingSteps.find((s) => s.kind === 'timeline_track' && Array.isArray(s.timelineEvents) && s.timelineEvents.length >= 2);
-  const titlePair = splitTitleIntoPair(cleanTitle);
+  const titlePair = splitTitleIntoPair(cleanTitle) || splitTitleIntoPair(cleanFormula);
 
   const rightEx =
     cleanBoardDisplayText(
@@ -3712,9 +4181,9 @@ function buildDynamicTopicRemixPair(params: {
         ''
     ).trim();
   const reasonNote =
-    distillToSixWordInk(
-      uiAction?.trapWrongReason || bulletPool[0] || boardState.sampleMeaningId || cleanFormula,
-      11
+    truncateDiagramLabel(
+      cleanBoardDisplayText(uiAction?.trapWrongReason || bulletPool[0] || boardState.sampleMeaningId || cleanFormula),
+      72
     ) || cleanTitle;
 
   const palLeft = DIRECTOR_INK_PALETTES[(seed + variantNonce * 3) % DIRECTOR_INK_PALETTES.length];
@@ -3722,14 +4191,14 @@ function buildDynamicTopicRemixPair(params: {
   const hatchLeft = DIRECTOR_HATCH_STYLES[(seed + variantNonce * 2) % DIRECTOR_HATCH_STYLES.length];
   const hatchRight = DIRECTOR_HATCH_STYLES[(seed + variantNonce * 2 + 2) % DIRECTOR_HATCH_STYLES.length];
 
-  // Ekstrak pasangan nyata dari tabel / cabang / blok / judul topik agar 100% sesuai materi!
+  // Ekstrak pasangan nyata 100% spesifik materi dari tabel / cabang / rumus multi-klausa / kalimat kontras ("sedangkan")
   const authenticPairs: Array<{ left: string; right: string }> = [];
   if (tblStep?.tableRows && tblStep.tableRows.length >= 2) {
     tblStep.tableRows.slice(0, 3).forEach((r) => {
       const l = cleanBoardDisplayText(r[0] || '').trim();
       const rhs = cleanBoardDisplayText(r[1] || r[2] || '').trim();
       if (l && rhs && l.toLowerCase() !== rhs.toLowerCase()) {
-        authenticPairs.push({ left: truncateDiagramLabel(l, 28), right: safeMathOrTruncate(rhs, 32) });
+        authenticPairs.push({ left: truncateDiagramLabel(l, 38), right: safeMathOrTruncate(rhs, 62) });
       }
     });
   }
@@ -3738,7 +4207,7 @@ function buildDynamicTopicRemixPair(params: {
       const l = cleanBoardDisplayText(b.label || '').trim();
       const rhs = cleanBoardDisplayText(b.example || b.sublabel || '').trim();
       if (l && rhs && l.toLowerCase() !== rhs.toLowerCase()) {
-        authenticPairs.push({ left: truncateDiagramLabel(l, 28), right: safeMathOrTruncate(rhs, 32) });
+        authenticPairs.push({ left: truncateDiagramLabel(l, 38), right: safeMathOrTruncate(rhs, 62) });
       }
     });
   }
@@ -3747,7 +4216,7 @@ function buildDynamicTopicRemixPair(params: {
       const l = cleanBoardDisplayText(bl.role || '').trim();
       const rhs = cleanBoardDisplayText(bl.token || bl.note || '').trim();
       if (l && rhs && l.toLowerCase() !== rhs.toLowerCase()) {
-        authenticPairs.push({ left: truncateDiagramLabel(l, 28), right: safeMathOrTruncate(rhs, 32) });
+        authenticPairs.push({ left: truncateDiagramLabel(l, 38), right: safeMathOrTruncate(rhs, 62) });
       }
     });
   }
@@ -3756,47 +4225,115 @@ function buildDynamicTopicRemixPair(params: {
       const l = cleanBoardDisplayText(ev.timeLabel || ev.title || '').trim();
       const rhs = cleanBoardDisplayText(ev.example || ev.title || '').trim();
       if (l && rhs && l.toLowerCase() !== rhs.toLowerCase()) {
-        authenticPairs.push({ left: truncateDiagramLabel(l, 28), right: safeMathOrTruncate(rhs, 32) });
+        authenticPairs.push({ left: truncateDiagramLabel(l, 38), right: safeMathOrTruncate(rhs, 62) });
       }
     });
   }
-  if (authenticPairs.length < 2 && titlePair && bulletPool.length >= 2) {
-    authenticPairs.push(
-      { left: truncateDiagramLabel(titlePair[0], 26), right: safeMathOrTruncate(bulletPool[0], 34) },
-      { left: truncateDiagramLabel(titlePair[1], 26), right: safeMathOrTruncate(bulletPool[1], 34) }
-    );
+  // Parse multi-item formula definitions like "Mitosis: 1 -> 2 | Meiosis: 1 -> 4" or "Permutasi: Urutan Penting. Kombinasi: Urutan Bebas."
+  if (authenticPairs.length < 2 && rawFormulaText) {
+    const formulaClauses = rawFormulaText
+      .split(/\s*(?:\||;|\.(?=\s+[A-Z])|,(?=\s+[A-Z][\w\s]{1,18}[:=]))\s*/)
+      .map((s) => cleanBoardDisplayText(s).trim())
+      .filter(Boolean);
+    if (formulaClauses.length >= 2) {
+      formulaClauses.slice(0, 3).forEach((cl) => {
+        const kv = cl.match(/^([^:=]{2,32}?)\s*[:=]\s*(.{2,64})$/);
+        if (kv) {
+          authenticPairs.push({
+            left: truncateDiagramLabel(kv[1].trim(), 34),
+            right: safeMathOrTruncate(kv[2].trim(), 60),
+          });
+        }
+      });
+    }
+  }
+  // Parse "X ... sedangkan/sementara Y ..." contrast clauses directly from explanation!
+  if (authenticPairs.length < 2 && titlePair) {
+    const contrastSplit = explanationFull.split(/\s*,?\s*\b(?:sedangkan|sementara(?:\s+itu)?|sebaliknya)\b\s*/i);
+    if (contrastSplit.length >= 2) {
+      const stripTermLead = (txt: string, term: string) => {
+        const esc = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        return txt
+          .replace(new RegExp(`^(?:kata|bentuk|pola|istilah)?\\s*${esc}\\s*(?:berarti|adalah|dipakai|digunakan|artinya)?\\s*`, 'i'), '')
+          .trim();
+      };
+      const d0 = stripTermLead(contrastSplit[0], titlePair[0]) || contrastSplit[0];
+      const d1 = stripTermLead(contrastSplit[1], titlePair[1]) || contrastSplit[1];
+      authenticPairs.push(
+        { left: truncateDiagramLabel(titlePair[0], 34), right: safeMathOrTruncate(d0, 62) },
+        { left: truncateDiagramLabel(titlePair[1], 34), right: safeMathOrTruncate(d1, 62) }
+      );
+    } else if (bulletPool.length >= 2) {
+      authenticPairs.push(
+        { left: truncateDiagramLabel(titlePair[0], 34), right: safeMathOrTruncate(bulletPool[0], 62) },
+        { left: truncateDiagramLabel(titlePair[1], 34), right: safeMathOrTruncate(bulletPool[1], 62) }
+      );
+    }
   }
   if (authenticPairs.length < 2) {
+    const topicAnchor = truncateDiagramLabel(cleanTitle.split(':')[0].trim() || cleanTitle, 24);
+    const isConceptualProse =
+      looksIndonesianExplanationProse(rightEx) ||
+      /\b(?:fisika|newton|ohm|ekonomi|harga|pasokan|biologi|mitosis|meiosis|kimia|matematika|rumus|luas|volume|segitiga|statistika|peluang|permutasi|kombinasi)\b/i.test(
+        `${cleanTitle} ${cleanFormula}`
+      );
+    const validRightLabel = isConceptualProse
+      ? wbPick('Accurate Fact ✓', 'Fakta Tepat ✓')
+      : wbPick('Natural Sentence ✓', 'Kalimat Alami ✓');
+    const trapLeftLabel = isConceptualProse
+      ? wbPick('Misconception ✕', 'Miskonsepsi ✕')
+      : wbPick('Mistake to Avoid ✕', 'Keliru (Hindari) ✕');
     if (cleanFormula && rightEx && cleanFormula.toLowerCase() !== rightEx.toLowerCase()) {
-      authenticPairs.push({ left: wbPick('Core Formula', 'Pola Inti'), right: safeMathOrTruncate(cleanFormula, 32) });
-      authenticPairs.push({ left: wbPick('Natural Usage', 'Contoh Tepat'), right: safeMathOrTruncate(rightEx, 32) });
-      if (wrongEx && wrongEx.toLowerCase() !== rightEx.toLowerCase()) {
-        authenticPairs.push({ left: wbPick('Common Trap', 'Hindari Jebakan'), right: safeMathOrTruncate(wrongEx, 32) });
-      }
-    } else if (bulletPool.length >= 2) {
-      bulletPool.slice(0, 3).forEach((bp, idx) => {
-        authenticPairs.push({
-          left: `${wbPick('Key', 'Kunci')} ${idx + 1}`,
-          right: safeMathOrTruncate(bp, 34),
-        });
+      authenticPairs.push({
+        left: wbFmt('Rule {t}', 'Prinsip {t}', undefined, { t: topicAnchor }),
+        right: safeMathOrTruncate(cleanFormula, 56),
       });
+      authenticPairs.push({
+        left: validRightLabel,
+        right: safeMathOrTruncate(rightEx, 58),
+      });
+      if (wrongEx && wrongEx.toLowerCase() !== rightEx.toLowerCase()) {
+        authenticPairs.push({
+          left: trapLeftLabel,
+          right: safeMathOrTruncate(wrongEx, 58),
+        });
+      }
     } else {
       authenticPairs.push(
-        { left: wbPick('Accurate Pattern', 'Bentuk Tepat'), right: safeMathOrTruncate(rightEx, 32) },
-        { left: wbPick('Why It Works', 'Alasan Kunci'), right: safeMathOrTruncate(reasonNote, 32) }
+        { left: validRightLabel, right: safeMathOrTruncate(rightEx, 58) },
+        {
+          left: wrongEx && wrongEx.toLowerCase() !== rightEx.toLowerCase()
+            ? trapLeftLabel
+            : wbPick('Core Reason', 'Alasan Logis'),
+          right: safeMathOrTruncate(
+            wrongEx && wrongEx.toLowerCase() !== rightEx.toLowerCase() ? wrongEx : reasonNote,
+            58
+          ),
+        }
       );
     }
   }
 
-  // Gunakan HANYA mekanik universal yang 100% bermakna untuk topik apa pun (TANPA pie pecahan atau gelombang sinus nyasar!)
-  const leftCycle = (seed + variantNonce) % 3;
+  const isComparisonFormula = /\b(?:vs\.?|versus)\b|\||!=|≠|;/i.test(cleanFormula);
+  const seqFormulaChunks =
+    isComparisonFormula || /\$|\\/.test(cleanFormula)
+      ? []
+      : cleanFormula
+          .split(/\s*(?:\+|->|→)\s*/)
+          .map((s) => s.trim())
+          .filter((s) => s.length >= 1 && s.length <= 28);
+  const rWords = rightEx.replace(/[.!?]+$/, '').split(/\s+/).filter(Boolean);
+  const canBuildTargetSentenceSlots = !looksIndonesianExplanationProse(rightEx) && rWords.length >= 3 && rWords.length <= 8;
+  const canUseLeftSlots = seqFormulaChunks.length >= 2 && seqFormulaChunks.length <= 4;
+
+  const leftCycle = (seed + variantNonce) % (canUseLeftSlots ? 3 : 2);
   let leftBeat: WhiteboardStepCommand;
 
   if (leftCycle === 0) {
-    const z1Label = titlePair?.[0] || authenticPairs[0]?.left || wbPick('Accurate Pattern', 'Pola Tepat');
-    const z2Label = titlePair?.[1] || authenticPairs[1]?.left || wbPick('Contrast / Trap', 'Pembanding / Jebakan');
-    const c1Label = titlePair ? authenticPairs[0]?.right || rightEx : rightEx;
-    const c2Label = titlePair ? authenticPairs[1]?.right || wrongEx || reasonNote : wrongEx || authenticPairs[1]?.right || reasonNote;
+    const z1Label = titlePair?.[0] || authenticPairs[0].left;
+    const z2Label = titlePair?.[1] || authenticPairs[1].left;
+    const c1Label = titlePair ? authenticPairs[0]?.right || rightEx : authenticPairs[0].right;
+    const c2Label = titlePair ? authenticPairs[1]?.right || wrongEx || reasonNote : authenticPairs[1].right;
     leftBeat = {
       id: `wb_auth_venn_${variantNonce}`,
       kind: 'interactive_mechanic',
@@ -3807,14 +4344,14 @@ function buildDynamicTopicRemixPair(params: {
       column: 'left',
       phaseIndex: 1,
       pauseForInteraction: true,
-      title: wbFmt('Sort Concept Zones: {t}', 'Sortir Zona Konsep: {t}', undefined, { t: truncateDiagramLabel(cleanTitle, 28) }),
+      title: wbFmt('Sort Concept Zones: {t}', 'Sortir Zona Konsep: {t}', undefined, { t: truncateDiagramLabel(cleanTitle, 32) }),
       bucketZones: [
-        { id: 'z_a', label: truncateDiagramLabel(z1Label, 26), sublabel: titlePair ? '' : wbPick('Target rule', 'Sesuai aturan') },
-        { id: 'z_b', label: truncateDiagramLabel(z2Label, 26), sublabel: titlePair ? '' : wbPick('Contrast', 'Perhatikan bedanya') },
+        { id: 'z_a', label: truncateDiagramLabel(z1Label, 34), sublabel: '' },
+        { id: 'z_b', label: truncateDiagramLabel(z2Label, 34), sublabel: '' },
       ],
       bucketChips: [
-        { id: 'c_a', label: safeMathOrTruncate(c1Label, 32), targetZoneId: 'z_a' },
-        { id: 'c_b', label: safeMathOrTruncate(c2Label, 32), targetZoneId: 'z_b' },
+        { id: 'c_a', label: safeMathOrTruncate(c1Label, 62), targetZoneId: 'z_a' },
+        { id: 'c_b', label: safeMathOrTruncate(c2Label, 62), targetZoneId: 'z_b' },
       ],
       socraticPrompt: wbPick(
         'Select each card above, then tap the matching sketched concept box!',
@@ -3833,7 +4370,7 @@ function buildDynamicTopicRemixPair(params: {
         { t: cleanTitle, z1: z1Label, z2: z2Label }
       ),
     };
-  } else if (leftCycle === 1) {
+  } else if (leftCycle === 1 || !canUseLeftSlots) {
     leftBeat = {
       id: `wb_auth_wire_${variantNonce}`,
       kind: 'interactive_mechanic',
@@ -3844,7 +4381,7 @@ function buildDynamicTopicRemixPair(params: {
       column: 'left',
       phaseIndex: 1,
       pauseForInteraction: true,
-      title: wbFmt('Connect Concept Pairs: {t}', 'Hubungkan Pasangan: {t}', undefined, { t: truncateDiagramLabel(cleanTitle, 26) }),
+      title: wbFmt('Connect Concept Pairs: {t}', 'Hubungkan Pasangan: {t}', undefined, { t: truncateDiagramLabel(cleanTitle, 30) }),
       wirePairs: authenticPairs.slice(0, 3).map((ap, pIdx) => ({
         id: `wp_${pIdx}`,
         leftLabel: ap.left,
@@ -3868,25 +4405,13 @@ function buildDynamicTopicRemixPair(params: {
       ),
     };
   } else {
-    const formulaChunks = /\$|\\/.test(cleanFormula)
-      ? []
-      : cleanFormula
-          .split(/\s*(?:\+|->|→|=|\||•)\s*/)
-          .map((s) => s.trim())
-          .filter((s) => s.length >= 1);
-    const wordChunks = rightEx.replace(/[.!?]+$/, '').split(/\s+/).filter(Boolean);
-    const orderedParts =
-      formulaChunks.length >= 2 && formulaChunks.length <= 4
-        ? formulaChunks
-        : wordChunks.length >= 3
-          ? [wordChunks[0], wordChunks.slice(1, -1).join(' '), wordChunks[wordChunks.length - 1]]
-          : [authenticPairs[0].left, authenticPairs[0].right];
+    const orderedParts = seqFormulaChunks;
     const extraTrap =
-      wrongEx
+      wrongEx && !looksIndonesianExplanationProse(wrongEx)
         ? wrongEx
             .replace(/[.!?]+$/, '')
             .split(/\s+/)
-            .find((w) => w.length >= 2 && !wordChunks.some((rw) => rw.toLowerCase() === w.toLowerCase()))
+            .find((w) => w.length >= 2 && !rWords.some((rw) => rw.toLowerCase() === w.toLowerCase()))
         : undefined;
     leftBeat = {
       id: `wb_auth_slots_l_${variantNonce}`,
@@ -3898,13 +4423,13 @@ function buildDynamicTopicRemixPair(params: {
       column: 'left',
       phaseIndex: 1,
       pauseForInteraction: true,
-      title: wbFmt('Build the Core Structure: {t}', 'Rakit Urutan Pola: {t}', undefined, { t: truncateDiagramLabel(cleanTitle, 26) }),
-      magnetSlotRoles: orderedParts.map((_, idx) => `Bagian ${idx + 1}`),
-      magnetTargetTokens: orderedParts.map((p) => safeMathOrTruncate(p, 24)),
-      magnetDistractors: extraTrap ? [truncateDiagramLabel(extraTrap, 18)] : [],
+      title: wbFmt('Build the Core Formula: {t}', 'Rakit Struktur Rumus: {t}', undefined, { t: truncateDiagramLabel(cleanTitle, 30) }),
+      magnetSlotRoles: orderedParts.map((_, idx) => `${wbPick('Slot', 'Unsur')} ${idx + 1}`),
+      magnetTargetTokens: orderedParts.map((p) => safeMathOrTruncate(p, 30)),
+      magnetDistractors: extraTrap ? [truncateDiagramLabel(extraTrap, 22)] : [],
       socraticPrompt: wbPick(
-        'Tap the tiles in order from left to right to snap the structure together!',
-        'Ketuk keping di bawah secara berurutan dari kiri ke kanan untuk merakit polanya!'
+        'Tap the formula tiles in order from left to right to snap the structure together!',
+        'Ketuk keping rumus di bawah secara berurutan dari kiri ke kanan!'
       ),
       successVoiceFeedback: wbFmt(
         'Locked into place: {seq}!',
@@ -3914,18 +4439,80 @@ function buildDynamicTopicRemixPair(params: {
       ),
       spokenNarration: wbFmt(
         'Notice the exact building blocks of {t}: {seq}. Tap the tiles below in order so you feel how the structure locks together!',
-        'Perhatikan urutan pembentuk pola {t}: {seq}. Sekarang ketuk kepingannya secara berurutan supaya kamu merasakan alur susunannya!',
+        'Perhatikan urutan pembentuk rumus {t}: {seq}. Sekarang ketuk kepingannya secara berurutan supaya kamu merasakan alur susunannya!',
         undefined,
         { t: cleanTitle, seq: orderedParts.join(', lalu ') }
       ),
     };
   }
 
-  const rWords = rightEx.replace(/[.!?]+$/, '').split(/\s+/).filter(Boolean);
-  const rightCycle = (seed + variantNonce * 2 + 1) % 2;
-  let rightBeat: WhiteboardStepCommand;
+  const surgicalCandidate = buildMinimalSurgicalStrikeStep({
+    id: `wb_auth_strike_${variantNonce}`,
+    title: cleanTitle,
+    wrongEx,
+    rightEx,
+    reasonNote,
+    pal: palRight,
+    hatch: hatchRight,
+    seed: seed + variantNonce + 23,
+  });
 
-  if (rightCycle === 0 || leftBeat.mechanic === 'magnetic_slot_builder' || rWords.length < 2) {
+  let rightBeat: WhiteboardStepCommand;
+  const rightCycle = (seed + variantNonce * 2 + 1) % 2;
+
+  if (surgicalCandidate && rightCycle === 1) {
+    rightBeat = surgicalCandidate;
+  } else if (canBuildTargetSentenceSlots && leftBeat.mechanic !== 'magnetic_slot_builder' && rightCycle === 1) {
+    const slotA = rWords[0];
+    const slotB = rWords.slice(1, -1).join(' ');
+    const slotC = rWords[rWords.length - 1];
+    const targetSlots = [slotA, slotB, slotC];
+    const slotRoles = [
+      wbPick('Opening', 'Pembuka'),
+      wbPick('Core Pattern', 'Inti Kalimat'),
+      wbPick('Closing', 'Pelengkap'),
+    ];
+    const trapDistractor =
+      wrongEx && !looksIndonesianExplanationProse(wrongEx)
+        ? wrongEx
+            .replace(/[.!?]+$/, '')
+            .split(/\s+/)
+            .find((w) => w.length >= 2 && !rWords.some((rw) => rw.toLowerCase() === w.toLowerCase()))
+        : undefined;
+    rightBeat = {
+      id: `wb_auth_slots_r_${variantNonce}`,
+      kind: 'interactive_mechanic',
+      mechanic: 'magnetic_slot_builder',
+      inkPalette: palRight,
+      roughHatch: hatchRight,
+      variantSeed: seed + variantNonce + 31,
+      column: 'right',
+      phaseIndex: 2,
+      pauseForInteraction: true,
+      title: wbPick('Snap the Natural Sentence', 'Rakit Kalimat Alami'),
+      magnetSlotRoles: slotRoles,
+      magnetTargetTokens: targetSlots.map((t) => truncateDiagramLabel(t, 32)),
+      magnetDistractors: trapDistractor ? [truncateDiagramLabel(trapDistractor, 22)] : [],
+      socraticPrompt: wbPick(
+        'Tap the tiles in order to assemble the natural sentence!',
+        'Ketuk keping secara berurutan untuk merakit kalimat yang alami!'
+      ),
+      successVoiceFeedback: wbFmt(
+        'Assembled cleanly: "{r}"!',
+        'Terpasang presisi menjadi "{r}"!',
+        undefined,
+        { r: rightEx }
+      ),
+      spokenNarration: wbFmt(
+        'Now put {t} into action on the right: tap the tiles in exact order to build "{r}"!',
+        'Sekarang praktikkan langsung {t} di sebelah kanan: ketuk kepingannya secara berurutan hingga membentuk "{r}"!',
+        undefined,
+        { t: cleanTitle, r: rightEx }
+      ),
+    };
+  } else if (surgicalCandidate) {
+    rightBeat = surgicalCandidate;
+  } else {
     rightBeat = {
       id: `wb_auth_scratch_${variantNonce}`,
       kind: 'interactive_mechanic',
@@ -3937,10 +4524,10 @@ function buildDynamicTopicRemixPair(params: {
       phaseIndex: 2,
       pauseForInteraction: true,
       title: wbPick('Scratch Card: Verify Key Rule', 'Gosok Kartu: Buktikan Kuncinya'),
-      scratchClueHeader: wbFmt('Predict the natural pattern for {t}, then swipe!', 'Tebak bentuk tepat untuk {t}, lalu usap!', undefined, {
-        t: truncateDiagramLabel(cleanTitle, 24),
+      scratchClueHeader: wbFmt('Predict the key takeaway for {t}, then swipe!', 'Tebak simpulan kunci {t}, lalu usap!', undefined, {
+        t: truncateDiagramLabel(cleanTitle, 26),
       }),
-      scratchHiddenFormula: safeMathOrTruncate(rightEx || cleanFormula, 46),
+      scratchHiddenFormula: safeMathOrTruncate(rightEx || cleanFormula, 68),
       scratchHiddenSubnote: reasonNote,
       scratchSketchKind: variantNonce % 2 === 0 ? 'prism_split' : 'venn_core',
       socraticPrompt: wbPick(
@@ -3954,50 +4541,8 @@ function buildDynamicTopicRemixPair(params: {
         { r: rightEx || cleanFormula }
       ),
       spokenNarration: wbFmt(
-        'Before opening the chalk card on the right, picture the accurate form for {t} in your head, then swipe the card to check!',
-        'Sebelum membuka kartu kapur di sebelah kanan, coba bayangkan dulu bentuk yang paling tepat untuk {t}, lalu usap kartunya untuk membuktikan!',
-        undefined,
-        { t: cleanTitle }
-      ),
-    };
-  } else {
-    const slotA = rWords[0];
-    const slotB = rWords.length >= 3 ? rWords.slice(1, -1).join(' ') : rWords[1];
-    const slotC = rWords.length >= 3 ? rWords[rWords.length - 1] : '';
-    const targetSlots = slotC ? [slotA, slotB, slotC] : [slotA, slotB];
-    const trapDistractor = wrongEx
-      ? wrongEx
-          .replace(/[.!?]+$/, '')
-          .split(/\s+/)
-          .find((w) => w.length >= 2 && !rWords.some((rw) => rw.toLowerCase() === w.toLowerCase()))
-      : undefined;
-    rightBeat = {
-      id: `wb_auth_slots_r_${variantNonce}`,
-      kind: 'interactive_mechanic',
-      mechanic: 'magnetic_slot_builder',
-      inkPalette: palRight,
-      roughHatch: hatchRight,
-      variantSeed: seed + variantNonce + 31,
-      column: 'right',
-      phaseIndex: 2,
-      pauseForInteraction: true,
-      title: wbPick('Snap the Accurate Example', 'Rakit Kalimat yang Tepat'),
-      magnetSlotRoles: targetSlots.map((_, idx) => `Bagian ${idx + 1}`),
-      magnetTargetTokens: targetSlots.map((t) => truncateDiagramLabel(t, 22)),
-      magnetDistractors: trapDistractor ? [truncateDiagramLabel(trapDistractor, 18)] : [],
-      socraticPrompt: wbPick(
-        'Tap the tiles in order to assemble the natural example!',
-        'Ketuk keping secara berurutan untuk merakit kalimat yang tepat!'
-      ),
-      successVoiceFeedback: wbFmt(
-        'Assembled cleanly: "{r}"!',
-        'Terpasang presisi menjadi "{r}"!',
-        undefined,
-        { r: rightEx }
-      ),
-      spokenNarration: wbFmt(
-        'Now put {t} into action on the right: tap the tiles in exact order to build the natural sentence!',
-        'Sekarang praktikkan langsung {t} di sebelah kanan: ketuk kepingannya secara berurutan hingga membentuk kalimat yang alami!',
+        'Before opening the chalk card on the right, picture the core rule for {t} in your head, then swipe the card to check!',
+        'Sebelum membuka kartu kapur di sebelah kanan, coba bayangkan dulu kunci utama untuk {t}, lalu usap kartunya untuk membuktikan!',
         undefined,
         { t: cleanTitle }
       ),
@@ -4255,13 +4800,14 @@ export function buildWhiteboardScenePlan(params: {
         const leftDesc = [st.leftPanel?.subtitle, st.leftPanel?.example ? `Contoh: ${st.leftPanel.example}` : ''].filter(Boolean).join(', ');
         const rightDesc = [st.rightPanel?.subtitle, st.rightPanel?.example ? `Contoh: ${st.rightPanel.example}` : ''].filter(Boolean).join(', ');
         const stripCamTitle = (s?: string) => (s && !/kamera|video/i.test(s) ? s : '');
+        const fallbackPair = splitTitleIntoPair(shortTitle);
         return {
           ...st,
           kind: 'contrast_scale',
           title: stripCamTitle(st.title) || `Perbandingan ${shortTitle}`,
-          termA: stripCamTitle(st.leftPanel?.title || st.termA) || 'Bentuk Tepat',
+          termA: stripCamTitle(st.leftPanel?.title || st.termA) || fallbackPair?.[0] || truncateDiagramLabel(shortTitle, 28),
           descA: stripCamTitle(leftDesc || st.descA) || '',
-          termB: stripCamTitle(st.rightPanel?.title || st.termB) || 'Pembanding',
+          termB: stripCamTitle(st.rightPanel?.title || st.termB) || fallbackPair?.[1] || 'Catatan Kontras',
           descB: stripCamTitle(rightDesc || st.descB) || '',
           analogy: stripCamTitle(st.analogy || st.caption) || undefined,
           spokenNarration: st.spokenNarration && !/foto|kamera|video/i.test(st.spokenNarration) ? st.spokenNarration : undefined,
@@ -4297,6 +4843,9 @@ export function buildWhiteboardScenePlan(params: {
   const finalizeStep = (rawInput: WhiteboardStepCommand, idx: number): WhiteboardSceneStep => {
     const normalized = normalizeIncomingWhiteboardStep(rawInput);
     const sanitized = sanitizeStepVisualFields(normalized);
+    if (sanitized.kind === 'heading' && !sanitized.title) {
+      sanitized.title = stripMetaStepTitle(cleanBoardDisplayText(shortTitle)) || shortTitle;
+    }
     const aligned = enforceSemanticVisualAlignment(sanitized);
     const mustPauseForStudent =
       aligned.kind === 'interactive_mechanic' ||
@@ -4674,11 +5223,14 @@ export function buildWhiteboardScenePlan(params: {
             phaseIndex: 2,
             pauseForInteraction: true,
             title: `Pasangkan Kosakata ${charTypeLabel} "${activeCharEntry.char}"`,
-            wirePairs: compSlice.map((c, cIdx) => ({
-              id: `kc_${cIdx}`,
-              leftLabel: `${c.word} (${c.reading})`,
-              rightLabel: c.meaning,
-            })),
+            wirePairs: compSlice.map((c, cIdx) => {
+              const cleanRead = String(c.reading || '').replace(/\s*\(([^()]+)\)/g, ' · $1').trim();
+              return {
+                id: `kc_${cIdx}`,
+                leftLabel: cleanRead ? `${c.word} (${cleanRead})` : c.word,
+                rightLabel: c.meaning,
+              };
+            }),
             socraticPrompt: `Hubungkan setiap kosakata yang memuat karakter "${activeCharEntry.char}" di kiri dengan artinya di kanan!`,
             successVoiceFeedback: `Hebat! Kamu sudah menguasai urutan goresan sekaligus kosakata penting dari karakter "${activeCharEntry.char}".`,
             spokenNarration: `Setelah melihat urutan goresan karakter ${activeCharEntry.char}, sekarang uji ingatan kosakatamu di sebelah kanan: sambungkan tiap kata yang mengandung ${activeCharEntry.char} ke arti bahasa Indonesianya!`,
@@ -4863,11 +5415,14 @@ export function buildWhiteboardScenePlan(params: {
               phaseIndex: 2,
               pauseForInteraction: true,
               title: `Pasangkan Kosakata ${charLabel} "${entry.char}"`,
-              wirePairs: entry.compounds.slice(0, 3).map((c, cIdx) => ({
-                id: `kc_${cIdx}`,
-                leftLabel: `${c.word} (${c.reading})`,
-                rightLabel: c.meaning,
-              })),
+              wirePairs: entry.compounds.slice(0, 3).map((c, cIdx) => {
+                const cleanRead = String(c.reading || '').replace(/\s*\(([^()]+)\)/g, ' · $1').trim();
+                return {
+                  id: `kc_${cIdx}`,
+                  leftLabel: cleanRead ? `${c.word} (${cleanRead})` : c.word,
+                  rightLabel: c.meaning,
+                };
+              }),
               socraticPrompt: `Hubungkan setiap kosakata "${entry.char}" di kiri dengan artinya di kanan!`,
               successVoiceFeedback: `Tepat sekali! Kosakata penting dari karakter "${entry.char}" sudah tersambung rapi.`,
             },
@@ -5541,7 +6096,7 @@ export function buildWhiteboardScenePlan(params: {
         const colors = ['#0EA5E9', '#10B981', '#8B5CF6', '#F59E0B', '#EC4899'];
         if (toks.length >= 2) {
           st.blocks = toks.map((tok, bIdx) => ({
-            role: bIdx === 0 ? wbPick('Subject', 'Subjek') : bIdx === 1 ? wbPick('Core Pattern', 'Inti Pola') : `${wbPick('Part', 'Bagian')} ${bIdx + 1}`,
+            role: bIdx === 0 ? wbPick('Subject', 'Subjek') : bIdx === 1 ? wbPick('Core Pattern', 'Inti Pola') : `${wbPick('Slot', 'Unsur')} ${bIdx + 1}`,
             token: tok,
             color: colors[bIdx % colors.length],
           }));
