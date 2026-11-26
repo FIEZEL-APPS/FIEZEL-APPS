@@ -21,10 +21,39 @@ export interface OpenerPacketLike {
   headingStep?: OpenerHeadingLike | null;
 }
 
-export function cleanBoardDisplayText(val: unknown): string {
+export function stripMetaStepTitle(val: unknown): string {
   return String(val ?? '')
+    .replace(/^(?:Langkah|Step|Tahap|Beat|Fase)\s*\d+\s*(?:[:.\-–—]+\s*|$)/i, '')
+    .trim();
+}
+
+export function stripRoboticMentorIntro(val: unknown): string {
+  const s = String(val ?? '').trim();
+  if (!s) return '';
+  const stripped = s
+    .replace(
+      /^(?:(?:Halo|Hai|Hi|Hello|Selamat\s+(?:pagi|siang|sore|malam))[,!.\s]+)?(?:(?:saya|aku|ini|bersama|nama\s+saya)\s+(?:Coach\s+|Sensei\s+|Dr\.\s+|Examiner\s+|Xiao\s+)?[A-Z][a-z]+(?:\s+[A-Z][a-z]+)?|(?:Coach|Sensei)\s+[A-Z][a-z]+\s+di\s+sini)(?:\s+di\s+sini)?[,!.\s]*(?:dan\s+)?/i,
+      ''
+    )
+    .replace(
+      /^(?:(?:Halo|Hai|Hi|Hello)[!.,\s]+)?(?:mari\s+kita\s+(?:perbaiki|pelajari|bahas|bedah|lihat|pahami)\s+[^.!?]{3,75}[.!?]\s+)/i,
+      ''
+    )
+    .trim();
+  if (!stripped) return s;
+  return stripped.charAt(0).toUpperCase() + stripped.slice(1);
+}
+
+export function cleanBoardDisplayText(val: unknown): string {
+  const base = String(val ?? '')
     .replace(/\s*[\u2014\u2013]\s*/g, ', ')
     .replace(/\(\s*\)|（\s*）|\[\s*\]|\{\s*\}/g, '')
+    // Flatten accidental nested reading parens like "木曜日 (もくようび (mokuyoubi))" -> "木曜日 (もくようび · mokuyoubi)" without touching math
+    .replace(
+      /([\p{L}\u3040-\u30ff\u4e00-\u9faf])\s*\(([^()$=+*/^]+?)\s*\(([^()$=+*/^]+?)\)\)/gu,
+      '$1 ($2 · $3)'
+    )
+    .replace(/^(?:Langkah|Step|Tahap|Beat|Fase)\s*0\s*(?:[:.\-–—]+\s*|$)/i, '')
     .replace(
       /(['"`]?\b(?:agree|know|believe|like|want|understand)\b['"`]?\s+(?:adalah|merupakan)\s+)(?:kata\s+kerja\s+aksi(?:\s*\([^)]*\))?|aksi\s+atau\s+(?:kata\s+kerja|tindakan)|aksi\b)/gi,
       '$1kata kerja utama (stative verb)'
@@ -38,6 +67,7 @@ export function cleanBoardDisplayText(val: unknown): string {
     .replace(/([,:•])\s*$/g, (_m, ch) => (ch === ':' ? ':' : ''))
     .replace(/\s{2,}/g, ' ')
     .trim();
+  return stripRoboticMentorIntro(base);
 }
 
 /** Narasi tutur langkah `heading` (dipakai deriveStepSpokenNarration & pre-warm opener). */
