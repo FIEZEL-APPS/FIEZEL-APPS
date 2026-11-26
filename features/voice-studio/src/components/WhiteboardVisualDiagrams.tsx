@@ -1017,7 +1017,7 @@ export const MindMapDiagram: React.FC<{
             <circle cx="15.5" cy="15" r="2.2" fill="#E0E7FF" />
             <path d="M10 6.8v3.2M10 10L5.5 13M10 10l4.5 3" />
           </svg>
-          <span>{wbPick('Concept Mind Map', 'Peta Pikiran Bercabang', 'แผนผังความคิด')}</span>
+          <span>{step.title || wbPick('Concept & Examples', 'Penjelasan & Contoh Inti', 'สรุปแนวคิดและตัวอย่าง')}</span>
         </span>
         <div className="flex items-center gap-2">
           {isWritingNow && <AnimatedTutorPenSvg label={wbPick('Drawing branches...', 'Menggambar cabang...', 'กำลังวาดกิ่ง...')} />}
@@ -1296,7 +1296,7 @@ export const FormulaBlocksDiagram: React.FC<{
             <rect x="11" y="4.5" width="6.5" height="6.5" rx="1.5" fill="#DCFCE7" />
             <rect x="6.8" y="11" width="6.5" height="6.5" rx="1.5" fill="#86EFAC" />
           </svg>
-          <span>{wbPick('Sentence Pattern Blocks', 'Rakit Puzzle Pola Kalimat', 'บล็อกโครงสร้างประโยค')}</span>
+          <span>{step.title || wbPick('Pattern & Examples', 'Pembahasan Pola & Contoh', 'โครงสร้างและตัวอย่าง')}</span>
         </span>
         <div className="flex items-center gap-2">
           {isWritingNow && <AnimatedTutorPenSvg label={wbPick('Arranging blocks...', 'Menyusun blok...', 'กำลังเรียงบล็อก...')} />}
@@ -1352,7 +1352,9 @@ export const FormulaBlocksDiagram: React.FC<{
                         <HighlightText text={bl.token} terms={terms} active={visible} emphasize={isFocused} />
                       </div>
                       {bl.note && (
-                        <div className="mt-0.5 text-[10.5px] font-medium text-[#475569] leading-snug">{bl.note}</div>
+                        <div className="mt-0.5 text-[10.5px] font-medium text-[#475569] leading-snug">
+                          <HighlightText text={bl.note} terms={[]} active={visible} />
+                        </div>
                       )}
                     </div>
                     {!isPatternMatrix && idx < blocks.length - 1 && (

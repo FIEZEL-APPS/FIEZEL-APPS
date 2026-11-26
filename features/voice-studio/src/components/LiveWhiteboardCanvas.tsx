@@ -2823,8 +2823,21 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
       autoSpotlight && isPlaying && isCurrent && activeStepProgress > 0.93;
     const isDimmedByFocus =
       autoSpotlight && isPlaying && !isCurrent && activeStepProgress >= 0.01 && activeStepProgress <= 0.93;
+    const hasIntegratedDiagramPen =
+      step.kind === 'mind_map' ||
+      step.kind === 'timeline_track' ||
+      step.kind === 'formula_blocks' ||
+      step.kind === 'metaphor_scene' ||
+      step.kind === 'rough_scene' ||
+      step.kind === 'contrast_scale' ||
+      step.kind === 'syntax_flow';
     const showActivePen =
-      step.kind !== 'checkpoint' && isPlaying && isCurrent && activeStepProgress > 0.01 && activeStepProgress < 0.95;
+      step.kind !== 'checkpoint' &&
+      !hasIntegratedDiagramPen &&
+      isPlaying &&
+      isCurrent &&
+      activeStepProgress > 0.01 &&
+      activeStepProgress < 0.95;
     const isWaitingThisStep = socraticWaitingStepId === step.id;
     const isSolvedThisStep = Boolean(completedSocraticStepIds?.has(step.id));
     const emitSocraticResult = (ev: SocraticInteractionEvent) => {
@@ -2848,6 +2861,14 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
       hasInlineSocraticBar &&
       (isCompleted || isWaitingThisStep || isSolvedThisStep || (isCurrent && activeRevealP >= 0.62));
 
+    const isTeachingExplanationCard =
+      !step.pauseForInteraction &&
+      step.kind !== 'heading' &&
+      step.kind !== 'highlight_callout' &&
+      step.kind !== 'checkpoint' &&
+      step.kind !== 'student_question' &&
+      step.kind !== 'trap_vs_fix';
+
     const wrapQueued = (node: React.ReactNode) => (
       <div
         key={step.id}
@@ -2859,6 +2880,7 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
           }
         }}
         data-wb-step-id={step.id}
+        data-wb-step-role={isTeachingExplanationCard ? 'teaching-explanation' : step.pauseForInteraction ? 'interactive-practice' : 'summary'}
         data-wb-step-state={
           isWaitingThisStep
             ? 'waiting-socratic'
@@ -2885,6 +2907,14 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
                 : 'border-0 bg-transparent opacity-100'
         }`}
       >
+        {isTeachingExplanationCard && (
+          <div className="mb-1.5 flex items-center gap-1.5" data-testid="wb-teaching-phase-badge">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#ECFDF5] border border-[#10B981]/45 text-[10.5px] font-extrabold uppercase tracking-wider text-[#065F46]">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]" />
+              <span>{wbPick('Explanation & Examples First', '1. Penjelasan & Contoh Dulu', '1. คำอธิบายและตัวอย่างก่อน', locale)}</span>
+            </span>
+          </div>
+        )}
         {showActivePen && (
           <div
             data-testid="wb-active-pen-badge"

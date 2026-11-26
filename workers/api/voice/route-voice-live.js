@@ -1456,11 +1456,11 @@ async function runFastOpenerOnly({ keys, userText, targetLang, targetLocaleName,
     `Course: ${targetLang.toUpperCase()}, Mandatory explanation language: ${targetLocaleName}, Mentor: ${personaName}.`,
     `Question: "${userText}"`,
     `IMPORTANT: Even if the learner wrote or spoke in ${targetLang.toUpperCase()}, write topicTitle, text, and spokenNarration 100% in ${targetLocaleName} (quoting only short ${targetLang.toUpperCase()} example words).`,
-    `NEVER write "Langkah 0" or "Step 0" in the title, and NEVER introduce yourself ("Halo saya Alex"). Jump straight into the core concept!`,
-    `Write ONLY the opening concept header + 1 crisp, direct opening hook sentence ("spokenNarration", 12-18 words in ${targetLocaleName}) immediately answering the question.`,
-    `JSON: {"topicTitle":"...","patternFormula":"...","headingStep":{"kind":"heading","title":"...","text":"1 concise <=6-word takeaway","spokenNarration":"..."}}`,
+    `NEVER write "Langkah 0" or "Step 0" in the title, and NEVER introduce yourself ("Halo saya Alex"). Jump straight into explaining the core concept!`,
+    `Write the opening concept header + a clear, plain-language 1-sentence core definition in "text" (12-24 words explaining what it is and when it is used) + 1-2 crisp opening teaching sentences in "spokenNarration" (18-32 words in ${targetLocaleName}).`,
+    `JSON: {"topicTitle":"...","patternFormula":"...","headingStep":{"kind":"heading","title":"...","text":"12-24 word clear core definition","spokenNarration":"..."}}`,
   ].join('\n');
-  const gen = await runGeminiJsonWithPool(keys, openerPrompt, 0.2, 260);
+  const gen = await runGeminiJsonWithPool(keys, openerPrompt, 0.2, 340);
   if (!gen.ok || !gen.parsed || typeof gen.parsed !== 'object') return null;
   const p = gen.parsed;
   const st0 = p.headingStep && typeof p.headingStep === 'object' ? p.headingStep : {};
@@ -2316,7 +2316,7 @@ async function executePartnerTurnCore(ctx, streamHooks = null) {
   if (isCacheableStandaloneBoard) {
     boardCacheKey = await sha256Hex(
       JSON.stringify({
-        v: 'wb-v6-socratic-live',
+        v: 'wb-v7-teach-first-live',
         q: userText.trim().toLowerCase(),
         targetLang,
         locale,
@@ -2418,36 +2418,42 @@ async function executePartnerTurnCore(ctx, streamHooks = null) {
         buildCjkStrokeFactDirective(false),
         `Context from recent turns: ${historyLines.length ? historyLines.slice(-2).map((h) => `${h.speaker}: ${h.text}`).join(' | ') : 'Direct question on whiteboard'}`,
         `Act as a razor-sharp, intellectual real-world classroom Polymath Mentor teaching "${userText}" interactively on an open dot-grid whiteboard.`,
-        `UNIVERSAL POLYMATH & SOCRATIC MICRO-BEAT PROTOCOL (ZERO WALLS OF TEXT, ZERO PASSIVE LECTURES, ZERO ROBOT INTROS!):`,
-        `1) THE 6-WORD CHALK RULE & PEDAGOGICAL PRECISION:`,
-        `   - NEVER introduce yourself ("Halo, saya Alex", "Hai teman-teman", "Mari kita bedah") and NEVER write "Langkah 0" or "Step 0" in any title. Jump straight into the core intuition in sentence 1!`,
-        `   - NEVER write full paragraphs or long prose on the board! Every visual label, block note, subtitle, or callout MUST be <= 6 words of crisp shorthand.`,
-        `   - LATEX HYGIENE: Wrap "$...$" ONLY around genuine mathematical/scientific notation containing operators/subscripts/fractions (e.g. "$3x - 5 = 16$", "$\\frac{2}{3} + \\frac{1}{4}$", "$F = m \\cdot a$"). NEVER wrap plain words or grammar formulas in "$...$" (write "Subjek + To Be + Verb 3" as plain text without "$", NEVER "$Subjek + To Be + Verb 3$")!`,
-        `   - Deliver 100% of the deep intuition, real-world logic, exact boundary conditions, and Socratic invitation through each step's "spokenNarration" (2-3 sharp spoken sentences, ~20-36 words per beat). Every "spokenNarration" MUST name the exact words/numbers shown in that step's visual!`,
+        `UNIVERSAL TEACH-FIRST & SOCRATIC CLASSROOM PROTOCOL (EXPLAIN CLEARLY WITH CONCRETE EXAMPLES FIRST, THEN INTERACTIVE PRACTICE!):`,
+        `1) MANDATORY TEACH-FIRST PEDAGOGY & VISUAL CLARITY:`,
+        `   - NEVER jump straight into an interactive exercise before teaching the concept! Assume the learner is asking because they DO NOT understand "${userText}" yet: you MUST explain the core meaning, formula/rules, concrete examples + translations, and common trap clearly in Beat 0 & Beat 1 ("pauseForInteraction":false) BEFORE asking them to solve Beat 2 & Beat 3!`,
+        `   - NEVER introduce yourself ("Halo, saya Alex", "Hai teman-teman", "Mari kita bedah") and NEVER write "Langkah 0" or "Step 0" in any title. Jump straight into explaining the concept in sentence 1!`,
+        `   - Keep board cards structured, scannable, and crystal clear (concise rules + concrete real-world examples + meanings; NEVER write giant essay walls on the board).`,
+        `   - LATEX HYGIENE: Wrap "$...$" ONLY around genuine mathematical/scientific notation containing operators/subscripts/fractions (e.g. "$3x - 5 = 16$", "$\\frac{2}{3} + \\frac{1}{4}$", "$F = m \\cdot a$"). NEVER wrap plain words or grammar formulas in "$...$" (write "Subject + Verb 2" or "Subjek + To Be + Verb 3" as plain text without "$")!`,
         targetLang === 'en' && /\b(to\s*be|am|is|are|was|were|agree|work|verb|sifat|kerja|passive|ing|do|does|did)\b/i.test(userText || '')
           ? `   - ACCURACY LOCK (To Be vs Verb): NEVER say "to be hanya untuk kata sifat"! State accurately: To Be pairs ONLY with (1) Adjective, (2) Noun/Location, (3) Verb ing (ongoing, never stative "am agreeing"), or (4) Verb 3 (passive "is agreed"), NEVER bare Verb 1 ("I am agree" -> "I agree").`
           : '',
         `   - Tenses / Particles / STEM accuracy: state exact time/math/physics boundaries using the EXACT numbers/words from "${userText}" (NEVER substitute canned textbook numbers!).`,
-        `2) SOCRATIC MICRO-BEAT CADENCE & TOPIC-AUTHENTIC INTERACTIVE LABS (BEAT 1 & BEAT 2 MUST BOTH PAUSE & WAIT FOR THE LEARNER!):`,
-        `   Emit 4 progressive "whiteboardSteps" where Beat 1 (left) and Beat 2 (right) ALWAYS use TWO DIFFERENT interactive mechanics AND TWO DIFFERENT "inkPalette" themes from ["cobalt_blueprint","terracotta_atelier","violet_prism","crimson_scalpel","amber_fulcrum","teal_oscillator","indigo_constellation","emerald_botanical"] + "roughHatch" from ["hachure","cross-hatch","zigzag","dots"]:`,
-        `   - Beat 0 (kind:"heading", column:"left", phaseIndex:0): crisp "title" + <=6-word "text" core rule; "spokenNarration" (1 sharp hook sentence, ~14-22 words).`,
-        `   - Beat 1 (kind:"interactive_mechanic" | "socratic_slider" | "kanji_grid", column:"left", phaseIndex:1, "pauseForInteraction":true): MUST populate ALL required data fields for "${userText}" (NEVER emit an empty step without its array!):`,
-        `     * kind:"interactive_mechanic", mechanic:"venn_bucket_sorter": for categories, prepositions (in/on/at, に/で), vs-contrasts -> MUST include 2-3 "bucketZones":[{"id":"z1","label":"...","sublabel":"..."}] & 3-4 "bucketChips":[{"id":"c1","label":"...","targetZoneId":"z1"}].`,
-        `     * kind:"interactive_mechanic", mechanic:"wire_node_connector": for matching pairs, causes->effects, 4 tones, compounds, sin/cos/tan, formulas -> MUST include 3 "wirePairs":[{"id":"w1","leftLabel":"...","rightLabel":"..."}].`,
+        `2) 5-STEP TEACH-FIRST CADENCE (BEAT 0 & BEAT 1 TEACH CLEARLY WITHOUT PAUSING; BEAT 2 & BEAT 3 PAUSE FOR GUIDED PRACTICE!):`,
+        `   Emit 5 progressive "whiteboardSteps" where Beat 1 teaches the full concept + examples first, and Beat 2 (left) + Beat 3 (right) use TWO DIFFERENT interactive mechanics AND TWO DIFFERENT "inkPalette" themes from ["cobalt_blueprint","terracotta_atelier","violet_prism","crimson_scalpel","amber_fulcrum","teal_oscillator","indigo_constellation","emerald_botanical"] + "roughHatch" from ["hachure","cross-hatch","zigzag","dots"]:`,
+        `   - Beat 0 (kind:"heading", column:"left", phaseIndex:0, "pauseForInteraction":false): crisp "title" + clear 1-sentence core definition in "text" (12-24 words explaining what it is & when it is used); "spokenNarration" (1-2 clear opening teaching sentences, ~18-32 words).`,
+        `   - Beat 1 (kind:"mind_map" | "formula_blocks" | "table" | "timeline_track" | "contrast_scale", column:"left", phaseIndex:1, "pauseForInteraction":false — MANDATORY CONCEPT, FORMULA & EXAMPLES EXPLANATION BEFORE ANY INTERACTION!):`,
+        `     * NEVER set pauseForInteraction:true or ask a quiz question in Beat 1! Beat 1 MUST stay visible on screen as the learner's clear reference guide while solving Beat 2!`,
+        `     * For Tenses (e.g. Past Tense, Present Perfect, Continuous, Future): emit "mind_map" (3-4 "branches" with "label", clear rule in "sublabel", and concrete sentence + meaning in "example") OR "formula_blocks" (3-4 "blocks" covering: 1. Fungsi & penanda waktu seperti yesterday/last night/ago, 2. Rumus Positif (+), 3. Rumus Negatif (-) seperti did not + Verb 1 kembali ke kata dasar, 4. Rumus Tanya (?) atau Regular vs Irregular)!`,
+        `     * For Grammar / Particles / Vocabulary contrasts: emit "mind_map", "table", or "contrast_scale" clearly explaining each word/pattern's exact function, rule, natural example sentence, and ${targetLocaleName} meaning!`,
+        `     * For Math / Physics / Science: emit "mind_map" or "formula_blocks" clearly explaining (1) makna konsep & variabel rumus, (2) rumus kunci dalam "$...$", dan (3) contoh penerapan / urutan langkah hitung langkah demi langkah!`,
+        `     * Beat 1 "spokenNarration": 3-4 clear, detailed yet concise spoken sentences (~40-65 words in ${targetLocaleName}) walking through the rules, formulas, and concrete examples in Beat 1 so a beginner understands 100% BEFORE practicing!`,
+        `   - Beat 2 (kind:"interactive_mechanic" | "socratic_slider" | "kanji_grid", column:"left", phaseIndex:2, "pauseForInteraction":true — GUIDED PRACTICE 1 TESTING WHAT BEAT 1 JUST TAUGHT!): MUST populate ALL required data fields for "${userText}" (NEVER emit an empty step without its array!):`,
+        `     * kind:"interactive_mechanic", mechanic:"venn_bucket_sorter": for categories, prepositions (in/on/at, に/で), positive/negative forms, vs-contrasts -> MUST include 2-3 "bucketZones":[{"id":"z1","label":"...","sublabel":"..."}] & 3-4 "bucketChips":[{"id":"c1","label":"...","targetZoneId":"z1"}].`,
+        `     * kind:"interactive_mechanic", mechanic:"wire_node_connector": for matching pairs, V1->V2, causes->effects, 4 tones, compounds, sin/cos/tan, formulas -> MUST include 3 "wirePairs":[{"id":"w1","leftLabel":"...","rightLabel":"..."}].`,
         `     * kind:"interactive_mechanic", mechanic:"balance_seesaw": ONLY for equations or two-side balance -> MUST include "seesawLeftFixedLabel", "seesawLeftWeight", "seesawRightBaseWeight", "seesawTokens":[{"id":"t1","label":"...","weight":6}].`,
         `     * kind:"interactive_mechanic", mechanic:"rotary_dial_gauge": ONLY for degree/intensity scales (modals, adverbs of frequency, angles) -> MUST include "dialInitialDeg":25, "dialTargetDeg":155, "dialStops":[{"angleDeg":25,"label":"...","expression":"...","note":"..."}].`,
         `     * kind:"interactive_mechanic", mechanic:"fraction_slice_shader": ONLY for genuine single fractions p/q (q<=8) -> MUST include "sliceTotal", "sliceTargetCount", "sliceCaptionUnit".`,
         `     * kind:"socratic_slider": ONLY when populated with 2-3 topic-specific "sliderStops":[{"value":0,"label":"...","formula":"...","example":"...","spokenHint":"..."}] (or math_graph/physics_vector for genuine geometry/force).`,
         `     * kind:"kanji_grid": ONLY when asked how to write a specific Kanji/Hanzi/Kana character -> single exact "character" & official "strokeCount".`,
-        `   - Beat 2 (kind:"interactive_mechanic" | "surgical_strike" | "step_derivation", column:"right", phaseIndex:2, "pauseForInteraction":true — MUST differ from Beat 1's mechanic & inkPalette!):`,
+        `   - Beat 3 (kind:"interactive_mechanic" | "surgical_strike" | "step_derivation", column:"right", phaseIndex:3, "pauseForInteraction":true — GUIDED PRACTICE 2 / TRAP FIX, MUST differ from Beat 2's mechanic & inkPalette!):`,
         `     * kind:"interactive_mechanic", mechanic:"magnetic_slot_builder": snap ordered tokens/steps -> MUST include "magnetTargetTokens":["...","...","..."], "magnetDistractors":["..."], "magnetSlotRoles":["..."].`,
         `     * kind:"interactive_mechanic", mechanic:"scratch_reveal": rub chalk-foil to test prediction -> MUST include "scratchClueHeader", "scratchHiddenFormula", "scratchHiddenSubnote", "scratchSketchKind":"arch_bridge"|"prism_split"|"venn_core".`,
         `     * kind:"surgical_strike": tap flawed word in a real trap sentence -> MUST include "wrongText", "rightText", "strikeTokens":["..."], "bugTokenIndex", "fixedToken", "reason".`,
         `     * kind:"step_derivation": ONLY for step-by-step math/science calculations -> MUST include 3 "derivationSteps":[{"latex":"...","sideOp":"..."},{"latex":"...","isInteractiveBlank":true,"expectedValue":"...","choices":["...","...","..."]}].`,
-        `   - Beat 3 (kind:"highlight_callout", column:"right", phaseIndex:3): crisp <=8-word "highlightPhrase" + concise closing synthesis in "spokenNarration".`,
+        `   - Beat 4 (kind:"highlight_callout", column:"right", phaseIndex:4, "pauseForInteraction":false): crisp <=10-word "highlightPhrase" + concise closing synthesis in "spokenNarration".`,
         `3) STRICT HYGIENE & QUIZ COHERENCE: ZERO empty "()", "[]", or unlabeled boxes. NEVER write hyphenated "Verb-ing" (write "Verb ing"). ZH uses Hanzi + Pinyin; JA uses Japanese + furigana/romaji; EN uses clean English.`,
         `4) Quiz transfer rule: "drillMeaningPrompt" in ${targetLocaleName}. BOTH "drillTargetSentence" AND "drillTrapSentence" / "trapWrongSentence" MUST be complete, natural sentences of similar length (4-10 words) directly testing "${userText}" (NEVER mix a 1-word option with a full sentence!).`,
-        `JSON schema (populate ONLY the fields matching your chosen Beat 1 & Beat 2 mechanics for "${userText}"): {"aiReply":"... (in 100% ${targetLocaleName}, zero self-intro)","aiReplyTranslation":"...",${includeReplies ? `"replies":[{"tier":"easy","text":"...","pronunciation":"...","hint":"..."},{"tier":"mission","text":"...","pronunciation":"...","hint":"..."},{"tier":"rescue","text":"...","pronunciation":"...","hint":"..."}],` : ''}"uiAction":{"actionType":"open_learning_popup","topicTitle":"...","focusType":"grammar","patternFormula":"...","coachSpokenScript":"...","explanationText":"...","sampleTarget":"...","trapWrongSentence":"...","trapWrongReason":"...","drillMeaningPrompt":"...","drillTargetSentence":"...","drillTrapSentence":"...","drillDistractors":["...","..."],"phaseLabels":["0 Inti","1 Eksplorasi","2 Bedah","3 Kunci","4 Uji"],"whiteboardSteps":[{"kind":"heading","inkPalette":"cobalt_blueprint","column":"left","phaseIndex":0,"title":"...","text":"<=6 words","spokenNarration":"..."},{"kind":"interactive_mechanic","mechanic":"venn_bucket_sorter | wire_node_connector | balance_seesaw | rotary_dial_gauge | fraction_slice_shader","inkPalette":"cobalt_blueprint","roughHatch":"hachure","pauseForInteraction":true,"column":"left","phaseIndex":1,"title":"...","bucketZones":[{"id":"z1","label":"...","sublabel":"..."},{"id":"z2","label":"...","sublabel":"..."}],"bucketChips":[{"id":"c1","label":"...","targetZoneId":"z1"},{"id":"c2","label":"...","targetZoneId":"z2"}],"wirePairs":[{"id":"w1","leftLabel":"...","rightLabel":"..."}],"socraticPrompt":"...","successVoiceFeedback":"...","spokenNarration":"..."},{"kind":"interactive_mechanic | surgical_strike | step_derivation","mechanic":"magnetic_slot_builder | scratch_reveal","inkPalette":"terracotta_atelier","roughHatch":"cross-hatch","pauseForInteraction":true,"column":"right","phaseIndex":2,"title":"...","magnetSlotRoles":["1","2","3"],"magnetTargetTokens":["...","...","..."],"magnetDistractors":["..."],"scratchClueHeader":"...","scratchHiddenFormula":"...","scratchHiddenSubnote":"...","wrongText":"...","rightText":"...","strikeTokens":["..."],"bugTokenIndex":1,"fixedToken":"...","reason":"...","derivationSteps":[{"latex":"...","sideOp":"..."},{"latex":"...","isInteractiveBlank":true,"expectedValue":"...","choices":["...","...","..."]}],"socraticPrompt":"...","successVoiceFeedback":"...","spokenNarration":"..."},{"kind":"highlight_callout","column":"right","phaseIndex":3,"title":"Rumus Inti","highlightPhrase":"<=8 words","spokenNarration":"..."}]}}`,
+        `JSON schema (Beat 1 MUST be a non-pausing explanation card with examples; populate ONLY the fields matching your chosen Beat 2 & Beat 3 mechanics for "${userText}"): {"aiReply":"... (in 100% ${targetLocaleName}, clear 2-3 sentence explanation summary, zero self-intro)","aiReplyTranslation":"...",${includeReplies ? `"replies":[{"tier":"easy","text":"...","pronunciation":"...","hint":"..."},{"tier":"mission","text":"...","pronunciation":"...","hint":"..."},{"tier":"rescue","text":"...","pronunciation":"...","hint":"..."}],` : ''}"uiAction":{"actionType":"open_learning_popup","topicTitle":"...","focusType":"grammar","patternFormula":"...","coachSpokenScript":"...","explanationText":"...","sampleTarget":"...","trapWrongSentence":"...","trapWrongReason":"...","drillMeaningPrompt":"...","drillTargetSentence":"...","drillTrapSentence":"...","drillDistractors":["...","..."],"phaseLabels":["0 Konsep","1 Penjelasan","2 Praktik","3 Bedah","4 Uji"],"whiteboardSteps":[{"kind":"heading","inkPalette":"cobalt_blueprint","column":"left","phaseIndex":0,"pauseForInteraction":false,"title":"...","text":"12-24 word clear core definition","spokenNarration":"..."},{"kind":"mind_map","inkPalette":"emerald_botanical","column":"left","phaseIndex":1,"pauseForInteraction":false,"title":"Penjelasan & Contoh Inti","metaphorCenterLabel":"...","branches":[{"label":"1. Fungsi & Kapan Dipakai","sublabel":"...","example":"...","icon":"clock","color":"#0284C7"},{"label":"2. Rumus / Pola Utama","sublabel":"...","example":"...","icon":"check","color":"#10B981"},{"label":"3. Catatan & Jebakan Umum","sublabel":"...","example":"...","icon":"warn","color":"#F59E0B"}],"spokenNarration":"3-4 clear teaching sentences (~40-65 words) explaining the rules and examples in detail before practice"},{"kind":"interactive_mechanic","mechanic":"venn_bucket_sorter | wire_node_connector | balance_seesaw | rotary_dial_gauge | fraction_slice_shader","inkPalette":"cobalt_blueprint","roughHatch":"hachure","pauseForInteraction":true,"column":"left","phaseIndex":2,"title":"...","bucketZones":[{"id":"z1","label":"...","sublabel":"..."},{"id":"z2","label":"...","sublabel":"..."}],"bucketChips":[{"id":"c1","label":"...","targetZoneId":"z1"},{"id":"c2","label":"...","targetZoneId":"z2"}],"wirePairs":[{"id":"w1","leftLabel":"...","rightLabel":"..."}],"socraticPrompt":"...","successVoiceFeedback":"...","spokenNarration":"..."},{"kind":"interactive_mechanic | surgical_strike | step_derivation","mechanic":"magnetic_slot_builder | scratch_reveal","inkPalette":"terracotta_atelier","roughHatch":"cross-hatch","pauseForInteraction":true,"column":"right","phaseIndex":3,"title":"...","magnetSlotRoles":["1","2","3"],"magnetTargetTokens":["...","...","..."],"magnetDistractors":["..."],"scratchClueHeader":"...","scratchHiddenFormula":"...","scratchHiddenSubnote":"...","wrongText":"...","rightText":"...","strikeTokens":["..."],"bugTokenIndex":1,"fixedToken":"...","reason":"...","derivationSteps":[{"latex":"...","sideOp":"..."},{"latex":"...","isInteractiveBlank":true,"expectedValue":"...","choices":["...","...","..."]}],"socraticPrompt":"...","successVoiceFeedback":"...","spokenNarration":"..."},{"kind":"highlight_callout","column":"right","phaseIndex":4,"pauseForInteraction":false,"title":"Kunci Ingatan","highlightPhrase":"<=10 words","spokenNarration":"..."}]}}`,
       ]
         .filter(Boolean)
         .join('\n');
@@ -2476,9 +2482,9 @@ async function executePartnerTurnCore(ctx, streamHooks = null) {
         `4) VOICE MODE SWITCHING & UNIVERSAL FIEZEL NAVIGATION + INTERACTIVE SOCRATIC WHITEBOARD ("uiAction"):`,
         `   - If learner asks to switch to casual chat ("chat seperti biasa", "ngobrol santai") or back to tutor mode ("mode mengajar"), set uiAction.actionType="switch_call_mode" and uiAction.callMode="casual_chat" or "tutor_coach".`,
         `   - If learner asks to navigate to any FIEZEL module by voice, set uiAction.actionType="navigate_app" and uiAction.destination to: "grammar"|"vocab"|"kana"|"kanji"|"reading"|"writing"|"listening"|"test"|"latihan"|"kurikulum"|"misi"|"progress"|"home".`,
-        `   - INTERACTIVE SOCRATIC WHITEBOARD POPUP (when learner asks ANY question, grammar/vocab/character/math/physics/concept OR needs visual correction in tutor_coach mode):`,
-        `     * Set actionType="open_learning_popup" and teach interactively in 100% ${targetLocaleName}! Enforce the 6-WORD CHALK RULE on the board (<=6 words or "$...$" per label, ZERO prose paragraphs on board) while putting full crisp nuance + Socratic prompts in each step's "spokenNarration"!`,
-        `     * Emit 4 progressive interactive "whiteboardSteps": Beat 0 "heading" -> Beat 1 interactive visual ("socratic_slider" for math/physics/tenses/scales OR "formula_blocks"/"rough_scene"/"mind_map"/"kanji_grid" with "pauseForInteraction":true, "socraticPrompt", and 2 "quickChoices") -> Beat 2 hands-on practice ("step_derivation" with KaTeX + 1 interactive blank for math/physics OR "surgical_strike" with strikeTokens + bugTokenIndex for language/concept traps, "pauseForInteraction":true) -> Beat 3 "highlight_callout" (<=8-word memory rule).`,
+        `   - INTERACTIVE TEACH-FIRST WHITEBOARD POPUP (when learner asks ANY question, grammar/vocab/character/math/physics/concept OR needs visual correction in tutor_coach mode):`,
+        `     * Set actionType="open_learning_popup" and teach in 100% ${targetLocaleName}! ALWAYS EXPLAIN THE CONCEPT & CONCRETE EXAMPLES FIRST BEFORE ASKING THE LEARNER TO INTERACT!`,
+        `     * Emit 5 progressive "whiteboardSteps": Beat 0 "heading" (pauseForInteraction:false) -> Beat 1 Teaching & Examples Card ("mind_map"/"formula_blocks"/"table"/"timeline_track"/"contrast_scale" with pauseForInteraction:false, clear rules + concrete examples + full spokenNarration) -> Beat 2 Guided Practice 1 ("interactive_mechanic" or "socratic_slider" with pauseForInteraction:true) -> Beat 3 Guided Practice 2 ("surgical_strike" or "step_derivation" with pauseForInteraction:true) -> Beat 4 "highlight_callout" (memory rule).`,
         `     * CHARACTER WRITING RULE: When asking how to write ANY Kanji/Hanzi/Kana character, emit "kanji_grid" (single exact char, exact strokeCount, stroke-by-stroke spokenNarration) + compound "table", and NEVER emit an unrelated sentence trap.`,
         `   - EXPLANATION LANGUAGE RULE: Outside of popups, "aiReply" stays 100% in ${targetLang.toUpperCase()}. When opening the learning popup ("open_learning_popup"), "aiReply", "coachSpokenScript", "aiReplyTranslation", "uiAction.explanationText", and "uiAction.trapWrongReason" MUST be in the LEARNER'S interface language (${targetLocaleName}).`,
         isExplanationTurn ? '' : modeDirective,
@@ -2497,7 +2503,7 @@ async function executePartnerTurnCore(ctx, streamHooks = null) {
           ? `2) "replies": 3 direct beginner candidate replies in ${targetLocaleName} directly answering or asking about the ACTIVE step in aiReply (plus asking for clarification on an unfamiliar term, saying they understand and want the next step, or asking a concrete check question), with "hint" in ${targetLocaleName} and clean Latin "pronunciation".`
           : `2) "replies": 3 spontaneous spoken replies directly answering your aiReply in ${targetLang === 'zh' ? 'Simplified Chinese Hanzi' : targetLang === 'ja' ? 'Japanese Kanji+Kana' : 'English'}, with ${targetLocaleName} "hint" and clean Romanized "pronunciation".`,
         isExplanationTurn
-          ? `JSON only: {"aiReply":"...","aiReplyTranslation":"...","replies":[{"tier":"easy","text":"...","pronunciation":"...","hint":"..."},{"tier":"mission","text":"...","pronunciation":"...","hint":"..."},{"tier":"rescue","text":"...","pronunciation":"...","hint":"..."}],"uiAction":{"actionType":"open_learning_popup","topicTitle":"...","focusType":"grammar","coachSpokenScript":"...","explanationText":"...","patternFormula":"...","sampleTarget":"...","trapWrongSentence":"...","trapWrongReason":"...","drillMeaningPrompt":"...","drillTargetSentence":"...","drillTrapSentence":"...","phaseLabels":["0 Inti","1 Eksplorasi","2 Bedah","3 Kunci","4 Uji"],"whiteboardSteps":[{"kind":"heading","column":"left","phaseIndex":0,"title":"...","text":"<=6 words","spokenNarration":"..."},{"kind":"socratic_slider | formula_blocks | timeline_track | mind_map | rough_scene | kanji_grid","pauseForInteraction":true,"column":"left","phaseIndex":1,"title":"...","socraticPrompt":"...","successVoiceFeedback":"...","quickChoices":[{"id":"c1","label":"...","isCorrect":true},{"id":"c2","label":"...","isCorrect":false}],"spokenNarration":"..."},{"kind":"surgical_strike | step_derivation | table","pauseForInteraction":true,"column":"right","phaseIndex":2,"title":"...","wrongText":"...","rightText":"...","strikeTokens":["..."],"bugTokenIndex":1,"fixedToken":"","reason":"...","socraticPrompt":"...","spokenNarration":"..."},{"kind":"highlight_callout","column":"right","phaseIndex":3,"title":"Rumus Inti","highlightPhrase":"<=8 words","spokenNarration":"..."}]}}`
+          ? `JSON only: {"aiReply":"...","aiReplyTranslation":"...","replies":[{"tier":"easy","text":"...","pronunciation":"...","hint":"..."},{"tier":"mission","text":"...","pronunciation":"...","hint":"..."},{"tier":"rescue","text":"...","pronunciation":"...","hint":"..."}],"uiAction":{"actionType":"open_learning_popup","topicTitle":"...","focusType":"grammar","coachSpokenScript":"...","explanationText":"...","patternFormula":"...","sampleTarget":"...","trapWrongSentence":"...","trapWrongReason":"...","drillMeaningPrompt":"...","drillTargetSentence":"...","drillTrapSentence":"...","phaseLabels":["0 Konsep","1 Penjelasan","2 Praktik","3 Bedah","4 Uji"],"whiteboardSteps":[{"kind":"heading","column":"left","phaseIndex":0,"pauseForInteraction":false,"title":"...","text":"12-24 word clear core definition","spokenNarration":"..."},{"kind":"mind_map","column":"left","phaseIndex":1,"pauseForInteraction":false,"title":"Penjelasan & Contoh Inti","metaphorCenterLabel":"...","branches":[{"label":"1. Fungsi & Konteks","sublabel":"...","example":"...","color":"#0284C7"},{"label":"2. Rumus / Pola","sublabel":"...","example":"...","color":"#10B981"},{"label":"3. Hindari Jebakan","sublabel":"...","example":"...","color":"#F59E0B"}],"spokenNarration":"3-4 clear spoken sentences explaining rules and examples before practice"},{"kind":"interactive_mechanic","mechanic":"venn_bucket_sorter | wire_node_connector","pauseForInteraction":true,"column":"left","phaseIndex":2,"title":"...","socraticPrompt":"...","successVoiceFeedback":"...","spokenNarration":"..."},{"kind":"surgical_strike | step_derivation","pauseForInteraction":true,"column":"right","phaseIndex":3,"title":"...","wrongText":"...","rightText":"...","strikeTokens":["..."],"bugTokenIndex":1,"fixedToken":"","reason":"...","socraticPrompt":"...","spokenNarration":"..."},{"kind":"highlight_callout","column":"right","phaseIndex":4,"pauseForInteraction":false,"title":"Kunci Ingatan","highlightPhrase":"<=10 words","spokenNarration":"..."}]}}`
           : `3) "diagnosis": Diagnose ANY grammar/syntax/particle/conjugation error in learner's turn (set ok:true if natural/grammatical, ok:false if error exists + choose canonical misconceptionCode from [tense_aspect.timeline_mismatch, tense_aspect.progressive_overuse, tense_aspect.perfect_misuse, tense_aspect.future_form_confusion, agreement.bare_form, agreement.number_mismatch, agreement.missing_auxiliary, structure.double_marking, structure.word_order, structure.malformed_blend, structure.omitted_element, modality.function_confusion, conditionals.type_mismatch, conditionals.clause_form_swap, passive.participle_form, articles.definiteness_mismatch, articles.countability_quantifier, prepositions.semantic_category, prepositions.collocation, lexical.form_confusion, lexical.register_mismatch, complementation.gerund_infinitive_swap, question.auxiliary_error, pronouns.case_form, transfer.id_l1_pattern]).
 JSON only: {"aiReply":"...","aiReplyTranslation":"...","diagnosis":{"ok":true,"misconceptionCode":null,"whyFailsId":"","correction":""},"replies":[{"tier":"easy","text":"...","pronunciation":"...","hint":"..."},{"tier":"mission","text":"...","pronunciation":"...","hint":"..."},{"tier":"rescue","text":"...","pronunciation":"...","hint":"..."}],"uiAction":{"actionType":"none","callMode":"","destination":"","bankTopicId":"","topicTitle":"","focusType":"grammar","coachSpokenScript":"","explanationText":"","patternFormula":"","drillInstruction":"","sampleTarget":"","leadText":"","triggerWord":"","triggerTag":"","wrongWord":"","wrongTag":"","rightWord":"","rightTag":"","tailText":"","trapWrongSentence":"","trapWrongToken":"","trapWrongReason":"","drillMeaningPrompt":"","drillTargetSentence":"","drillTrapSentence":"","phaseLabels":[],"whiteboardSteps":[]}}`,
       ]
@@ -2526,7 +2532,7 @@ JSON only: {"aiReply":"...","aiReplyTranslation":"...","diagnosis":{"ok":true,"m
       keys,
       prompt,
       boardOnly ? 0.25 : 0.35,
-      3000
+      3400
     );
     const [, boardRes] = await Promise.all([openerPromise, boardPromise]);
     gen = boardRes;
@@ -2535,7 +2541,7 @@ JSON only: {"aiReply":"...","aiReplyTranslation":"...","diagnosis":{"ok":true,"m
       keys,
       prompt,
       boardOnly ? 0.25 : isExplanationTurn ? 0.35 : 0.6,
-      boardOnly ? 3000 : isExplanationTurn ? 3000 : 1500
+      boardOnly ? 3400 : isExplanationTurn ? 3400 : 1500
     );
   }
   if (
@@ -2578,7 +2584,7 @@ JSON only: {"aiReply":"...","aiReplyTranslation":"...","diagnosis":{"ok":true,"m
     if (isOffTopicToBeDrift || !Array.isArray(firstSteps) || firstSteps.length < 4) {
       const boardOnlyFallbackKey = await sha256Hex(
         JSON.stringify({
-          v: 'wb-v6-socratic',
+          v: 'wb-v7-teach-first',
           q: userText.trim().toLowerCase(),
           targetLang,
           locale,
@@ -2610,12 +2616,12 @@ JSON only: {"aiReply":"...","aiReplyTranslation":"...","diagnosis":{"ok":true,"m
             : {}),
         };
       } else {
-        const extraRule = `[CRITICAL]: STRICT TOPIC LOCK to "${userText}" (NEVER output unrelated "To Be vs Kata Kerja" or "I am agree" examples unless explicitly asked!). "uiAction.whiteboardSteps" MUST contain 4 interactive Socratic Beats (heading, interactive visual/socratic_slider, surgical_strike/step_derivation, highlight_callout) in 100% ${targetLocaleName} obeying the <=6-word chalk rule. NEVER return empty whiteboardSteps!`;
+        const extraRule = `[CRITICAL]: STRICT TOPIC LOCK to "${userText}" (NEVER output unrelated "To Be vs Kata Kerja" or "I am agree" examples unless explicitly asked!). "uiAction.whiteboardSteps" MUST contain 5 Teach-First Socratic Beats (Beat 0 heading, Beat 1 non-pausing explanation + concrete examples card with pauseForInteraction:false, Beat 2 interactive practice lab, Beat 3 surgical_strike/step_derivation, Beat 4 highlight_callout) in 100% ${targetLocaleName}. NEVER return empty whiteboardSteps!`;
         const retryGen = await runGeminiJsonWithPool(
           keys,
           buildBoardCompilerPrompt(extraRule),
           0.25,
-          3000
+          3400
         );
         if (retryGen.ok && retryGen.parsed?.uiAction) {
           const mergedUi = {
@@ -2982,7 +2988,22 @@ JSON only: {"aiReply":"...","aiReplyTranslation":"...","diagnosis":{"ok":true,"m
                           : undefined,
                       variantSeed: typeof st.variantSeed === 'number' ? st.variantSeed : undefined,
                       pauseForInteraction:
-                        typeof st.pauseForInteraction === 'boolean' ? st.pauseForInteraction : undefined,
+                        resolvedKind === 'heading' ||
+                        resolvedKind === 'note' ||
+                        resolvedKind === 'table' ||
+                        resolvedKind === 'formula_blocks' ||
+                        resolvedKind === 'timeline_track' ||
+                        resolvedKind === 'mind_map' ||
+                        resolvedKind === 'contrast_scale' ||
+                        resolvedKind === 'metaphor_scene' ||
+                        resolvedKind === 'rough_scene' ||
+                        resolvedKind === 'syntax_flow' ||
+                        resolvedKind === 'kanji_grid' ||
+                        resolvedKind === 'highlight_callout'
+                          ? false
+                          : typeof st.pauseForInteraction === 'boolean'
+                            ? st.pauseForInteraction
+                            : undefined,
                       socraticPrompt:
                         typeof st.socraticPrompt === 'string' && st.socraticPrompt.trim()
                           ? cleanSpokenText(st.socraticPrompt).slice(0, 320)
@@ -2995,19 +3016,25 @@ JSON only: {"aiReply":"...","aiReplyTranslation":"...","diagnosis":{"ok":true,"m
                         typeof st.wrongTapHint === 'string' && st.wrongTapHint.trim()
                           ? cleanSpokenText(st.wrongTapHint).slice(0, 260)
                           : undefined,
-                      quickChoices: Array.isArray(st.quickChoices)
-                        ? st.quickChoices
-                            .filter((qc) => qc && typeof qc === 'object' && typeof qc.label === 'string' && qc.label.trim())
-                            .slice(0, 4)
-                            .map((qc, qIdx) => ({
-                              id: typeof qc.id === 'string' && qc.id.trim() ? qc.id.slice(0, 32) : `qc_${qIdx}`,
-                              label: cleanSpokenText(qc.label).slice(0, 96),
-                              isCorrect: Boolean(qc.isCorrect),
-                              ...(typeof qc.socraticHint === 'string' && qc.socraticHint.trim()
-                                ? { socraticHint: cleanSpokenText(qc.socraticHint).slice(0, 220) }
-                                : {}),
-                            }))
-                        : undefined,
+                      quickChoices:
+                        resolvedKind === 'interactive_mechanic' ||
+                        resolvedKind === 'socratic_slider' ||
+                        resolvedKind === 'surgical_strike' ||
+                        resolvedKind === 'step_derivation'
+                          ? Array.isArray(st.quickChoices)
+                            ? st.quickChoices
+                                .filter((qc) => qc && typeof qc === 'object' && typeof qc.label === 'string' && qc.label.trim())
+                                .slice(0, 4)
+                                .map((qc, qIdx) => ({
+                                  id: typeof qc.id === 'string' && qc.id.trim() ? qc.id.slice(0, 32) : `qc_${qIdx}`,
+                                  label: cleanSpokenText(qc.label).slice(0, 96),
+                                  isCorrect: Boolean(qc.isCorrect),
+                                  ...(typeof qc.socraticHint === 'string' && qc.socraticHint.trim()
+                                    ? { socraticHint: cleanSpokenText(qc.socraticHint).slice(0, 220) }
+                                    : {}),
+                                }))
+                            : undefined
+                          : undefined,
                       bucketLayout:
                         st.bucketLayout === 'concentric' || st.bucketLayout === 'dual_rings' || st.bucketLayout === 'triple_bins'
                           ? st.bucketLayout
@@ -3256,9 +3283,9 @@ JSON only: {"aiReply":"...","aiReplyTranslation":"...","diagnosis":{"ok":true,"m
                             .filter((b) => b && typeof b === 'object' && typeof (b.label || b.title) === 'string' && (b.label || b.title).trim())
                             .slice(0, 6)
                             .map((b) => ({
-                              label: cleanSpokenText(b.label || b.title).slice(0, 64),
-                              ...(typeof (b.sublabel || b.subtitle) === 'string' && (b.sublabel || b.subtitle).trim() ? { sublabel: cleanSpokenText(b.sublabel || b.subtitle).slice(0, 140) } : {}),
-                              ...(typeof b.example === 'string' && b.example.trim() ? { example: cleanSpokenText(b.example).slice(0, 140) } : {}),
+                              label: cleanSpokenText(b.label || b.title).slice(0, 80),
+                              ...(typeof (b.sublabel || b.subtitle) === 'string' && (b.sublabel || b.subtitle).trim() ? { sublabel: cleanSpokenText(b.sublabel || b.subtitle).slice(0, 180) } : {}),
+                              ...(typeof b.example === 'string' && b.example.trim() ? { example: cleanSpokenText(b.example).slice(0, 160) } : {}),
                               ...(typeof b.icon === 'string' && b.icon.trim() ? { icon: cleanSpokenText(b.icon).slice(0, 24) } : {}),
                               ...(typeof b.color === 'string' && /^#[0-9a-f]{3,8}$/i.test(b.color.trim()) ? { color: b.color.trim() } : {}),
                             }))
@@ -3268,9 +3295,9 @@ JSON only: {"aiReply":"...","aiReplyTranslation":"...","diagnosis":{"ok":true,"m
                             .filter((ev) => ev && typeof ev === 'object' && typeof (ev.title || ev.label) === 'string' && (ev.title || ev.label).trim())
                             .slice(0, 5)
                             .map((ev) => ({
-                              timeLabel: typeof (ev.timeLabel || ev.time || ev.label) === 'string' ? cleanSpokenText(ev.timeLabel || ev.time || ev.label).slice(0, 48) : 'Tahap',
-                              title: cleanSpokenText(ev.title || ev.label).slice(0, 96),
-                              ...(typeof ev.example === 'string' && ev.example.trim() ? { example: cleanSpokenText(ev.example).slice(0, 140) } : {}),
+                              timeLabel: typeof (ev.timeLabel || ev.time || ev.label) === 'string' ? cleanSpokenText(ev.timeLabel || ev.time || ev.label).slice(0, 56) : 'Tahap',
+                              title: cleanSpokenText(ev.title || ev.label).slice(0, 110),
+                              ...(typeof ev.example === 'string' && ev.example.trim() ? { example: cleanSpokenText(ev.example).slice(0, 160) } : {}),
                               ...(typeof ev.icon === 'string' && ev.icon.trim() ? { icon: cleanSpokenText(ev.icon).slice(0, 24) } : {}),
                               ...(typeof ev.isActive === 'boolean' ? { isActive: ev.isActive } : {}),
                               ...(typeof ev.color === 'string' && /^#[0-9a-f]{3,8}$/i.test(ev.color.trim()) ? { color: ev.color.trim() } : {}),
@@ -3281,9 +3308,9 @@ JSON only: {"aiReply":"...","aiReplyTranslation":"...","diagnosis":{"ok":true,"m
                             .filter((bl) => bl && typeof bl === 'object' && typeof (bl.token || bl.word || bl.text || bl.label) === 'string' && (bl.token || bl.word || bl.text || bl.label).trim())
                             .slice(0, 6)
                             .map((bl) => ({
-                              role: typeof (bl.role || bl.title || bl.label) === 'string' ? cleanSpokenText(bl.role || bl.title || bl.label).slice(0, 48) : 'Bagian',
-                              token: cleanSpokenText(bl.token || bl.word || bl.text || bl.label).slice(0, 80),
-                              ...(typeof bl.note === 'string' && bl.note.trim() ? { note: cleanSpokenText(bl.note).slice(0, 120) } : {}),
+                              role: typeof (bl.role || bl.title || bl.label) === 'string' ? cleanSpokenText(bl.role || bl.title || bl.label).slice(0, 64) : 'Bagian',
+                              token: cleanSpokenText(bl.token || bl.word || bl.text || bl.label).slice(0, 110),
+                              ...(typeof bl.note === 'string' && bl.note.trim() ? { note: cleanSpokenText(bl.note).slice(0, 160) } : {}),
                               ...(typeof bl.color === 'string' && /^#[0-9a-f]{3,8}$/i.test(bl.color.trim()) ? { color: bl.color.trim() } : {}),
                             }))
                         : undefined,
@@ -4129,7 +4156,7 @@ export async function routeVoiceWhiteboardStream(ctx) {
       'content-type': 'text/event-stream; charset=utf-8',
       'cache-control': 'no-cache, no-store',
       'x-accel-buffering': 'no',
-      'access-control-allow-origin': '*',
+      ...(ctx?.corsHeaders || {}),
     },
   });
 }

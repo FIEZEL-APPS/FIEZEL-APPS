@@ -372,4 +372,37 @@ const unlockSrc = read('features/voice-studio/src/lib/boardAudioUnlock.ts');
   console.log('  ✅ PASS 15: Combinatorial 11 interactive mechanics × 8 ink palettes × 5 Rough.js hatches & dual scratch engine verified');
 }
 
-console.log('\n🎉 ALL 15 WHITEBOARD CONTRACT TESTS PASSED 100%!');
+// ============================================================================
+// TEST 16: Mandatory Teach-First Explanation Before Interactive Practice + SSE CORS
+// ============================================================================
+{
+  const workerLiveSrc = read('workers/api/voice/route-voice-live.js');
+  const canvasSrcLocal = read('features/voice-studio/src/components/LiveWhiteboardCanvas.tsx');
+  const directorSrcLocal = read('features/voice-studio/src/lib/whiteboardDirector.ts');
+  const distSrc = read('features/voice-studio/dist/voice-studio.js');
+
+  assert.ok(
+    workerLiveSrc.includes("v: 'wb-v7-teach-first-live'") &&
+      workerLiveSrc.includes('5-STEP TEACH-FIRST CADENCE') &&
+      workerLiveSrc.includes('...(ctx?.corsHeaders || {})') &&
+      !workerLiveSrc.includes("'access-control-allow-origin': '*'"),
+    'Worker route-voice-live.js must enforce wb-v7-teach-first-live 5-step Teach-First cadence and use credential-safe ctx.corsHeaders on SSE whiteboard-stream'
+  );
+  assert.ok(
+    directorSrcLocal.includes('wb_teach_first_past_tense') &&
+      directorSrcLocal.includes('wb_teach_first_breakdown') &&
+      directorSrcLocal.includes('allTeachingSteps') &&
+      directorSrcLocal.includes("wbPick('1 Explanation', '1 Penjelasan')"),
+    'whiteboardDirector.ts must guarantee a non-blocking Phase 1 Explanation & Examples card (including Simple Past Tense breakdown) ordered strictly before interactive practice'
+  );
+  assert.ok(
+    canvasSrcLocal.includes('data-testid="wb-teaching-phase-badge"') &&
+      canvasSrcLocal.includes("'teaching-explanation'") &&
+      distSrc.includes('wb_teach_first_past_tense') &&
+      distSrc.includes('wb-teaching-phase-badge'),
+    'LiveWhiteboardCanvas.tsx and compiled dist/voice-studio.js must render the 1. Penjelasan & Contoh Dulu badge and Teach-First guarantee'
+  );
+  console.log('  ✅ PASS 16: Mandatory Teach-First explanation phase before interactive practice & SSE CORS parity verified');
+}
+
+console.log('\n🎉 ALL 16 WHITEBOARD CONTRACT TESTS PASSED 100%!');

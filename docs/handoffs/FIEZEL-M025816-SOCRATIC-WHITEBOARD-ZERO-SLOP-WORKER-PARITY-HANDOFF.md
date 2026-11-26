@@ -48,4 +48,8 @@ Setelah pengujian *roleplay* 150 pertanyaan (`Q1–Q50` + `Q101–Q200`) pada `m
 
 - Seluruh gerbang kontrak lokal (`id-golden-snapshot-test.js`, `th-ui-leak-test.js`, `curriculum-cache-version-test.js`, `gate-registry-test.js`, `bump-build.mjs --check`, dan `fiezel-guardians.mjs` `self-test`, `a9`, `a10`, `a11`, `a13`) **100% HIJAU**.
 - Tidak ada permukaan terproteksi (`auth`, `onboarding`, `manifest.json`, `website`, `.github/workflows`) yang disentuh.
-- **Catatan Operasional Rilis**: Karena perubahan mencakup `workers/api/voice/route-voice-live.js`, selain memantau `FIEZEL Deploy Site` setelah merge PR, alur kerja `deploy-api-worker.yml` juga wajib dijalankan pada branch `main` dan diverifikasi langsung terhadap `https://api.fiezel.my.id/api/voice/whiteboard-stream`.
+## 5. Perbaikan Tambahan `m025-817`: Paritas CORS Kredensial pada SSE `whiteboard-stream`
+
+- Pada verifikasi peramban Chromium produksi tanpa *mock* terhadap `https://fiezel.my.id/app/call.html` -> `https://api.fiezel.my.id/api/voice/whiteboard-stream` (`credentials: 'include'`), ditemukan bahwa `routeVoiceWhiteboardStream` menuliskan `'access-control-allow-origin': '*'` secara statis.
+- Sesuai spesifikasi Fetch/CORS W3C, peramban memblokir respons `Access-Control-Allow-Origin: *` saat `credentials: 'include'` aktif (`net::ERR_FAILED`), dan keberadaan header tersebut membuat `needsCorsHeaders()` di `workers/api/index.js` melewati penempelan `ctx.corsHeaders`.
+- Mengganti `'access-control-allow-origin': '*'` dengan `...(ctx?.corsHeaders || {})` memulihkan `Access-Control-Allow-Origin: https://fiezel.my.id` + `Access-Control-Allow-Credentials: true` secara presisi pada aliran SSE papan tulis *real-time*.

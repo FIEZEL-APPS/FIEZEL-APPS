@@ -866,26 +866,40 @@ function deriveStepSpokenNarration(
     case 'mind_map': {
       const brs = (step.branches || []).slice(0, 6);
       const low = existing.toLowerCase();
-      const coveredBrs = brs.filter((b) => extractNarrationTokens(`${b.label || ''} ${b.example || ''}`).some((t) => low.includes(t))).length;
-      if (existingWords >= 16 && coveredBrs >= Math.min(2, brs.length)) {
+      const coveredBrs = brs.filter((b) =>
+        extractNarrationTokens(`${b.label || ''} ${b.sublabel || ''} ${b.example || ''}`).some((t) => low.includes(t))
+      ).length;
+      if (existingWords >= 15 && coveredBrs >= Math.min(1, brs.length)) {
         return /[.!?。！？]$/.test(existing) ? existing : `${existing}.`;
       }
+      const ordinalsId = ['Pertama', 'Kedua', 'Ketiga', 'Keempat', 'Kelima', 'Keenam'];
+      const ordinalsEn = ['First', 'Second', 'Third', 'Fourth', 'Fifth', 'Sixth'];
       const items = brs
-        .map((b, bIdx) => wbFmt(
-          'Branch {num}, {label}{sub}{ex}',
-          'Cabang {num}, {label}{sub}{ex}',
-          undefined,
-          {
-            num: bIdx + 1,
-            label: b.label,
-            sub: b.sublabel ? wbFmt(', meaning {sublabel}', ', yaitu {sublabel}', undefined, { sublabel: b.sublabel }) : '',
-            ex: b.example ? wbFmt(', for example {example}', ', contohnya {example}', undefined, { example: b.example }) : '',
-          }
-        ))
+        .map((b, bIdx) => {
+          const cleanLbl = String(b.label || '').replace(/^\d+[.)]\s*/, '').trim();
+          return wbFmt(
+            '{ord}, {label}{sub}{ex}',
+            '{ord}, {label}{sub}{ex}',
+            undefined,
+            {
+              ord: wbPick(ordinalsEn[bIdx] || `Point ${bIdx + 1}`, ordinalsId[bIdx] || `Poin ${bIdx + 1}`),
+              label: cleanLbl,
+              sub: b.sublabel ? `: ${b.sublabel.replace(/[.]+$/, '')}` : '',
+              ex: b.example
+                ? wbFmt(
+                    ', for example {example}',
+                    ', contohnya {example}',
+                    undefined,
+                    { example: b.example.replace(/^[✓✕]\s*/, '').replace(/[.]+$/, '') }
+                  )
+                : '',
+            }
+          );
+        })
         .join('. ');
       return wbFmt(
-        "Let's walk through the concept map for {topic} one by one. {detail}.",
-        'Mari kita baca peta konsep {topic} satu per satu. {detail}.',
+        'Understand the core breakdown of {topic} first. {detail}.',
+        'Pahami dulu poin kunci {topic} berikut. {detail}.',
         undefined,
         {
           topic: cleanBoardDisplayText(step.metaphorCenterLabel || step.title || topicTitle),
@@ -4270,6 +4284,17 @@ function buildDynamicTopicRemixPair(params: {
       );
     }
   }
+  if (
+    authenticPairs.length < 2 &&
+    /\b(?:simple\s*past|past\s*tense)\b/i.test(`${cleanTitle} ${cleanFormula}`) &&
+    !/\bpresent\s*perfect\b/i.test(`${cleanTitle} ${cleanFormula}`)
+  ) {
+    authenticPairs.push(
+      { left: 'Kalimat Positif (+)', right: 'Subject + Verb 2 (She went / I watched)' },
+      { left: 'Kalimat Negatif (-)', right: 'did not + Verb 1 dasar (I did not go)' },
+      { left: 'Kalimat Tanya (?)', right: 'Did + Subject + Verb 1? (Did you study?)' }
+    );
+  }
   if (authenticPairs.length < 2) {
     const topicAnchor = truncateDiagramLabel(cleanTitle.split(':')[0].trim() || cleanTitle, 24);
     const isConceptualProse =
@@ -4666,17 +4691,20 @@ export function buildWhiteboardScenePlan(params: {
     variantNonce = 0,
   } = params;
 
+  const isLegacyShortPhases =
+    Array.isArray(uiAction?.phaseLabels) &&
+    uiAction.phaseLabels.some((p) => /0\s*inti|1\s*eksplorasi/i.test(String(p || '')));
   const customPhases =
-    Array.isArray(uiAction?.phaseLabels) && uiAction.phaseLabels.length >= 3
+    Array.isArray(uiAction?.phaseLabels) && uiAction.phaseLabels.length >= 3 && !isLegacyShortPhases
       ? uiAction.phaseLabels
       : null;
 
   const phaseLabels = customPhases || [
-    wbPick('0 Start', '0 Mulai'),
-    wbPick('1 Concept', '1 Konsep'),
-    wbPick('2 Sketch', '2 Sketsa'),
+    wbPick('0 Concept', '0 Konsep'),
+    wbPick('1 Explanation', '1 Penjelasan'),
+    wbPick('2 Practice', '2 Praktik'),
     wbPick('3 Breakdown', '3 Bedah'),
-    wbPick('4 Practice', '4 Latihan'),
+    wbPick('4 Quiz', '4 Uji'),
   ];
 
   const steps: WhiteboardSceneStep[] = [];
@@ -4847,21 +4875,28 @@ export function buildWhiteboardScenePlan(params: {
       sanitized.title = stripMetaStepTitle(cleanBoardDisplayText(shortTitle)) || shortTitle;
     }
     const aligned = enforceSemanticVisualAlignment(sanitized);
-    const mustPauseForStudent =
+    const isGenuineInteractiveKind =
       aligned.kind === 'interactive_mechanic' ||
       aligned.kind === 'socratic_slider' ||
       aligned.kind === 'surgical_strike' ||
-      aligned.kind === 'step_derivation' ||
-      Boolean(aligned.quickChoices && aligned.quickChoices.length > 0) ||
-      Boolean(aligned.pauseForInteraction);
-    const narration = deriveStepSpokenNarration(aligned, shortTitle, boardState.coachExplanation || '', targetLang);
-    const highlightTerms = extractStepHighlightTerms(aligned, sampleSentenceGlobal);
+      aligned.kind === 'step_derivation';
     const enriched: WhiteboardStepCommand = {
       ...aligned,
-      ...(mustPauseForStudent ? { pauseForInteraction: true } : {}),
-      highlightTerms,
-      spokenNarration: narration,
+      pauseForInteraction: isGenuineInteractiveKind ? true : false,
+      quickChoices: isGenuineInteractiveKind ? aligned.quickChoices : undefined,
+      highlightTerms: extractStepHighlightTerms(aligned, sampleSentenceGlobal),
+      spokenNarration: deriveStepSpokenNarration(
+        {
+          ...aligned,
+          pauseForInteraction: isGenuineInteractiveKind ? true : false,
+          quickChoices: isGenuineInteractiveKind ? aligned.quickChoices : undefined,
+        },
+        shortTitle,
+        boardState.coachExplanation || '',
+        targetLang
+      ),
     };
+    const narration = enriched.spokenNarration || '';
     return {
       ...enriched,
       id: aligned.id || `wb_step_${idx}`,
@@ -5250,7 +5285,7 @@ export function buildWhiteboardScenePlan(params: {
             phaseIndex: 0,
             title: boardState.topicTitle || 'Papan Belajar',
             text:
-              distillToSixWordInk(boardState.patternFormula || '', 7) ||
+              truncateDiagramLabel(boardState.patternFormula || '', 120) ||
               (characterEntryForHeading
                 ? `${characterEntryForHeading.char}${characterEntryForHeading.reading ? ` (${characterEntryForHeading.reading})` : ''}${characterEntryForHeading.strokeCount ? ` • ${characterEntryForHeading.strokeCount} Goresan` : ''}`
                 : ''),
@@ -5364,7 +5399,7 @@ export function buildWhiteboardScenePlan(params: {
           column: 'left',
           phaseIndex: 0,
           title: shortTitle,
-          text: distillToSixWordInk(boardState.patternFormula || '', 7),
+          text: truncateDiagramLabel(boardState.patternFormula || '', 120),
         },
         steps.length
       )
@@ -5586,33 +5621,35 @@ export function buildWhiteboardScenePlan(params: {
   for (let i = steps.length - 1; i >= 0; i--) {
     const st = steps[i];
     if (st.kind === 'note') {
-      const hasRichDiagramSibling = steps.some(
+      const hasNonInteractiveTeachingDiagram = steps.some(
         (other) =>
-          other.kind === 'interactive_mechanic' ||
-          other.kind === 'socratic_slider' ||
-          other.kind === 'formula_blocks' ||
-          other.kind === 'timeline_track' ||
-          other.kind === 'mind_map' ||
-          other.kind === 'rough_scene' ||
-          other.kind === 'metaphor_scene' ||
-          other.kind === 'kanji_grid'
+          other.id !== st.id &&
+          !other.pauseForInteraction &&
+          (other.kind === 'formula_blocks' ||
+            other.kind === 'timeline_track' ||
+            other.kind === 'mind_map' ||
+            other.kind === 'contrast_scale' ||
+            other.kind === 'rough_scene' ||
+            other.kind === 'metaphor_scene' ||
+            other.kind === 'kanji_grid')
       );
-      if (hasRichDiagramSibling) {
+      if (hasNonInteractiveTeachingDiagram) {
         const nextVis = steps.find(
           (other) =>
             other.id !== st.id &&
+            !other.pauseForInteraction &&
             other.kind !== 'heading' &&
             other.kind !== 'note' &&
             other.kind !== 'checkpoint'
         );
-        if (nextVis && st.spokenNarration && (nextVis.spokenNarration || '').split(/\s+/).length < 18) {
+        if (nextVis && st.spokenNarration && (nextVis.spokenNarration || '').split(/\s+/).length < 24) {
           const mergedNar = `${st.spokenNarration.split(/(?<=[.!?])\s+/)[0]} ${nextVis.spokenNarration || ''}`.trim();
           nextVis.spokenNarration = mergedNar;
           nextVis.durationMs = computeStepDurationMs(nextVis, mergedNar);
         }
         steps.splice(i, 1);
       } else if (Array.isArray(st.bullets)) {
-        st.bullets = st.bullets.slice(0, 3).map((b) => distillToSixWordInk(b, 7));
+        st.bullets = st.bullets.slice(0, 4).map((b) => condenseNoteBulletToVisualKey(b)).filter(Boolean);
       }
     }
   }
@@ -5691,8 +5728,11 @@ export function buildWhiteboardScenePlan(params: {
     });
   }
 
-  // Upgrade `timeline_track` Tenses menjadi `socratic_slider` interaktif bila belum ada slider & bukan visual switch manual
-  if (!hasExplicitVisualSwitch && !steps.some((s) => s.kind === 'socratic_slider')) {
+  // PERTAHANKAN `timeline_track` Tenses sebagai Penjelasan Fase 1, lalu TAMBAHKAN `socratic_slider` sebagai Praktik Fase 2 bila belum ada lab interaktif!
+  if (
+    !hasExplicitVisualSwitch &&
+    !steps.some((s) => s.kind === 'socratic_slider' || s.kind === 'interactive_mechanic')
+  ) {
     const tlIdx = steps.findIndex(
       (s) => s.kind === 'timeline_track' && Array.isArray(s.timelineEvents) && s.timelineEvents.length >= 2
     );
@@ -5708,12 +5748,14 @@ export function buildWhiteboardScenePlan(params: {
       }));
       const targetStopIdx = Math.max(0, stops.length - 1);
       const targetStop = stops[targetStopIdx];
-      const sliderUpgrade: WhiteboardStepCommand = {
-        ...tl,
+      const sliderPractice: WhiteboardStepCommand = {
+        id: 'wb_tense_slider_practice',
         kind: 'socratic_slider',
         domainType: 'language',
         column: 'left',
+        phaseIndex: 2,
         pauseForInteraction: true,
+        title: wbPick('Interactive Timeline Lab', 'Praktik Geser Titik Waktu'),
         sliderDomain: 'tense_timeline',
         sliderLabel: wbPick('Time Anchor', 'Titik Waktu'),
         sliderMin: 0,
@@ -5723,8 +5765,8 @@ export function buildWhiteboardScenePlan(params: {
         sliderTarget: targetStopIdx,
         sliderStops: stops,
         socraticPrompt: wbFmt(
-          'Slide or tap "{label}" to see how the verb transforms!',
-          'Geser titik atau ketuk tombol "{label}" dan amati perubahan polanya!',
+          'Now try it: slide or tap "{label}" to see how the verb transforms!',
+          'Sekarang giliranmu: geser titik atau ketuk tombol "{label}" dan amati perubahan polanya!',
           undefined,
           { label: targetStop.label }
         ),
@@ -5735,73 +5777,304 @@ export function buildWhiteboardScenePlan(params: {
           { label: targetStop.label, formula: targetStop.formula, example: targetStop.example }
         ),
       };
-      const freshNar = deriveStepSpokenNarration(sliderUpgrade, shortTitle, boardState.coachExplanation || '', targetLang);
-      steps[tlIdx] = {
-        ...sliderUpgrade,
-        id: tl.id || 'wb_tense_slider',
-        phaseIndex: 1,
-        column: 'left',
-        spokenNarration: freshNar,
-        durationMs: computeStepDurationMs(sliderUpgrade, freshNar),
-      };
+      steps.push(finalizeStep(sliderPractice, steps.length));
     }
   }
 
-  // Pastikan Beat visual utama memiliki pertanyaan Sokratik ringan bila belum ada `socratic_slider` / `interactive_mechanic` di papan
-  if (
-    !isCharacterWritingTopic &&
-    !steps.some((s) => s.kind === 'socratic_slider' || s.kind === 'interactive_mechanic' || Boolean(s.socraticPrompt && s.quickChoices?.length))
-  ) {
-    const primaryVisIdx = steps.findIndex(
-      (s) =>
+  // JAMINAN MUTLAK TEACH-FIRST ("JELASKAN DETAIL, SINGKAT & JELAS + CONTOH NYATA DULU, BARU PRAKTIK INTERAKTIF!"):
+  // Pastikan setiap papan memiliki kartu Penjelasan & Contoh non-blocking (Fase 1, pauseForInteraction: false)
+  // SEBELUM langkah interaktif pertama (Fase 2, pauseForInteraction: true), sehingga murid tidak pernah disodori soal buta!
+  {
+    const isNonBlockingTeachingStep = (s: WhiteboardSceneStep) =>
+      !s.pauseForInteraction &&
+      (s.kind === 'mind_map' ||
         s.kind === 'formula_blocks' ||
-        s.kind === 'rough_scene' ||
-        s.kind === 'mind_map' ||
-        s.kind === 'metaphor_scene' ||
+        s.kind === 'timeline_track' ||
         s.kind === 'contrast_scale' ||
-        s.kind === 'syntax_flow'
-    );
-    const rightAns = cleanBoardDisplayText(sampleSentenceGlobal || boardState.sampleTarget || '').trim();
-    const wrongAns = cleanBoardDisplayText(
-      uiAction?.trapWrongSentence ||
-        boardState.quiz?.options?.find((o) => !o.isCorrect)?.text ||
-        ''
-    ).trim();
-    if (primaryVisIdx >= 0 && rightAns && wrongAns && rightAns.toLowerCase() !== wrongAns.toLowerCase()) {
-      const pv = steps[primaryVisIdx];
-      const qPrompt = wbPick(
-        'Quick check from this sketch: which form follows the pattern above?',
-        'Cek cepat dari sketsa di atas: mana bentuk yang sesuai polanya?'
-      );
-      pv.pauseForInteraction = true;
-      pv.socraticPrompt = qPrompt;
-      pv.quickChoices = [
-        {
-          id: 'qc_right',
-          label: truncateDiagramLabel(rightAns, 42),
-          isCorrect: true,
-          socraticHint: wbPick('Matches the target slot!', 'Sesuai dengan slot pola!'),
-        },
-        {
-          id: 'qc_wrong',
-          label: truncateDiagramLabel(wrongAns, 42),
-          isCorrect: false,
-          socraticHint: wbPick(
-            'Look closely at the slot rule in the sketch above and try the other form!',
-            'Perhatikan lagi aturan pada sketsa di atas, lalu pilih bentuk satunya!'
-          ),
-        },
-      ];
-      pv.successVoiceFeedback = wbFmt(
-        'Great eye! "{ans}" follows the exact structure on the board.',
-        'Tajam! "{ans}" sudah persis mengikuti pola sketsa di atas.',
-        undefined,
-        { ans: rightAns }
-      );
-      if (pv.spokenNarration && !pv.spokenNarration.toLowerCase().includes('cek cepat') && !pv.spokenNarration.toLowerCase().includes('quick check')) {
-        pv.spokenNarration = `${pv.spokenNarration.replace(/\s*$/, '')} ${qPrompt}`;
-        pv.durationMs = computeStepDurationMs(pv, pv.spokenNarration);
+        s.kind === 'metaphor_scene' ||
+        s.kind === 'rough_scene' ||
+        s.kind === 'syntax_flow' ||
+        s.kind === 'kanji_grid' ||
+        s.kind === 'tone_wave' ||
+        (s.kind === 'table' && Array.isArray(s.tableRows) && s.tableRows.length >= 2) ||
+        (s.kind === 'note' && Array.isArray(s.bullets) && s.bullets.length >= 2));
+
+    const explainRaw = cleanBoardDisplayText(boardState.coachExplanation || uiAction?.explanationText || '');
+    const explainSentences = splitExplanationIntoBullets(explainRaw, boardState.patternFormula || '');
+    const headingStepRef = steps.find((s) => s.kind === 'heading');
+    const topicCheckBlob = `${shortTitle} ${latestUserQuestionText} ${boardState.patternFormula || ''}`.toLowerCase();
+    const isSimplePastOnly =
+      /\b(?:simple\s*past|past\s*tense|verb\s*2|did\s+not|didn'?t)\b/i.test(topicCheckBlob) &&
+      !/\b(?:present\s*perfect|past\s*continuous|past\s*perfect|have\s+been|has\s+been)\b/i.test(topicCheckBlob);
+    const isPastVsPerfect =
+      /\bsimple\s*past\b|\bpast\s*tense\b/i.test(topicCheckBlob) && /\bpresent\s*perfect\b/i.test(topicCheckBlob);
+
+    if (headingStepRef && !isCharacterWritingTopic) {
+      const curHeadWords = String(headingStepRef.text || '').trim().split(/\s+/).filter(Boolean).length;
+      if (isSimplePastOnly && curHeadWords < 9) {
+        headingStepRef.text = wbPick(
+          'Used for actions that started and finished at a specific time in the past (yesterday, last night, two days ago).',
+          'Dipakai untuk kejadian yang mulai dan sudah selesai di waktu lampau tertentu (yesterday, last night, two days ago).'
+        );
+      } else if (curHeadWords < 7 && explainSentences[0] && explainSentences[0].length >= 24) {
+        headingStepRef.text = truncateDiagramLabel(explainSentences[0], 138);
       }
+    }
+
+    // Jika topik adalah Simple Past Tense dan diagram bawaan hanyalah garis waktu generik 3 kotak (`wb_dynamic_timeline`),
+    // singkirkan agar diganti dengan Peta Penjelasan & Rumus Lengkap Simple Past Tense (Positif, Negatif did not + V1, Tanya)!
+    if (isSimplePastOnly) {
+      for (let i = steps.length - 1; i >= 0; i--) {
+        if (steps[i].id === 'wb_dynamic_timeline' || steps[i].id === 'wb_dynamic_blocks') {
+          steps.splice(i, 1);
+        }
+      }
+    }
+
+    if (!steps.some(isNonBlockingTeachingStep)) {
+      const formulaClean = cleanBoardDisplayText(boardState.patternFormula || uiAction?.patternFormula || '');
+      const rightSample = cleanBoardDisplayText(sampleSentenceGlobal || boardState.sampleTarget || '');
+      const wrongTrap = cleanBoardDisplayText(uiAction?.trapWrongSentence || '');
+      const wrongWhy = cleanBoardDisplayText(uiAction?.trapWrongReason || '');
+
+      let synthesizedTeachStep: WhiteboardStepCommand;
+
+      if (isSimplePastOnly) {
+        synthesizedTeachStep = {
+          id: 'wb_teach_first_past_tense',
+          kind: 'mind_map',
+          inkPalette: 'emerald_botanical',
+          column: 'left',
+          phaseIndex: 1,
+          pauseForInteraction: false,
+          title: wbPick('Simple Past Tense: Rules & Examples', 'Penjelasan & Rumus Simple Past Tense'),
+          metaphorCenterLabel: 'Simple Past Tense',
+          branches: [
+            {
+              label: wbPick('1. When to Use', '1. Fungsi & Penanda Waktu'),
+              sublabel: wbPick(
+                'Completed action at a specific past time: yesterday, last night, ... ago, in 2020.',
+                'Kejadian sudah selesai di titik waktu lampau: yesterday, last night, ... ago, in 2020.'
+              ),
+              example: 'I visited Bandung two days ago. (2 hari lalu)',
+              icon: 'clock',
+              color: '#0284C7',
+            },
+            {
+              label: wbPick('2. Positive (+)', '2. Kalimat Positif (+)'),
+              sublabel: wbPick(
+                'Subject + Verb 2. Regular verbs add -ed; Irregular verbs change form.',
+                'Rumus: Subject + Verb 2. Regular tambah -ed, Irregular berubah bentuk.'
+              ),
+              example: '✓ I watched TV · She went to school',
+              icon: 'check',
+              color: '#10B981',
+            },
+            {
+              label: wbPick('3. Negative (-)', '3. Kalimat Negatif (-)'),
+              sublabel: wbPick(
+                'Subject + did not + Verb 1. Key rule: verb returns to base Verb 1!',
+                'Rumus: Subject + did not + Verb 1. PENTING: Kata kerja kembali ke Verb 1 dasar!'
+              ),
+              example: '✓ I did not go (✕ BUKAN: I did not went)',
+              icon: 'warn',
+              color: '#F59E0B',
+            },
+            {
+              label: wbPick('4. Question (?)', '4. Kalimat Tanya (?)'),
+              sublabel: wbPick(
+                'Did + Subject + Verb 1? Because "Did" already marks past, keep Verb 1.',
+                'Rumus: Did + Subject + Verb 1? Karena sudah ada "Did", kata kerja tetap Verb 1.'
+              ),
+              example: '✓ Did you study English last night?',
+              icon: 'star',
+              color: '#8B5CF6',
+            },
+          ],
+          spokenNarration: wbPick(
+            'Before we try the interactive practice, let us make the rule crystal clear. Simple Past Tense describes an action completed at a specific past time like yesterday or last night. In positive sentences, use Verb 2, such as watched or went. Watch out in negative and question sentences: once did not or Did appears, the verb must return to base Verb 1, like I did not go, never I did not went.',
+            'Sebelum masuk ke latihan interaktif, pahami dulu konsep dasarnya secara singkat dan jelas. Simple Past Tense dipakai untuk kejadian yang sudah tuntas di masa lalu, ditandai waktu seperti yesterday atau last night. Pada kalimat positif, gunakan kata kerja kedua atau Verb 2, misalnya I watched TV atau She went to school. Hati-hati pada kalimat negatif dan tanya: begitu muncul kata bantu did not atau Did, kata kerjanya wajib kembali ke bentuk dasar Verb 1, contohnya I did not go, bukan I did not went.'
+          ),
+        };
+      } else if (isPastVsPerfect) {
+        synthesizedTeachStep = {
+          id: 'wb_teach_first_past_vs_perfect',
+          kind: 'mind_map',
+          inkPalette: 'emerald_botanical',
+          column: 'left',
+          phaseIndex: 1,
+          pauseForInteraction: false,
+          title: wbPick('Simple Past vs Present Perfect', 'Penjelasan: Simple Past vs Present Perfect'),
+          metaphorCenterLabel: 'Past vs Perfect',
+          branches: [
+            {
+              label: '1. Simple Past (V2)',
+              sublabel: wbPick(
+                'Finished at a closed past time (yesterday, last year, in 2020).',
+                'Kejadian selesai di waktu lampau yang spesifik (yesterday, last year, in 2020).'
+              ),
+              example: '✓ I lost my key yesterday. (Fokus kapan terjadi)',
+              icon: 'clock',
+              color: '#0284C7',
+            },
+            {
+              label: '2. Present Perfect (Have/Has + V3)',
+              sublabel: wbPick(
+                'Past action whose result or experience still connects to NOW.',
+                'Aksi lampau tanpa jam spesifik yang hasilnya/pengalamannya masih terasa sekarang.'
+              ),
+              example: '✓ I have lost my key! (Sekarang kuncinya masih hilang)',
+              icon: 'bolt',
+              color: '#10B981',
+            },
+            {
+              label: wbPick('3. Time Signal Contrast', '3. Kunci Penanda Waktu'),
+              sublabel: wbPick(
+                'Specific past clock/year -> Verb 2. Since / for / already / yet -> Have/Has + V3.',
+                'Ada waktu lampau spesifik -> wajib Verb 2. Ada since / for / already / yet -> Have/Has + V3.'
+              ),
+              example: wrongTrap ? `✕ ${wrongTrap}` : '✕ I have seen him yesterday -> ✓ I saw him yesterday',
+              icon: 'warn',
+              color: '#F59E0B',
+            },
+          ],
+          spokenNarration: wbPick(
+            'First, understand the core boundary between the two. Simple Past uses Verb 2 when the past time is specific and closed, like yesterday or in 2020. Present Perfect uses have or has plus Verb 3 when the exact time is not stated or the effect still connects to right now, such as with since, for, or already.',
+            'Pahami dulu batas utamanya sebelum berlatih. Simple Past memakai Verb 2 saat titik waktu lampaunya disebut jelas dan sudah lewat, seperti yesterday atau in 2020. Sebaliknya, Present Perfect memakai have atau has ditambah Verb 3 saat pengalaman atau dampaknya masih nyambung sampai detik ini, biasanya ditemani kata since, for, atau already.'
+          ),
+        };
+      } else {
+        // Universal Teach-First Card (covers Grammar, Vocab, Mandarin, Japanese, SSW, Math, Physics, Science!)
+        const isStemBoard = steps.some(
+          (s) =>
+            s.domainType === 'math' ||
+            s.domainType === 'physics' ||
+            s.domainType === 'science' ||
+            s.kind === 'step_derivation'
+        );
+        const firstInteractive = steps.find(
+          (s) => s.kind === 'interactive_mechanic' || s.kind === 'socratic_slider' || s.kind === 'step_derivation'
+        );
+        const derivStep0 = steps.find((s) => s.kind === 'step_derivation')?.derivationSteps?.[0];
+        const stemFormulaHint = derivStep0?.latex
+          ? `$${derivStep0.latex}$${derivStep0.sideOp ? ` (${derivStep0.sideOp})` : ''}`
+          : formulaClean;
+
+        const stripLeadConnector = (s: string) =>
+          String(s || '')
+            .replace(/^(?:karena\s+itu|oleh\s+karena\s+itu|oleh\s+sebab\s+itu|jadi|sehingga|maka(?:\s+dari\s+itu)?)[,\s]+/i, '')
+            .replace(/^([a-z])/, (m) => m.toUpperCase())
+            .trim();
+        const colonParts = shortTitle.split(/:\s*/).map((p) => p.trim()).filter(Boolean);
+        const compactHubLabel =
+          colonParts.length >= 2 && colonParts[colonParts.length - 1].length >= 4 && colonParts[colonParts.length - 1].length <= 28
+            ? colonParts[colonParts.length - 1]
+            : truncateDiagramLabel(shortTitle, 28);
+        const compactTitleSuffix = safeMathOrTruncate(shortTitle, 48);
+
+        const branches: NonNullable<WhiteboardStepCommand['branches']> = [];
+        const conceptLine = stripLeadConnector(
+          explainSentences[0] ||
+          (isStemBoard
+            ? wbFmt('Understand the core relationship in {t} before calculating.', 'Pahami hubungan dasar pada {t} sebelum mulai menghitung.', undefined, { t: shortTitle })
+            : wbFmt('Core usage rule and context for {t}.', 'Aturan dasar dan konteks pemakaian {t}.', undefined, { t: shortTitle }))
+        );
+        branches.push({
+          label: isStemBoard
+            ? wbPick('1. Core Concept', '1. Konsep Dasar')
+            : wbPick('1. Core Meaning & Function', '1. Makna & Fungsi Utama'),
+          sublabel: truncateDiagramLabel(conceptLine, 135),
+          example: !isStemBoard && rightSample ? `✓ ${truncateDiagramLabel(rightSample, 88)}` : undefined,
+          icon: 'star',
+          color: '#0284C7',
+        });
+
+        const ruleOrFormulaLine = stripLeadConnector(
+          explainSentences[1] ||
+          (formulaClean
+            ? formulaClean
+            : firstInteractive?.wirePairs?.[0]
+              ? `${firstInteractive.wirePairs[0].leftLabel} → ${firstInteractive.wirePairs[0].rightLabel}`
+              : '')
+        );
+        if (formulaClean || ruleOrFormulaLine) {
+          branches.push({
+            label: isStemBoard
+              ? wbPick('2. Formula & Key Rule', '2. Rumus & Aturan Kunci')
+              : wbPick('2. Pattern & Examples', '2. Pola & Contoh Kalimat'),
+            sublabel: truncateDiagramLabel(
+              isStemBoard && ruleOrFormulaLine && ruleOrFormulaLine !== formulaClean
+                ? ruleOrFormulaLine
+                : formulaClean || ruleOrFormulaLine,
+              135
+            ),
+            example: isStemBoard
+              ? stemFormulaHint
+                ? safeMathOrTruncate(stemFormulaHint, 92)
+                : rightSample
+                  ? truncateDiagramLabel(rightSample, 88)
+                  : undefined
+              : rightSample
+                ? `✓ ${truncateDiagramLabel(rightSample, 92)}`
+                : undefined,
+            icon: 'check',
+            color: '#10B981',
+          });
+        }
+
+        const thirdNote = stripLeadConnector(
+          wrongWhy ||
+          explainSentences[2] ||
+          (isStemBoard && derivStep0?.sideOp
+            ? `Langkah awal: lakukan ${derivStep0.sideOp} secara teliti sebelum menentukan hasil akhir.`
+            : '')
+        );
+        if (wrongTrap || thirdNote) {
+          branches.push({
+            label: isStemBoard
+              ? wbPick('3. How to Solve Cleanly', '3. Langkah & Ketelitian')
+              : wbPick('3. Common Trap to Avoid', '3. Catatan & Jebakan Umum'),
+            sublabel: truncateDiagramLabel(
+              thirdNote || wbPick('Compare the wrong form with the natural pattern above.', 'Bandingkan bentuk keliru ini dengan pola yang benar di atas.'),
+              135
+            ),
+            example: wrongTrap && !isStemBoard ? `✕ ${truncateDiagramLabel(wrongTrap, 88)}` : undefined,
+            icon: wrongTrap ? 'warn' : 'bolt',
+            color: '#F59E0B',
+          });
+        }
+
+        const fullSpokenTeach =
+          explainRaw && explainRaw.split(/\s+/).length >= 14
+            ? explainRaw
+            : [
+                conceptLine,
+                formulaClean ? `Pola kuncinya adalah ${formulaClean.replace(/\$+/g, '')}.` : '',
+                rightSample && !isStemBoard ? `Contoh kalimat yang tepat: ${rightSample}.` : '',
+                wrongWhy ? wrongWhy : '',
+              ]
+                .filter(Boolean)
+                .join(' ');
+
+        synthesizedTeachStep = {
+          id: 'wb_teach_first_breakdown',
+          kind: 'mind_map',
+          inkPalette: 'emerald_botanical',
+          column: 'left',
+          phaseIndex: 1,
+          pauseForInteraction: false,
+          title: isStemBoard
+            ? `${wbPick('Concept & Method', 'Penjelasan & Cara Hitung')}: ${compactTitleSuffix}`
+            : `${wbPick('Explanation & Examples', 'Penjelasan & Contoh')}: ${compactTitleSuffix}`,
+          metaphorCenterLabel: compactHubLabel,
+          branches,
+          spokenNarration: fullSpokenTeach,
+        };
+      }
+
+      const headingPos = steps.findIndex((s) => s.kind === 'heading');
+      const insertPos = headingPos >= 0 ? headingPos + 1 : 0;
+      steps.splice(insertPos, 0, finalizeStep(synthesizedTeachStep, insertPos));
     }
   }
 
@@ -5820,10 +6093,7 @@ export function buildWhiteboardScenePlan(params: {
     const leftReplaceIdx = steps.findIndex(
       (s) =>
         s.column !== 'right' &&
-        s.kind !== 'heading' &&
-        s.kind !== 'note' &&
-        s.kind !== 'checkpoint' &&
-        s.kind !== 'student_question'
+        (s.kind === 'interactive_mechanic' || s.kind === 'socratic_slider')
     );
     const rightReplaceIdx = steps.findIndex(
       (s) =>
@@ -5901,93 +6171,119 @@ export function buildWhiteboardScenePlan(params: {
     }
   });
 
-  // Jaga urutan pedagogis alami Sokratik: Heading (0) -> Visual / Interactive Lab Kiri (1) -> Lab Interaktif Kanan / Bedah / Derivasi (2) -> Kunci Inti (3) -> Kuis
+  // Jaga urutan pedagogis Teach-First Sokratik yang kronologis 100% di Mobile & Desktop:
+  // Kolom Kiri: Heading (Fase 0) -> Penjelasan & Contoh Non-Blocking (Fase 1) -> Lab Interaktif 1 (Fase 2, bila ada 2 lab)
+  // Kolom Kanan: Lab Interaktif 2 / Bedah / Derivasi (Fase 3) -> Kunci Inti (Fase 4) -> Kuis Akhir (Fase 4)
   if (steps.length > 1) {
-    const headings = steps.filter((s) => s.kind === 'heading');
-    const notes = steps.filter((s) => s.kind === 'note');
-    const isVisualDiagramKind = (k: WhiteboardStepCommand['kind']) =>
-      k === 'interactive_mechanic' ||
-      k === 'socratic_slider' ||
-      k === 'kanji_grid' ||
-      k === 'rough_scene' ||
-      k === 'metaphor_scene' ||
-      k === 'mind_map' ||
-      k === 'timeline_track' ||
-      k === 'formula_blocks' ||
-      k === 'contrast_scale' ||
-      k === 'syntax_flow' ||
-      k === 'tone_wave';
-    const isLeftPrimaryVisual = (s: WhiteboardSceneStep) =>
-      isVisualDiagramKind(s.kind) && !(s.kind === 'interactive_mechanic' && s.column === 'right');
-    const allPrimaryVisuals = steps.filter((s) => isLeftPrimaryVisual(s));
-    if (isWorkflowDiagramTopic && variantNonce === 0) {
-      allPrimaryVisuals.sort(
-        (a, b) =>
-          Number(a.kind !== 'rough_scene' && a.kind !== 'socratic_slider' && a.kind !== 'interactive_mechanic') -
-          Number(b.kind !== 'rough_scene' && b.kind !== 'socratic_slider' && b.kind !== 'interactive_mechanic')
-      );
-    } else if (isCharacterWritingTopic) {
-      allPrimaryVisuals.sort((a, b) => Number(a.kind !== 'kanji_grid') - Number(b.kind !== 'kanji_grid'));
+    const headings = steps.filter((s) => s.kind === 'heading').slice(0, 1);
+    const isInteractivePracticeStep = (s: WhiteboardSceneStep) =>
+      Boolean(s.pauseForInteraction) ||
+      s.kind === 'interactive_mechanic' ||
+      s.kind === 'socratic_slider' ||
+      s.kind === 'surgical_strike' ||
+      s.kind === 'step_derivation';
+    const isTeachingVisualStep = (s: WhiteboardSceneStep) =>
+      !isInteractivePracticeStep(s) &&
+      (s.kind === 'kanji_grid' ||
+        s.kind === 'rough_scene' ||
+        s.kind === 'metaphor_scene' ||
+        s.kind === 'mind_map' ||
+        s.kind === 'timeline_track' ||
+        s.kind === 'formula_blocks' ||
+        s.kind === 'contrast_scale' ||
+        s.kind === 'syntax_flow' ||
+        s.kind === 'tone_wave' ||
+        (s.kind === 'table' && Array.isArray(s.tableRows) && s.tableRows.length >= 2) ||
+        (s.kind === 'note' && Array.isArray(s.bullets) && s.bullets.length >= 2));
+
+    const allTeachingSteps = steps.filter(isTeachingVisualStep);
+    if (isCharacterWritingTopic) {
+      allTeachingSteps.sort((a, b) => Number(a.kind !== 'kanji_grid') - Number(b.kind !== 'kanji_grid'));
+    } else if (isWorkflowDiagramTopic && variantNonce === 0) {
+      allTeachingSteps.sort((a, b) => Number(a.kind !== 'rough_scene') - Number(b.kind !== 'rough_scene'));
     } else {
-      const rankVisual = (v: WhiteboardSceneStep) => {
-        if (v.kind === 'interactive_mechanic') return -2;
-        if (v.kind === 'socratic_slider') return -1;
-        if (v.kind === 'formula_blocks' || v.kind === 'timeline_track' || v.kind === 'mind_map') return 0;
-        if (v.kind === 'rough_scene' && Array.isArray(v.shapes) && v.shapes.length >= 4) return 1;
-        return 2;
+      const rankTeach = (v: WhiteboardSceneStep) => {
+        if (v.kind === 'mind_map' || v.kind === 'formula_blocks' || v.kind === 'timeline_track') return 0;
+        if (v.kind === 'contrast_scale' || v.kind === 'metaphor_scene') return 1;
+        if (v.kind === 'rough_scene' && Array.isArray(v.shapes) && v.shapes.length >= 4) return 2;
+        if (v.kind === 'table') return 3;
+        return 4;
       };
-      allPrimaryVisuals.sort((a, b) => rankVisual(a) - rankVisual(b));
+      allTeachingSteps.sort((a, b) => rankTeach(a) - rankTeach(b));
     }
-    // Simpan tepat 1 diagram/lab utama di Kolom Kiri sementara Lab Interaktif Kolom Kanan tetap utuh di `others`!
-    const primaryVisuals = allPrimaryVisuals.slice(0, 1);
-    const nonEmptyOtherSteps = steps.filter(
-      (s) => s.kind !== 'heading' && s.kind !== 'note' && !isLeftPrimaryVisual(s)
-    );
-    const others = nonEmptyOtherSteps
-      .filter(
-        (s) => !(s.kind === 'table' && (!s.tableRows || s.tableRows.length === 0) && headings.length + primaryVisuals.length + notes.length >= 2)
-      )
-      .sort((a, b) => {
-        const rankOther = (st: WhiteboardSceneStep) => {
-          if (
-            st.kind === 'interactive_mechanic' ||
-            st.kind === 'surgical_strike' ||
-            st.kind === 'step_derivation' ||
-            st.kind === 'trap_vs_fix'
-          ) {
-            return 0;
-          }
-          if (st.kind === 'table') return 1;
-          if (st.kind === 'highlight_callout') return 2;
-          if (st.kind === 'student_question') return 3;
-          if (st.kind === 'checkpoint') return 4;
-          return 2;
-        };
-        return rankOther(a) - rankOther(b);
-      });
-    const reordered =
-      isCharacterWritingTopic || isWorkflowDiagramTopic
-        ? [...headings, ...primaryVisuals, ...notes.slice(0, 1), ...others]
-        : [...headings, ...notes.slice(0, 1), ...primaryVisuals, ...others];
-    reordered.forEach((s, rIdx) => {
-      if (s.kind === 'heading' || rIdx === 0) {
-        s.phaseIndex = 0;
-      } else if (isLeftPrimaryVisual(s) || s.kind === 'note') {
-        s.phaseIndex = 1;
-      } else if (
-        (s.kind === 'interactive_mechanic' && s.column === 'right') ||
-        s.kind === 'surgical_strike' ||
-        s.kind === 'step_derivation' ||
-        s.kind === 'trap_vs_fix' ||
-        s.kind === 'table'
-      ) {
-        s.phaseIndex = Math.min(phaseLabels.length - 1, 2);
-      } else if (s.kind === 'checkpoint' || s.kind === 'student_question') {
-        s.phaseIndex = Math.max(3, phaseLabels.length - 1);
-      } else {
-        s.phaseIndex = Math.min(phaseLabels.length - 1, 3);
-      }
+    const primaryTeaching = allTeachingSteps.slice(0, 1);
+    // Khusus penulisan karakter Kanji/Hanzi yang punya tabel kosakata pendamping, izinkan tabel tetap mendampingi
+    const extraCharTable =
+      isCharacterWritingTopic && primaryTeaching[0]?.kind === 'kanji_grid'
+        ? allTeachingSteps.filter((s) => s.kind === 'table').slice(0, 1)
+        : [];
+
+    const interactiveSteps = steps.filter(isInteractivePracticeStep);
+    const trapFallbacks =
+      interactiveSteps.length < 2
+        ? steps.filter((s) => s.kind === 'trap_vs_fix').slice(0, 1)
+        : [];
+    const callouts = steps.filter((s) => s.kind === 'highlight_callout').slice(0, 1);
+    const studentQs = steps.filter((s) => s.kind === 'student_question');
+    const checkpoints = steps.filter((s) => s.kind === 'checkpoint').slice(0, 1);
+
+    // Tempatkan Lab Interaktif 1 di bawah Penjelasan (Kolom Kiri) bila ada >= 2 latihan agar kiri-kanan seimbang DAN urutan DOM mobile 100% kronologis!
+    const leftInteractive =
+      interactiveSteps.length >= 2 ? [interactiveSteps[0]] : [];
+    const rightInteractive =
+      interactiveSteps.length >= 2
+        ? interactiveSteps.slice(1, 2)
+        : interactiveSteps.slice(0, 1);
+
+    headings.forEach((s) => {
+      s.column = 'left';
+      s.phaseIndex = 0;
+      s.pauseForInteraction = false;
     });
+    [...primaryTeaching, ...extraCharTable].forEach((s) => {
+      s.column = 'left';
+      s.phaseIndex = 1;
+      s.pauseForInteraction = false;
+    });
+    leftInteractive.forEach((s) => {
+      s.column = 'left';
+      s.phaseIndex = Math.min(phaseLabels.length - 1, 2);
+      s.pauseForInteraction = true;
+    });
+    rightInteractive.forEach((s) => {
+      s.column = 'right';
+      s.phaseIndex = Math.min(phaseLabels.length - 1, leftInteractive.length > 0 ? 3 : 2);
+      s.pauseForInteraction = true;
+    });
+    trapFallbacks.forEach((s) => {
+      s.column = 'right';
+      s.phaseIndex = Math.min(phaseLabels.length - 1, 3);
+    });
+    callouts.forEach((s) => {
+      s.column = 'right';
+      s.phaseIndex = Math.min(phaseLabels.length - 1, 4);
+      s.pauseForInteraction = false;
+    });
+    studentQs.forEach((s) => {
+      s.column = 'right';
+      s.phaseIndex = Math.min(phaseLabels.length - 1, 4);
+    });
+    checkpoints.forEach((s) => {
+      s.column = 'right';
+      s.phaseIndex = Math.max(3, phaseLabels.length - 1);
+    });
+
+    const reordered = [
+      ...headings,
+      ...primaryTeaching,
+      ...extraCharTable,
+      ...leftInteractive,
+      ...rightInteractive,
+      ...trapFallbacks,
+      ...callouts,
+      ...studentQs,
+      ...checkpoints,
+    ];
     steps.splice(0, steps.length, ...reordered);
   }
 
