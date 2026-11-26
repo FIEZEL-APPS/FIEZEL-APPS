@@ -969,8 +969,9 @@ const RoughKanjiGridDiagram: React.FC<{
             {strokes.length > 0 && (
               <button
                 type="button"
+                data-testid="wb-kanji-trace-btn"
                 onClick={() => setShowTraceGuide((v) => !v)}
-                className={`px-2 py-0.5 rounded-full text-[10.5px] font-bold border transition cursor-pointer ${
+                className={`min-h-[40px] min-w-[84px] px-3.5 py-2 rounded-full text-[11.5px] font-bold border inline-flex items-center justify-center transition cursor-pointer ${
                   showTraceGuide
                     ? 'bg-[#E2E8F0] text-[#0F172A] border-[#94A3B8]'
                     : 'bg-white text-[#64748B] border-[#E2E8F0] hover:text-[#0F172A]'
@@ -983,8 +984,9 @@ const RoughKanjiGridDiagram: React.FC<{
             {focusedStrokeIdx !== null && (
               <button
                 type="button"
+                data-testid="wb-kanji-follow-btn"
                 onClick={() => setFocusedStrokeIdx(null)}
-                className="px-2 py-0.5 rounded-full bg-[#DCFCE7] text-[#15803D] text-[11px] font-bold hover:bg-[#BBF7D0] cursor-pointer"
+                className="min-h-[40px] min-w-[84px] px-3.5 py-2 rounded-full bg-[#DCFCE7] text-[#15803D] text-[11.5px] font-bold hover:bg-[#BBF7D0] inline-flex items-center justify-center cursor-pointer"
               >
                 {wbPick('▶ Follow Tutor', '▶ Ikuti Tutor')}
               </button>
@@ -1123,19 +1125,21 @@ const InteractiveToneWaveWidget: React.FC<{
         <div className="flex items-center gap-2">
           <button
             type="button"
+            data-testid="wb-tone-play-btn"
             onClick={() => setIsAnimating((v) => !v)}
-            className="px-2.5 py-1 rounded-lg bg-[#0F172A] text-white font-bold text-[11px] cursor-pointer"
+            className="min-h-[40px] min-w-[64px] px-3.5 py-2 rounded-xl bg-[#0F172A] text-white font-bold text-[12px] inline-flex items-center justify-center cursor-pointer"
           >
             {isAnimating ? wbPick('Pause', 'Jeda', 'หยุด') : wbPick('Play', 'Putar', 'เล่น')}
           </button>
           <button
             type="button"
+            data-testid="wb-tone-reset-btn"
             onClick={() => {
               setFreq(1.2);
               setPhaseShift(0);
               setIsAnimating(true);
             }}
-            className="px-2.5 py-1 rounded-lg bg-[#F1F5F9] text-[#334155] font-bold text-[11px] cursor-pointer"
+            className="min-h-[40px] min-w-[64px] px-3.5 py-2 rounded-xl bg-[#F1F5F9] text-[#334155] font-bold text-[12px] inline-flex items-center justify-center cursor-pointer"
           >
             Reset
           </button>
@@ -2020,10 +2024,10 @@ const RoughFreeformSceneDiagram: React.FC<{
                   type="button"
                   data-testid={`diagram-stage-${m.id}`}
                   onClick={() => setStageFilter(stageFilter === m.count ? null : m.count)}
-                  className={`px-2 py-0.5 rounded-full text-[10px] font-bold transition cursor-pointer ${
+                  className={`min-h-[40px] min-w-[60px] px-3 py-1.5 rounded-full text-[11px] font-bold inline-flex items-center justify-center transition cursor-pointer ${
                     active
                       ? 'bg-[#15803D] text-white'
-                      : 'bg-white/80 text-[#475569] border border-[#D5DAD3] hover:text-[#15803D]'
+                      : 'bg-white/90 text-[#475569] border border-[#D5DAD3] hover:text-[#15803D]'
                   }`}
                 >
                   {m.label}
@@ -2782,11 +2786,16 @@ export const LiveWhiteboardCanvas: React.FC<LiveWhiteboardCanvasProps> = ({
   };
 
   const isMobileBoardLite = isMobileLowMemoryDevice();
+  const waitingStepIdx = socraticWaitingStepId
+    ? steps.findIndex((s) => s.id === socraticWaitingStepId)
+    : -1;
+  const gatedMaxVisibleStepIdx =
+    waitingStepIdx >= 0 ? Math.min(activeStepIndex, waitingStepIdx) : activeStepIndex;
 
   const renderStepNode = (step: WhiteboardSceneStep, stepIdx: number) => {
-    const isCompleted = stepIdx < activeStepIndex;
-    const isCurrent = stepIdx === activeStepIndex;
-    const isQueued = stepIdx > activeStepIndex;
+    const isCompleted = stepIdx < gatedMaxVisibleStepIdx;
+    const isCurrent = stepIdx === gatedMaxVisibleStepIdx;
+    const isQueued = stepIdx > gatedMaxVisibleStepIdx;
     const isFarQueuedHeavyDiagram =
       isMobileBoardLite &&
       isQueued &&

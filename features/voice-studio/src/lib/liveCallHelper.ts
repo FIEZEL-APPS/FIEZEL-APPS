@@ -1695,6 +1695,7 @@ function sanitizeTranslationOutput(text: string, targetLocale?: string): string 
       return ro ? `"${ro}"` : '';
     })
     .replace(/[\u3400-\u4dbf\u4e00-\u9fff\u3040-\u30ff]+/g, '')
+    .replace(/\(\s*\)|（\s*）|\[\s*\]|\{\s*\}/g, '')
     .replace(/\s{2,}/g, ' ')
     .trim();
 

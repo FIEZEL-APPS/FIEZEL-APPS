@@ -322,6 +322,7 @@ export interface InCallLearningWorkbenchProps {
   latestPteDiagnostic?: PteDiagnosticSpeechResult | null;
   latestReadAloudAlignment?: SpeechAlignmentResult | null;
   latestAiSubtitle?: string;
+  latestUserUtterance?: string;
   onActiveBoardSync?: (info: {
     contextMode: string;
     topicTitle: string;
@@ -525,14 +526,26 @@ function synthesizeSentenceDistractors(
       .trim();
   const seen = new Set<string>([normQuizKey(cleanTarget)]);
   const out: Array<{ text: string; feedback: string }> = [];
+  const targetWordCount = cleanTarget.split(/\s+/).filter(Boolean).length;
+  const isShortTokenTarget = targetWordCount <= 2 && cleanTarget.length <= 18;
   const pushCandidate = (txt: string, feedback: string) => {
     const t = String(txt || '').replace(/\s+/g, ' ').trim();
     if (!t || t.length < 2) return;
+    const candWordCount = t.split(/\s+/).filter(Boolean).length;
+    // Jangan mencampur pilihan 1 kata ("fun") dengan kalimat 9 kata ("That movie was so fun...")!
+    if (isShortTokenTarget && candWordCount >= 5) return;
+    if (!isShortTokenTarget && targetWordCount >= 5 && candWordCount === 1 && !/\d/.test(t)) return;
     const key = normQuizKey(t);
     if (!key || seen.has(key)) return;
     seen.add(key);
     out.push({ text: t, feedback });
   };
+
+  if (isShortTokenTarget && Array.isArray(action?.drillDistractors)) {
+    for (const d of action.drillDistractors) {
+      pushCandidate(d, action?.trapWrongReason || defaultWrongFeedback);
+    }
+  }
 
   if (primaryTrap && primaryTrap.trim() !== cleanTarget) {
     pushCandidate(primaryTrap, action?.trapWrongReason || defaultWrongFeedback);
@@ -1603,13 +1616,20 @@ export function deriveContextualPedagogicalBoard(
   const cleanFormula = (action?.patternFormula || '').trim();
   const cleanExplanation = (action?.coachSpokenScript || action?.explanationText || '').trim();
 
-  const rawTargetSent = (action?.drillTargetSentence || action?.sampleTarget || '').trim();
+  const rawDrillTarget = (action?.drillTargetSentence || '').trim();
+  const rawSampleTarget = (action?.sampleTarget || '').trim();
   const isDegenerateVal = (v: string) => /^[\d\s.,\-/+•:;()]+$/.test(v.trim()) || /^(example|contoh|sample|placeholder|\.\.\.)$/i.test(v.trim());
-  const targetSent = isDegenerateVal(rawTargetSent)
-    ? !isDegenerateVal(action?.drillTargetSentence || '')
-      ? (action?.drillTargetSentence || '').trim()
-      : ''
-    : rawTargetSent;
+  const drillOk = rawDrillTarget && !isDegenerateVal(rawDrillTarget);
+  const sampleOk = rawSampleTarget && !isDegenerateVal(rawSampleTarget);
+  // Utamakan kalimat utuh (>=3 kata) bila drillTargetSentence hanya 1 kata terisolasi sementara trapWrongSentence berupa kalimat penuh
+  const targetSent =
+    drillOk && sampleOk && rawDrillTarget.split(/\s+/).length <= 1 && rawSampleTarget.split(/\s+/).length >= 3
+      ? rawSampleTarget
+      : drillOk
+        ? rawDrillTarget
+        : sampleOk
+          ? rawSampleTarget
+          : '';
   const rawTrapSent = (action?.drillTrapSentence || action?.trapWrongSentence || '').trim();
   const trapSent = isDegenerateVal(rawTrapSent) ? '' : rawTrapSent;
   const hasAnyAiPayload = Boolean(
@@ -1619,17 +1639,33 @@ export function deriveContextualPedagogicalBoard(
     targetSent
   );
 
-  // Deteksi apakah topik secara eksplisit membahas karakter Kanji/Hanzi/Kana tertentu
-  const cjkMatch = `${cleanTitle} ${targetSent}`.match(/[\u4e00-\u9faf\u3040-\u309f\u30a0-\u30ff]/);
+  // Deteksi apakah topik secara eksplisit membahas cara menulis karakter Kanji/Hanzi/Kana tertentu:
+  // JANGAN PERNAH mengubah pertanyaan partikel/tata bahasa (misal "partikel ni に vs de で") menjadi papan urutan goresan!
+  const explicitWritingIntent =
+    action?.focusType === 'kanji' ||
+    action?.focusType === 'kana' ||
+    /cara\s*(?:tulis|nulis|menulis)|urutan\s*goresan|goresan|coretan|stroke|kakijun|(?:menulis|tulis|nulis)\s*(?:kanji|hanzi|hiragana|katakana|karakter|huruf)/i.test(
+      `${query || ''} ${cleanTitle}`
+    );
+  const kanjiStepChar =
+    explicitWritingIntent && Array.isArray(action?.whiteboardSteps)
+      ? action.whiteboardSteps.find((s) => s?.kind === 'kanji_grid' && s.character)?.character?.trim() || ''
+      : '';
+  const explicitQueryOrTitleCjk = explicitWritingIntent
+    ? `${query || ''} ${cleanTitle}`.match(/[\u4e00-\u9faf\u3040-\u309f\u30a0-\u30ff]/)?.[0] || ''
+    : '';
   const kakijunHits =
-    targetLang === 'ja' || targetLang === 'zh'
-      ? resolveKakijunRequestFromPrompt(`${cleanTitle} ${targetSent} ${cleanExplanation}`, targetLang)
+    explicitWritingIntent && (targetLang === 'ja' || targetLang === 'zh')
+      ? resolveKakijunRequestFromPrompt(
+          explicitQueryOrTitleCjk || kanjiStepChar
+            ? `${kanjiStepChar} ${query || ''} ${cleanTitle}`
+            : `${query || ''} ${cleanTitle} ${targetSent}`,
+          targetLang
+        )
       : [];
-  const matchedChar = kakijunHits[0]?.char || cjkMatch?.[0] || '';
+  const matchedChar = kanjiStepChar || explicitQueryOrTitleCjk || kakijunHits[0]?.char || '';
   const characterData =
-    matchedChar &&
-    (targetLang === 'ja' || targetLang === 'zh') &&
-    (kakijunHits.length > 0 || /kanji|hanzi|hiragana|katakana|huruf|karakter|aksara|tulis|goresan|coret|stroke/i.test(`${cleanTitle} ${cleanExplanation}`))
+    explicitWritingIntent && matchedChar && (targetLang === 'ja' || targetLang === 'zh')
       ? {
           char: matchedChar,
           reading: (action as any)?.kanjiReading || kakijunHits[0]?.reading || cleanFormula || '',
@@ -4019,6 +4055,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
   latestPteDiagnostic = null,
   latestReadAloudAlignment = null,
   latestAiSubtitle = '',
+  latestUserUtterance = '',
   onActiveBoardSync,
   onWhiteboardBraincoreEvent,
 }) => {
@@ -4401,7 +4438,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
       persona?.id === 'dr_julian' ||
       scenario?.personaId === 'dr_julian'
     );
-    const query = (effectiveAction?.topicTitle || topicTitle || '').trim();
+    const query = `${effectiveAction?.topicTitle || topicTitle || ''} ${studentQuestions.length === 0 ? latestUserUtterance || '' : ''}`.trim();
     const hasRich =
       hasRichDynamicAction(effectiveAction) ||
       focusType === 'read_aloud' ||
@@ -4434,6 +4471,8 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
     latestPteDiagnostic,
     scenario,
     persona,
+    latestUserUtterance,
+    studentQuestions.length,
   ]);
 
   // Sinkronkan konten target papan tulis aktif -> konteks AI Live + catat selesainya alur papan ke Braincore
@@ -4638,10 +4677,11 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
       targetLang,
       locale: effectiveBoardLocale,
       studentQuestions,
+      initialQuestionText: latestUserUtterance,
       uploadedMaterials,
       variantNonce: mechanicVariantNonce,
     });
-  }, [boardState, uiAction, scenario, targetLang, effectiveBoardLocale, studentQuestions, uploadedMaterials, cjkRevision, mechanicVariantNonce]);
+  }, [boardState, uiAction, scenario, targetLang, effectiveBoardLocale, studentQuestions, latestUserUtterance, uploadedMaterials, cjkRevision, mechanicVariantNonce]);
 
   const cohesiveAudioPlan = useMemo(
     () => (whiteboardPlan ? buildCohesiveBoardNarrationScript(whiteboardPlan) : null),
@@ -4988,10 +5028,14 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
 
     const applyTrackFraction = (frac: number, allowComplete = true): boolean => {
       if (cancelled || lockstepSeqIdRef.current !== seqId) return true;
+      const firstPendingGateIdx = steps.findIndex(
+        (st) => Boolean(st.pauseForInteraction) && !completedSocraticSetRef.current.has(st.id)
+      );
+      const canFinishAll = allowComplete && firstPendingGateIdx < 0;
       const clampedRaw = Math.max(0, Math.min(1, frac));
-      const f = allowComplete ? clampedRaw : Math.min(0.994, clampedRaw);
+      const f = canFinishAll ? clampedRaw : Math.min(0.994, clampedRaw);
       trackFracRef.current = f;
-      if (allowComplete && f >= 0.999) {
+      if (canFinishAll && f >= 0.999) {
         lastCommitIdxRef.current = steps.length;
         lastCommitProgRef.current = 1;
         lastCommitProgAtRef.current = performance.now();
@@ -5009,6 +5053,26 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
           matched = currentSpans[i];
           break;
         }
+      }
+      if (firstPendingGateIdx >= 0 && matched.stepIndex > firstPendingGateIdx) {
+        const gatedSpan = currentSpans.find((sp) => sp.stepIndex === firstPendingGateIdx) || matched;
+        lastCommitIdxRef.current = firstPendingGateIdx;
+        lastCommitProgRef.current = 0.992;
+        lastCommitProgAtRef.current = performance.now();
+        setLockstepIndex(firstPendingGateIdx);
+        setLockstepProgress(0.992);
+        if (gatedSpan.caption && lastCommitSubRef.current !== gatedSpan.caption) {
+          lastCommitSubRef.current = gatedSpan.caption;
+          setActiveStepSubtitle(gatedSpan.caption);
+        }
+        if (allowComplete) {
+          setSocraticWaitingStepId(steps[firstPendingGateIdx].id);
+          setIsStepAudioActive(false);
+          setIsWritingPlaying(false);
+          stopLockstepAudio();
+          return true;
+        }
+        return false;
       }
       const spanLen = Math.max(0.001, matched.endFrac - matched.startFrac);
       const rawLocalP = Math.max(0, Math.min(1, (f - matched.startFrac) / spanLen));
@@ -5948,14 +6012,26 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
       ? `wb_${boardState.topicTitle.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '').slice(0, 32)}`
       : 'workbench_syntax_slip');
 
-  const speakQuizCoachLine = (spokenText: string) => {
+  const speakQuizCoachLine = (spokenText: string, onDone?: () => void) => {
     const cleanText = String(spokenText || '').trim();
-    if (!cleanText) return;
+    if (!cleanText) {
+      onDone?.();
+      return;
+    }
     unlockSharedBoardAudioContext();
     stopLockstepAudio();
     stopQuizCoachSpeech();
     onStopMainAudioRef.current?.();
     const token = ++quizSpeechTokenRef.current;
+    let settledDone = false;
+    const finishSpeech = () => {
+      if (settledDone) return;
+      settledDone = true;
+      if (quizSpeechTokenRef.current === token) {
+        setQuizCoachReply((prev) => (prev ? { ...prev, isSpeaking: false } : prev));
+        onDone?.();
+      }
+    };
     const langCode = String(effectiveBoardLocale || 'id').toLowerCase().split(/[-_]/)[0];
     setQuizCoachReply((prev) => (prev ? { ...prev, isSpeaking: true } : prev));
     void (async () => {
@@ -5967,9 +6043,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
           force: true,
         }).catch(() => null);
         if (quizSpeechTokenRef.current !== token || !tts?.audioBase64) {
-          if (quizSpeechTokenRef.current === token) {
-            setQuizCoachReply((prev) => (prev ? { ...prev, isSpeaking: false } : prev));
-          }
+          finishSpeech();
           return;
         }
         const ctx = getSharedBoardAudioContext();
@@ -5990,11 +6064,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
               src.buffer = decoded;
               src.connect(ctx.destination);
               quizSpeechSourceRef.current = src;
-              src.onended = () => {
-                if (quizSpeechTokenRef.current === token) {
-                  setQuizCoachReply((prev) => (prev ? { ...prev, isSpeaking: false } : prev));
-                }
-              };
+              src.onended = finishSpeech;
               src.start(0);
               return;
             } catch {
@@ -6015,21 +6085,15 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
         };
         a.onended = () => {
           releaseQuizAudio();
-          if (quizSpeechTokenRef.current === token) {
-            setQuizCoachReply((prev) => (prev ? { ...prev, isSpeaking: false } : prev));
-          }
+          finishSpeech();
         };
         const st = await playHtmlAudioBounded(a, 650);
         if (st !== 'playing') {
           releaseQuizAudio();
-          if (quizSpeechTokenRef.current === token) {
-            setQuizCoachReply((prev) => (prev ? { ...prev, isSpeaking: false } : prev));
-          }
+          finishSpeech();
         }
       } catch {
-        if (quizSpeechTokenRef.current === token) {
-          setQuizCoachReply((prev) => (prev ? { ...prev, isSpeaking: false } : prev));
-        }
+        finishSpeech();
       }
     })();
   };
@@ -6815,12 +6879,12 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
         </div>
       )}
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#F0E6D9] pb-2.5">
-        <div className="flex items-center gap-1 bg-[#FAF4E8] p-1 rounded-xl">
+        <div className="flex flex-wrap items-center gap-1 bg-[#FAF4E8] p-1 rounded-xl">
           <button
             type="button"
             onClick={() => { playFiezelSfx('button_tap'); setQuizMode('multiple_choice'); }}
             data-testid="mode-tab-multiple_choice"
-            className={`px-2 py-0.5 rounded-lg text-[10.5px] font-bold transition-colors cursor-pointer ${
+            className={`min-h-[40px] min-w-[64px] px-3 py-1.5 rounded-lg text-[11px] font-bold inline-flex items-center justify-center transition-colors cursor-pointer ${
               quizMode === 'multiple_choice' ? 'bg-[#FFFFFF] text-[#231A12] shadow-xs' : 'text-[#8C7760] hover:text-[#5C4A38]'
             }`}
           >
@@ -6830,7 +6894,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
             type="button"
             onClick={() => { playFiezelSfx('button_tap'); setQuizMode('cloze_gap'); }}
             data-testid="mode-tab-cloze_gap"
-            className={`px-2 py-0.5 rounded-lg text-[10.5px] font-bold transition-colors cursor-pointer ${
+            className={`min-h-[40px] min-w-[64px] px-3 py-1.5 rounded-lg text-[11px] font-bold inline-flex items-center justify-center transition-colors cursor-pointer ${
               quizMode === 'cloze_gap' ? 'bg-[#FFFFFF] text-[#231A12] shadow-xs' : 'text-[#8C7760] hover:text-[#5C4A38]'
             }`}
           >
@@ -6840,7 +6904,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
             type="button"
             onClick={() => { playFiezelSfx('button_tap'); setQuizMode('sentence_blocks'); }}
             data-testid="mode-tab-sentence_blocks"
-            className={`px-2 py-0.5 rounded-lg text-[10.5px] font-bold transition-colors cursor-pointer ${
+            className={`min-h-[40px] min-w-[64px] px-3 py-1.5 rounded-lg text-[11px] font-bold inline-flex items-center justify-center transition-colors cursor-pointer ${
               quizMode === 'sentence_blocks' ? 'bg-[#FFFFFF] text-[#231A12] shadow-xs' : 'text-[#8C7760] hover:text-[#5C4A38]'
             }`}
           >
@@ -6852,7 +6916,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
           type="button"
           onClick={handleReRollQuestion}
           data-testid="wb-reroll-btn"
-          className="px-2.5 py-1 rounded-xl bg-[#FAF4E8] hover:bg-[#F3EBE0] text-[#5C4A38] text-[10.5px] font-bold inline-flex items-center gap-1 cursor-pointer transition-transform active:scale-95"
+          className="min-h-[40px] min-w-[76px] px-3.5 py-1.5 rounded-xl bg-[#FAF4E8] hover:bg-[#F3EBE0] text-[#5C4A38] text-[11px] font-bold inline-flex items-center justify-center gap-1 cursor-pointer transition-transform active:scale-95"
           title={wbT(locale, 'Generate a fresh question', 'Ganti Soal Baru Tanpa Terjawab Duluan', 'เปลี่ยนโจทย์ข้อใหม่')}
         >
           <span>↻</span>
@@ -6863,7 +6927,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
       {quizMode === 'multiple_choice' && (
         <div className="space-y-2 pt-1">
           <p className="fz-handwriting-body text-sm font-bold text-[#231A12]">{activeQuiz.prompt}</p>
-          <div className="grid grid-cols-1 gap-1.5">
+          <div className="grid grid-cols-1 gap-2">
             {activeQuiz.options.map((opt) => {
               const isSelected = selectedOptionId === opt.id;
               return (
@@ -6872,7 +6936,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                   type="button"
                   onClick={() => handleSelectOption(opt.id)}
                   data-testid={`quiz-option-${opt.id}`}
-                  className={`w-full p-2.5 rounded-xl border text-left text-xs font-semibold cursor-pointer transition-all active:scale-98 ${
+                  className={`w-full min-h-[44px] p-3 rounded-xl border text-left text-xs font-semibold cursor-pointer transition-all active:scale-98 ${
                     isSelected
                       ? opt.isCorrect
                         ? 'bg-[#E6F4EA] border-[#34D399] text-[#1B5E34]'
@@ -6904,14 +6968,14 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
             </span>{' '}
             {activeQuiz.cloze.suffix}
           </div>
-          <div className="flex flex-wrap items-center gap-1.5 pt-1">
+          <div className="flex flex-wrap items-center gap-2 pt-1">
             {activeQuiz.cloze.chips.map((chip, idx) => (
               <button
                 key={idx}
                 type="button"
                 onClick={() => handleSelectClozeChip(chip)}
                 data-testid={`cloze-chip-${idx}`}
-                className={`px-3 py-1.5 rounded-xl border text-xs font-bold transition-all cursor-pointer active:scale-95 ${
+                className={`min-h-[44px] min-w-[52px] px-3.5 py-2 rounded-xl border text-xs font-bold inline-flex items-center justify-center transition-all cursor-pointer active:scale-95 ${
                   clozeAnswer === chip
                     ? chip.toLowerCase() === activeQuiz.cloze.blankWord.toLowerCase()
                       ? 'bg-[#E6F4EA] border-[#34D399] text-[#1B5E34]'
@@ -6940,7 +7004,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
       {quizMode === 'sentence_blocks' && (
         <div className="space-y-2.5 pt-1">
           <p className="text-xs font-bold text-[#231A12]">{activeQuiz.blocks.meaningId}</p>
-          <div className="min-h-[44px] p-2 rounded-xl bg-[#FAF6EE] border border-[#EADBCE] flex flex-wrap gap-1.5 items-center">
+          <div className="min-h-[48px] p-2 rounded-xl bg-[#FAF6EE] border border-[#EADBCE] flex flex-wrap gap-2 items-center">
             {placedBlocks.length === 0 ? (
               <span className="text-[11px] text-[#8C7760] italic">{ui.blocksEmpty}</span>
             ) : (
@@ -6949,14 +7013,14 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                   key={idx}
                   type="button"
                   onClick={() => handleRemoveBlock(idx)}
-                  className="px-2.5 py-1 rounded-lg bg-[#FFFFFF] border border-[#D8CBB5] text-xs font-bold text-[#231A12] shadow-2xs hover:bg-[#FEE2E2] cursor-pointer"
+                  className="min-h-[40px] min-w-[48px] px-3 py-1.5 rounded-lg bg-[#FFFFFF] border border-[#D8CBB5] text-xs font-bold text-[#231A12] shadow-2xs hover:bg-[#FEE2E2] inline-flex items-center justify-center cursor-pointer"
                 >
                   {blk} ✕
                 </button>
               ))
             )}
           </div>
-          <div className="flex flex-wrap items-center gap-1.5 pt-1">
+          <div className="flex flex-wrap items-center gap-2 pt-1">
             {activeQuiz.blocks.pool.map((blk, idx) => {
               const countInPool = activeQuiz.blocks.pool.filter(w => w === blk).length;
               const countPlaced = placedBlocks.filter(w => w === blk).length;
@@ -6968,7 +7032,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                   disabled={isExhausted}
                   onClick={() => handleAddBlock(blk)}
                   data-testid={`available-block-${idx}`}
-                  className={`px-3 py-1.5 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
+                  className={`min-h-[44px] min-w-[48px] px-3.5 py-2 rounded-xl border text-xs font-bold inline-flex items-center justify-center transition-all cursor-pointer ${
                     isExhausted
                       ? 'opacity-35 bg-[#EADBCE] border-transparent text-[#8C7760] cursor-not-allowed'
                       : 'bg-[#FFFFFF] border-[#EADBCE] text-[#3D2E20] hover:border-[#B45309] active:scale-95'
@@ -7956,6 +8020,12 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                     onSocraticInteraction={(ev) => {
                       unlockSharedBoardAudioContext();
                       setNeedsAudioUnlock(false);
+                      // Hentikan segera suara penjelasan langkah berjalan agar TIDAK PERNAH bertumpuk dengan suara respon interaksi!
+                      stopLockstepAudio();
+                      if (socraticAdvanceTimerRef.current) {
+                        window.clearTimeout(socraticAdvanceTimerRef.current);
+                        socraticAdvanceTimerRef.current = null;
+                      }
                       const attemptSig = `${currentKey}::socratic::${ev.stepId}::${ev.userAnswer}`;
                       const firstAttempt = !reportedQuizKeysRef.current.has(attemptSig);
                       if (firstAttempt) {
@@ -7977,53 +8047,63 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                         completedSocraticSetRef.current.add(ev.stepId);
                         setCompletedSocraticIds(Array.from(completedSocraticSetRef.current));
                         const wasWaitingThisStep = socraticWaitingStepId === ev.stepId;
-                        if (wasWaitingThisStep) {
-                          setSocraticWaitingStepId(null);
-                        }
-                        if (ev.feedbackToSpeak) {
-                          setActiveStepSubtitle(ev.feedbackToSpeak);
-                          speakQuizCoachLine(ev.feedbackToSpeak);
-                        }
+                        setSocraticWaitingStepId(null);
+                        setIsWritingPlaying(false);
                         const solvedIdx = whiteboardPlan.steps.findIndex((s) => s.id === ev.stepId);
-                        if (solvedIdx >= 0 && (wasWaitingThisStep || lockstepIndex === solvedIdx)) {
+                        const advanceToNextBeat = () => {
                           if (socraticAdvanceTimerRef.current) {
                             window.clearTimeout(socraticAdvanceTimerRef.current);
-                          }
-                          const feedbackWords = (ev.feedbackToSpeak || '').split(/\s+/).filter(Boolean).length;
-                          const waitMs = ev.feedbackToSpeak
-                            ? Math.min(4400, Math.max(1900, feedbackWords * 290))
-                            : 550;
-                          socraticAdvanceTimerRef.current = window.setTimeout(() => {
                             socraticAdvanceTimerRef.current = null;
-                            stopQuizCoachSpeech();
-                            const nextIdx = solvedIdx + 1;
-                            const total = whiteboardPlan.steps.length;
-                            const bounded = Math.max(0, Math.min(total, nextIdx));
-                            seekTargetStepRef.current = bounded < total ? bounded : null;
-                            const span = cohesiveAudioPlan?.stepSpans[bounded];
-                            const estSec = Math.max(
-                              4,
-                              whiteboardPlan.steps.reduce((s, st) => s + (st.durationMs || 2200), 0) / 1000
-                            );
-                            const totalSec = trackTotalSecRef.current || estSec;
-                            const targetFrac = bounded >= total ? 1 : span ? span.startFrac : 0;
-                            trackFracRef.current = targetFrac;
-                            trackOffsetSecRef.current =
-                              bounded >= total ? totalSec : span ? span.startFrac * totalSec : 0;
-                            lastCommitIdxRef.current = bounded;
-                            lastCommitProgRef.current = bounded >= total ? 1 : 0.04;
-                            lastCommitSubRef.current = span?.caption || '';
-                            spokenCursorRef.current = null;
-                            setSpokenCursor(null);
-                            setActiveStepSubtitle(span?.caption || '');
-                            setLockstepIndex(bounded);
-                            setLockstepProgress(bounded >= total ? 1 : 0.04);
-                            setIsWritingPlaying(bounded < total);
-                            setSeekNonce((n) => n + 1);
-                          }, waitMs);
+                          }
+                          stopQuizCoachSpeech();
+                          const nextIdx = solvedIdx + 1;
+                          const total = whiteboardPlan.steps.length;
+                          const bounded = Math.max(0, Math.min(total, nextIdx));
+                          seekTargetStepRef.current = bounded < total ? bounded : null;
+                          const span = cohesiveAudioPlan?.stepSpans[bounded];
+                          const estSec = Math.max(
+                            4,
+                            whiteboardPlan.steps.reduce((s, st) => s + (st.durationMs || 2200), 0) / 1000
+                          );
+                          const totalSec = trackTotalSecRef.current || estSec;
+                          const targetFrac = bounded >= total ? 1 : span ? span.startFrac : 0;
+                          trackFracRef.current = targetFrac;
+                          trackOffsetSecRef.current =
+                            bounded >= total ? totalSec : span ? span.startFrac * totalSec : 0;
+                          lastCommitIdxRef.current = bounded;
+                          lastCommitProgRef.current = bounded >= total ? 1 : 0.04;
+                          lastCommitSubRef.current = span?.caption || '';
+                          spokenCursorRef.current = null;
+                          setSpokenCursor(null);
+                          setActiveStepSubtitle(span?.caption || '');
+                          setLockstepIndex(bounded);
+                          setLockstepProgress(bounded >= total ? 1 : 0.04);
+                          setIsWritingPlaying(bounded < total);
+                          setSeekNonce((n) => n + 1);
+                        };
+                        let advancedOnce = false;
+                        const triggerAdvanceOnce = () => {
+                          if (advancedOnce) return;
+                          advancedOnce = true;
+                          if (solvedIdx >= 0 && (wasWaitingThisStep || lockstepIndex <= solvedIdx)) {
+                            advanceToNextBeat();
+                          }
+                        };
+                        if (ev.feedbackToSpeak) {
+                          setActiveStepSubtitle(ev.feedbackToSpeak);
+                          const feedbackWords = ev.feedbackToSpeak.split(/\s+/).filter(Boolean).length;
+                          const maxGuardMs = Math.min(5200, Math.max(2200, feedbackWords * 340));
+                          socraticAdvanceTimerRef.current = window.setTimeout(triggerAdvanceOnce, maxGuardMs);
+                          speakQuizCoachLine(ev.feedbackToSpeak, () => {
+                            window.setTimeout(triggerAdvanceOnce, 220);
+                          });
+                        } else {
+                          socraticAdvanceTimerRef.current = window.setTimeout(triggerAdvanceOnce, 360);
                         }
                       } else {
                         playFiezelSfx('answer_wrong');
+                        setSocraticWaitingStepId(ev.stepId);
+                        setIsWritingPlaying(false);
                         if (onEvaluatePractice && firstAttempt) {
                           onEvaluatePractice(
                             ev.userAnswer,
@@ -8343,7 +8423,7 @@ export const InCallLearningWorkbenchModal: React.FC<InCallLearningWorkbenchProps
                     type="button"
                     data-testid="wb-voice-question-mic-btn"
                     onClick={() => void toggleBoardVoiceQuestionMic()}
-                    className={`h-7 px-2 rounded-full text-[11px] font-bold flex items-center justify-center gap-1 cursor-pointer shrink-0 transition-colors ${
+                    className={`min-h-[38px] min-w-[38px] px-2.5 rounded-full text-[11px] font-bold flex items-center justify-center gap-1 cursor-pointer shrink-0 transition-colors ${
                       isBoardMicListening
                         ? 'bg-[#DC2626] text-white shadow-xs'
                         : 'bg-[#E2E8F0]/80 hover:bg-[#CBD5E1] text-[#1E293B]'

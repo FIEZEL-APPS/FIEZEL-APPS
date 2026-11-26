@@ -312,6 +312,53 @@ const PEDAGOGICAL_DETAILS: Record<
       { word: '水道', reading: 'すいどう (suidou)', meaning: 'Keran / saluran air' },
     ],
   },
+  火: {
+    reading: 'ka / hi | huǒ',
+    meaning: 'Api (4 Goresan)',
+    mnemonic: 'Dua percikan api di kiri-kanan dulu, baru batang api menjulang lalu melebar di bawah!',
+    strokeHints: [
+      'Goresan 1: Titik percikan pendek di sisi kiri (丶).',
+      'Goresan 2: Sapuan percikan pendek dari kanan atas ke arah tengah (↙).',
+      'Goresan 3: Batang tengah dari puncak atas melengkung turun ke kiri bawah (↙).',
+      'Goresan 4: Kaki kanan melebar tegas ke kanan bawah (↘).',
+    ],
+    compounds: [
+      { word: '火曜日', reading: 'かようび (kayoubi)', meaning: 'Hari Selasa' },
+      { word: '花火', reading: 'はなび (hanabi)', meaning: 'Kembang api' },
+      { word: '火山', reading: 'かざん (kazan)', meaning: 'Gunung berapi' },
+    ],
+  },
+  山: {
+    reading: 'san / yama | shān',
+    meaning: 'Gunung (3 Goresan)',
+    mnemonic: 'Puncak tertinggi di tengah dulu (1), lereng kiri menyiku ke dasar (2), lalu tebing kanan mengunci (3)!',
+    strokeHints: [
+      'Goresan 1: Puncak tengah tegak lurus turun lebih dulu (↓).',
+      'Goresan 2: Lereng kiri turun lalu belok mendatar ke kanan (└).',
+      'Goresan 3: Tebing kanan tegak turun mengunci dasar (↓).',
+    ],
+    compounds: [
+      { word: '富士山', reading: 'ふじさん (Fujisan)', meaning: 'Gunung Fuji' },
+      { word: '火山', reading: 'かざん (kazan)', meaning: 'Gunung berapi' },
+      { word: '山手線', reading: 'やまのてせん (Yamanote-sen)', meaning: 'Jalur kereta Yamanote' },
+    ],
+  },
+  木: {
+    reading: 'moku / ki | mù',
+    meaning: 'Pohon / Kayu (4 Goresan)',
+    mnemonic: 'Dahan datar (1), batang utama tegak lurus (2), lalu akar kiri (3) dan akar kanan (4)!',
+    strokeHints: [
+      'Goresan 1: Dahan mendatar dari kiri ke kanan (→).',
+      'Goresan 2: Batang utama tegak lurus dari puncak sampai dasar (↓).',
+      'Goresan 3: Akar kiri menyapu miring ke kiri bawah (↙).',
+      'Goresan 4: Akar kanan menyapu miring ke kanan bawah (↘).',
+    ],
+    compounds: [
+      { word: '木曜日', reading: 'もくようび (mokuyoubi)', meaning: 'Hari Kamis' },
+      { word: '大きい木', reading: 'おおきいき (ookii ki)', meaning: 'Pohon besar' },
+      { word: '木材', reading: 'もくざい (mokuzai)', meaning: 'Bahan kayu' },
+    ],
+  },
   車: {
     reading: 'sha / kuruma | chē',
     meaning: 'Mobil / Kendaraan (7 Goresan)',
@@ -433,6 +480,8 @@ const ZH_READING_OVERRIDE: Record<string, string> = {
   '四': 'sì',
   '五': 'wǔ',
   '水': 'shuǐ',
+  '火': 'huǒ',
+  '木': 'mù',
   '山': 'shān',
   '川': 'chuān',
   '心': 'xīn',
@@ -475,6 +524,14 @@ const ZH_COMPOUNDS_OVERRIDE: Record<string, Array<{ word: string; reading: strin
     { word: '喝水', reading: 'hē shuǐ', meaning: 'Minum air' },
     { word: '水果', reading: 'shuǐguǒ', meaning: 'Buah-buahan' },
     { word: '开水', reading: 'kāishuǐ', meaning: 'Air matang' },
+  ],
+  '火': [
+    { word: '火车', reading: 'huǒchē', meaning: 'Kereta api' },
+    { word: '火山', reading: 'huǒshān', meaning: 'Gunung berapi' },
+  ],
+  '木': [
+    { word: '木头', reading: 'mùtou', meaning: 'Kayu' },
+    { word: '树木', reading: 'shùmù', meaning: 'Pepohonan' },
   ],
   '山': [
     { word: '爬山', reading: 'páshān', meaning: 'Mendaki gunung' },
@@ -1231,23 +1288,32 @@ export function resolveKakijunRequestFromPrompt(
     }
   };
 
-  // 1. Cek apakah prompt menyebut karakter Kanji/Hanzi/Kana eksplisit di dalam bank
+  // 1. Cek apakah prompt menyebut karakter Kanji/Hanzi/Kana eksplisit di dalam bank (HANYA bila konteks menulis huruf / input 1-2 huruf murni!)
   const chars = Array.from(raw);
-  for (const ch of chars) {
-    if (/[\u3040-\u30ff\u4e00-\u9faf]/.test(ch)) {
-      const hit = getKakijunEntry(ch, targetLang);
-      if (hit && (wantsChar || chars.length <= 4)) {
-        pushUnique(hit);
-      } else if (!hit && (wantsChar || chars.length <= 4) && typeof window !== 'undefined') {
-        void ensureKanjiStrokesLoaded(ch, targetLang);
+  if (wantsChar || chars.length <= 2) {
+    for (const ch of chars) {
+      if (/[\u3040-\u30ff\u4e00-\u9faf]/.test(ch)) {
+        const hit = getKakijunEntry(ch, targetLang);
+        if (hit) {
+          pushUnique(hit);
+        } else if (typeof window !== 'undefined') {
+          void ensureKanjiStrokesLoaded(ch, targetLang);
+        }
       }
     }
   }
 
+  // Jika sudah menemukan karakter CJK eksplisit di prompt (misal "kanji air 水" atau "hanzi 我"),
+  // JANGAN lanjutkan ke pencocokan kata/angka Indonesia (agar "4 goresan" tidak nyasar ke 四/五)!
+  if (results.length > 0) {
+    return results.slice(0, 2);
+  }
+
   // Jika bukan permintaan tulis/karakter dan belum ketemu karakter target, hentikan
-  if (!wantsChar && results.length === 0) return [];
+  if (!wantsChar) return [];
 
   // 2. Pencocokan makna / angka dalam Bahasa Indonesia / Inggris / Romaji / Pinyin
+  // Letakkan kata benda konkret SEBELUM angka, dan cegah angka diikuti kata "goresan/coretan/langkah/stroke"!
   const keywordMappings: Array<[RegExp, string]> = [
     [/\b(?:hiragana)\s*(?:huruf\s*)?a\b/i, 'あ'],
     [/\b(?:hiragana)\s*(?:huruf\s*)?i\b/i, 'い'],
@@ -1258,50 +1324,50 @@ export function resolveKakijunRequestFromPrompt(
     [/\b(?:katakana)\s*(?:huruf\s*)?a\b/i, 'ア'],
     [/\b(?:katakana)\s*(?:huruf\s*)?ka\b/i, 'カ'],
     [/\b(?:katakana)\s*(?:huruf\s*)?ki\b/i, 'キ'],
-    [/\b(?:10000|sepuluh ribu|man)\b/i, '万'],
-    [/\b(?:1000|seribu|sen)\b/i, '千'],
-    [/\b(?:100|seratus|hyaku|bai)\b/i, '百'],
-    [/\b(?:10|sepuluh|juu|shi)\b/i, '十'],
-    [/\b(?:9|sembilan|kyuu|jiu)\b/i, '九'],
-    [/\b(?:8|delapan|hachi|ba)\b/i, '八'],
-    [/\b(?:7|tujuh|nana|shichi|qi)\b/i, '七'],
-    [/\b(?:6|enam|roku|liu)\b/i, '六'],
-    [/\b(?:5|lima|go|itsutsu|wu)\b/i, '五'],
-    [/\b(?:4|empat|yon|yottsu|si)\b/i, '四'],
-    [/\b(?:3|tiga|san|mittsu)\b/i, '三'],
-    [/\b(?:2|dua|ni|futatsu|er)\b/i, '二'],
-    [/\b(?:1|satu|ichi|hitotsu|yi)\b/i, '一'],
-    [/\b(?:yen|uang yen|en)\b/i, '円'],
     [/\b(?:air|mizu|sui|shui)\b/i, '水'],
-    [/\b(?:api|hi|ka|huo)\b/i, '火'],
-    [/\b(?:pohon|kayu|ki|moku|mu)\b/i, '木'],
-    [/\b(?:emas|uang|logam|kane|kin|jin)\b/i, '金'],
-    [/\b(?:tanah|tsuchi|do|tu)\b/i, '土'],
-    [/\b(?:matahari|hari|nichi|ri)\b/i, '日'],
+    [/\b(?:api|huo)\b/i, '火'],
+    [/\b(?:pohon|kayu|moku|mu)\b/i, '木'],
+    [/\b(?:emas|logam|kane|kin|jin)\b/i, '金'],
+    [/\b(?:tanah|tsuchi|tu)\b/i, '土'],
+    [/\b(?:matahari|nichi)\b/i, '日'],
     [/\b(?:bulan|tsuki|getsu|yue)\b/i, '月'],
-    [/\b(?:gunung|yama|san|shan)\b/i, '山'],
+    [/\b(?:gunung|yama|shan)\b/i, '山'],
     [/\b(?:sungai|kawa|chuan)\b/i, '川'],
     [/\b(?:mobil|kendaraan|kuruma|sha|che)\b/i, '車'],
     [/\b(?:orang|manusia|hito|ren)\b/i, '人'],
     [/\b(?:pria|laki|otoko|nan)\b/i, '男'],
     [/\b(?:wanita|perempuan|onna|nv)\b/i, '女'],
-    [/\b(?:anak|ko|kodomo|zi)\b/i, '子'],
+    [/\b(?:anak|kodomo|zi)\b/i, '子'],
     [/\b(?:belajar|gaku|manabu|xue)\b/i, '学'],
-    [/\b(?:hidup|lahir|nama|sei|ikiru|sheng)\b/i, '生'],
-    [/\b(?:sekolah|kou|gakkou|xiao)\b/i, '校'],
+    [/\b(?:hidup|lahir|ikiru|sheng)\b/i, '生'],
+    [/\b(?:sekolah|gakkou|xiao)\b/i, '校'],
     [/\b(?:buku|hon|ben)\b/i, '本'],
     [/\b(?:negara|kuni|koku|guo)\b/i, '国'],
-    [/\b(?:besar|ookii|dai|da)\b/i, '大'],
-    [/\b(?:kecil|chiisai|shou|xiao)\b/i, '小'],
-    [/\b(?:tengah|dalam|naka|chuu|zhong)\b/i, '中'],
+    [/\b(?:besar|ookii|dai)\b/i, '大'],
+    [/\b(?:kecil|chiisai|shou)\b/i, '小'],
+    [/\b(?:tengah|naka|chuu|zhong)\b/i, '中'],
     [/\b(?:atas|ue|jou|shang)\b/i, '上'],
-    [/\b(?:bawah|shita|ka|xia)\b/i, '下'],
-    [/\b(?:mata|me|moku|mu)\b/i, '目'],
+    [/\b(?:bawah|shita|xia)\b/i, '下'],
+    [/\b(?:mata|moku)\b/i, '目'],
     [/\b(?:mulut|kuchi|kou)\b/i, '口'],
-    [/\b(?:tangan|te|shu|shou)\b/i, '手'],
+    [/\b(?:tangan|shu|shou)\b/i, '手'],
     [/\b(?:hati|perasaan|kokoro|xin)\b/i, '心'],
-    [/\b(?:aman|anzen|yasui|an)\b/i, '安'],
+    [/\b(?:aman|anzen|yasui)\b/i, '安'],
     [/\b(?:baik|suka|hao)\b/i, '好'],
+    [/\b(?:yen|uang yen)\b/i, '円'],
+    [/\b(?:10000|sepuluh ribu|man)(?!\s*(?:goresan|coretan|langkah|stroke))\b/i, '万'],
+    [/\b(?:1000|seribu|sen)(?!\s*(?:goresan|coretan|langkah|stroke))\b/i, '千'],
+    [/\b(?:100|seratus|hyaku|bai)(?!\s*(?:goresan|coretan|langkah|stroke))\b/i, '百'],
+    [/\b(?:10|sepuluh|juu)(?!\s*(?:goresan|coretan|langkah|stroke))\b/i, '十'],
+    [/\b(?:9|sembilan|kyuu|jiu)(?!\s*(?:goresan|coretan|langkah|stroke))\b/i, '九'],
+    [/\b(?:8|delapan|hachi)(?!\s*(?:goresan|coretan|langkah|stroke))\b/i, '八'],
+    [/\b(?:7|tujuh|nana|shichi)(?!\s*(?:goresan|coretan|langkah|stroke))\b/i, '七'],
+    [/\b(?:6|enam|roku|liu)(?!\s*(?:goresan|coretan|langkah|stroke))\b/i, '六'],
+    [/\b(?:5|lima|itsutsu|wu)(?!\s*(?:goresan|coretan|langkah|stroke))\b/i, '五'],
+    [/\b(?:4|empat|yon|yottsu)(?!\s*(?:goresan|coretan|langkah|stroke))\b/i, '四'],
+    [/\b(?:3|tiga|mittsu)(?!\s*(?:goresan|coretan|langkah|stroke))\b/i, '三'],
+    [/\b(?:2|dua|futatsu|er)(?!\s*(?:goresan|coretan|langkah|stroke))\b/i, '二'],
+    [/\b(?:1|satu|ichi|hitotsu|yi)(?!\s*(?:goresan|coretan|langkah|stroke))\b/i, '一'],
   ];
 
   // Cek juga nama huruf hiragana/katakana yang tersisa (misal "hiragana ka", "katakana su")

@@ -2,6 +2,7 @@ import React from 'react';
 import { renderFuriganaHtml, toPhoneticRomaji, stripEmojisAndEmotWords } from '../lib/japanesePhonetics';
 import { renderMandarinRubyHtml, toPhoneticPinyin, containsHanzi } from '../lib/mandarinPhonetics';
 import { resolveUnifiedPronunciation, looksAlreadyIndonesian } from '../lib/liveCallHelper';
+import { MathText } from './MathText';
 
 export interface JapaneseRubyDisplayProps {
   text: string;
@@ -146,7 +147,7 @@ export const JapaneseRubyDisplay: React.FC<JapaneseRubyDisplayProps> = ({
         } ${className}`}
       >
         <span lang="en" className={`break-words block ${rubyClassName}`}>
-          {clean}
+          <MathText text={clean} active />
         </span>
         <span
           lang="id-Latn"
@@ -159,7 +160,11 @@ export const JapaneseRubyDisplay: React.FC<JapaneseRubyDisplayProps> = ({
     );
   }
 
-  return <span className={className}>{clean}</span>;
+  return (
+    <span className={className}>
+      <MathText text={clean} active />
+    </span>
+  );
 };
 
 export const CjkRubyDisplay = JapaneseRubyDisplay;
