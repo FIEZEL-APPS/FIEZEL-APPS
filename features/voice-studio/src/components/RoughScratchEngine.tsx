@@ -35,7 +35,7 @@ export const INK_STUDIO_PALETTES: Record<InkPaletteId, InkStudioPalette> = {
     wash: '#DBEAFE',
     accentWash: '#FEF3C7',
     foilA: '#1E3A8A',
-    foilB: '#3B82F6',
+    foilB: '#2563EB',
     label: 'Blueprint',
   },
   terracotta_atelier: {
@@ -55,7 +55,7 @@ export const INK_STUDIO_PALETTES: Record<InkPaletteId, InkStudioPalette> = {
     wash: '#EDE9FE',
     accentWash: '#FCE7F3',
     foilA: '#4C1D95',
-    foilB: '#8B5CF6',
+    foilB: '#7C3AED',
     label: 'Prism',
   },
   crimson_scalpel: {
@@ -65,7 +65,7 @@ export const INK_STUDIO_PALETTES: Record<InkPaletteId, InkStudioPalette> = {
     wash: '#FFE4E6',
     accentWash: '#DCFCE7',
     foilA: '#881337',
-    foilB: '#F43F5E',
+    foilB: '#E11D48',
     label: 'Carmine',
   },
   amber_fulcrum: {
@@ -75,7 +75,7 @@ export const INK_STUDIO_PALETTES: Record<InkPaletteId, InkStudioPalette> = {
     wash: '#FEF3C7',
     accentWash: '#DBEAFE',
     foilA: '#78350F',
-    foilB: '#F59E0B',
+    foilB: '#D97706',
     label: 'Fulcrum',
   },
   teal_oscillator: {
@@ -85,7 +85,7 @@ export const INK_STUDIO_PALETTES: Record<InkPaletteId, InkStudioPalette> = {
     wash: '#CCFBF1',
     accentWash: '#FFE4E6',
     foilA: '#115E59',
-    foilB: '#14B8A6',
+    foilB: '#0D9488',
     label: 'Oscillator',
   },
   indigo_constellation: {
@@ -95,7 +95,7 @@ export const INK_STUDIO_PALETTES: Record<InkPaletteId, InkStudioPalette> = {
     wash: '#E0E7FF',
     accentWash: '#E0F2FE',
     foilA: '#312E81',
-    foilB: '#6366F1',
+    foilB: '#4F46E5',
     label: 'Constellation',
   },
   emerald_botanical: {
@@ -105,7 +105,7 @@ export const INK_STUDIO_PALETTES: Record<InkPaletteId, InkStudioPalette> = {
     wash: '#DCFCE7',
     accentWash: '#FEF9C3',
     foilA: '#14532D',
-    foilB: '#22C55E',
+    foilB: '#16A34A',
     label: 'Botanical',
   },
 };
@@ -138,11 +138,6 @@ export function resolveStepHatch(step: WhiteboardStepCommand & { id?: string }):
   return HATCH_STYLES[seed % HATCH_STYLES.length];
 }
 
-/**
- * Progressive Hand-Scratch Path Animator:
- * Animates Rough.js multi-stroke & hachure scratch lines drawing sequentially onto the paper
- * using GPU-friendly stroke-dashoffset with strong ease-out cubic-bezier(0.23, 1, 0.32, 1).
- */
 export function animateRoughScratchPaths(svgEl: SVGSVGElement | null, maxAnimated = 42): void {
   if (!svgEl || typeof window === 'undefined') return;
   try {
@@ -155,7 +150,6 @@ export function animateRoughScratchPaths(svgEl: SVGSVGElement | null, maxAnimate
       p.style.strokeDasharray = `${len}`;
       p.style.strokeDashoffset = `${len}`;
       p.style.transition = 'none';
-      // Force initial dash state then release into smooth progressive scratch stroke
       void p.getBoundingClientRect();
       const delayMs = Math.min(340, idx * 18);
       const durMs = Math.min(460, 190 + (idx % 5) * 38);
@@ -200,7 +194,7 @@ const SkipGateLink: React.FC<{
       type="button"
       data-testid="wb-socratic-skip-btn"
       onClick={onSkip}
-      className="text-[11px] font-semibold text-[#64748B] hover:text-[#0F172A] cursor-pointer shrink-0 transition-transform active:scale-95"
+      className="min-h-[40px] min-w-[64px] px-3 py-1.5 rounded-xl bg-white/85 hover:bg-white border border-[#E2E8F0] text-[11.5px] font-bold text-[#475569] hover:text-[#0F172A] cursor-pointer shrink-0 inline-flex items-center justify-center transition-transform active:scale-95"
     >
       {pickL(locale, 'Continue ›', 'Lanjut ›', 'ไปต่อ ›')}
     </button>
@@ -209,8 +203,6 @@ const SkipGateLink: React.FC<{
 
 /* ============================================================================
  * MECHANIC 1: SCRATCH-OFF FOIL INK CARD (`scratch_reveal`)
- * Genuine HTML5 Canvas coated in Rough.js cross-hatched foil ink.
- * Learner rubs/scratches with finger or mouse to uncover hidden sketch & rule!
  * ============================================================================ */
 export const ScratchRevealFoilLab: React.FC<MechanicWidgetProps> = ({
   step,
@@ -236,14 +228,15 @@ export const ScratchRevealFoilLab: React.FC<MechanicWidgetProps> = ({
     step.scratchHiddenFormula ||
     step.rightText ||
     step.highlightPhrase ||
+    step.caption ||
     step.text ||
-    'Subjek + Have/Has + Verb 3';
+    step.title ||
+    pickL(locale, 'Core Concept Key', 'Kunci Konsep Inti');
   const hiddenSubnote =
     step.scratchHiddenSubnote ||
     step.reason ||
     pickL(locale, 'Core pattern unlocked underneath the chalk layer!', 'Pola kunci di balik lapisan kapur terbuka!');
 
-  // Draw Rough.js sketch underneath the scratch foil
   useEffect(() => {
     const svg = underSvgRef.current;
     if (!svg) return;
@@ -252,49 +245,48 @@ export const ScratchRevealFoilLab: React.FC<MechanicWidgetProps> = ({
     const sketchKind = step.scratchSketchKind || 'arch_bridge';
     if (sketchKind === 'prism_split') {
       svg.appendChild(
-        rc.polygon([[76, 108], [134, 24], [192, 108]], {
+        rc.polygon([[56, 108], [116, 20], [176, 108]], {
           stroke: pal.ink,
           fill: pal.wash,
           fillStyle: hatch,
           strokeWidth: 2.2,
-          roughness: 1.4,
+          roughness: 1.35,
         })
       );
-      svg.appendChild(rc.line(18, 72, 98, 72, { stroke: '#0F172A', strokeWidth: 2.2, roughness: 1.2 }));
-      svg.appendChild(rc.line(166, 56, 268, 36, { stroke: pal.ink, strokeWidth: 2.4, roughness: 1.3 }));
-      svg.appendChild(rc.line(168, 74, 268, 74, { stroke: pal.accent, strokeWidth: 2.4, roughness: 1.3 }));
-      svg.appendChild(rc.line(166, 90, 268, 108, { stroke: '#15803D', strokeWidth: 2.4, roughness: 1.3 }));
+      svg.appendChild(rc.line(14, 72, 82, 72, { stroke: '#0F172A', strokeWidth: 2.2, roughness: 1.2 }));
+      svg.appendChild(rc.line(152, 56, 224, 36, { stroke: pal.ink, strokeWidth: 2.4, roughness: 1.3 }));
+      svg.appendChild(rc.line(154, 74, 224, 74, { stroke: pal.accent, strokeWidth: 2.4, roughness: 1.3 }));
+      svg.appendChild(rc.line(152, 90, 224, 108, { stroke: '#15803D', strokeWidth: 2.4, roughness: 1.3 }));
     } else if (sketchKind === 'venn_core') {
       svg.appendChild(
-        rc.circle(118, 68, 82, { stroke: pal.ink, fill: pal.wash, fillStyle: 'hachure', roughness: 1.35 })
+        rc.circle(96, 68, 76, { stroke: pal.ink, fill: pal.wash, fillStyle: 'hachure', roughness: 1.3 })
       );
       svg.appendChild(
-        rc.circle(172, 68, 82, { stroke: pal.accent, fill: pal.accentWash, fillStyle: 'cross-hatch', roughness: 1.35 })
+        rc.circle(144, 68, 76, { stroke: pal.accent, fill: pal.accentWash, fillStyle: 'cross-hatch', roughness: 1.3 })
       );
     } else {
       svg.appendChild(
-        rc.arc(148, 98, 190, 110, Math.PI, Math.PI * 2, false, {
+        rc.arc(120, 98, 168, 104, Math.PI, Math.PI * 2, false, {
           stroke: pal.ink,
           strokeWidth: 2.8,
-          roughness: 1.45,
+          roughness: 1.4,
         })
       );
       svg.appendChild(
-        rc.circle(54, 98, 22, { stroke: pal.ink, fill: pal.wash, fillStyle: hatch, roughness: 1.3 })
+        rc.circle(38, 98, 22, { stroke: pal.ink, fill: pal.wash, fillStyle: hatch, roughness: 1.3 })
       );
       svg.appendChild(
-        rc.circle(242, 98, 26, { stroke: pal.accent, fill: pal.accentWash, fillStyle: 'cross-hatch', roughness: 1.3 })
+        rc.circle(202, 98, 24, { stroke: pal.accent, fill: pal.accentWash, fillStyle: 'cross-hatch', roughness: 1.3 })
       );
     }
     animateRoughScratchPaths(svg);
   }, [step.id, step.scratchSketchKind, pal, hatch]);
 
-  // Paint tactile Rough.js cross-hatched chalk/foil coating onto the top canvas
   useEffect(() => {
     const cv = foilCanvasRef.current;
     if (!cv || solved) return;
     const w = 460;
-    const h = 152;
+    const h = 156;
     cv.width = w;
     cv.height = h;
     const ctx = cv.getContext('2d');
@@ -309,35 +301,33 @@ export const ScratchRevealFoilLab: React.FC<MechanicWidgetProps> = ({
     ctx.roundRect(0, 0, w, h, 18);
     ctx.fill();
 
-    // Hand-scratched diagonal chalk texture via Rough.js canvas!
     try {
       const rCanvas = rough.canvas(cv);
       rCanvas.rectangle(8, 8, w - 16, h - 16, {
-        stroke: 'rgba(255,255,255,0.34)',
-        fill: 'rgba(255,255,255,0.12)',
-        fillStyle: 'cross-hatch',
-        hachureGap: 11,
-        roughness: 1.6,
+        stroke: 'rgba(255,255,255,0.36)',
+        fill: 'rgba(255,255,255,0.1)',
+        fillStyle: 'hachure',
+        hachureGap: 12,
+        roughness: 1.4,
         strokeWidth: 1.4,
       });
     } catch {}
 
     ctx.fillStyle = '#FFFFFF';
-    ctx.font = '700 15px "Plus Jakarta Sans", sans-serif';
+    ctx.font = '800 14.5px "Plus Jakarta Sans", sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText(
-      pickL(locale, 'SCRATCH HERE WITH FINGER / CURSOR', 'GOSOK TINTA INI DENGAN JARI / KURSOR', 'ขูดตรงนี้ด้วยนิ้วหรือเมาส์'),
+      pickL(locale, 'RUB HERE WITH FINGER / CURSOR', 'GOSOK KARTU INI DENGAN JARI / KURSOR', 'ขูดตรงนี้ด้วยนิ้วหรือเมาส์'),
       w / 2,
-      h / 2 - 4
+      h / 2 - 6
     );
-    ctx.fillStyle = 'rgba(255,255,255,0.82)';
+    ctx.fillStyle = 'rgba(255,255,255,0.9)';
     ctx.font = '600 12px "Plus Jakarta Sans", sans-serif';
-    ctx.fillText(
+    const clue = String(
       step.scratchClueHeader ||
-        pickL(locale, 'Predict the pattern first, then rub to reveal!', 'Tebak dulu polanya, lalu gosok untuk membuktikan!'),
-      w / 2,
-      h / 2 + 20
-    );
+        pickL(locale, 'Predict first, then swipe once to reveal!', 'Tebak dulu, lalu usap untuk membuktikan!')
+    ).slice(0, 56);
+    ctx.fillText(clue, w / 2, h / 2 + 18);
   }, [step.id, pal, locale, solved, step.scratchClueHeader]);
 
   const finishReveal = (how: string) => {
@@ -373,37 +363,36 @@ export const ScratchRevealFoilLab: React.FC<MechanicWidgetProps> = ({
     ctx.globalCompositeOperation = 'destination-out';
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
-    ctx.lineWidth = 38;
+    ctx.lineWidth = 52;
     ctx.beginPath();
     if (lastPtRef.current) {
       ctx.moveTo(lastPtRef.current.x, lastPtRef.current.y);
       ctx.lineTo(x, y);
     } else {
-      ctx.arc(x, y, 20, 0, Math.PI * 2);
+      ctx.arc(x, y, 26, 0, Math.PI * 2);
     }
     ctx.stroke();
-    // Organic scratch bristles around the brush
     ctx.beginPath();
-    ctx.arc(x + 9, y - 6, 12, 0, Math.PI * 2);
+    ctx.arc(x + 10, y - 6, 16, 0, Math.PI * 2);
     ctx.fill();
     lastPtRef.current = { x, y };
 
     strokeMoveCountRef.current += 1;
-    if (strokeMoveCountRef.current % 5 === 0) {
+    if (strokeMoveCountRef.current === 1 || strokeMoveCountRef.current % 2 === 0) {
       try {
-        const img = ctx.getImageData(40, 20, cv.width - 80, cv.height - 40).data;
+        const img = ctx.getImageData(32, 18, cv.width - 64, cv.height - 36).data;
         let transparent = 0;
-        const totalPx = img.length / 4;
+        const sampledTotal = Math.max(1, Math.floor(img.length / 16));
         for (let i = 3; i < img.length; i += 16) {
-          if (img[i] < 64) transparent += 1;
+          if (img[i] < 80) transparent += 1;
         }
-        const pct = Math.min(100, Math.round((transparent / (totalPx / 4)) * 100));
+        const pct = Math.min(100, Math.round((transparent / sampledTotal) * 100));
         setScratchedPct(pct);
-        if (pct >= 38) {
+        if (pct >= 24 || strokeMoveCountRef.current >= 9) {
           finishReveal(hiddenFormula);
         }
       } catch {
-        if (strokeMoveCountRef.current >= 18) finishReveal(hiddenFormula);
+        if (strokeMoveCountRef.current >= 8) finishReveal(hiddenFormula);
       }
     }
   };
@@ -415,43 +404,45 @@ export const ScratchRevealFoilLab: React.FC<MechanicWidgetProps> = ({
       className="py-2 space-y-2.5"
     >
       <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 min-w-0">
           <span
-            className="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider"
+            className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider shrink-0"
             style={{ backgroundColor: pal.wash, color: pal.ink }}
           >
             {pickL(locale, 'Scratch Ink', 'Gosok Kapur')}
           </span>
-          <span className="fz-handwriting-heading text-xl sm:text-2xl font-bold text-[#0F172A]">
+          <span className="fz-handwriting-heading text-xl sm:text-2xl font-bold text-[#0F172A] leading-tight">
             <HighlightText text={step.title || pickL(locale, 'Scratch & Discover', 'Gosok & Buktikan Intinya')} active />
           </span>
         </div>
         <SkipGateLink show={isWaitingOnStudent && !solved} locale={locale} onSkip={onSkipContinue} />
       </div>
 
-      <div className="relative w-full max-w-[460px] h-[152px] rounded-[18px] overflow-hidden select-none">
-        {/* Revealed Hand-Sketched Layer Underneath */}
+      <div className="relative w-full max-w-[460px] min-h-[156px] rounded-[18px] overflow-hidden select-none border border-[#CBD5E1]/80 bg-white">
         <div
-          className="absolute inset-0 flex items-center justify-between px-3.5 pr-4 py-3"
+          className={`flex items-center justify-between px-3.5 py-3.5 min-h-[156px] transition-opacity duration-150 ${
+            solved || scratchedPct > 0 ? 'opacity-100' : 'opacity-0'
+          }`}
           style={{ backgroundColor: `${pal.wash}66` }}
         >
-          <svg ref={underSvgRef} viewBox="0 0 280 128" className="w-[38%] h-full shrink-0 overflow-visible" />
-          <div className="flex-1 pl-2.5 pr-1 space-y-1 min-w-0">
+          <svg ref={underSvgRef} viewBox="0 0 240 128" className="w-[34%] h-[118px] shrink-0 overflow-visible" />
+          <div className="flex-1 pl-3 pr-1 space-y-1 min-w-0">
             <div className="fz-handwriting-heading text-lg sm:text-xl font-bold leading-snug break-words" style={{ color: pal.ink }}>
               <MathText text={hiddenFormula} active />
             </div>
-            <p className="text-[12px] font-semibold text-[#334155] leading-snug break-words">
+            <p className="text-[12.5px] font-semibold text-[#334155] leading-snug break-words">
               <MathText text={hiddenSubnote} active />
             </p>
           </div>
         </div>
 
-        {/* Interactive Scratch-Off Foil Canvas */}
         {!solved && (
           <canvas
             ref={foilCanvasRef}
             data-testid="wb-scratch-foil-canvas"
+            style={{ touchAction: 'none' }}
             onPointerDown={(e) => {
+              e.stopPropagation();
               isDrawingRef.current = true;
               lastPtRef.current = null;
               try {
@@ -461,6 +452,7 @@ export const ScratchRevealFoilLab: React.FC<MechanicWidgetProps> = ({
             }}
             onPointerMove={(e) => {
               if (!isDrawingRef.current) return;
+              e.stopPropagation();
               scratchAtClientPoint(e.clientX, e.clientY);
             }}
             onPointerUp={() => {
@@ -471,19 +463,19 @@ export const ScratchRevealFoilLab: React.FC<MechanicWidgetProps> = ({
               isDrawingRef.current = false;
               lastPtRef.current = null;
             }}
-            className="absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing touch-none transition-opacity duration-200"
+            className="absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing touch-none"
           />
         )}
       </div>
 
-      <div className="flex items-center justify-between gap-2 text-[12px]">
-        <span className="font-medium text-[#475569] pl-2.5 border-l-2" style={{ borderColor: pal.ink }}>
+      <div className="flex flex-wrap items-center justify-between gap-2.5 text-[12.5px]">
+        <span className="font-medium text-[#334155] pl-3 border-l-2 flex-1 min-w-[180px]" style={{ borderColor: pal.ink }}>
           <MathText
             text={
               solved
                 ? step.successVoiceFeedback || hiddenSubnote
                 : step.socraticPrompt ||
-                  pickL(locale, 'Rub across the colored chalk surface to uncover the answer!', 'Usap atau gosok permukaan warna di atas untuk membuka kuncinya!')
+                  pickL(locale, 'Swipe across the chalk card to uncover the answer!', 'Usap kartu kapur di atas dengan jari untuk membuka jawabannya!')
             }
             active
           />
@@ -493,11 +485,11 @@ export const ScratchRevealFoilLab: React.FC<MechanicWidgetProps> = ({
             type="button"
             data-testid="wb-scratch-quick-rub-btn"
             onClick={() => finishReveal(hiddenFormula)}
-            className="px-2.5 py-1 rounded-full text-[11px] font-bold cursor-pointer shrink-0 transition-transform active:scale-95"
-            style={{ backgroundColor: pal.wash, color: pal.ink }}
+            className="min-h-[44px] min-w-[112px] px-4 py-2 rounded-full text-[12px] font-bold cursor-pointer shrink-0 inline-flex items-center justify-center transition-transform active:scale-95 border"
+            style={{ backgroundColor: pal.wash, color: pal.ink, borderColor: `${pal.ink}44` }}
           >
             {scratchedPct > 0 ? `${scratchedPct}% · ` : ''}
-            {pickL(locale, 'Quick Rub', 'Gosok Cepat')}
+            {pickL(locale, 'Reveal Now', 'Buka Cepat')}
           </button>
         )}
       </div>
@@ -507,8 +499,6 @@ export const ScratchRevealFoilLab: React.FC<MechanicWidgetProps> = ({
 
 /* ============================================================================
  * MECHANIC 2: BALANCE SEESAW LAB (`balance_seesaw`)
- * Hand-sketched Rough.js fulcrum & tilting beam with spring physics!
- * Tap weights / grammar tokens to balance Left vs Right pans!
  * ============================================================================ */
 export const BalanceSeesawLab: React.FC<MechanicWidgetProps> = ({
   step,
@@ -522,7 +512,7 @@ export const BalanceSeesawLab: React.FC<MechanicWidgetProps> = ({
   const hatch = useMemo(() => resolveStepHatch(step), [step]);
   const fulcrumSvgRef = useRef<SVGSVGElement | null>(null);
 
-  const leftFixed = step.seesawLeftFixedLabel || '2x + 4';
+  const leftFixed = step.seesawLeftFixedLabel || step.text || step.title || pickL(locale, 'Target Rule', 'Sisi Target');
   const targetWeight = typeof step.seesawLeftWeight === 'number' ? step.seesawLeftWeight : 10;
   const rightBaseWeight = typeof step.seesawRightBaseWeight === 'number' ? step.seesawRightBaseWeight : 4;
   const rightFixed = step.seesawRightFixedLabel || (rightBaseWeight > 0 ? `${rightBaseWeight}` : '');
@@ -531,15 +521,18 @@ export const BalanceSeesawLab: React.FC<MechanicWidgetProps> = ({
     if (Array.isArray(step.seesawTokens) && step.seesawTokens.length >= 2) {
       return step.seesawTokens;
     }
+    const rightAns = step.rightText || step.highlightPhrase || pickL(locale, 'Matching Form', 'Pasangan Tepat');
+    const wrongAns = step.wrongText || pickL(locale, 'Mismatched Form', 'Bentuk Keliru');
+    const needW = Math.max(1, targetWeight - rightBaseWeight);
     return [
-      { id: 't1', label: 'x = 3 (+6)', weight: 6 },
-      { id: 't2', label: 'x = 1 (+2)', weight: 2 },
-      { id: 't3', label: 'x = 5 (+10)', weight: 10 },
+      { id: 't_match', label: rightAns, weight: needW },
+      { id: 't_wrong', label: wrongAns, weight: needW + 4 },
     ];
-  }, [step.seesawTokens]);
+  }, [step.seesawTokens, step.rightText, step.highlightPhrase, step.wrongText, targetWeight, rightBaseWeight, locale]);
 
   const [placedIds, setPlacedIds] = useState<string[]>([]);
   const [localSolved, setLocalSolved] = useState(false);
+  const [hintNote, setHintNote] = useState<string>('');
   const solved = isCompletedByStudent || localSolved;
 
   useEffect(() => {
@@ -547,7 +540,6 @@ export const BalanceSeesawLab: React.FC<MechanicWidgetProps> = ({
     if (!svg) return;
     svg.innerHTML = '';
     const rc = rough.svg(svg);
-    // Ground line + Rough.js hachured fulcrum triangle
     svg.appendChild(rc.line(60, 56, 400, 56, { stroke: '#64748B', strokeWidth: 1.8, roughness: 1.4 }));
     svg.appendChild(
       rc.polygon([[230, 8], [198, 56], [262, 56]], {
@@ -568,16 +560,15 @@ export const BalanceSeesawLab: React.FC<MechanicWidgetProps> = ({
   }, 0);
   const rightTotal = solved ? targetWeight : rightBaseWeight + addedWeight;
   const diff = rightTotal - targetWeight;
-  const tiltDeg = Math.max(-13, Math.min(13, diff * 2.1));
+  const tiltDeg = Math.max(-12, Math.min(12, diff * 1.9));
 
   const toggleToken = (tok: SeesawItemToken) => {
     if (solved) return;
     const exists = placedIds.includes(tok.id);
-    // Single-slot or additive mode: if 1 token alone hits target, replace cleanly so user isn't stuck unloading
-    const singleHits = rightBaseWeight + tok.weight === targetWeight;
+    const hasSingleWinner = trayTokens.some((t) => rightBaseWeight + t.weight === targetWeight);
     const nextIds = exists
       ? placedIds.filter((x) => x !== tok.id)
-      : singleHits
+      : hasSingleWinner
         ? [tok.id]
         : [...placedIds, tok.id];
     setPlacedIds(nextIds);
@@ -586,13 +577,14 @@ export const BalanceSeesawLab: React.FC<MechanicWidgetProps> = ({
       nextIds.reduce((s, id) => s + (trayTokens.find((t) => t.id === id)?.weight || 0), 0);
     if (nextSum === targetWeight) {
       setLocalSolved(true);
+      setHintNote('');
       const chosenLabels = nextIds.map((id) => trayTokens.find((t) => t.id === id)?.label || id).join(' + ');
       const praise =
         step.successVoiceFeedback ||
         pickL(
           locale,
           `Balanced at 0 degrees! "${chosenLabels}" brings both sides into exact equilibrium.`,
-          `Seimbang sempurna! "${chosenLabels}" membuat beban kiri dan kanan sama persis.`
+          `Seimbang sempurna! "${chosenLabels}" membuat sisi kiri dan kanan sama persis.`
         );
       onInteractionResult({
         stepId: step.id,
@@ -601,6 +593,13 @@ export const BalanceSeesawLab: React.FC<MechanicWidgetProps> = ({
         expectedAnswer: String(targetWeight),
         feedbackToSpeak: praise,
       });
+    } else if (!exists) {
+      const nudge = pickL(
+        locale,
+        `Still tilted (${nextSum < targetWeight ? 'too light' : 'too heavy'}). Try another block below!`,
+        `Masih miring (${nextSum < targetWeight ? 'kurang berat' : 'kelebihan beban'}). Coba ketuk keping lainnya!`
+      );
+      setHintNote(nudge);
     }
   };
 
@@ -611,21 +610,20 @@ export const BalanceSeesawLab: React.FC<MechanicWidgetProps> = ({
       className="py-2 space-y-2.5"
     >
       <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 min-w-0">
           <span
-            className="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider"
+            className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider shrink-0"
             style={{ backgroundColor: pal.wash, color: pal.ink }}
           >
-            {pickL(locale, 'Equilibrium Scale', 'Timbangan Fisik')}
+            {pickL(locale, 'Equilibrium Scale', 'Timbangan Konsep')}
           </span>
-          <span className="fz-handwriting-heading text-xl sm:text-2xl font-bold text-[#0F172A]">
+          <span className="fz-handwriting-heading text-xl sm:text-2xl font-bold text-[#0F172A] leading-tight">
             <HighlightText text={step.title || pickL(locale, 'Balance the Beam', 'Seimbangkan Kedua Sisi')} active />
           </span>
         </div>
         <SkipGateLink show={isWaitingOnStudent && !solved} locale={locale} onSkip={onSkipContinue} />
       </div>
 
-      {/* Tilting Beam + Pans */}
       <div className="pt-3 pb-1 select-none">
         <div
           style={{
@@ -633,36 +631,35 @@ export const BalanceSeesawLab: React.FC<MechanicWidgetProps> = ({
             transition: 'transform 320ms cubic-bezier(0.23, 1, 0.32, 1)',
             transformOrigin: 'center bottom',
           }}
-          className="max-w-[440px] mx-auto"
+          className="max-w-[450px] mx-auto"
         >
-          <div className="flex items-end justify-between px-4 pb-1.5">
-            {/* Left Pan */}
+          <div className="grid grid-cols-11 items-end gap-1.5 px-1 sm:px-3 pb-1.5">
             <div
-              className="min-w-[132px] px-3 py-2 rounded-2xl border-2 text-center shadow-2xs"
+              className="col-span-5 px-2.5 py-2 rounded-2xl border-2 text-center shadow-2xs min-w-0"
               style={{ borderColor: pal.ink, backgroundColor: pal.wash }}
             >
-              <div className="text-[10px] font-bold uppercase tracking-wider opacity-75" style={{ color: pal.ink }}>
+              <div className="text-[10px] font-bold uppercase tracking-wider opacity-80" style={{ color: pal.ink }}>
                 {pickL(locale, 'Target Side', 'Ruas Kiri')}
               </div>
-              <div className="fz-handwriting-heading text-lg font-bold text-[#0F172A]">
+              <div className="fz-handwriting-heading text-base sm:text-lg font-bold text-[#0F172A] break-words">
                 <MathText text={leftFixed} active />
               </div>
             </div>
 
-            {/* Center Equilibrium Badge */}
-            <div
-              className="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold"
-              style={{
-                backgroundColor: diff === 0 ? '#DCFCE7' : '#FEF3C7',
-                color: diff === 0 ? '#15803D' : '#92400E',
-              }}
-            >
-              {diff === 0 ? '=' : diff < 0 ? '‹ Berat Kiri' : 'Berat Kanan ›'}
+            <div className="col-span-1 flex justify-center pb-2">
+              <span
+                className="px-2 py-0.5 rounded-full text-[11px] font-extrabold whitespace-nowrap"
+                style={{
+                  backgroundColor: diff === 0 ? '#DCFCE7' : '#FEF3C7',
+                  color: diff === 0 ? '#15803D' : '#92400E',
+                }}
+              >
+                {diff === 0 ? '=' : diff < 0 ? '‹' : '›'}
+              </span>
             </div>
 
-            {/* Right Interactive Pan */}
             <div
-              className="min-w-[132px] px-3 py-2 rounded-2xl border-2 border-dashed text-center transition-colors"
+              className="col-span-5 px-2.5 py-2 rounded-2xl border-2 border-dashed text-center transition-colors min-w-0"
               style={{
                 borderColor: diff === 0 ? '#15803D' : pal.accent,
                 backgroundColor: diff === 0 ? '#DCFCE7' : pal.accentWash,
@@ -671,7 +668,7 @@ export const BalanceSeesawLab: React.FC<MechanicWidgetProps> = ({
               <div className="text-[10px] font-bold uppercase tracking-wider" style={{ color: diff === 0 ? '#15803D' : pal.accent }}>
                 {pickL(locale, 'Your Pan', 'Nampanmu')}
               </div>
-              <div className="fz-handwriting-heading text-lg font-bold text-[#0F172A]">
+              <div className="fz-handwriting-heading text-base sm:text-lg font-bold text-[#0F172A] break-words">
                 {placedIds.length > 0 ? (
                   <MathText
                     text={[rightFixed, ...placedIds.map((id) => trayTokens.find((t) => t.id === id)?.label || '')]
@@ -680,24 +677,23 @@ export const BalanceSeesawLab: React.FC<MechanicWidgetProps> = ({
                     active
                   />
                 ) : (
-                  <span className="text-sm text-[#64748B]">{rightFixed ? `${rightFixed} + ?` : pickL(locale, 'Tap block below', 'Ketuk beban bawah')}</span>
+                  <span className="text-xs sm:text-sm text-[#64748B]">
+                    {rightFixed ? `${rightFixed} + ?` : pickL(locale, 'Tap block below', 'Ketuk keping bawah')}
+                  </span>
                 )}
               </div>
             </div>
           </div>
-          {/* Sketchy Wooden Plank */}
           <div
             className="h-2.5 mx-2 rounded-full border-2 border-[#0F172A]"
             style={{ backgroundColor: pal.ink }}
           />
         </div>
 
-        {/* Rough.js Fulcrum Base */}
-        <svg ref={fulcrumSvgRef} viewBox="0 0 460 62" className="w-full max-w-[440px] h-[56px] mx-auto -mt-1 block overflow-visible" />
+        <svg ref={fulcrumSvgRef} viewBox="0 0 460 62" className="w-full max-w-[440px] h-[54px] mx-auto -mt-1 block overflow-visible" />
       </div>
 
-      {/* Tactile Weight / Token Tray */}
-      <div className="flex flex-wrap items-center gap-2 pt-0.5">
+      <div className="flex flex-wrap items-center gap-2.5 pt-0.5">
         {trayTokens.map((tok, idx) => {
           const active = placedIds.includes(tok.id);
           return (
@@ -707,9 +703,9 @@ export const BalanceSeesawLab: React.FC<MechanicWidgetProps> = ({
               data-testid={`wb-seesaw-token-${idx}`}
               disabled={solved}
               onClick={() => toggleToken(tok)}
-              className="px-3.5 py-1.5 rounded-xl border-2 text-[13px] font-bold cursor-pointer transition-transform active:scale-95"
+              className="min-h-[46px] min-w-[76px] px-4 py-2.5 rounded-2xl border-2 text-[13.5px] font-bold cursor-pointer inline-flex items-center justify-center transition-transform active:scale-95 shadow-2xs"
               style={{
-                borderColor: active ? pal.accent : '#CBD5E1',
+                borderColor: active ? pal.accent : '#94A3B8',
                 backgroundColor: active ? pal.accentWash : '#FFFFFF',
                 color: '#0F172A',
               }}
@@ -720,12 +716,13 @@ export const BalanceSeesawLab: React.FC<MechanicWidgetProps> = ({
         })}
       </div>
 
-      <p className="text-[12.5px] font-medium text-[#334155] pl-3 border-l-2" style={{ borderColor: pal.ink }}>
+      <p className="text-[12.5px] font-medium text-[#334155] pl-3 border-l-2" style={{ borderColor: hintNote ? '#D97706' : pal.ink }}>
         <MathText
           text={
-            solved
+            hintNote ||
+            (solved
               ? step.successVoiceFeedback || pickL(locale, 'Both sides are in exact equilibrium!', 'Kedua sisi timbangan sudah sejajar!')
-              : step.socraticPrompt || pickL(locale, 'Tap a block to load the right pan until the beam levels at 0 degrees!', 'Ketuk blok beban di atas untuk menyeimbangkan nampan kanan!')
+              : step.socraticPrompt || pickL(locale, 'Tap a block above to balance the right pan!', 'Ketuk keping di atas untuk menyeimbangkan nampan kanan!'))
           }
           active
         />
@@ -735,9 +732,78 @@ export const BalanceSeesawLab: React.FC<MechanicWidgetProps> = ({
 };
 
 /* ============================================================================
- * MECHANIC 3: VENN / CONCENTRIC ZONE SORTER (`venn_bucket_sorter`)
- * Hand-sketched Rough.js hachured rings/zones where student tosses chips!
+ * MECHANIC 3: RESPONSIVE ROUGH.JS ZONE SORTER (`venn_bucket_sorter`)
  * ============================================================================ */
+const RoughSketchedZoneCard: React.FC<{
+  zone: BucketZoneSpec;
+  zoneIdx: number;
+  insideChips: BucketSortableChip[];
+  strokeColor: string;
+  washColor: string;
+  hatchStyle: RoughHatchKind;
+  disabled: boolean;
+  isArmed: boolean;
+  onDrop: () => void;
+}> = ({ zone, zoneIdx, insideChips, strokeColor, washColor, hatchStyle, disabled, isArmed, onDrop }) => {
+  const bgSvgRef = useRef<SVGSVGElement | null>(null);
+
+  useEffect(() => {
+    const svg = bgSvgRef.current;
+    if (!svg) return;
+    svg.innerHTML = '';
+    const rc = rough.svg(svg);
+    svg.appendChild(
+      rc.rectangle(4, 4, 212, 86, {
+        stroke: strokeColor,
+        fill: washColor,
+        fillStyle: hatchStyle,
+        hachureGap: 10,
+        strokeWidth: isArmed ? 2.6 : 2.0,
+        roughness: 1.35,
+      })
+    );
+  }, [strokeColor, washColor, hatchStyle, isArmed]);
+
+  return (
+    <button
+      type="button"
+      data-testid={`wb-bucket-zone-${zoneIdx}`}
+      disabled={disabled}
+      onClick={onDrop}
+      className="relative min-h-[88px] w-full rounded-2xl p-3 flex flex-col items-center justify-center text-center cursor-pointer transition-transform active:scale-[0.98] overflow-hidden"
+    >
+      <svg
+        ref={bgSvgRef}
+        viewBox="0 0 220 94"
+        preserveAspectRatio="none"
+        className="absolute inset-0 w-full h-full pointer-events-none"
+      />
+      <div className="relative z-10 space-y-0.5 w-full px-1">
+        <div className="fz-handwriting-heading text-[16px] sm:text-[17px] font-extrabold text-[#0F172A] leading-snug break-words">
+          <MathText text={zone.label} active />
+        </div>
+        {zone.sublabel && (
+          <div className="text-[11px] font-semibold text-[#334155] leading-tight break-words">
+            <MathText text={zone.sublabel} active />
+          </div>
+        )}
+        {insideChips.length > 0 && (
+          <div className="pt-1.5 flex flex-wrap justify-center gap-1.5">
+            {insideChips.map((c) => (
+              <span
+                key={c.id}
+                className="px-2.5 py-0.5 rounded-full bg-white/95 border border-[#15803D] text-[11.5px] font-bold text-[#14532D] shadow-2xs"
+              >
+                ✓ <MathText text={c.label} active />
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+    </button>
+  );
+};
+
 export const VennBucketSorterLab: React.FC<MechanicWidgetProps> = ({
   step,
   locale,
@@ -747,62 +813,39 @@ export const VennBucketSorterLab: React.FC<MechanicWidgetProps> = ({
   onSkipContinue,
 }) => {
   const pal = useMemo(() => resolveStepPalette(step, 3), [step]);
-  const zonesSvgRef = useRef<SVGSVGElement | null>(null);
 
   const zones: BucketZoneSpec[] = useMemo(() => {
     if (Array.isArray(step.bucketZones) && step.bucketZones.length >= 2) {
       return step.bucketZones.slice(0, 3);
     }
     return [
-      { id: 'z_in', label: 'IN (Ruang/Kota)', sublabel: 'Wilayah luas' },
-      { id: 'z_on', label: 'ON (Permukaan)', sublabel: 'Menempel bidang' },
-      { id: 'z_at', label: 'AT (Titik/Jam)', sublabel: 'Titik spesifik' },
+      { id: 'z_a', label: step.termA || pickL(locale, 'Valid Pattern', 'Pola Tepat'), sublabel: step.descA || '' },
+      { id: 'z_b', label: step.termB || pickL(locale, 'Contrast / Trap', 'Pembanding'), sublabel: step.descB || '' },
     ];
-  }, [step.bucketZones]);
+  }, [step.bucketZones, step.termA, step.descA, step.termB, step.descB, locale]);
 
   const chips: BucketSortableChip[] = useMemo(() => {
     if (Array.isArray(step.bucketChips) && step.bucketChips.length >= 2) {
       return step.bucketChips.slice(0, 4);
     }
+    const cA = step.rightText || step.text || zones[0].label;
+    const cB = step.wrongText || step.caption || zones[1]?.label || zones[0].label;
     return [
-      { id: 'c1', label: 'Jakarta', targetZoneId: zones[0].id },
-      { id: 'c2', label: 'the table', targetZoneId: zones[1]?.id || zones[0].id },
-      { id: 'c3', label: '7:00 AM', targetZoneId: zones[2]?.id || zones[1]?.id || zones[0].id },
+      { id: 'c1', label: cA, targetZoneId: zones[0].id },
+      { id: 'c2', label: cB, targetZoneId: zones[1]?.id || zones[0].id },
     ];
-  }, [step.bucketChips, zones]);
+  }, [step.bucketChips, step.rightText, step.text, step.wrongText, step.caption, zones]);
 
   const [selectedChipId, setSelectedChipId] = useState<string | null>(chips[0]?.id || null);
   const [placedMap, setPlacedMap] = useState<Record<string, string>>({});
   const [hintMsg, setHintMsg] = useState<string>('');
   const solved = isCompletedByStudent || Object.keys(placedMap).length >= chips.length;
 
-  useEffect(() => {
-    const svg = zonesSvgRef.current;
-    if (!svg) return;
-    svg.innerHTML = '';
-    const rc = rough.svg(svg);
-    const zoneColors = [
-      { s: pal.ink, f: pal.wash, style: 'hachure' },
-      { s: pal.accent, f: pal.accentWash, style: 'cross-hatch' },
-      { s: '#15803D', f: '#DCFCE7', style: 'dots' },
-    ];
-    const colW = Math.floor(436 / zones.length);
-    zones.forEach((_, idx) => {
-      const c = zoneColors[idx % zoneColors.length];
-      const cx = 12 + idx * colW + colW / 2;
-      svg.appendChild(
-        rc.ellipse(cx, 58, colW - 14, 96, {
-          stroke: c.s,
-          fill: c.f,
-          fillStyle: c.style,
-          strokeWidth: 2.2,
-          roughness: 1.45,
-          hachureGap: 9,
-        })
-      );
-    });
-    animateRoughScratchPaths(svg);
-  }, [step.id, zones, pal]);
+  const zoneStyles: Array<{ s: string; f: string; h: RoughHatchKind }> = [
+    { s: pal.ink, f: pal.wash, h: 'hachure' },
+    { s: pal.accent, f: pal.accentWash, h: 'cross-hatch' },
+    { s: '#15803D', f: '#DCFCE7', h: 'dots' },
+  ];
 
   const dropIntoZone = (zoneId: string) => {
     if (solved) return;
@@ -818,7 +861,7 @@ export const VennBucketSorterLab: React.FC<MechanicWidgetProps> = ({
       if (Object.keys(next).length >= chips.length) {
         const praise =
           step.successVoiceFeedback ||
-          pickL(locale, 'Every item landed in its exact conceptual zone!', 'Semua contoh sudah masuk ke zona yang tepat!');
+          pickL(locale, 'Every item landed in its exact conceptual zone!', 'Semua contoh sudah masuk ke zona konsep yang tepat!');
         onInteractionResult({
           stepId: step.id,
           isCorrect: true,
@@ -833,8 +876,8 @@ export const VennBucketSorterLab: React.FC<MechanicWidgetProps> = ({
         chip.hint ||
         pickL(
           locale,
-          `Not that ring: think about the scale of "${chip.label}" before sorting!`,
-          `Belum pas di situ: perhatikan cakupan "${chip.label}", coba masukkan ke zona yang sesuai!`
+          `Not that zone: check the meaning of "${chip.label}" and tap the matching sketched box!`,
+          `Belum pas di zona itu: perhatikan ciri "${chip.label}", lalu ketuk kotak zona pasangannya!`
         );
       setHintMsg(nudge);
       onInteractionResult({
@@ -847,40 +890,41 @@ export const VennBucketSorterLab: React.FC<MechanicWidgetProps> = ({
     }
   };
 
+  const activeChipId = selectedChipId || chips.find((x) => !placedMap[x.id])?.id || null;
+
   return (
     <div
       data-testid="wb-venn-bucket-lab"
       data-solved={solved ? '1' : '0'}
-      className="py-2 space-y-2.5"
+      className="py-2 space-y-3"
     >
       <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 min-w-0">
           <span
-            className="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider"
+            className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider shrink-0"
             style={{ backgroundColor: pal.wash, color: pal.ink }}
           >
             {pickL(locale, 'Zone Sorter', 'Sortir Zona')}
           </span>
-          <span className="fz-handwriting-heading text-xl sm:text-2xl font-bold text-[#0F172A]">
+          <span className="fz-handwriting-heading text-xl sm:text-2xl font-bold text-[#0F172A] leading-tight">
             <HighlightText text={step.title || pickL(locale, 'Sort Into Sketched Zones', 'Masukkan ke Zona Sketsa')} active />
           </span>
         </div>
         <SkipGateLink show={isWaitingOnStudent && !solved} locale={locale} onSkip={onSkipContinue} />
       </div>
 
-      {/* Floating Unsorted Chips */}
       {!solved && (
         <div className="flex flex-wrap items-center gap-2">
           {chips.map((ch, idx) => {
             if (placedMap[ch.id]) return null;
-            const isSel = (selectedChipId || chips.find((x) => !placedMap[x.id])?.id) === ch.id;
+            const isSel = activeChipId === ch.id;
             return (
               <button
                 key={ch.id}
                 type="button"
                 data-testid={`wb-bucket-chip-${idx}`}
                 onClick={() => setSelectedChipId(ch.id)}
-                className="px-3 py-1 rounded-full text-[13px] font-bold cursor-pointer transition-transform active:scale-95"
+                className="min-h-[44px] min-w-[68px] px-4 py-2 rounded-full text-[13.5px] font-bold cursor-pointer inline-flex items-center justify-center transition-transform active:scale-95 shadow-2xs"
                 style={{
                   backgroundColor: isSel ? pal.ink : '#FFFFFF',
                   color: isSel ? '#FFFFFF' : '#0F172A',
@@ -894,39 +938,29 @@ export const VennBucketSorterLab: React.FC<MechanicWidgetProps> = ({
         </div>
       )}
 
-      {/* Hand-Sketched Rough.js Elliptical Zones */}
-      <div className="relative w-full max-w-[460px]">
-        <svg ref={zonesSvgRef} viewBox="0 0 460 118" className="w-full h-[118px] block overflow-visible pointer-events-none" />
-        <div
-          className="absolute inset-0 grid gap-2 px-2 items-center"
-          style={{ gridTemplateColumns: `repeat(${zones.length}, minmax(0, 1fr))` }}
-        >
-          {zones.map((zn, zIdx) => {
-            const inside = chips.filter((c) => solved ? c.targetZoneId === zn.id : placedMap[c.id] === zn.id);
-            return (
-              <button
-                key={zn.id}
-                type="button"
-                data-testid={`wb-bucket-zone-${zIdx}`}
-                disabled={solved}
-                onClick={() => dropIntoZone(zn.id)}
-                className="h-[104px] rounded-3xl flex flex-col items-center justify-center px-2 text-center cursor-pointer transition-transform active:scale-95"
-              >
-                <span className="fz-handwriting-heading text-[15px] font-extrabold text-[#0F172A] leading-tight">
-                  {zn.label}
-                </span>
-                {zn.sublabel && <span className="text-[10px] font-semibold text-[#475569]">{zn.sublabel}</span>}
-                <div className="mt-1 flex flex-wrap justify-center gap-1">
-                  {inside.map((c) => (
-                    <span key={c.id} className="px-2 py-0.5 rounded-full bg-white/95 border border-[#15803D] text-[11px] font-bold text-[#14532D]">
-                      ✓ {c.label}
-                    </span>
-                  ))}
-                </div>
-              </button>
-            );
-          })}
-        </div>
+      <div
+        className={`grid gap-2.5 w-full max-w-[480px] ${
+          zones.length >= 3 ? 'grid-cols-1 sm:grid-cols-3' : 'grid-cols-1 sm:grid-cols-2'
+        }`}
+      >
+        {zones.map((zn, zIdx) => {
+          const st = zoneStyles[zIdx % zoneStyles.length];
+          const inside = chips.filter((c) => (solved ? c.targetZoneId === zn.id : placedMap[c.id] === zn.id));
+          return (
+            <RoughSketchedZoneCard
+              key={zn.id}
+              zone={zn}
+              zoneIdx={zIdx}
+              insideChips={inside}
+              strokeColor={st.s}
+              washColor={st.f}
+              hatchStyle={st.h}
+              disabled={solved}
+              isArmed={!solved && Boolean(activeChipId)}
+              onDrop={() => dropIntoZone(zn.id)}
+            />
+          );
+        })}
       </div>
 
       <p className="text-[12.5px] font-medium text-[#334155] pl-3 border-l-2" style={{ borderColor: hintMsg ? '#D97706' : pal.ink }}>
@@ -934,8 +968,8 @@ export const VennBucketSorterLab: React.FC<MechanicWidgetProps> = ({
           text={
             hintMsg ||
             (solved
-              ? step.successVoiceFeedback || pickL(locale, 'All items sorted cleanly!', 'Semua kata sudah tersortir rapi!')
-              : step.socraticPrompt || pickL(locale, 'Select a chip above, then tap its matching sketched ring!', 'Pilih kata di atas lalu ketuk lingkaran zona yang tepat!'))
+              ? step.successVoiceFeedback || pickL(locale, 'All items sorted cleanly!', 'Semua contoh sudah tersortir rapi!')
+              : step.socraticPrompt || pickL(locale, 'Tap a word chip above, then tap its matching sketched zone!', 'Pilih keping kata di atas, lalu ketuk kotak zona yang sesuai!'))
           }
           active
         />
@@ -946,7 +980,6 @@ export const VennBucketSorterLab: React.FC<MechanicWidgetProps> = ({
 
 /* ============================================================================
  * MECHANIC 4: BEZIER WIRE NODE CONNECTOR (`wire_node_connector`)
- * Connect left triggers/formulas to right outcomes with hand-sketched ink cables!
  * ============================================================================ */
 export const WireNodeConnectorLab: React.FC<MechanicWidgetProps> = ({
   step,
@@ -959,14 +992,15 @@ export const WireNodeConnectorLab: React.FC<MechanicWidgetProps> = ({
   const pal = useMemo(() => resolveStepPalette(step, 4), [step]);
   const pairs: WirePairSpec[] = useMemo(() => {
     if (Array.isArray(step.wirePairs) && step.wirePairs.length >= 2) {
-      return step.wirePairs.slice(0, 3);
+      return step.wirePairs.slice(0, 4);
     }
+    const rightAns = step.rightText || step.text || pickL(locale, 'Accurate Form', 'Bentuk Tepat');
+    const wrongAns = step.wrongText || pickL(locale, 'Common Trap', 'Jebakan Umum');
     return [
-      { id: 'w1', leftLabel: 'Yesterday', rightLabel: 'Verb 2 (went)' },
-      { id: 'w2', leftLabel: 'Since 2020', rightLabel: 'Have + V3 (have gone)' },
-      { id: 'w3', leftLabel: 'Right now', rightLabel: 'Am/Is/Are + V ing' },
+      { id: 'w1', leftLabel: pickL(locale, 'Use This', 'Gunakan Ini'), rightLabel: rightAns },
+      { id: 'w2', leftLabel: pickL(locale, 'Avoid Trap', 'Hindari Ini'), rightLabel: wrongAns },
     ];
-  }, [step.wirePairs]);
+  }, [step.wirePairs, step.rightText, step.text, step.wrongText, locale]);
 
   const rightShuffled = useMemo(() => {
     const arr = [...pairs];
@@ -1011,8 +1045,8 @@ export const WireNodeConnectorLab: React.FC<MechanicWidgetProps> = ({
     } else {
       const nudge = pickL(
         locale,
-        `"${leftPair.leftLabel}" doesn't pair with "${rightPair.rightLabel}". Check the cue and wire another terminal!`,
-        `"${leftPair.leftLabel}" belum cocok disambung ke "${rightPair.rightLabel}". Coba sambungkan ke terminal pasangannya!`
+        `"${leftPair.leftLabel}" doesn't pair with "${rightPair.rightLabel}". Tap its matching right terminal!`,
+        `"${leftPair.leftLabel}" belum cocok ke "${rightPair.rightLabel}". Ketuk terminal pasangannya di kanan!`
       );
       setWrongMsg(nudge);
       onInteractionResult({
@@ -1025,7 +1059,9 @@ export const WireNodeConnectorLab: React.FC<MechanicWidgetProps> = ({
     }
   };
 
-  const wireColors = [pal.ink, pal.accent, '#15803D'];
+  const wireColors = [pal.ink, pal.accent, '#15803D', '#7C3AED'];
+  const rowStepPx = 56;
+  const svgHeight = Math.max(112, pairs.length * rowStepPx);
 
   return (
     <div
@@ -1034,26 +1070,26 @@ export const WireNodeConnectorLab: React.FC<MechanicWidgetProps> = ({
       className="py-2 space-y-2.5"
     >
       <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 min-w-0">
           <span
-            className="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider"
+            className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider shrink-0"
             style={{ backgroundColor: pal.wash, color: pal.ink }}
           >
             {pickL(locale, 'Ink Circuit', 'Sambung Jalur')}
           </span>
-          <span className="fz-handwriting-heading text-xl sm:text-2xl font-bold text-[#0F172A]">
+          <span className="fz-handwriting-heading text-xl sm:text-2xl font-bold text-[#0F172A] leading-tight">
             <HighlightText text={step.title || pickL(locale, 'Wire Matching Nodes', 'Hubungkan Pasangan Konsep')} active />
           </span>
         </div>
         <SkipGateLink show={isWaitingOnStudent && !solved} locale={locale} onSkip={onSkipContinue} />
       </div>
 
-      <div className="relative grid grid-cols-12 items-center gap-1 max-w-[460px] py-1">
-        {/* Left Terminals */}
-        <div className="col-span-5 space-y-2.5 z-10">
+      <div className="relative grid grid-cols-[1.12fr_26px_0.98fr] sm:grid-cols-[1fr_56px_1fr] items-center gap-1 sm:gap-2 max-w-[496px] py-1">
+        <div className="space-y-2 z-10 min-w-0">
           {pairs.map((p, idx) => {
             const done = solved || connectedIds.includes(p.id);
             const isSel = !done && (activeLeftId || pairs.find((x) => !connectedIds.includes(x.id))?.id) === p.id;
+            const col = wireColors[idx % wireColors.length];
             return (
               <button
                 key={p.id}
@@ -1061,31 +1097,32 @@ export const WireNodeConnectorLab: React.FC<MechanicWidgetProps> = ({
                 data-testid={`wb-wire-left-${idx}`}
                 disabled={done}
                 onClick={() => setActiveLeftId(p.id)}
-                className="w-full px-3 py-2 rounded-xl border-2 text-left text-[12.5px] font-bold flex items-center justify-between cursor-pointer transition-transform active:scale-95"
+                className="min-h-[48px] w-full px-2.5 sm:px-3 py-2 rounded-2xl border-2 text-left text-[12px] sm:text-[13px] font-bold flex items-center justify-between cursor-pointer transition-transform active:scale-95 shadow-2xs"
                 style={{
-                  borderColor: done ? wireColors[idx % wireColors.length] : isSel ? pal.ink : '#CBD5E1',
-                  backgroundColor: done ? `${wireColors[idx % wireColors.length]}18` : isSel ? pal.wash : '#FFFFFF',
+                  borderColor: done ? col : isSel ? pal.ink : '#CBD5E1',
+                  backgroundColor: done ? `${col}18` : isSel ? pal.wash : '#FFFFFF',
                 }}
               >
-                <span className="leading-tight line-clamp-2 text-[11.5px]"><MathText text={p.leftLabel} active /></span>
+                <span className="leading-snug break-words text-[12px] sm:text-[13px] text-[#0F172A] min-w-0">
+                  <MathText text={p.leftLabel} active />
+                </span>
                 <span
-                  className="w-2.5 h-2.5 rounded-full shrink-0 ml-1"
-                  style={{ backgroundColor: done ? wireColors[idx % wireColors.length] : isSel ? pal.ink : '#94A3B8' }}
+                  className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full shrink-0 ml-1.5"
+                  style={{ backgroundColor: done ? col : isSel ? pal.ink : '#94A3B8' }}
                 />
               </button>
             );
           })}
         </div>
 
-        {/* Center Bezier Cable SVG */}
-        <div className="col-span-2 h-[132px] relative pointer-events-none">
-          <svg viewBox="0 0 80 132" className="w-full h-full overflow-visible">
+        <div className="relative pointer-events-none" style={{ height: `${svgHeight}px` }}>
+          <svg viewBox={`0 0 80 ${svgHeight}`} className="w-full h-full overflow-visible">
             {pairs.map((p, lIdx) => {
               const done = solved || connectedIds.includes(p.id);
               if (!done) return null;
               const rIdx = rightShuffled.findIndex((r) => r.id === p.id);
-              const y1 = 22 + lIdx * 44;
-              const y2 = 22 + rIdx * 44;
+              const y1 = 26 + lIdx * rowStepPx;
+              const y2 = 26 + rIdx * rowStepPx;
               const col = wireColors[lIdx % wireColors.length];
               return (
                 <path
@@ -1093,7 +1130,7 @@ export const WireNodeConnectorLab: React.FC<MechanicWidgetProps> = ({
                   d={`M 0 ${y1} C 36 ${y1}, 44 ${y2}, 80 ${y2}`}
                   fill="none"
                   stroke={col}
-                  strokeWidth="3"
+                  strokeWidth="3.2"
                   strokeLinecap="round"
                 />
               );
@@ -1101,8 +1138,7 @@ export const WireNodeConnectorLab: React.FC<MechanicWidgetProps> = ({
           </svg>
         </div>
 
-        {/* Right Terminals */}
-        <div className="col-span-5 space-y-2.5 z-10">
+        <div className="space-y-2 z-10 min-w-0">
           {rightShuffled.map((r, rIdx) => {
             const origIdx = pairs.findIndex((p) => p.id === r.id);
             const done = solved || connectedIds.includes(r.id);
@@ -1114,14 +1150,16 @@ export const WireNodeConnectorLab: React.FC<MechanicWidgetProps> = ({
                 data-testid={`wb-wire-right-${rIdx}`}
                 disabled={done}
                 onClick={() => connectRight(r.id)}
-                className="w-full px-3 py-2 rounded-xl border-2 text-left text-[12.5px] font-bold flex items-center gap-2 cursor-pointer transition-transform active:scale-95"
+                className="min-h-[48px] w-full px-2.5 sm:px-3 py-2 rounded-2xl border-2 text-left text-[12px] sm:text-[13px] font-bold flex items-center gap-1.5 sm:gap-2 cursor-pointer transition-transform active:scale-95 shadow-2xs"
                 style={{
                   borderColor: done ? col : '#CBD5E1',
                   backgroundColor: done ? `${col}18` : '#FFFFFF',
                 }}
               >
-                <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: done ? col : '#94A3B8' }} />
-                <span className="leading-tight line-clamp-2 text-[11.5px]"><MathText text={r.rightLabel} active /></span>
+                <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full shrink-0" style={{ backgroundColor: done ? col : '#94A3B8' }} />
+                <span className="leading-snug break-words text-[12px] sm:text-[13px] text-[#0F172A] min-w-0">
+                  <MathText text={r.rightLabel} active />
+                </span>
               </button>
             );
           })}
@@ -1134,7 +1172,7 @@ export const WireNodeConnectorLab: React.FC<MechanicWidgetProps> = ({
             wrongMsg ||
             (solved
               ? step.successVoiceFeedback || pickL(locale, 'Every wire is connected!', 'Seluruh kabel konsep sudah terhubung!')
-              : step.socraticPrompt || pickL(locale, 'Tap a left node, then tap its matching right terminal to draw the ink wire!', 'Pilih titik di kiri lalu ketuk pasangannya di kanan untuk menarik garis tinta!'))
+              : step.socraticPrompt || pickL(locale, 'Tap a left node, then tap its matching right terminal!', 'Ketuk titik di kiri, lalu ketuk pasangannya di kanan!'))
           }
           active
         />
@@ -1145,7 +1183,6 @@ export const WireNodeConnectorLab: React.FC<MechanicWidgetProps> = ({
 
 /* ============================================================================
  * MECHANIC 5: ROTARY COMPASS / PROTRACTOR DIAL (`rotary_dial_gauge`)
- * Hand-sketched Rough.js semi-circular gauge with direct pointer-drag needle!
  * ============================================================================ */
 export const RotaryDialGaugeLab: React.FC<MechanicWidgetProps> = ({
   step,
@@ -1163,12 +1200,15 @@ export const RotaryDialGaugeLab: React.FC<MechanicWidgetProps> = ({
     if (Array.isArray(step.dialStops) && step.dialStops.length >= 2) {
       return step.dialStops;
     }
+    const lowExpr = step.wrongText || pickL(locale, 'Starting State', 'Kondisi Awal');
+    const midExpr = step.text || step.caption || step.title || pickL(locale, 'Core Rule', 'Kunci Aturan');
+    const topExpr = step.rightText || step.highlightPhrase || step.title || pickL(locale, 'Target Form', 'Bentuk Tepat');
     return [
-      { angleDeg: 25, label: 'Might (25%)', expression: 'It might rain later.', note: 'Kemungkinan tipis' },
-      { angleDeg: 90, label: 'Should (65%)', expression: 'You should rest now.', note: 'Saran kuat' },
-      { angleDeg: 155, label: 'Must (95%)', expression: 'She must be tired!', note: 'Hampir pasti / wajib' },
+      { angleDeg: 28, label: pickL(locale, 'Step 1', 'Awal'), expression: lowExpr },
+      { angleDeg: 90, label: pickL(locale, 'Step 2', 'Tengah'), expression: midExpr },
+      { angleDeg: 152, label: pickL(locale, 'Target', 'Target'), expression: topExpr },
     ];
-  }, [step.dialStops]);
+  }, [step.dialStops, step.wrongText, step.text, step.caption, step.title, step.rightText, step.highlightPhrase, locale]);
 
   const targetDeg = typeof step.dialTargetDeg === 'number' ? step.dialTargetDeg : stops[stops.length - 1].angleDeg;
   const initDeg = typeof step.dialInitialDeg === 'number' ? step.dialInitialDeg : stops[0].angleDeg;
@@ -1182,7 +1222,7 @@ export const RotaryDialGaugeLab: React.FC<MechanicWidgetProps> = ({
     svg.innerHTML = '';
     const rc = rough.svg(svg);
     svg.appendChild(
-      rc.arc(210, 132, 196, 196, Math.PI, Math.PI * 2, false, {
+      rc.arc(210, 128, 192, 192, Math.PI, Math.PI * 2, false, {
         stroke: pal.ink,
         fill: pal.wash,
         fillStyle: 'hachure',
@@ -1191,66 +1231,75 @@ export const RotaryDialGaugeLab: React.FC<MechanicWidgetProps> = ({
         roughness: 1.4,
       })
     );
-    [25, 60, 90, 120, 155].forEach((d) => {
+    [28, 60, 90, 120, 152].forEach((d) => {
       const rad = Math.PI + (d / 180) * Math.PI;
-      const x1 = 210 + Math.cos(rad) * 86;
-      const y1 = 132 + Math.sin(rad) * 86;
-      const x2 = 210 + Math.cos(rad) * 101;
-      const y2 = 132 + Math.sin(rad) * 101;
+      const x1 = 210 + Math.cos(rad) * 84;
+      const y1 = 128 + Math.sin(rad) * 84;
+      const x2 = 210 + Math.cos(rad) * 98;
+      const y2 = 128 + Math.sin(rad) * 98;
       svg.appendChild(rc.line(x1, y1, x2, y2, { stroke: '#334155', strokeWidth: 2 }));
     });
     animateRoughScratchPaths(svg);
   }, [step.id, pal]);
 
-  const activeStop = stops.reduce((best, s) =>
-    Math.abs(s.angleDeg - deg) < Math.abs(best.angleDeg - deg) ? s : best
-  , stops[0]);
+  const activeStop = stops.reduce(
+    (best, s) => (Math.abs(s.angleDeg - deg) < Math.abs(best.angleDeg - deg) ? s : best),
+    stops[0]
+  );
 
-  const updateAngleFromPointer = (svgEl: SVGSVGElement, clientX: number, clientY: number) => {
+  const selectDegree = (nextAngle: number, chosenStop?: DialSectorStop) => {
     if (solved) return;
-    const rect = svgEl.getBoundingClientRect();
-    const sx = ((clientX - rect.left) / rect.width) * 420;
-    const sy = ((clientY - rect.top) / rect.height) * 150;
-    const dx = sx - 210;
-    const dy = 132 - sy;
-    const rawAngle = 180 - (Math.atan2(Math.max(4, dy), dx) * 180) / Math.PI;
-    const clamped = Math.max(10, Math.min(170, Math.round(rawAngle)));
+    const clamped = Math.max(10, Math.min(170, Math.round(nextAngle)));
     setDeg(clamped);
-    if (Math.abs(clamped - targetDeg) <= 16) {
+    if (Math.abs(clamped - targetDeg) <= 18) {
       setDeg(targetDeg);
       setLocalSolved(true);
+      const st =
+        chosenStop ||
+        stops.reduce((best, s) => (Math.abs(s.angleDeg - targetDeg) < Math.abs(best.angleDeg - targetDeg) ? s : best), stops[stops.length - 1]);
       const praise =
         step.successVoiceFeedback ||
-        pickL(locale, `Locked onto ${activeStop.label}: "${activeStop.expression}"!`, `Tepat di derajat ${activeStop.label}: "${activeStop.expression}"!`);
+        pickL(locale, `Locked onto ${st.label}: "${st.expression}"!`, `Tepat di ${st.label}: "${st.expression}"!`);
       onInteractionResult({
         stepId: step.id,
         isCorrect: true,
-        userAnswer: `${clamped}°`,
+        userAnswer: st.label || `${clamped}°`,
         expectedAnswer: `${targetDeg}°`,
         feedbackToSpeak: praise,
       });
     }
   };
 
+  const updateAngleFromPointer = (svgEl: SVGSVGElement, clientX: number, clientY: number) => {
+    if (solved) return;
+    const rect = svgEl.getBoundingClientRect();
+    const sx = ((clientX - rect.left) / Math.max(1, rect.width)) * 420;
+    const sy = ((clientY - rect.top) / Math.max(1, rect.height)) * 144;
+    const dx = sx - 210;
+    const dy = 128 - sy;
+    const rawAngle = 180 - (Math.atan2(Math.max(4, dy), dx) * 180) / Math.PI;
+    selectDegree(rawAngle);
+  };
+
   const rad = Math.PI + (deg / 180) * Math.PI;
-  const tipX = 210 + Math.cos(rad) * 80;
-  const tipY = 132 + Math.sin(rad) * 80;
+  const tipX = 210 + Math.cos(rad) * 78;
+  const tipY = 128 + Math.sin(rad) * 78;
 
   return (
     <div
       data-testid="wb-rotary-dial-lab"
       data-solved={solved ? '1' : '0'}
-      className="py-2 space-y-2"
+      className="py-2 space-y-2.5"
     >
       <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 min-w-0">
           <span
-            className="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider"
+            className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider shrink-0"
             style={{ backgroundColor: pal.wash, color: pal.ink }}
           >
             {pickL(locale, 'Rotary Dial', 'Kompas Putar')}
           </span>
-          <span className="fz-handwriting-heading text-xl sm:text-2xl font-bold text-[#0F172A]">
+          <span className="fz-handwriting-heading text-xl sm:text-2xl font-bold text-[#0F172A] leading-tight">
             <HighlightText text={step.title || pickL(locale, 'Rotate the Gauge Needle', 'Putar Jarum Derajat')} active />
           </span>
         </div>
@@ -1258,11 +1307,13 @@ export const RotaryDialGaugeLab: React.FC<MechanicWidgetProps> = ({
       </div>
 
       <div className="relative max-w-[420px] select-none">
-        <svg ref={dialBgRef} viewBox="0 0 420 150" className="w-full h-[146px] block overflow-visible pointer-events-none" />
+        <svg ref={dialBgRef} viewBox="0 0 420 144" className="w-full h-[138px] block overflow-visible pointer-events-none" />
         <svg
           data-testid="wb-rotary-dial-svg"
-          viewBox="0 0 420 150"
+          viewBox="0 0 420 144"
+          style={{ touchAction: 'none' }}
           onPointerDown={(e) => {
+            e.stopPropagation();
             draggingRef.current = true;
             try {
               e.currentTarget.setPointerCapture(e.pointerId);
@@ -1271,54 +1322,45 @@ export const RotaryDialGaugeLab: React.FC<MechanicWidgetProps> = ({
           }}
           onPointerMove={(e) => {
             if (!draggingRef.current) return;
+            e.stopPropagation();
             updateAngleFromPointer(e.currentTarget, e.clientX, e.clientY);
           }}
           onPointerUp={() => {
             draggingRef.current = false;
           }}
-          className="absolute inset-0 w-full h-[146px] cursor-grab active:cursor-grabbing touch-none overflow-visible"
+          onPointerCancel={() => {
+            draggingRef.current = false;
+          }}
+          className="absolute inset-0 w-full h-[138px] cursor-grab active:cursor-grabbing touch-none overflow-visible"
         >
-          {stops.map((st, idx) => {
-            const sRad = Math.PI + (st.angleDeg / 180) * Math.PI;
-            const lx = 210 + Math.cos(sRad) * 136;
-            const ly = 132 + Math.sin(sRad) * 116;
-            return (
-              <text
-                key={idx}
-                x={lx}
-                y={Math.max(16, ly)}
-                textAnchor="middle"
-                fontSize="11.5"
-                fontWeight="700"
-                stroke="#FCFBF7"
-                strokeWidth="4"
-                style={{ paintOrder: 'stroke' }}
-                fill={Math.abs(st.angleDeg - deg) <= 22 ? pal.accent : '#334155'}
-                onClick={() => {
-                  if (solved) return;
-                  setDeg(st.angleDeg);
-                  if (Math.abs(st.angleDeg - targetDeg) <= 16) {
-                    setLocalSolved(true);
-                    onInteractionResult({
-                      stepId: step.id,
-                      isCorrect: true,
-                      userAnswer: st.label,
-                      expectedAnswer: `${targetDeg}°`,
-                      feedbackToSpeak: step.successVoiceFeedback || st.expression,
-                    });
-                  }
-                }}
-                className="cursor-pointer"
-              >
-                {st.label}
-              </text>
-            );
-          })}
-          {/* Draggable Needle */}
-          <line x1="210" y1="132" x2={tipX} y2={tipY} stroke={pal.accent} strokeWidth="4" strokeLinecap="round" />
-          <circle cx={tipX} cy={tipY} r="9" fill={pal.accent} stroke="#FFFFFF" strokeWidth="2.2" />
-          <circle cx="210" cy="132" r="7" fill="#0F172A" />
+          <line x1="210" y1="128" x2={tipX} y2={tipY} stroke={pal.accent} strokeWidth="4.2" strokeLinecap="round" />
+          <circle cx={tipX} cy={tipY} r="26" fill={pal.accent} fillOpacity="0.14" />
+          <circle cx={tipX} cy={tipY} r="11" fill={solved ? '#15803D' : pal.accent} stroke="#FFFFFF" strokeWidth="2.5" />
+          <circle cx="210" cy="128" r="7" fill="#0F172A" />
         </svg>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-2">
+        {stops.map((st, idx) => {
+          const isCurrentStop = Math.abs(st.angleDeg - deg) <= 20;
+          return (
+            <button
+              key={idx}
+              type="button"
+              data-testid={`wb-dial-stop-${idx}`}
+              disabled={solved}
+              onClick={() => selectDegree(st.angleDeg, st)}
+              className="min-h-[44px] min-w-[76px] px-3.5 py-2 rounded-2xl border-2 text-[12.5px] font-bold cursor-pointer inline-flex items-center justify-center transition-transform active:scale-95 shadow-2xs"
+              style={{
+                borderColor: isCurrentStop ? pal.accent : '#CBD5E1',
+                backgroundColor: isCurrentStop ? pal.accentWash : '#FFFFFF',
+                color: '#0F172A',
+              }}
+            >
+              <MathText text={st.label} active />
+            </button>
+          );
+        })}
       </div>
 
       <div className="flex flex-wrap items-baseline justify-between gap-2 px-1">
@@ -1326,7 +1368,9 @@ export const RotaryDialGaugeLab: React.FC<MechanicWidgetProps> = ({
           <MathText text={activeStop.expression} active />
         </span>
         {activeStop.note && (
-          <span className="text-xs font-bold" style={{ color: pal.ink }}>{activeStop.note}</span>
+          <span className="text-xs font-bold" style={{ color: pal.ink }}>
+            <MathText text={activeStop.note} active />
+          </span>
         )}
       </div>
 
@@ -1335,7 +1379,7 @@ export const RotaryDialGaugeLab: React.FC<MechanicWidgetProps> = ({
           text={
             solved
               ? step.successVoiceFeedback || activeStop.expression
-              : step.socraticPrompt || pickL(locale, 'Grab and rotate the needle directly on the dial!', 'Tarik dan putar langsung ujung jarum pada busur kompas!')
+              : step.socraticPrompt || pickL(locale, 'Drag the needle or tap a sector button above!', 'Putar jarum kompas atau ketuk tombol sektor di atas!')
           }
           active
         />
@@ -1346,7 +1390,6 @@ export const RotaryDialGaugeLab: React.FC<MechanicWidgetProps> = ({
 
 /* ============================================================================
  * MECHANIC 6: FRACTION / SECTOR HACHURE SHADER (`fraction_slice_shader`)
- * Tap sectors of a hand-sketched Rough.js wheel to shade them with live scratch ink!
  * ============================================================================ */
 export const FractionSliceShaderLab: React.FC<MechanicWidgetProps> = ({
   step,
@@ -1371,7 +1414,7 @@ export const FractionSliceShaderLab: React.FC<MechanicWidgetProps> = ({
     if (!svg) return;
     svg.innerHTML = '';
     const rc = rough.svg(svg);
-    const cx = 104;
+    const cx = 92;
     const cy = 78;
     const r = 64;
     for (let i = 0; i < total; i++) {
@@ -1418,28 +1461,27 @@ export const FractionSliceShaderLab: React.FC<MechanicWidgetProps> = ({
       className="py-2 space-y-2.5"
     >
       <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 min-w-0">
           <span
-            className="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider"
+            className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider shrink-0"
             style={{ backgroundColor: pal.wash, color: pal.ink }}
           >
             {pickL(locale, 'Ink Shader', 'Arsir Bidang')}
           </span>
-          <span className="fz-handwriting-heading text-xl sm:text-2xl font-bold text-[#0F172A]">
+          <span className="fz-handwriting-heading text-xl sm:text-2xl font-bold text-[#0F172A] leading-tight">
             <HighlightText text={step.title || pickL(locale, 'Tap Sectors to Shade', 'Ketuk Juring untuk Mengarsir')} active />
           </span>
         </div>
         <SkipGateLink show={isWaitingOnStudent && !solved} locale={locale} onSkip={onSkipContinue} />
       </div>
 
-      <div className="flex items-center gap-4 max-w-[440px]">
-        <div className="relative w-[208px] h-[156px] shrink-0">
-          <svg ref={svgRef} viewBox="0 0 208 156" className="w-full h-full block overflow-visible pointer-events-none" />
-          {/* Invisible Polar Tap Targets */}
-          <svg viewBox="0 0 208 156" className="absolute inset-0 w-full h-full">
+      <div className="flex flex-wrap items-center gap-4 max-w-[460px]">
+        <div className="relative w-[184px] h-[156px] shrink-0">
+          <svg ref={svgRef} viewBox="0 0 184 156" className="w-full h-full block overflow-visible pointer-events-none" />
+          <svg viewBox="0 0 184 156" className="absolute inset-0 w-full h-full">
             {Array.from({ length: total }, (_, i) => {
               const aMid = -Math.PI / 2 + ((i + 0.5) * 2 * Math.PI) / total;
-              const bx = 104 + Math.cos(aMid) * 38;
+              const bx = 92 + Math.cos(aMid) * 38;
               const by = 78 + Math.sin(aMid) * 38;
               return (
                 <circle
@@ -1447,7 +1489,7 @@ export const FractionSliceShaderLab: React.FC<MechanicWidgetProps> = ({
                   data-testid={`wb-slice-sector-${i}`}
                   cx={bx}
                   cy={by}
-                  r="20"
+                  r="26"
                   fill="transparent"
                   onClick={() => toggleSlice(i)}
                   className="cursor-pointer"
@@ -1457,21 +1499,22 @@ export const FractionSliceShaderLab: React.FC<MechanicWidgetProps> = ({
           </svg>
         </div>
 
-        <div className="space-y-1.5">
+        <div className="space-y-2 flex-1 min-w-[140px]">
           <div className="fz-handwriting-heading text-3xl font-extrabold" style={{ color: pal.ink }}>
             <MathText text={`$\\frac{${shaded.length}}{${total}}$`} active />
           </div>
           <div className="text-xs font-bold text-[#475569]">
             {Math.round((shaded.length / total) * 100)}% {step.sliceCaptionUnit || pickL(locale, 'shaded', 'terarsir')}
           </div>
-          <div className="flex flex-wrap gap-1 pt-1">
+          <div className="flex flex-wrap gap-2 pt-1">
             {Array.from({ length: total }, (_, i) => (
               <button
                 key={i}
                 type="button"
+                data-testid={`wb-slice-btn-${i}`}
                 disabled={solved}
                 onClick={() => toggleSlice(i)}
-                className="w-7 h-7 rounded-lg text-xs font-bold border cursor-pointer transition-transform active:scale-95"
+                className="min-w-[44px] min-h-[44px] px-3 py-2 rounded-xl text-sm font-bold border-2 cursor-pointer inline-flex items-center justify-center transition-transform active:scale-95"
                 style={{
                   borderColor: shaded.includes(i) ? pal.accent : '#CBD5E1',
                   backgroundColor: shaded.includes(i) ? pal.accentWash : '#FFFFFF',
@@ -1490,7 +1533,7 @@ export const FractionSliceShaderLab: React.FC<MechanicWidgetProps> = ({
           text={
             solved
               ? step.successVoiceFeedback || `${target}/${total}`
-              : step.socraticPrompt || pickL(locale, `Tap slices on the circle until ${target}/${total} are hatched!`, `Ketuk bagian lingkaran langsung sampai terarsir ${target}/${total}!`)
+              : step.socraticPrompt || pickL(locale, `Tap slices or numbers until ${target}/${total} are hatched!`, `Ketuk bagian lingkaran atau nomornya sampai terarsir ${target}/${total}!`)
           }
           active
         />
@@ -1501,7 +1544,6 @@ export const FractionSliceShaderLab: React.FC<MechanicWidgetProps> = ({
 
 /* ============================================================================
  * MECHANIC 7: MAGNETIC BLUEPRINT SLOT BUILDER (`magnetic_slot_builder`)
- * Snap sketchy ink tiles into Rough.js dashed blueprint slots!
  * ============================================================================ */
 export const MagneticSlotBuilderLab: React.FC<MechanicWidgetProps> = ({
   step,
@@ -1516,9 +1558,13 @@ export const MagneticSlotBuilderLab: React.FC<MechanicWidgetProps> = ({
     if (Array.isArray(step.magnetTargetTokens) && step.magnetTargetTokens.length >= 2) {
       return step.magnetTargetTokens;
     }
-    const raw = String(step.rightText || 'She has finished work').trim().split(/\s+/).filter(Boolean);
-    return raw.slice(0, 5);
-  }, [step.magnetTargetTokens, step.rightText]);
+    const rawSource = String(step.rightText || step.text || step.title || '').trim();
+    const parts = rawSource.split(/\s*(?:\+|->|→|\|)\s*/).filter(Boolean);
+    if (parts.length >= 2) return parts.slice(0, 4);
+    const words = rawSource.split(/\s+/).filter(Boolean);
+    if (words.length >= 2) return words.slice(0, 5);
+    return [pickL(locale, 'Part 1', 'Bagian 1'), pickL(locale, 'Part 2', 'Bagian 2')];
+  }, [step.magnetTargetTokens, step.rightText, step.text, step.title, locale]);
 
   const pool = useMemo(() => {
     const extras = Array.isArray(step.magnetDistractors) ? step.magnetDistractors.slice(0, 2) : [];
@@ -1533,7 +1579,7 @@ export const MagneticSlotBuilderLab: React.FC<MechanicWidgetProps> = ({
   const tapTile = (tile: { id: string; label: string }) => {
     if (solved || pickedIds.includes(tile.id)) return;
     const expectedNext = targetTokens[pickedIds.length];
-    if (tile.label.toLowerCase() === expectedNext.toLowerCase()) {
+    if (tile.label.trim().toLowerCase() === expectedNext.trim().toLowerCase()) {
       const next = [...pickedIds, tile.id];
       setPickedIds(next);
       setWrongPulse('');
@@ -1574,21 +1620,20 @@ export const MagneticSlotBuilderLab: React.FC<MechanicWidgetProps> = ({
       className="py-2 space-y-2.5"
     >
       <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 min-w-0">
           <span
-            className="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider"
+            className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider shrink-0"
             style={{ backgroundColor: pal.wash, color: pal.ink }}
           >
             {pickL(locale, 'Magnet Rail', 'Rel Magnetik')}
           </span>
-          <span className="fz-handwriting-heading text-xl sm:text-2xl font-bold text-[#0F172A]">
+          <span className="fz-handwriting-heading text-xl sm:text-2xl font-bold text-[#0F172A] leading-tight">
             <HighlightText text={step.title || pickL(locale, 'Snap Into Blueprint Slots', 'Pasang ke Slot Cetak Biru')} active />
           </span>
         </div>
         <SkipGateLink show={isWaitingOnStudent && !solved} locale={locale} onSkip={onSkipContinue} />
       </div>
 
-      {/* Magnetic Blueprint Slots */}
       <div className="flex flex-wrap items-center gap-2 py-1.5">
         {targetTokens.map((exp, idx) => {
           const filledTile = solved
@@ -1600,15 +1645,15 @@ export const MagneticSlotBuilderLab: React.FC<MechanicWidgetProps> = ({
           return (
             <React.Fragment key={idx}>
               <div
-                className="min-w-[68px] px-3 py-2 rounded-2xl border-2 text-center transition-transform duration-200"
+                className="min-w-[74px] px-3 py-2 rounded-2xl border-2 text-center transition-transform duration-200"
                 style={{
                   borderStyle: filledTile ? 'solid' : 'dashed',
                   borderColor: filledTile ? pal.ink : '#94A3B8',
-                  backgroundColor: filledTile ? pal.wash : 'rgba(255,255,255,0.55)',
+                  backgroundColor: filledTile ? pal.wash : 'rgba(255,255,255,0.65)',
                   transform: filledTile ? 'scale(1)' : 'scale(0.97)',
                 }}
               >
-                <div className="text-[9px] font-extrabold uppercase tracking-wider text-[#64748B]">{role}</div>
+                <div className="text-[9.5px] font-extrabold uppercase tracking-wider text-[#64748B]">{role}</div>
                 <div className="fz-handwriting-heading text-base font-bold text-[#0F172A] min-h-[22px]">
                   {filledTile ? <MathText text={filledTile.label} active /> : '?'}
                 </div>
@@ -1621,9 +1666,8 @@ export const MagneticSlotBuilderLab: React.FC<MechanicWidgetProps> = ({
         })}
       </div>
 
-      {/* Draggable / Tappable Tile Pool */}
       {!solved && (
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2.5">
           {pool.map((tile, idx) => {
             if (pickedIds.includes(tile.id)) return null;
             return (
@@ -1632,7 +1676,7 @@ export const MagneticSlotBuilderLab: React.FC<MechanicWidgetProps> = ({
                 type="button"
                 data-testid={`wb-magnet-tile-${idx}`}
                 onClick={() => tapTile(tile)}
-                className="px-3.5 py-1.5 rounded-xl border-2 bg-white text-[13.5px] font-bold text-[#0F172A] cursor-pointer transition-transform active:scale-95"
+                className="min-h-[46px] min-w-[64px] px-4 py-2.5 rounded-2xl border-2 bg-white text-[13.5px] font-bold text-[#0F172A] cursor-pointer inline-flex items-center justify-center transition-transform active:scale-95 shadow-2xs"
                 style={{ borderColor: pal.accent }}
               >
                 <MathText text={tile.label} active />
@@ -1648,7 +1692,7 @@ export const MagneticSlotBuilderLab: React.FC<MechanicWidgetProps> = ({
             wrongPulse ||
             (solved
               ? step.successVoiceFeedback || targetTokens.join(' ')
-              : step.socraticPrompt || pickL(locale, 'Tap tiles in order to snap them into the blueprint rail!', 'Ketuk kepingan secara berurutan agar menempel ke slot cetak biru!'))
+              : step.socraticPrompt || pickL(locale, 'Tap tiles in order to snap them into the blueprint rail!', 'Ketuk keping secara berurutan agar menempel ke slot cetak biru!'))
           }
           active
         />
@@ -1659,7 +1703,6 @@ export const MagneticSlotBuilderLab: React.FC<MechanicWidgetProps> = ({
 
 /* ============================================================================
  * MECHANIC 8: LIVE WAVE / PITCH OSCILLATOR (`wave_pendulum_oscillator`)
- * Pluck & drag the crest directly on the Rough-accented live wave canvas!
  * ============================================================================ */
 export const WavePendulumOscillatorLab: React.FC<MechanicWidgetProps> = ({
   step,
@@ -1698,25 +1741,30 @@ export const WavePendulumOscillatorLab: React.FC<MechanicWidgetProps> = ({
     pts.push(`${pts.length === 0 ? 'M' : 'L'} ${x} ${y.toFixed(1)}`);
   }
 
+  const selectWaveLevel = (next: number) => {
+    if (solved) return;
+    const clamped = Math.max(1, Math.min(4, Math.round(next)));
+    setLvl(clamped);
+    if (clamped === targetLvl) {
+      setLocalSolved(true);
+      const praise =
+        step.successVoiceFeedback ||
+        pickL(locale, `Resonance matched at ${clamped} cycles!`, `Gelombang beresonansi tepat pada frekuensi ${clamped}×!`);
+      onInteractionResult({
+        stepId: step.id,
+        isCorrect: true,
+        userAnswer: `${clamped}×`,
+        expectedAnswer: `${targetLvl}×`,
+        feedbackToSpeak: praise,
+      });
+    }
+  };
+
   const handleDragWave = (svgEl: SVGSVGElement, clientX: number) => {
     if (solved) return;
     const rect = svgEl.getBoundingClientRect();
     const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / Math.max(1, rect.width)));
-    const next = Math.max(1, Math.min(4, Math.round(1 + ratio * 3)));
-    setLvl(next);
-    if (next === targetLvl) {
-      setLocalSolved(true);
-      const praise =
-        step.successVoiceFeedback ||
-        pickL(locale, `Resonance matched at ${next} cycles!`, `Gelombang beresonansi tepat pada frekuensi tingkat ${next}!`);
-      onInteractionResult({
-        stepId: step.id,
-        isCorrect: true,
-        userAnswer: `${next}`,
-        expectedAnswer: `${targetLvl}`,
-        feedbackToSpeak: praise,
-      });
-    }
+    selectWaveLevel(1 + ratio * 3);
   };
 
   const handleX = 24 + ((lvl - 1) / 3) * 396;
@@ -1725,18 +1773,18 @@ export const WavePendulumOscillatorLab: React.FC<MechanicWidgetProps> = ({
     <div
       data-testid="wb-wave-oscillator-lab"
       data-solved={solved ? '1' : '0'}
-      className="py-2 space-y-2"
+      className="py-2 space-y-2.5"
     >
       <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 min-w-0">
           <span
-            className="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider"
+            className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider shrink-0"
             style={{ backgroundColor: pal.wash, color: pal.ink }}
           >
             {pickL(locale, 'Live Wave', 'Osilator Hidup')}
           </span>
-          <span className="fz-handwriting-heading text-xl sm:text-2xl font-bold text-[#0F172A]">
-            <HighlightText text={step.title || pickL(locale, 'Tune the Wave Crest', 'Tarik Puncak Gelombang')} active />
+          <span className="fz-handwriting-heading text-xl sm:text-2xl font-bold text-[#0F172A] leading-tight">
+            <HighlightText text={step.title || pickL(locale, 'Tune the Wave Crest', 'Atur Frekuensi Gelombang')} active />
           </span>
         </div>
         <SkipGateLink show={isWaitingOnStudent && !solved} locale={locale} onSkip={onSkipContinue} />
@@ -1745,7 +1793,9 @@ export const WavePendulumOscillatorLab: React.FC<MechanicWidgetProps> = ({
       <svg
         data-testid="wb-wave-svg"
         viewBox="0 0 448 144"
+        style={{ touchAction: 'none' }}
         onPointerDown={(e) => {
+          e.stopPropagation();
           draggingRef.current = true;
           try {
             e.currentTarget.setPointerCapture(e.pointerId);
@@ -1754,27 +1804,52 @@ export const WavePendulumOscillatorLab: React.FC<MechanicWidgetProps> = ({
         }}
         onPointerMove={(e) => {
           if (!draggingRef.current) return;
+          e.stopPropagation();
           handleDragWave(e.currentTarget, e.clientX);
         }}
         onPointerUp={() => {
           draggingRef.current = false;
         }}
-        className="w-full max-w-[448px] h-[138px] cursor-ew-resize touch-none select-none overflow-visible"
+        onPointerCancel={() => {
+          draggingRef.current = false;
+        }}
+        className="w-full max-w-[448px] h-[132px] cursor-ew-resize touch-none select-none overflow-visible"
       >
         <line x1="20" y1="72" x2="428" y2="72" stroke="#CBD5E1" strokeWidth="1.6" strokeDasharray="5 5" />
         <path d={pts.join(' ')} fill="none" stroke={pal.ink} strokeWidth="3.2" strokeLinecap="round" />
-        <circle cx={handleX} cy="72" r="11" fill={pal.accent} stroke="#FFFFFF" strokeWidth="2.5" />
+        <circle cx={handleX} cy="72" r="26" fill={pal.accent} fillOpacity="0.15" />
+        <circle cx={handleX} cy="72" r="11" fill={solved ? '#15803D' : pal.accent} stroke="#FFFFFF" strokeWidth="2.5" />
         <text x="28" y="24" fontSize="13" fontWeight="700" fill={pal.ink}>
           {step.waveUnitLabel || 'f'} = {lvl}×
         </text>
       </svg>
+
+      <div className="flex flex-wrap items-center gap-2">
+        {[1, 2, 3, 4].map((preset) => (
+          <button
+            key={preset}
+            type="button"
+            data-testid={`wb-wave-level-${preset}`}
+            disabled={solved}
+            onClick={() => selectWaveLevel(preset)}
+            className="min-h-[44px] min-w-[60px] px-3.5 py-2 rounded-2xl border-2 text-[13px] font-bold cursor-pointer inline-flex items-center justify-center transition-transform active:scale-95"
+            style={{
+              borderColor: lvl === preset ? pal.accent : '#CBD5E1',
+              backgroundColor: lvl === preset ? pal.accentWash : '#FFFFFF',
+              color: '#0F172A',
+            }}
+          >
+            {preset}×
+          </button>
+        ))}
+      </div>
 
       <p className="text-[12.5px] font-medium text-[#334155] pl-3 border-l-2" style={{ borderColor: pal.ink }}>
         <MathText
           text={
             solved
               ? step.successVoiceFeedback || pickL(locale, 'Wave locked in!', 'Frekuensi gelombang tepat!')
-              : step.socraticPrompt || pickL(locale, 'Drag the glowing node sideways right on the oscillating wave!', 'Geser titik bulat langsung di atas gelombang hidup!')
+              : step.socraticPrompt || pickL(locale, 'Drag the wave node or tap a frequency button above!', 'Geser titik gelombang atau ketuk tombol frekuensi di atas!')
           }
           active
         />

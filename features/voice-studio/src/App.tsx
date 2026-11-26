@@ -3605,7 +3605,13 @@ export default function App() {
     }
 
     // 1) Explicit voice navigation commands to FIEZEL modules & courses
+    // Guard: NEVER hijack genuine conceptual questions ("cara menulis kanji...", "bedanya akeru vs aku buka pintu...", "kenapa...")!
+    const isConceptualQuestion =
+      /\b(bedanya|perbedaan|kenapa|mengapa|bagaimana|gimana|cara\s+(?:nulis|menulis|pakai|pake|baca|hitung|ngitung|kerja|bikin|ubah|cari)|apa\s+itu|arti|kapan|aturan|rumus|urutan\s+goresan)\b/i.test(
+        s
+      );
     const navTrigger =
+      !isConceptualQuestion &&
       /\b(buka|bukain|bukakan|arahkan|arahin|pindah|ganti|masuk|pergi|lanjut|ke halaman|ke fitur|ke modul|ke kursus|open|go to|take me to|switch to|navigate to|เปิด|ไปที่)\b/i.test(
         s
       );
@@ -10941,6 +10947,8 @@ ${
             workbenchSessionRef.current.dismissedByUser = true;
             isWorkbenchOpenRef.current = false;
             isWorkbenchExplanationActiveRef.current = false;
+            setIsAnalyzingTurn(false);
+            setIsGeneratingWorkbench(false);
             setLearningWorkbench(null);
           }}
           onResumeConversation={(completedSentence, finishedTopic) => {
@@ -10950,6 +10958,8 @@ ${
             workbenchSessionRef.current.completedQuizSentence = '';
             isWorkbenchOpenRef.current = false;
             isWorkbenchExplanationActiveRef.current = false;
+            setIsAnalyzingTurn(false);
+            setIsGeneratingWorkbench(false);
             speakTokenRef.current += 1;
             interruptAiAndStartListening();
             setLearningWorkbench(null);
@@ -11123,6 +11133,7 @@ ${
             });
           }}
           latestAiSubtitle={turns.filter((t) => t.speaker === 'ai').slice(-1)[0]?.text || ''}
+          latestUserUtterance={turns.filter((t) => t.speaker === 'user').slice(-1)[0]?.text || ''}
           currentMasteryPct={Math.round(
             ((brainState.competencies[activeScenario.competencyId]?.pMasteryDecayed ??
               brainState.competencies[activeScenario.competencyId]?.pMastery ??

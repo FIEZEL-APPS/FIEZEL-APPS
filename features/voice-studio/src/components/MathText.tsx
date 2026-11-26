@@ -44,6 +44,63 @@ function isSafeInlineStemMatch(match: string): boolean {
   return true;
 }
 
+function isGenuineDelimitedMath(inner: string): boolean {
+  const s = String(inner || '').trim();
+  if (!s) return false;
+  // Single mathematical symbol ($x$, $y$, $L$, $K$, $V$, $I$, $R$, $p$, $q$, $r$)
+  if (/^[A-Za-zπθλ]$/.test(s)) return true;
+  // Compact function / Big-O / probability notation ($O(n)$, $f(x)$, $f'(x)$, $P(A)$)
+  if (/^[A-Za-z]'?\([A-Za-z0-9,+\-\s]{1,14}\)$/.test(s)) return true;
+  // True LaTeX math commands or superscripts/subscripts always qualify unless surrounded by full prose sentences
+  if (
+    /\\(?:frac|sqrt|sum|int|lim|log|ln|sin|cos|tan|pi|theta|alpha|beta|gamma|Delta|rho|lambda|pm|mp|le|ge|neq|approx|implies|iff|Leftrightarrow|leftrightarrow|to|rightarrow|cdot|times|div|text)\b/.test(
+      s
+    )
+  ) {
+    const proseWords = s
+      .replace(/\\text\{[^{}]*\}/g, ' ')
+      .replace(/\\[a-zA-Z]+/g, ' ')
+      .match(/[A-Za-z\u00C0-\u024F]{4,}/g);
+    if (proseWords && proseWords.length >= 3 && !/\d/.test(s) && !/[=^_<>]/.test(s)) {
+      return false;
+    }
+    return true;
+  }
+  if (/[\^_]|²|³/.test(s) && (/\d/.test(s) || /\b[a-zA-Z]\s*[\^_²³]/.test(s) || /[a-zA-Z][\^_]/.test(s))) {
+    return true;
+  }
+  // Reject CJK characters or multi-word grammar formulas wrapped in $...$ (e.g. "$Subjek + To Be + Verb 3$", "$Wa = Topik, Ga = Subjek Baru$")
+  if (/[\u3040-\u30ff\u4e00-\u9faf]/.test(s)) return false;
+  if (/\|/.test(s) && /[A-Za-z]{3,}/.test(s)) return false;
+  const multiLetterWords = (s.replace(/\bpH\b/g, '').match(/[A-Za-z]{3,}/g) || []).filter(
+    (w) => !/^(?:sin|cos|tan|log|lim|max|min|mod|and|dan)$/i.test(w)
+  );
+  if (multiLetterWords.length >= 2) return false;
+  if (multiLetterWords.length === 1 && !/\d/.test(s)) return false;
+  return /[\d=+\-*/×·÷<>]/.test(s);
+}
+
+function humanizePseudoMathProse(inner: string): string {
+  return String(inner || '')
+    .trim()
+    .replace(/\\downarrow/g, '↓')
+    .replace(/\\uparrow/g, '↑')
+    .replace(/\\Longleftrightarrow|\\Leftrightarrow|\\iff/g, '⇔')
+    .replace(/\\Longrightarrow|\\implies/g, '⇒')
+    .replace(/\\rightarrow|\\to/g, '→')
+    .replace(/\\leftarrow/g, '←')
+    .replace(/\\times/g, '×')
+    .replace(/\\cdot/g, '·')
+    .replace(/\\div/g, '÷')
+    .replace(/\\neq/g, '≠')
+    .replace(/\\le\b/g, '≤')
+    .replace(/\\ge\b/g, '≥')
+    .replace(/\\pi\b/g, 'π')
+    .replace(/\\log\b/g, 'log ')
+    .replace(/\$/g, '')
+    .replace(/\s+/g, ' ');
+}
+
 export function splitMathSegments(text: string): MathSegment[] {
   if (!text) return [];
   const out: MathSegment[] = [];
@@ -58,7 +115,7 @@ export function splitMathSegments(text: string): MathSegment[] {
       const matched = m[0];
       if (!isSafeInlineStemMatch(matched)) continue;
       if (m.index > last) {
-        out.push({ kind: 'text', raw: plain.slice(last, m.index) });
+        out.push({ kind: 'text', raw: humanizeStrayLatexCommands(plain.slice(last, m.index)) });
       }
       out.push({
         kind: 'math',
@@ -69,9 +126,26 @@ export function splitMathSegments(text: string): MathSegment[] {
       last = m.index + matched.length;
     }
     if (last < plain.length) {
-      out.push({ kind: 'text', raw: plain.slice(last) });
+      out.push({ kind: 'text', raw: humanizeStrayLatexCommands(plain.slice(last)) });
     }
   };
+
+  function humanizeStrayLatexCommands(chunk: string): string {
+    if (!chunk || (!chunk.includes('\\') && !chunk.includes('$'))) return chunk;
+    return chunk
+      .replace(/\\Longleftrightarrow|\\Leftrightarrow|\\iff\b/g, '⇔')
+      .replace(/\\Longrightarrow|\\implies\b/g, '⇒')
+      .replace(/\\rightarrow|\\to\b/g, '→')
+      .replace(/\\times\b/g, '×')
+      .replace(/\\cdot\b/g, '·')
+      .replace(/\\div\b/g, '÷')
+      .replace(/\\neq\b/g, '≠')
+      .replace(/\\le\b/g, '≤')
+      .replace(/\\ge\b/g, '≥')
+      .replace(/\\pi\b/g, 'π')
+      .replace(/\\log\b/g, 'log ')
+      .replace(/\$/g, '');
+  }
 
   DELIM_RE.lastIndex = 0;
   let dm: RegExpExecArray | null;
@@ -93,12 +167,19 @@ export function splitMathSegments(text: string): MathSegment[] {
     } else if (token.startsWith('$') && token.endsWith('$')) {
       inner = token.slice(1, -1);
     }
-    out.push({
-      kind: 'math',
-      raw: token,
-      latex: normalizeAsciiToLatex(inner),
-      displayMode,
-    });
+    if (!isGenuineDelimitedMath(inner)) {
+      out.push({
+        kind: 'text',
+        raw: humanizePseudoMathProse(inner),
+      });
+    } else {
+      out.push({
+        kind: 'math',
+        raw: token,
+        latex: normalizeAsciiToLatex(inner),
+        displayMode,
+      });
+    }
     cursor = dm.index + token.length;
   }
   if (cursor < text.length) {
@@ -133,7 +214,8 @@ export const MathText: React.FC<{
   const lowerTerms = new Set((terms || []).map((t) => String(t || '').trim().toLowerCase()).filter(Boolean));
 
   if (segments.every((s) => s.kind === 'text')) {
-    return <>{renderPlainSegment ? renderPlainSegment(text, 'plain-0') : <span className={className}>{text}</span>}</>;
+    const joinedPlain = segments.map((s) => s.raw).join('');
+    return <>{renderPlainSegment ? renderPlainSegment(joinedPlain, 'plain-0') : <span className={className}>{joinedPlain}</span>}</>;
   }
 
   return (

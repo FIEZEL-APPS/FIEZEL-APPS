@@ -130,8 +130,8 @@ export const InlineSocraticCheckpointBar: React.FC<{
         matchedChoice?.socraticHint ||
         pickLoc(
           locale,
-          `Almost, look closely at the pattern on the board before picking "${clean}". Try once more!`,
-          `Hampir! Coba perhatikan lagi kaitan tanda di sketsa atas untuk "${clean}", lalu coba sekali lagi.`,
+          `Almost! Check the pattern on the board before picking "${clean}", then try once more.`,
+          `Hampir! Perhatikan lagi pola di sketsa atas untuk "${clean}", lalu coba sekali lagi.`,
           `เกือบถูกแล้ว ลองสังเกตจุดสำคัญบนกระดานอีกครั้งนะ!`
         );
       setFeedbackNote({ ok: false, text: hint });
@@ -191,16 +191,17 @@ export const InlineSocraticCheckpointBar: React.FC<{
   return (
     <div
       data-testid="wb-socratic-checkpoint-bar"
+      data-solved={isSolved ? '1' : '0'}
       data-waiting={isWaitingOnStudent ? '1' : '0'}
-      className="mt-3 pl-3.5 border-l-2 transition-colors rounded-r-2xl py-1.5 pr-2"
+      className="mt-3 pl-3.5 border-l-2 transition-colors rounded-r-2xl py-2 pr-2.5"
       style={{
         borderColor: isSolved ? '#15803D' : accentColor,
-        backgroundColor: isWaitingOnStudent && !isSolved ? `${washColor}55` : 'transparent',
+        backgroundColor: isWaitingOnStudent && !isSolved ? `${washColor}66` : 'transparent',
       }}
     >
       {prompt && (
         <div className="flex items-start justify-between gap-2">
-          <p className="text-[13.5px] sm:text-[14px] font-semibold text-[#0F172A] leading-snug">
+          <p className="text-[13.5px] sm:text-[14px] font-semibold text-[#0F172A] leading-snug pt-1">
             <span
               className="inline-block w-2 h-2 rounded-full mr-2 align-middle"
               style={{ backgroundColor: accentColor }}
@@ -212,7 +213,7 @@ export const InlineSocraticCheckpointBar: React.FC<{
               type="button"
               data-testid="wb-socratic-skip-btn"
               onClick={onSkipContinue}
-              className="text-[11px] font-semibold text-[#64748B] hover:text-[#0F172A] whitespace-nowrap cursor-pointer shrink-0"
+              className="min-h-[40px] min-w-[64px] px-3 py-1.5 rounded-xl bg-white/85 hover:bg-white border border-[#E2E8F0] text-[11.5px] font-bold text-[#475569] hover:text-[#0F172A] whitespace-nowrap cursor-pointer shrink-0 inline-flex items-center justify-center"
             >
               {pickLoc(locale, 'Continue ›', 'Lanjut ›', 'ไปต่อ ›')}
             </button>
@@ -221,7 +222,7 @@ export const InlineSocraticCheckpointBar: React.FC<{
       )}
 
       {choices && choices.length > 0 && (
-        <div className="mt-2.5 flex flex-wrap items-center gap-2">
+        <div className="mt-2.5 flex flex-wrap items-center gap-2.5">
           {choices.map((ch, idx) => {
             const isPicked = selectedIdx === idx;
             const showRight = isSolved && ch.isCorrect;
@@ -257,8 +258,8 @@ export const InlineSocraticCheckpointBar: React.FC<{
                       ch.socraticHint ||
                       pickLoc(
                         locale,
-                        `Hold on, "${ch.label}" doesn't match the cue yet. Check the anchor above and try the other one!`,
-                        `Tunggu dulu, "${ch.label}" belum klop sama penanda di atas. Coba cek pilihan satunya!`,
+                        `Hold on, "${ch.label}" doesn't match the cue yet. Check the anchor above and try the other choice!`,
+                        `Tunggu dulu, "${ch.label}" belum klop dengan aturan di atas. Coba pilih bentuk satunya!`,
                         `เดี๋ยวก่อน "${ch.label}" ยังไม่ตรงกับตัวบ่งชี้ด้านบน ลองดูอีกตัวเลือกนะ!`
                       );
                     setFeedbackNote({ ok: false, text: nudge });
@@ -271,12 +272,12 @@ export const InlineSocraticCheckpointBar: React.FC<{
                     });
                   }
                 }}
-                className={`px-3.5 py-1.5 rounded-full text-[13px] font-bold transition-transform cursor-pointer active:scale-95 ${
+                className={`min-h-[44px] min-w-[68px] px-4 py-2.5 rounded-2xl text-[13.5px] font-bold transition-transform cursor-pointer inline-flex items-center justify-center active:scale-95 shadow-2xs ${
                   showRight
                     ? 'bg-[#15803D] text-white ring-2 ring-[#86EFAC]'
                     : showWrong
-                      ? 'bg-[#FEF2F2] text-[#B91C1C] ring-1 ring-[#FCA5A5]'
-                      : 'bg-white/95 text-[#0F172A] ring-1 ring-[#CBD5E1]'
+                      ? 'bg-[#FEF2F2] text-[#B91C1C] ring-2 ring-[#FCA5A5]'
+                      : 'bg-white text-[#0F172A] ring-1 ring-[#94A3B8]'
                 }`}
               >
                 <MathText text={ch.label} active />
@@ -289,14 +290,14 @@ export const InlineSocraticCheckpointBar: React.FC<{
               type="button"
               data-testid="wb-socratic-inline-mic"
               onClick={toggleQuickVoice}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold cursor-pointer transition-colors ${
+              className={`min-h-[44px] min-w-[108px] inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-2xl text-[12.5px] font-bold cursor-pointer transition-colors border ${
                 isListening
-                  ? 'bg-[#DC2626] text-white animate-pulse'
-                  : 'bg-[#F1F5F9] hover:bg-[#E2E8F0] text-[#334155]'
+                  ? 'bg-[#DC2626] text-white border-[#DC2626] animate-pulse'
+                  : 'bg-[#F8FAFC] hover:bg-[#E2E8F0] text-[#334155] border-[#CBD5E1]'
               }`}
               title={pickLoc(locale, 'Answer by voice', 'Jawab langsung pakai suara', 'ตอบด้วยเสียง')}
             >
-              <svg viewBox="0 0 16 16" className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+              <svg viewBox="0 0 16 16" className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
                 <rect x="5.5" y="1.8" width="5" height="7.5" rx="2.5" />
                 <path d="M3.2 7.5a4.8 4.8 0 0 0 9.6 0M8 12.3v2.2" />
               </svg>
@@ -316,18 +317,19 @@ export const InlineSocraticCheckpointBar: React.FC<{
             e.preventDefault();
             evaluateFreeResponse(typedReply);
           }}
-          className="mt-2 flex items-center gap-2 max-w-md"
+          className="mt-2.5 flex items-center gap-2 max-w-md"
         >
           <input
             type="text"
             value={typedReply}
             onChange={(e) => setTypedReply(e.target.value)}
             placeholder={pickLoc(locale, 'Type short answer or speak...', 'Ketik singkat atau tekan mic...', 'พิมพ์สั้นๆ หรือพูดตอบ...')}
-            className="flex-1 px-3 py-1.5 rounded-full bg-white ring-1 ring-[#CBD5E1] text-[13px] text-[#0F172A] outline-none"
+            className="flex-1 min-h-[44px] px-4 py-2 rounded-2xl bg-white ring-1 ring-[#CBD5E1] text-[13.5px] text-[#0F172A] outline-none"
           />
           <button
             type="submit"
-            className="px-3.5 py-1.5 rounded-full text-white text-[12px] font-semibold cursor-pointer"
+            data-testid="wb-socratic-free-submit"
+            className="min-h-[44px] min-w-[68px] px-4 py-2 rounded-2xl text-white text-[13px] font-bold cursor-pointer inline-flex items-center justify-center"
             style={{ backgroundColor: accentColor }}
           >
             {pickLoc(locale, 'Check', 'Cek', 'ตรวจ')}
@@ -351,9 +353,6 @@ export const InlineSocraticCheckpointBar: React.FC<{
 
 /* ============================================================================
  * MECHANIC 9: DIRECT-2D ROUGH.JS DRAGGABLE CANVAS LAB (`direct_2d_canvas_lab`)
- * ZERO plain HTML `<input type="range">` bars!
- * Hand-sketched Rough.js geometry, free-body vectors, coordinate curves, and
- * arched time bridges with a glowing ink handle dragged DIRECTLY on the canvas!
  * ============================================================================ */
 export const InteractiveSliderLabWidget: React.FC<ManipulativeCommonProps> = ({
   step,
@@ -370,7 +369,7 @@ export const InteractiveSliderLabWidget: React.FC<ManipulativeCommonProps> = ({
 
   const domain = step.sliderDomain || 'tense_timeline';
   const min = typeof step.sliderMin === 'number' ? step.sliderMin : 0;
-  const max = typeof step.sliderMax === 'number' ? step.sliderMax : 100;
+  const max = typeof step.sliderMax === 'number' ? step.sliderMax : 10;
   const stepSize = typeof step.sliderStep === 'number' ? step.sliderStep : 1;
   const initialVal = typeof step.sliderInitial === 'number' ? step.sliderInitial : min;
   const targetVal = typeof step.sliderTarget === 'number' ? step.sliderTarget : max;
@@ -383,19 +382,23 @@ export const InteractiveSliderLabWidget: React.FC<ManipulativeCommonProps> = ({
     if (Array.isArray(step.sliderStops) && step.sliderStops.length >= 2) {
       return step.sliderStops;
     }
+    const startExpr = step.wrongText || step.text || step.title || pickLoc(locale, 'Initial Form', 'Kondisi Awal');
+    const endExpr = step.rightText || step.highlightPhrase || step.caption || step.title || pickLoc(locale, 'Target Form', 'Pola Target');
     return [
       {
         value: min,
-        tag: pickLoc(locale, 'Past Point (Closed)', 'Titik Lampau (Selesai)'),
-        expression: 'I lived in Bali (2020)',
+        tag: pickLoc(locale, 'Step 1', 'Awal'),
+        label: pickLoc(locale, 'Step 1', 'Awal'),
+        expression: startExpr,
       },
       {
-        value: max,
-        tag: pickLoc(locale, 'Connected to Now', 'Nyambung ke Sekarang'),
-        expression: 'I have lived in Bali since 2020',
+        value: targetVal,
+        tag: pickLoc(locale, 'Target', 'Target'),
+        label: pickLoc(locale, 'Target', 'Target'),
+        expression: endExpr,
       },
     ];
-  }, [step.sliderStops, min, max, locale]);
+  }, [step.sliderStops, step.wrongText, step.text, step.title, step.rightText, step.highlightPhrase, step.caption, min, targetVal, locale]);
 
   const activeStop = useMemo(() => {
     let best = stops[0];
@@ -422,19 +425,19 @@ export const InteractiveSliderLabWidget: React.FC<ManipulativeCommonProps> = ({
     if (Math.abs(nextVal - targetVal) <= Math.max(stepSize * 0.65, span * 0.12)) {
       setHasLockedTarget(true);
       setVal(targetVal);
-      const targetStop =
-        stops.reduce((best, s) =>
-          Math.abs(s.value - targetVal) < Math.abs(best.value - targetVal) ? s : best
-        , stops[stops.length - 1]);
-      const stopExpr = targetStop?.expression || targetStop?.example || targetStop?.formula || String(targetVal);
+      const targetStop = stops.reduce(
+        (best, s) => (Math.abs(s.value - targetVal) < Math.abs(best.value - targetVal) ? s : best),
+        stops[stops.length - 1]
+      );
+      const stopExpr = targetStop?.expression || targetStop?.example || targetStop?.formula || `${targetVal}${step.sliderUnit || ''}`;
       const praise =
         targetStop?.voiceFeedback ||
         targetStop?.spokenHint ||
         step.successVoiceFeedback ||
         pickLoc(
           locale,
-          `Nice! Notice how "${stopExpr}" locks in right as you pull the sketch handle.`,
-          `Mantap! Lihat langsung bagaimana "${stopExpr}" terbentuk saat titik sketsa kamu tarik.`
+          `Nice! Notice how "${stopExpr}" locks in right as you move to the target.`,
+          `Mantap! Lihat langsung bagaimana "${stopExpr}" terkunci tepat di sasaran.`
         );
       onInteractionResult({
         stepId: step.id,
@@ -446,7 +449,6 @@ export const InteractiveSliderLabWidget: React.FC<ManipulativeCommonProps> = ({
     }
   };
 
-  // Render genuine Rough.js multi-stroke hatched illustrations whenever val or palette changes!
   useEffect(() => {
     const svg = roughSvgRef.current;
     if (!svg) return;
@@ -476,7 +478,7 @@ export const InteractiveSliderLabWidget: React.FC<ManipulativeCommonProps> = ({
         svg.appendChild(rc.rectangle(ox, oy - 15, 15, 15, { stroke: pal.accent, strokeWidth: 1.9, roughness: 1.1 }));
       } else if (fn === 'circle_area') {
         const r = Math.max(1, Number(val.toFixed(1)));
-        const radPx = Math.min(66, 14 + r * 8.5);
+        const radPx = Math.min(68, 12 + (r / Math.max(5, max)) * 54);
         svg.appendChild(
           rc.circle(132, 86, radPx * 2, {
             stroke: pal.ink,
@@ -507,9 +509,8 @@ export const InteractiveSliderLabWidget: React.FC<ManipulativeCommonProps> = ({
       }
     } else if (domain === 'physics_vector') {
       const forceN = Math.max(0, Math.round(val));
-      const arrowLen = Math.min(196, 22 + forceN * 7);
+      const arrowLen = Math.min(196, 22 + (forceN / Math.max(12, max)) * 170);
       svg.appendChild(rc.line(22, 122, 434, 122, { stroke: '#64748B', strokeWidth: 2, roughness: 1.45 }));
-      // Rough.js hachured crate
       svg.appendChild(
         rc.rectangle(76, 64, 72, 58, {
           stroke: pal.ink,
@@ -520,7 +521,6 @@ export const InteractiveSliderLabWidget: React.FC<ManipulativeCommonProps> = ({
           roughness: 1.4,
         })
       );
-      // Sketched Force Vector Shaft + Arrowhead
       const xTip = 152 + arrowLen;
       svg.appendChild(rc.line(152, 93, xTip, 93, { stroke: pal.accent, strokeWidth: 3.4, roughness: 1.25 }));
       svg.appendChild(
@@ -532,7 +532,6 @@ export const InteractiveSliderLabWidget: React.FC<ManipulativeCommonProps> = ({
         })
       );
     } else {
-      // Hand-sketched Rough.js Arched Time Bridge
       const startX = 56;
       const endX = 404;
       const knobX = startX + frac * (endX - startX);
@@ -556,9 +555,8 @@ export const InteractiveSliderLabWidget: React.FC<ManipulativeCommonProps> = ({
         );
       }
     }
-  }, [val, domain, step.mathFnType, pal, hatch, frac]);
+  }, [val, domain, step.mathFnType, pal, hatch, frac, max]);
 
-  // Animate scratch strokes on initial mount / remix!
   useEffect(() => {
     animateRoughScratchPaths(roughSvgRef.current, 36);
   }, [step.id, step.variantSeed]);
@@ -568,17 +566,16 @@ export const InteractiveSliderLabWidget: React.FC<ManipulativeCommonProps> = ({
     const sx = ((clientX - rect.left) / Math.max(1, rect.width)) * 460;
     if (domain === 'math_graph') {
       const fn = step.mathFnType || 'linear';
-      if (fn === 'pythagoras') return min + ((sx - 114) / 196) * (max - min);
-      if (fn === 'circle_area') return (sx - 132) / 9;
+      if (fn === 'pythagoras') return min + ((sx - 88) / 208) * (max - min);
+      if (fn === 'circle_area') return min + ((sx - 144) / 68) * (max - min);
       return (sx - 156) / 18;
     }
     if (domain === 'physics_vector') {
-      return (sx - 166) / 7;
+      return min + ((sx - 160) / 180) * (max - min);
     }
     return min + ((sx - 56) / 348) * (max - min);
   };
 
-  // Compute interactive handle (x, y) & live readout overlay
   const handlePos = useMemo(() => {
     if (domain === 'math_graph') {
       const fn = step.mathFnType || 'linear';
@@ -588,18 +585,19 @@ export const InteractiveSliderLabWidget: React.FC<ManipulativeCommonProps> = ({
         return {
           x: Math.min(308, 88 + b * 26),
           y: 148,
-          readoutA: `a = 3,  b = ${b}`,
+          readoutA: `a = 3, b = ${b}`,
           readoutB: `c = √${9 + b * b} = ${Number.isInteger(c) ? c : c.toFixed(2)}`,
         };
       }
       if (fn === 'circle_area') {
         const r = Math.max(1, Number(val.toFixed(1)));
-        const radPx = Math.min(66, 14 + r * 8.5);
+        const radPx = Math.min(68, 12 + (r / Math.max(5, max)) * 54);
+        const area = r % 7 === 0 ? (22 / 7) * r * r : Math.PI * r * r;
         return {
           x: 132 + radPx,
           y: 86,
           readoutA: `r = ${r}${step.sliderUnit || ''}`,
-          readoutB: `L ≈ ${(Math.PI * r * r).toFixed(1)}`,
+          readoutB: `L ≈ ${Number.isInteger(area) ? area : area.toFixed(1)}`,
         };
       }
       const py = fn === 'quadratic' ? 0.35 * val * val - 1.4 : 0.65 * val + 0.5;
@@ -613,11 +611,11 @@ export const InteractiveSliderLabWidget: React.FC<ManipulativeCommonProps> = ({
     }
     if (domain === 'physics_vector') {
       const forceN = Math.max(0, Math.round(val));
-      const arrowLen = Math.min(196, 22 + forceN * 7);
+      const arrowLen = Math.min(196, 22 + (forceN / Math.max(12, max)) * 170);
       return {
         x: 152 + arrowLen,
         y: 93,
-        readoutA: `F = ${forceN} N  (m = 2 kg)`,
+        readoutA: `F = ${forceN} N (m = 2 kg)`,
         readoutB: `a = ${(forceN / 2).toFixed(1)} m/s²`,
       };
     }
@@ -627,24 +625,45 @@ export const InteractiveSliderLabWidget: React.FC<ManipulativeCommonProps> = ({
       readoutA: activeStop?.expression || activeStop?.example || '',
       readoutB: activeStop?.subnote || activeStop?.formula || '',
     };
-  }, [domain, step.mathFnType, step.sliderUnit, val, frac, activeStop]);
+  }, [domain, step.mathFnType, step.sliderUnit, val, frac, activeStop, max]);
+
+  const presetValues = useMemo(() => {
+    if (domain === 'tense_timeline' && stops.length >= 2) {
+      return stops.slice(0, 4).map((s, idx) => ({
+        val: s.value,
+        label: s.label || s.tag || `${idx + 1}`,
+      }));
+    }
+    const candidates = Array.from(
+      new Set([
+        min,
+        initialVal,
+        targetVal,
+        max,
+      ].map((n) => Number(n.toFixed(1))))
+    ).sort((a, b) => a - b);
+    return candidates.slice(0, 4).map((v) => ({
+      val: v,
+      label: `${v}${step.sliderUnit || ''}`,
+    }));
+  }, [domain, stops, min, initialVal, targetVal, max, step.sliderUnit]);
 
   return (
     <div
       data-testid="wb-socratic-slider-lab"
       data-solved={solved ? '1' : '0'}
-      className="py-2 space-y-2"
+      className="py-2 space-y-2.5"
     >
       <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 min-w-0">
           <span
-            className="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider"
+            className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider shrink-0"
             style={{ backgroundColor: pal.wash, color: pal.ink }}
           >
             {pickLoc(locale, 'Direct Sketch Lab', 'Tarik di Sketsa')}
           </span>
           {step.title && (
-            <span className="fz-handwriting-heading text-xl sm:text-2xl font-bold text-[#0F172A]">
+            <span className="fz-handwriting-heading text-xl sm:text-2xl font-bold text-[#0F172A] leading-tight">
               <HighlightText text={step.title} terms={step.highlightTerms} active />
             </span>
           )}
@@ -652,21 +671,23 @@ export const InteractiveSliderLabWidget: React.FC<ManipulativeCommonProps> = ({
         {isWaitingOnStudent && !solved && onSkipContinue && (
           <button
             type="button"
+            data-testid="wb-socratic-skip-btn"
             onClick={onSkipContinue}
-            className="text-[11px] font-semibold text-[#64748B] hover:text-[#0F172A] cursor-pointer shrink-0"
+            className="min-h-[40px] min-w-[64px] px-3 py-1.5 rounded-xl bg-white/85 hover:bg-white border border-[#E2E8F0] text-[11.5px] font-bold text-[#475569] hover:text-[#0F172A] cursor-pointer shrink-0 inline-flex items-center justify-center"
           >
             {pickLoc(locale, 'Continue ›', 'Lanjut ›', 'ไปต่อ ›')}
           </button>
         )}
       </div>
 
-      {/* Direct-Manipulation Rough.js Canvas (NO HTML range slider!) */}
       <div className="relative w-full max-w-[460px] h-[168px] select-none">
         <svg ref={roughSvgRef} viewBox="0 0 460 168" className="w-full h-full block overflow-visible pointer-events-none" />
         <svg
           data-testid="wb-direct-canvas-svg"
           viewBox="0 0 460 168"
+          style={{ touchAction: 'none' }}
           onPointerDown={(e) => {
+            e.stopPropagation();
             draggingRef.current = true;
             try {
               e.currentTarget.setPointerCapture(e.pointerId);
@@ -675,29 +696,24 @@ export const InteractiveSliderLabWidget: React.FC<ManipulativeCommonProps> = ({
           }}
           onPointerMove={(e) => {
             if (!draggingRef.current) return;
+            e.stopPropagation();
             commitValue(mapPointerToDomainVal(e.currentTarget, e.clientX));
           }}
           onPointerUp={() => {
+            draggingRef.current = false;
+          }}
+          onPointerCancel={() => {
             draggingRef.current = false;
           }}
           className="absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing touch-none overflow-visible"
         >
           {domain === 'tense_timeline' && (
             <>
-              <text x="56" y="132" textAnchor="middle" fontSize="11.5" fontWeight="700" fill={pal.ink}>
-                {stops[0]?.tag || stops[0]?.label || 'Past'}
+              <text x="56" y="134" textAnchor="middle" fontSize="11.5" fontWeight="700" fill={pal.ink}>
+                {stops[0]?.tag || stops[0]?.label || '1'}
               </text>
-              <text
-                x="404"
-                y="132"
-                textAnchor="middle"
-                fontSize="11.5"
-                fontWeight="700"
-                fill={pal.accent}
-                onClick={() => commitValue(targetVal)}
-                className="cursor-pointer"
-              >
-                {stops[stops.length - 1]?.tag || stops[stops.length - 1]?.label || 'Now'}
+              <text x="404" y="134" textAnchor="middle" fontSize="11.5" fontWeight="700" fill={pal.accent}>
+                {stops[stops.length - 1]?.tag || stops[stops.length - 1]?.label || 'Target'}
               </text>
             </>
           )}
@@ -708,31 +724,29 @@ export const InteractiveSliderLabWidget: React.FC<ManipulativeCommonProps> = ({
           )}
           {domain !== 'tense_timeline' && (
             <>
-              <text x="308" y="64" fontSize="15" fontWeight="800" fill="#0F172A">
+              <text x="296" y="64" fontSize="14.5" fontWeight="800" fill="#0F172A">
                 {handlePos.readoutA}
               </text>
-              <text x="308" y="92" fontSize="14.5" fontWeight="800" fill={pal.ink}>
+              <text x="296" y="92" fontSize="14" fontWeight="800" fill={pal.ink}>
                 {handlePos.readoutB}
               </text>
             </>
           )}
 
-          {/* Pulsing Halo + Tactile Draggable Ink Puck directly on the Sketch! */}
           {!solved && (
-            <circle cx={handlePos.x} cy={handlePos.y} r="17" fill={pal.accent} fillOpacity="0.2" />
+            <circle cx={handlePos.x} cy={handlePos.y} r="26" fill={pal.accent} fillOpacity="0.18" />
           )}
           <circle
             data-testid="wb-direct-drag-puck"
             cx={handlePos.x}
             cy={handlePos.y}
-            r="10.5"
+            r="12"
             fill={solved ? '#15803D' : pal.accent}
             stroke="#FFFFFF"
-            strokeWidth="2.6"
+            strokeWidth="2.8"
           />
         </svg>
 
-        {/* Hidden accessible range mirror so screen-readers & automated keyboard/input tests remain 100% supported */}
         <input
           type="range"
           data-testid="wb-socratic-slider-input"
@@ -746,37 +760,61 @@ export const InteractiveSliderLabWidget: React.FC<ManipulativeCommonProps> = ({
         />
       </div>
 
+      {/* One-tap ergonomic preset pills alongside direct 2D drag */}
+      <div className="flex flex-wrap items-center gap-2">
+        {presetValues.map((pv, idx) => {
+          const isCur = Math.abs(val - pv.val) <= Math.max(0.01, stepSize * 0.4);
+          return (
+            <button
+              key={idx}
+              type="button"
+              data-testid={`wb-slider-preset-${idx}`}
+              disabled={solved}
+              onClick={() => commitValue(pv.val)}
+              className="min-h-[44px] min-w-[68px] px-3.5 py-2 rounded-2xl border-2 text-[12.5px] font-bold cursor-pointer inline-flex items-center justify-center transition-transform active:scale-95 shadow-2xs"
+              style={{
+                borderColor: isCur ? pal.accent : '#CBD5E1',
+                backgroundColor: isCur ? pal.accentWash : '#FFFFFF',
+                color: '#0F172A',
+              }}
+            >
+              <MathText text={pv.label} active />
+            </button>
+          );
+        })}
+      </div>
+
       {domain === 'tense_timeline' && (handlePos.readoutA || handlePos.readoutB) && (
         <div className="flex flex-wrap items-baseline justify-between gap-2 px-1">
           <div className="fz-handwriting-body text-lg sm:text-xl font-bold text-[#0F172A]">
             <MathText text={handlePos.readoutA} active />
           </div>
           {handlePos.readoutB && (
-            <span className="text-xs font-bold" style={{ color: pal.ink }}>{handlePos.readoutB}</span>
+            <span className="text-xs font-bold" style={{ color: pal.ink }}>
+              <MathText text={handlePos.readoutB} active />
+            </span>
           )}
         </div>
       )}
 
-      {step.socraticPrompt && (
-        <p className="text-[12.5px] font-medium text-[#334155] pl-3 border-l-2" style={{ borderColor: pal.ink }}>
-          <MathText
-            text={
-              solved
-                ? step.successVoiceFeedback ||
-                  pickLoc(locale, 'Great intuition! Notice how the form locks in.', 'Intuisimu tajam! Kelihatan jelas perubahan polanya.')
-                : step.socraticPrompt
-            }
-            active
-          />
-        </p>
-      )}
+      <p className="text-[12.5px] font-medium text-[#334155] pl-3 border-l-2" style={{ borderColor: pal.ink }}>
+        <MathText
+          text={
+            solved
+              ? step.successVoiceFeedback ||
+                pickLoc(locale, 'Great intuition! Notice how the form locks in.', 'Intuisimu tajam! Kelihatan jelas perubahan polanya.')
+              : step.socraticPrompt ||
+                pickLoc(locale, 'Drag the handle on the sketch or tap a point above!', 'Tarik titik pada sketsa atau ketuk tombol titik di atas!')
+          }
+          active
+        />
+      </p>
     </div>
   );
 };
 
 /* ============================================================================
  * MECHANIC 10: ROUGH.JS RED-MARKER SURGICAL STRIKE (`surgical_ink_strike`)
- * Crosses out the flawed token with jagged Rough.js red marker slashes!
  * ============================================================================ */
 const RoughRedSlashBadge: React.FC<{ text: string }> = ({ text }) => {
   const slashRef = useRef<SVGSVGElement | null>(null);
@@ -791,7 +829,7 @@ const RoughRedSlashBadge: React.FC<{ text: string }> = ({ text }) => {
   }, [text]);
 
   return (
-    <span className="relative inline-flex items-center px-2 py-0.5">
+    <span className="relative inline-flex items-center px-2.5 py-1 min-h-[44px]">
       <span className="fz-handwriting-body text-xl sm:text-2xl text-[#991B1B]/65 select-none">
         <MathText text={text} active />
       </span>
@@ -799,6 +837,19 @@ const RoughRedSlashBadge: React.FC<{ text: string }> = ({ text }) => {
     </span>
   );
 };
+
+function tokenizeSurgicalText(raw: string): string[] {
+  const clean = String(raw || '').replace(/^[✕×✓\s]+/, '').trim();
+  if (!clean) return [];
+  const spaceSplit = clean.split(/\s+/).filter(Boolean);
+  if (spaceSplit.length >= 2) return spaceSplit;
+  if (/[\u3040-\u30ff\u4e00-\u9faf]/.test(clean) && clean.length >= 3) {
+    const cjkSegs = clean.match(/[\u4e00-\u9faf]+|[\u3040-\u309f]|[\u30a0-\u30ff]+|[a-zA-Z0-9]+/g) || [];
+    if (cjkSegs.length >= 2) return cjkSegs.slice(0, 8);
+    return Array.from(clean).slice(0, 8);
+  }
+  return spaceSplit;
+}
 
 export const SurgicalStrikeWidget: React.FC<ManipulativeCommonProps> = ({
   step,
@@ -813,30 +864,27 @@ export const SurgicalStrikeWidget: React.FC<ManipulativeCommonProps> = ({
     if (Array.isArray(step.strikeTokens) && step.strikeTokens.length >= 2) {
       return step.strikeTokens;
     }
-    const raw = String(step.wrongText || 'I am agree with you').trim();
-    return raw.split(/\s+/).filter(Boolean);
-  }, [step.strikeTokens, step.wrongText]);
+    const parsed = tokenizeSurgicalText(step.wrongText || step.text || '');
+    if (parsed.length >= 2) return parsed;
+    return [pickLoc(locale, 'FlawedForm', 'BagianSalah'), pickLoc(locale, 'Context', 'Konteks')];
+  }, [step.strikeTokens, step.wrongText, step.text, locale]);
 
   const bugIdx = useMemo(() => {
     if (typeof step.bugTokenIndex === 'number' && step.bugTokenIndex >= 0 && step.bugTokenIndex < tokens.length) {
       return step.bugTokenIndex;
     }
     const rightWords = new Set(
-      String(step.rightText || '')
-        .toLowerCase()
-        .replace(/[.,!?]/g, '')
-        .split(/\s+/)
-        .filter(Boolean)
+      tokenizeSurgicalText(step.rightText || '').map((t) => t.toLowerCase().replace(/[.,!?。！？]/g, ''))
     );
     const diffIdx = tokens.findIndex(
-      (t) => !rightWords.has(t.toLowerCase().replace(/[.,!?]/g, ''))
+      (t) => !rightWords.has(t.toLowerCase().replace(/[.,!?。！？]/g, ''))
     );
     return diffIdx >= 0 ? diffIdx : Math.min(1, tokens.length - 1);
   }, [step.bugTokenIndex, tokens, step.rightText]);
 
   const replacement = useMemo(() => {
     if (step.fixedToken !== undefined) return step.fixedToken;
-    const rightArr = String(step.rightText || '').trim().split(/\s+/).filter(Boolean);
+    const rightArr = tokenizeSurgicalText(step.rightText || '');
     if (rightArr.length === tokens.length && rightArr[bugIdx]) {
       return rightArr[bugIdx];
     }
@@ -858,22 +906,23 @@ export const SurgicalStrikeWidget: React.FC<ManipulativeCommonProps> = ({
       className="py-2 space-y-3"
     >
       <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 min-w-0">
           <span
-            className="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider"
+            className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider shrink-0"
             style={{ backgroundColor: '#FFE4E6', color: '#BE123C' }}
           >
             {pickLoc(locale, 'Red Marker', 'Spidol Koreksi')}
           </span>
-          <span className="fz-handwriting-heading text-xl sm:text-2xl font-bold text-[#0F172A]">
-            {step.title || pickLoc(locale, 'Slash the Clash', 'Coret Kata Pengganggu', 'ขีดฆ่าจุดที่ผิด')}
+          <span className="fz-handwriting-heading text-xl sm:text-2xl font-bold text-[#0F172A] leading-tight">
+            {step.title || pickLoc(locale, 'Slash the Clash', 'Coret Bagian yang Keliru', 'ขีดฆ่าจุดที่ผิด')}
           </span>
         </div>
         {isWaitingOnStudent && !solved && onSkipContinue && (
           <button
             type="button"
+            data-testid="wb-socratic-skip-btn"
             onClick={onSkipContinue}
-            className="text-[11px] font-semibold text-[#64748B] hover:text-[#0F172A] cursor-pointer"
+            className="min-h-[40px] min-w-[64px] px-3 py-1.5 rounded-xl bg-white/85 hover:bg-white border border-[#E2E8F0] text-[11.5px] font-bold text-[#475569] hover:text-[#0F172A] cursor-pointer shrink-0 inline-flex items-center justify-center"
           >
             {pickLoc(locale, 'Continue ›', 'Lanjut ›', 'ไปต่อ ›')}
           </button>
@@ -888,7 +937,7 @@ export const SurgicalStrikeWidget: React.FC<ManipulativeCommonProps> = ({
               <span key={idx} className="inline-flex items-center gap-2">
                 <RoughRedSlashBadge text={tok} />
                 {replacement && replacement !== step.rightText && (
-                  <span className="fz-handwriting-body text-xl sm:text-2xl font-bold text-[#15803D] bg-[#DCFCE7] px-2.5 py-0.5 rounded-xl ring-1 ring-[#86EFAC]">
+                  <span className="fz-handwriting-body text-xl sm:text-2xl font-bold text-[#15803D] bg-[#DCFCE7] px-3 py-1.5 min-h-[44px] inline-flex items-center rounded-2xl ring-1 ring-[#86EFAC]">
                     <MathText text={replacement} active />
                   </span>
                 )}
@@ -930,9 +979,9 @@ export const SurgicalStrikeWidget: React.FC<ManipulativeCommonProps> = ({
                     step.wrongTapHint ||
                     pickLoc(
                       locale,
-                      `"${tok}" is fine here, check the verb or connector next to it!`,
-                      `"${tok}" sudah aman di situ, coba cek kata kerja atau penghubung di sebelahnya!`,
-                      `"${tok}" วางถูกแล้ว ลองเช็กคำกริยาหรือตัวเชื่อมข้างๆ ดูนะ!`
+                      `"${tok}" is fine here, check the word or particle right next to it!`,
+                      `"${tok}" sudah aman di situ, coba cek kata atau partikel di sebelahnya!`,
+                      `"${tok}" วางถูกแล้ว ลองเช็กคำข้างๆ ดูนะ!`
                     );
                   setNudgeText(hint);
                   onInteractionResult({
@@ -944,12 +993,12 @@ export const SurgicalStrikeWidget: React.FC<ManipulativeCommonProps> = ({
                   });
                 }
               }}
-              className={`fz-handwriting-body text-xl sm:text-2xl px-2.5 py-1 rounded-xl transition-transform cursor-pointer select-none active:scale-95 ${
+              className={`fz-handwriting-body text-xl sm:text-2xl min-h-[44px] min-w-[48px] px-3.5 py-2 rounded-2xl border transition-transform cursor-pointer select-none inline-flex items-center justify-center active:scale-95 ${
                 solved
-                  ? 'text-[#0F172A] font-bold cursor-default'
+                  ? 'text-[#0F172A] border-transparent font-bold cursor-default'
                   : isWrongTap
-                    ? 'bg-[#FEF3C7] text-[#92400E] ring-1 ring-[#F59E0B] fz-wb-shake'
-                    : 'text-[#0F172A] hover:bg-[#FFE4E6] hover:text-[#9F1239]'
+                    ? 'bg-[#FEF3C7] text-[#92400E] border-[#F59E0B] fz-wb-shake'
+                    : 'bg-white/90 border-[#CBD5E1] text-[#0F172A] hover:bg-[#FFE4E6] hover:border-[#FDA4AF] hover:text-[#9F1239] shadow-2xs'
               }`}
             >
               <MathText text={tok} active />
@@ -977,8 +1026,8 @@ export const SurgicalStrikeWidget: React.FC<ManipulativeCommonProps> = ({
             step.socraticPrompt ||
             pickLoc(
               locale,
-              'Tap the exact word or term above to slash it with red ink.',
-              'Ketuk langsung satu kata pengganggu di atas untuk mencoretnya dengan spidol merah.'
+              'Tap the flawed word chip above to slash it with red ink.',
+              'Ketuk langsung keping kata pengganggu di atas untuk mencoretnya dengan spidol merah.'
             )
           }
           active
@@ -1003,21 +1052,40 @@ export const StepByStepDerivationWidget: React.FC<ManipulativeCommonProps> = ({
   const pal = useMemo(() => resolveStepPalette(step, 5), [step]);
   const lines: StepDerivationLine[] = useMemo(() => {
     if (Array.isArray(step.derivationSteps) && step.derivationSteps.length >= 2) {
-      return step.derivationSteps;
+      const copy = step.derivationSteps.map((ln) => ({ ...ln }));
+      if (!copy.some((l) => l.isInteractiveBlank)) {
+        const lastIdx = copy.length - 1;
+        const lastRaw = String(copy[lastIdx].expr || copy[lastIdx].latex || '').replace(/^\$|\$$/g, '').trim();
+        const eqIdx = lastRaw.lastIndexOf('=');
+        const ans = eqIdx >= 0 ? lastRaw.slice(eqIdx + 1).trim() : lastRaw;
+        const lhs = eqIdx >= 0 ? lastRaw.slice(0, eqIdx + 1).trim() : '';
+        const numMatch = ans.match(/-?\d+(?:\.\d+)?/);
+        const nVal = numMatch ? Number(numMatch[0]) : NaN;
+        const altA = Number.isFinite(nVal) ? ans.replace(numMatch![0], String(nVal + 2)) : `${ans} + 1`;
+        const altB = Number.isFinite(nVal) ? ans.replace(numMatch![0], String(Math.max(0, nVal * 2))) : `${ans} / 2`;
+        copy[lastIdx] = {
+          ...copy[lastIdx],
+          expr: lhs ? `${lhs} ?` : '?',
+          isInteractiveBlank: true,
+          expectedValue: ans || lastRaw,
+          choices: Array.from(new Set([ans || lastRaw, altA, altB])).slice(0, 3),
+        };
+      }
+      return copy;
     }
+    const mainExpr = step.rightText || step.text || step.highlightPhrase || step.title || 'Langkah Kunci';
+    const trapExpr = step.wrongText || pickLoc(locale, 'Incorrect form', 'Bentuk keliru');
     return [
-      { expr: '$2x + 4 = 10$', sideOp: pickLoc(locale, '− 4 both sides', '− 4 kedua ruas') },
+      { expr: step.caption || step.title || pickLoc(locale, 'Given Rule', 'Aturan Dasar'), sideOp: pickLoc(locale, 'Apply', 'Terapkan') },
       {
-        expr: '$2x = ?$',
-        sideOp: pickLoc(locale, '÷ 2 both sides', '÷ 2 kedua ruas'),
+        expr: '?',
         isInteractiveBlank: true,
-        expectedValue: '2x = 6',
-        choices: ['2x = 6', '2x = 14', 'x = 6'],
-        hint: pickLoc(locale, 'Subtract 4 from 10 first!', 'Kurangi 10 dengan 4 dulu!'),
+        expectedValue: mainExpr,
+        choices: [mainExpr, trapExpr],
+        hint: step.reason || pickLoc(locale, 'Match the core rule above!', 'Sesuaikan dengan aturan inti di atas!'),
       },
-      { expr: '$x = 3$' },
     ];
-  }, [step.derivationSteps, locale]);
+  }, [step.derivationSteps, step.rightText, step.text, step.highlightPhrase, step.title, step.wrongText, step.caption, step.reason, locale]);
 
   const [solvedLocal, setSolvedLocal] = useState(false);
   const solved = isCompletedByStudent || solvedLocal;
@@ -1033,11 +1101,14 @@ export const StepByStepDerivationWidget: React.FC<ManipulativeCommonProps> = ({
     socraticHint: blankLine.hint,
   }));
 
-  const wrapMathIfNeeded = (raw?: string): string => {
+  const formatLineMath = (raw?: string): string => {
     const s = String(raw || '').trim();
     if (!s) return '';
     if (s.includes('$')) return s;
-    return `$${s}$`;
+    if (/[=+\-*/÷×^_\\]|\d/.test(s) && s.split(/\s+/).length <= 6) {
+      return `$${s}$`;
+    }
+    return s;
   };
 
   return (
@@ -1046,17 +1117,29 @@ export const StepByStepDerivationWidget: React.FC<ManipulativeCommonProps> = ({
       data-solved={solved ? '1' : '0'}
       className="py-2 space-y-2.5"
     >
-      <div className="flex items-center gap-2">
-        <span
-          className="px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider"
-          style={{ backgroundColor: pal.wash, color: pal.ink }}
-        >
-          {pickLoc(locale, 'Step Cascade', 'Alur Turunan')}
-        </span>
-        {step.title && (
-          <div className="fz-handwriting-heading text-xl sm:text-2xl font-bold text-[#0F172A]">
-            <HighlightText text={step.title} terms={step.highlightTerms} active />
-          </div>
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 min-w-0">
+          <span
+            className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider shrink-0"
+            style={{ backgroundColor: pal.wash, color: pal.ink }}
+          >
+            {pickLoc(locale, 'Step Cascade', 'Alur Turunan')}
+          </span>
+          {step.title && (
+            <div className="fz-handwriting-heading text-xl sm:text-2xl font-bold text-[#0F172A] leading-tight">
+              <HighlightText text={step.title} terms={step.highlightTerms} active />
+            </div>
+          )}
+        </div>
+        {!blankLine && isWaitingOnStudent && !solved && onSkipContinue && (
+          <button
+            type="button"
+            data-testid="wb-socratic-skip-btn"
+            onClick={onSkipContinue}
+            className="min-h-[40px] min-w-[64px] px-3 py-1.5 rounded-xl bg-white/85 hover:bg-white border border-[#E2E8F0] text-[11.5px] font-bold text-[#475569] hover:text-[#0F172A] cursor-pointer shrink-0 inline-flex items-center justify-center"
+          >
+            {pickLoc(locale, 'Continue ›', 'Lanjut ›', 'ไปต่อ ›')}
+          </button>
         )}
       </div>
 
@@ -1076,12 +1159,12 @@ export const StepByStepDerivationWidget: React.FC<ManipulativeCommonProps> = ({
                 ? baseRaw.replace('?', ln.expectedValue)
                 : ln.expectedValue
               : baseRaw;
-          const displayExpr = wrapMathIfNeeded(filledRaw);
+          const displayExpr = formatLineMath(filledRaw);
 
           return (
             <div key={idx} className="flex flex-wrap items-center gap-2.5">
               <span
-                className="w-5 h-5 rounded-full text-[11px] font-bold flex items-center justify-center shrink-0"
+                className="w-6 h-6 rounded-full text-[11px] font-bold flex items-center justify-center shrink-0"
                 style={{
                   backgroundColor: isBlankRow && !solved ? pal.wash : '#F1F5F9',
                   color: isBlankRow && !solved ? pal.ink : '#475569',
@@ -1090,7 +1173,7 @@ export const StepByStepDerivationWidget: React.FC<ManipulativeCommonProps> = ({
                 {idx + 1}
               </span>
               <div
-                className="text-lg sm:text-xl font-bold tracking-tight"
+                className="text-lg sm:text-xl font-bold tracking-tight break-words"
                 style={{ color: isBlankRow && solved ? '#15803D' : '#0F172A' }}
               >
                 <MathText text={displayExpr} active />
@@ -1115,8 +1198,8 @@ export const StepByStepDerivationWidget: React.FC<ManipulativeCommonProps> = ({
             step.socraticPrompt ||
             pickLoc(
               locale,
-              'Your turn: what does the next step simplify to?',
-              'Giliranmu: langkah berikutnya berubah jadi apa?',
+              'Your turn: choose the accurate next step!',
+              'Giliranmu: pilih hasil langkah berikutnya yang tepat!',
               'ตาคุณแล้ว ขั้นต่อไปได้เท่าไหร่?'
             )
           }
@@ -1142,7 +1225,6 @@ export const StepByStepDerivationWidget: React.FC<ManipulativeCommonProps> = ({
 
 /* ============================================================================
  * POLYMORPHIC INTERACTIVE DISPATCHER (`PolymorphicInteractiveLab`)
- * Routes across all 11 distinct Rough.js & tactile Socratic mechanics!
  * ============================================================================ */
 export const PolymorphicInteractiveLab: React.FC<ManipulativeCommonProps> = (props) => {
   const m =
