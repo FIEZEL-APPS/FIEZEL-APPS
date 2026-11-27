@@ -5581,22 +5581,46 @@ export async function routeVoiceVerifySpeech(ctx) {
   const audioBase64 = String(body.audioBase64 || '').replace(/^data:audio\/[^;]+;base64,/, '').trim();
   const mimeType = String(body.mimeType || 'audio/wav').trim();
   const aiCurrentText = cleanSpokenText(body.aiCurrentText || '').slice(0, 220);
+  const targetSentence = cleanSpokenText(body.targetSentence || '').slice(0, 220);
+  const targetLang = ['en', 'ja', 'zh'].includes(String(body.targetLang || '').toLowerCase())
+    ? String(body.targetLang).toLowerCase()
+    : '';
 
   if (!audioBase64 || audioBase64.length < 120) {
     return badRequest('empty_audio');
   }
 
-  const prompt = [
-    `Inspect this short microphone clip strictly for real spoken human language.`,
-    aiCurrentText ? `Coach AI was currently playing aloud: "${aiCurrentText}"` : '',
-    `Rules:`,
-    `1. Set "hasLanguage": true ONLY if you clearly hear intelligible spoken human words/phrases in any natural language (Indonesian, English, Japanese, Mandarin, Thai, etc., including bilingual mixed Indonesian-Japanese speech and SSW exam terms like klorin, yukkuri, kurumi, pistachio).`,
-    `2. Set "hasLanguage": false for motorcycle/car/truck engines, traffic rumble, car horns, sirens, wind, fans, knocks, coughing, music, non-speech noise, unintelligible mumbling, or silence.`,
-    `3. Set "isEchoOnly": true if the heard words are only speaker bleed/echo of Coach AI's sentence above.`,
-    `JSON only: {"hasLanguage":boolean,"isEchoOnly":boolean,"transcript":"...","detectedLang":"id|en|ja|zh|th|other|none"}`,
-  ]
-    .filter(Boolean)
-    .join('\n');
+  const langRubric =
+    targetLang === 'zh'
+      ? 'Mandarin Chinese (zh-CN): strictly evaluate 4-tone contour accuracy, initials/finals clarity, and syllable completeness.'
+      : targetLang === 'ja'
+        ? 'Japanese (ja-JP): strictly evaluate mora rhythm, long vowels/geminates (っ/ー), particle clarity, and natural pitch contour.'
+        : 'English (en-US): strictly evaluate consonant/vowel articulation, word stress, linking, and ending sounds.';
+
+  const prompt = targetSentence
+    ? [
+        `Assess this learner's spoken pronunciation clip against the target sentence.`,
+        `Target language: ${langRubric}`,
+        `Target sentence: "${targetSentence}"`,
+        `Rules:`,
+        `1. Set "hasLanguage": true ONLY if intelligible human speech is present; false for silence or pure noise.`,
+        `2. Transcribe what the learner actually spoke in "transcript" (use native script for ja/zh, English words for en).`,
+        `3. Score "pronunciationScore" (0-100) for phonetic/tone/rhythm accuracy, "accuracyScore" (0-100) for word/character fidelity to the target sentence, and "fluencyScore" (0-100) for smooth pacing.`,
+        `4. Set "passed": true ONLY if hasLanguage is true AND pronunciationScore >= 65 AND accuracyScore >= 70.`,
+        `5. Provide a concise 1-sentence Indonesian tip in "feedback".`,
+        `JSON only: {"hasLanguage":boolean,"isEchoOnly":false,"transcript":"...","detectedLang":"id|en|ja|zh|th|other|none","pronunciationScore":number,"accuracyScore":number,"fluencyScore":number,"passed":boolean,"feedback":"..."}`,
+      ].join('\n')
+    : [
+        `Inspect this short microphone clip strictly for real spoken human language.`,
+        aiCurrentText ? `Coach AI was currently playing aloud: "${aiCurrentText}"` : '',
+        `Rules:`,
+        `1. Set "hasLanguage": true ONLY if you clearly hear intelligible spoken human words/phrases in any natural language (Indonesian, English, Japanese, Mandarin, Thai, etc., including bilingual mixed Indonesian-Japanese speech and SSW exam terms like klorin, yukkuri, kurumi, pistachio).`,
+        `2. Set "hasLanguage": false for motorcycle/car/truck engines, traffic rumble, car horns, sirens, wind, fans, knocks, coughing, music, non-speech noise, unintelligible mumbling, or silence.`,
+        `3. Set "isEchoOnly": true if the heard words are only speaker bleed/echo of Coach AI's sentence above.`,
+        `JSON only: {"hasLanguage":boolean,"isEchoOnly":boolean,"transcript":"...","detectedLang":"id|en|ja|zh|th|other|none"}`,
+      ]
+        .filter(Boolean)
+        .join('\n');
 
   const verifyModels = ['gemini-3.1-flash-lite-preview', 'gemini-3-flash-preview', 'gemini-3.5-flash-lite'];
   const total = keys.length;
@@ -5610,7 +5634,7 @@ export async function routeVoiceVerifySpeech(ctx) {
       if (Date.now() < (_copilotCooldownMap.get(ck) || 0)) continue;
 
       const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 3200);
+      const timer = setTimeout(() => controller.abort(), targetSentence ? 6500 : 3200);
       try {
         const res = await fetch(
           `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
@@ -5630,7 +5654,7 @@ export async function routeVoiceVerifySpeech(ctx) {
               generationConfig: {
                 response_mime_type: 'application/json',
                 temperature: 0.0,
-                max_output_tokens: 160,
+                max_output_tokens: targetSentence ? 260 : 160,
               },
             }),
             signal: controller.signal,
@@ -5658,12 +5682,26 @@ export async function routeVoiceVerifySpeech(ctx) {
         }
         if (parsed && typeof parsed === 'object') {
           _copilotPoolIndex = (idx + 1) % total;
+          const clampScore = (v) => Math.max(0, Math.min(100, Math.round(Number(v) || 0)));
+          const pron = clampScore(parsed.pronunciationScore);
+          const acc = clampScore(parsed.accuracyScore);
+          const flu = clampScore(parsed.fluencyScore);
+          const hasLang = Boolean(parsed.hasLanguage);
           return jsonResponse({
             ok: true,
-            hasLanguage: Boolean(parsed.hasLanguage),
+            hasLanguage: hasLang,
             isEchoOnly: Boolean(parsed.isEchoOnly),
             transcript: cleanSpokenText(String(parsed.transcript || '')).slice(0, 180),
             detectedLang: cleanSpokenText(String(parsed.detectedLang || 'none')).slice(0, 20),
+            ...(targetSentence
+              ? {
+                  pronunciationScore: pron,
+                  accuracyScore: acc,
+                  fluencyScore: flu,
+                  passed: hasLang && (parsed.passed === true || (pron >= 65 && acc >= 70)),
+                  feedback: cleanSpokenText(String(parsed.feedback || '')).slice(0, 220),
+                }
+              : {}),
           });
         }
       } catch {

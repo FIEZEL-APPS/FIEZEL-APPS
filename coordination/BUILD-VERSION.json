@@ -1,7 +1,7 @@
 {
-  "version": "m025-817",
-  "claimedBy": "branch fix/wb-stream-cors-credentials-m025-817",
-  "claimedAt": "2026-11-26T13:00:18.705Z",
-  "reason": "fix(api): align whiteboard-stream SSE CORS headers with credentialed ctx.corsHeaders",
+  "version": "m025-818",
+  "claimedBy": "branch fix/placement-accuracy-m025-819",
+  "claimedAt": "2026-11-27T17:59:15.155Z",
+  "reason": "feat(placement,onboarding): adaptive 5-skill IRT 3PL placement across EN/JA/ZH with easy/normal/hard tiers",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }
