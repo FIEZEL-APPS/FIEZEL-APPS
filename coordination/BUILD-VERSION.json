@@ -1,7 +1,7 @@
 {
-  "version": "m025-817",
-  "claimedBy": "branch fix/wb-stream-cors-credentials-m025-817",
-  "claimedAt": "2026-11-26T13:00:18.705Z",
-  "reason": "fix(api): align whiteboard-stream SSE CORS headers with credentialed ctx.corsHeaders",
+  "version": "m025-818",
+  "claimedBy": "branch feat/tactile-experiment-sandbox-m025-818",
+  "claimedAt": "2026-11-27T11:54:13.778Z",
+  "reason": "feat(voice-studio,api): add 60fps tactile 3D cube net folding and multi-domain experiment sandboxes",
   "protocol": "Jangan pernah mengetik nomor build langsung ke sw.js, core-config.js, atau fiezel-diag-panel.js. Jalankan `node tools/bump-build.mjs \"<alasan singkat>\"`. Ia mengambil versi dari origin/main, menaikkan satu, lalu menulis KEEMPAT tempat sekaligus. Kalau dua sesi menaikkan bersamaan, konfliknya jatuh di berkas 8 baris ini - bukan di sw.js atau style.css."
 }

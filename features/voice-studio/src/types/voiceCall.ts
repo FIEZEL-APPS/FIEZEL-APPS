@@ -189,6 +189,7 @@ export interface SocraticQuickChoice {
 }
 
 export type InteractiveMechanicKind =
+  | 'experiment_sandbox'
   | 'balance_seesaw'
   | 'scratch_reveal'
   | 'venn_bucket_sorter'
@@ -200,6 +201,15 @@ export type InteractiveMechanicKind =
   | 'wave_pendulum_oscillator'
   | 'surgical_ink_strike'
   | 'step_derivation';
+
+export type ExperimentSandboxKind =
+  | 'cube_3d_net'
+  | 'geometry_2d_morph'
+  | 'circuit_ohm_live'
+  | 'newton_motion_track'
+  | 'fraction_grid_mixer'
+  | 'algebra_live_scale'
+  | 'grammar_time_morph';
 
 export type InkPaletteId =
   | 'cobalt_blueprint'
@@ -276,6 +286,8 @@ export interface WhiteboardStepCommand {
     | 'checkpoint';
   domainType?: WhiteboardDomainType;
   mechanic?: InteractiveMechanicKind;
+  sandboxKind?: ExperimentSandboxKind;
+  sandboxParams?: Record<string, number | string | boolean>;
   inkPalette?: InkPaletteId;
   roughHatch?: RoughHatchKind;
   variantSeed?: number;

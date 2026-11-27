@@ -1249,6 +1249,170 @@ function synthesizePolymathStemBeats(
     return null;
   }
 
+  // 0A. 3D Cube, Paper Net Folding & Solid Geometry (`kubus`, `jaring-jaring`, `balok`, `bangun ruang`)!
+  if (/\b(?:kubus|jaring[- ]?jaring|balok|bangun\s*ruang|cube|rusuk\s*kubus)\b/i.test(blob)) {
+    const sideMatch = queryAndTitleBlob.match(/(?:rusuk|sisi|s)\s*(?:=\s*)?(\d+)/i) || queryAndTitleBlob.match(/(\d+)\s*cm/i);
+    const sVal = sideMatch ? Math.max(2, Math.min(12, Number(sideMatch[1]))) : 4;
+    const areaVal = 6 * sVal * sVal;
+    const volVal = sVal * sVal * sVal;
+    const asksVolume = /\bvolume|isi\b/i.test(queryAndTitleBlob);
+    return [
+      {
+        id: 'wb_dyn_cube_3d_sandbox',
+        kind: 'interactive_mechanic',
+        mechanic: 'experiment_sandbox',
+        sandboxKind: 'cube_3d_net',
+        sandboxParams: { sideCm: sVal },
+        inkPalette: 'cobalt_blueprint',
+        roughHatch: 'hachure',
+        domainType: 'math',
+        column: 'left',
+        phaseIndex: 2,
+        pauseForInteraction: true,
+        title: `Lab Lipat Kertas Jaring-Jaring Kubus 3D ($s = ${sVal}\\text{ cm}$)`,
+        socraticPrompt:
+          'Geser tuas lipatan hingga 90° (atau ketuk Lipat Jadi Kubus), putar bentuk 3D-nya dengan jari, dan bandingkan pola jaring yang valid vs jaring yang bertabrakan!',
+        successVoiceFeedback: `Luar biasa! Keenam persegi terlipat 90 derajat menutup rapat menjadi kubus utuh dengan 6 sisi, 12 rusuk, dan 8 titik sudut!`,
+        spokenNarration: `Sekarang saatnya kamu bereksperimen langsung! Coba geser tuas lipatan atau ketuk tombol Lipat Jadi Kubus untuk melipat kertas datar menjadi kubus tiga dimensi, putar sudut pandangnya 360 derajat, lalu uji juga kenapa pola jaring keempat gagal menutup karena dua sisinya bertabrakan!`,
+      },
+      {
+        id: 'wb_dyn_cube_deriv',
+        kind: 'step_derivation',
+        inkPalette: 'emerald_botanical',
+        roughHatch: 'cross-hatch',
+        domainType: 'math',
+        column: 'right',
+        phaseIndex: 3,
+        pauseForInteraction: true,
+        title: asksVolume ? `Hitung Volume Kubus ($s = ${sVal}\\text{ cm}$)` : `Hitung Luas Permukaan Kubus ($s = ${sVal}\\text{ cm}$)`,
+        derivationSteps: asksVolume
+          ? [
+              { latex: `V = s \\times s \\times s = s^3`, sideOp: '3 dimensi rusuk' },
+              {
+                latex: `V = ${sVal}^3 = ?`,
+                isInteractiveBlank: true,
+                expectedValue: `${volVal} cm³`,
+                choices: [`${volVal} cm³`, `${areaVal} cm³`, `${sVal * 3} cm³`],
+                hint: `Kalikan ${sVal} × ${sVal} × ${sVal}!`,
+              },
+            ]
+          : [
+              { latex: `L = 6 \\times s^2 = 6 \\times ${sVal}^2`, sideOp: '6 sisi persegi kembar' },
+              {
+                latex: `L = 6 \\times ${sVal * sVal} = ?`,
+                isInteractiveBlank: true,
+                expectedValue: `${areaVal} cm²`,
+                choices: [`${areaVal} cm²`, `${volVal} cm²`, `${4 * sVal * sVal} cm²`],
+                hint: `Satu persegi luasnya ${sVal * sVal} cm², dikali 6 sisi kubus!`,
+              },
+            ],
+        socraticPrompt: asksVolume
+          ? `Berapa volume kubus dengan panjang rusuk ${sVal} cm?`
+          : `Karena kubus tersusun dari 6 persegi berukuran ${sVal} × ${sVal} cm, berapa total luas permukaannya?`,
+        successVoiceFeedback: asksVolume
+          ? `Tepat! ${sVal} pangkat 3 menghasilkan volume ${volVal} cm³!`
+          : `Tepat sekali! Enam sisi dikali ${sVal * sVal} cm² menghasilkan luas permukaan ${areaVal} cm²!`,
+      },
+    ];
+  }
+
+  // 0B. Newton's Second Law & Motion Track (`hukum newton`, `gaya`, `percepatan`, `F = m * a`)!
+  if (/\bhukum\s*newton\b|\bf\s*=\s*m\s*[·*×x]?\s*a\b|(?:\bgaya\b.*\bpercepatan\b)/i.test(blob)) {
+    const fM = queryAndTitleBlob.match(/(\d+)\s*n(?:ewton)?\b/i);
+    const mM = queryAndTitleBlob.match(/(\d+)\s*kg\b/i);
+    const F = fM ? Number(fM[1]) : 12;
+    const M = mM ? Math.max(1, Number(mM[1])) : 3;
+    const A = Number((F / M).toFixed(2));
+    return [
+      {
+        id: 'wb_dyn_newton_sandbox',
+        kind: 'interactive_mechanic',
+        mechanic: 'experiment_sandbox',
+        sandboxKind: 'newton_motion_track',
+        sandboxParams: { forceN: F, massKg: M },
+        inkPalette: 'teal_oscillator',
+        roughHatch: 'hachure',
+        domainType: 'physics',
+        column: 'left',
+        phaseIndex: 2,
+        pauseForInteraction: true,
+        title: `Lintasan Eksperimen Hukum II Newton ($F = m \\cdot a$)`,
+        socraticPrompt: 'Atur gaya dorong (F), ubah beban massa (m), uji gesekan permukaan, lalu ketuk Dorong & Luncurkan!',
+        successVoiceFeedback: `Melesat! Semakin besar gaya F kereta makin kencang, sedangkan makin berat massa m percepatannya makin tertahan!`,
+        spokenNarration: `Sekarang uji sendiri Hukum Kedua Newton di lintasan eksperimen: naik-turunkan gaya dorong dan massa beban di atas kereta, coba ganti permukaan es licin ke aspal kasar, lalu tekan tombol Dorong dan Luncurkan!`,
+      },
+      {
+        id: 'wb_dyn_newton_deriv',
+        kind: 'step_derivation',
+        inkPalette: 'amber_fulcrum',
+        roughHatch: 'cross-hatch',
+        domainType: 'physics',
+        column: 'right',
+        phaseIndex: 3,
+        pauseForInteraction: true,
+        title: `Hitung Percepatan ($F = ${F}\\text{ N}, m = ${M}\\text{ kg}$)`,
+        derivationSteps: [
+          { latex: `F = m \\cdot a \\implies a = \\frac{F}{m}`, sideOp: 'Bagi gaya dengan massa' },
+          {
+            latex: `a = \\frac{${F}}{${M}} = ?`,
+            isInteractiveBlank: true,
+            expectedValue: `${A} m/s²`,
+            choices: [`${A} m/s²`, `${F * M} m/s²`, `${F + M} m/s²`],
+            hint: `Bagi gaya ${F} Newton dengan massa ${M} kg!`,
+          },
+        ],
+        socraticPrompt: `Berapa percepatan kereta saat didorong gaya ${F} N dengan massa ${M} kg?`,
+        successVoiceFeedback: `Presisi! ${F} dibagi ${M} menghasilkan percepatan ${A} m/s²!`,
+      },
+    ];
+  }
+
+  // 0C. Pythagoras & Circle Interactive 2D Sandbox (`pythagoras`, `sisi miring`, `luas lingkaran`, `keliling lingkaran`)!
+  if (/\bpythagor|sisi\s*miring|hipotenusa\b/i.test(blob)) {
+    return [
+      {
+        id: 'wb_dyn_pythagoras_sandbox',
+        kind: 'interactive_mechanic',
+        mechanic: 'experiment_sandbox',
+        sandboxKind: 'geometry_2d_morph',
+        sandboxParams: { shape: 'pythagoras', targetBase: 4, targetHeight: 3 },
+        inkPalette: 'violet_prism',
+        roughHatch: 'hachure',
+        domainType: 'math',
+        column: 'left',
+        phaseIndex: 2,
+        pauseForInteraction: true,
+        title: 'Meja Eksperimen Segitiga Siku-Siku Pythagoras',
+        socraticPrompt: 'Tarik titik sudut merah dan biru langsung di atas petak untuk melihat sisi miring c berubah secara real-time!',
+        successVoiceFeedback: 'Mantap! Kamu membuktikan langsung hubungan kuadrat alas ditambah kuadrat tinggi menghasilkan sisi miring!',
+        spokenNarration: 'Geser langsung titik sudut segitiga siku-siku di atas kertas berpetak ini dengan jarimu, dan amati bagaimana panjang sisi miring c selalu mengikuti akar dari a kuadrat tambah b kuadrat!',
+      },
+      {
+        id: 'wb_dyn_pythagoras_deriv',
+        kind: 'step_derivation',
+        inkPalette: 'cobalt_blueprint',
+        roughHatch: 'cross-hatch',
+        domainType: 'math',
+        column: 'right',
+        phaseIndex: 3,
+        pauseForInteraction: true,
+        title: 'Tripel Pythagoras Klasik ($a=3, b=4$)',
+        derivationSteps: [
+          { latex: `c = \\sqrt{a^2 + b^2} = \\sqrt{3^2 + 4^2}`, sideOp: 'Kuadratkan sisi siku-siku' },
+          {
+            latex: `c = \\sqrt{9 + 16} = \\sqrt{25} = ?`,
+            isInteractiveBlank: true,
+            expectedValue: '5',
+            choices: ['5', '7', '25'],
+            hint: 'Akar kuadrat dari 25 adalah 5!',
+          },
+        ],
+        socraticPrompt: 'Berapa panjang sisi miring c jika alas 3 cm dan tinggi 4 cm?',
+        successVoiceFeedback: 'Tepat! Akar dari 25 adalah 5 cm!',
+      },
+    ];
+  }
+
   // 1A. Japanese Particles に vs で -> Authentic Japanese Spatial / Action Zone Sorter + Surgical Particle Fix!
   if (
     targetLang === 'ja' &&
@@ -1558,52 +1722,23 @@ function synthesizePolymathStemBeats(
       const invOp = op === '+' ? '-' : '+';
       const wrongRhs = op === '+' ? c + b : c - b;
 
-      const leftBeat: WhiteboardStepCommand =
-        op === '+' && a > 0 && b > 0 && c > b && Number.isInteger(xVal)
-          ? {
-              id: 'wb_dyn_algebra_seesaw',
-              kind: 'interactive_mechanic',
-              mechanic: 'balance_seesaw',
-              inkPalette: 'violet_prism',
-              roughHatch: 'cross-hatch',
-              domainType: 'math',
-              column: 'left',
-              phaseIndex: 1,
-              pauseForInteraction: true,
-              title: `Timbangan Persamaan: $${eqStr}$`,
-              seesawLeftFixedLabel: `$${eqStr}$`,
-              seesawLeftWeight: c,
-              seesawRightBaseWeight: b,
-              seesawRightFixedLabel: String(b),
-              seesawTokens: [
-                { id: 'alg_ok', label: `$${aPrefix}x = ${rhsStep}$ ($x = ${cleanX}$)`, weight: rhsStep },
-                { id: 'alg_lo', label: `$${aPrefix}x = ${Math.max(1, rhsStep - a)}$`, weight: Math.max(1, rhsStep - a) },
-                { id: 'alg_hi', label: `$${aPrefix}x = ${rhsStep + a}$`, weight: rhsStep + a },
-              ],
-              socraticPrompt: `Nampan kanan sudah punya ${b}. Ketuk nilai ${aPrefix}x yang menyeimbangkan timbangan ke ${c}!`,
-              successVoiceFeedback: `Seimbang tepat di ${c}! Karena ${b} ditambah ${rhsStep} sama dengan ${c}, maka ${aPrefix}x bernilai ${rhsStep} dan x sama dengan ${cleanX}.`,
-              spokenNarration: `Lihat persamaan ${eqStr} sebagai timbangan. Karena di sisi kiri sudah ada tambah ${b}, kita butuh bagian ${aPrefix}x yang bernilai ${rhsStep} supaya jumlahnya pas ${c}. Ketuk keping yang tepat di bawah!`,
-            }
-          : {
-              id: 'wb_dyn_algebra_wires',
-              kind: 'interactive_mechanic',
-              mechanic: 'wire_node_connector',
-              inkPalette: 'violet_prism',
-              roughHatch: 'cross-hatch',
-              domainType: 'math',
-              column: 'left',
-              phaseIndex: 1,
-              pauseForInteraction: true,
-              title: `Alur Isolasi Variabel: $${eqStr}$`,
-              wirePairs: [
-                { id: 'al1', leftLabel: `1. Hilangkan ${op}${b} (${invOp}${b} kedua ruas)`, rightLabel: `$${aPrefix}x = ${c} ${invOp} ${b}$` },
-                { id: 'al2', leftLabel: '2. Hitung ruas kanan', rightLabel: `$${aPrefix}x = ${rhsStep}$` },
-                { id: 'al3', leftLabel: `3. Bagi kedua ruas dengan ${a}`, rightLabel: `$x = ${cleanX}$` },
-              ],
-              socraticPrompt: `Hubungkan tiap langkah operasi pada ${eqStr} di kiri ke hasil persamaannya di kanan!`,
-              successVoiceFeedback: `Ketiga langkah terhubung rapi! Dari ${eqStr}, pindah ruas jadi ${aPrefix}x sama dengan ${rhsStep}, lalu dibagi ${a} menghasilkan x sama dengan ${cleanX}.`,
-              spokenNarration: `Untuk mencari x dari ${eqStr}, kita kupas angkanya satu per satu dari luar: pertama lakukan operasi kebalikan ${invOp} ${b} di kedua ruas sehingga dapat ${aPrefix}x sama dengan ${rhsStep}, lalu bagi dengan ${a}. Sambungkan ketiga jalurnya di kiri!`,
-            };
+      const leftBeat: WhiteboardStepCommand = {
+        id: 'wb_dyn_algebra_scale_sandbox',
+        kind: 'interactive_mechanic',
+        mechanic: 'experiment_sandbox',
+        sandboxKind: 'algebra_live_scale',
+        sandboxParams: { a, b: op === '+' ? b : -b, c },
+        inkPalette: 'violet_prism',
+        roughHatch: 'cross-hatch',
+        domainType: 'math',
+        column: 'left',
+        phaseIndex: 2,
+        pauseForInteraction: true,
+        title: `Timbangan Eksperimen Dua Ruas: $${eqStr}$`,
+        socraticPrompt: `Uji sendiri timbangan aljabar di atas: tekan operasi kebalikan di kedua ruas (atau coba tambah satu sisi saja untuk melihat timbangan miring!) hingga tersisa x!`,
+        successVoiceFeedback: `Seimbang sempurna! Dengan melakukan operasi kebalikan di kedua ruas, variabel x berdiri sendiri bernilai ${cleanX}.`,
+        spokenNarration: `Sekarang bereksperimenlah langsung di timbangan aljabar untuk ${eqStr}: coba tekan tombol operasi kedua ruas untuk mengisolasi x, atau uji apa jadinya kalau kamu hanya mengubah sisi kiri saja!`,
+      };
 
       return [
         leftBeat,
@@ -1663,22 +1798,21 @@ function synthesizePolymathStemBeats(
       const opWord = op === '+' ? 'Jumlahkan' : 'Kurangkan';
       return [
         {
-          id: 'wb_dyn_frac_slots',
+          id: 'wb_dyn_frac_mixer_sandbox',
           kind: 'interactive_mechanic',
-          mechanic: 'magnetic_slot_builder',
+          mechanic: 'experiment_sandbox',
+          sandboxKind: 'fraction_grid_mixer',
+          sandboxParams: { n1: a, d1: b, n2: c, d2: d, op },
           inkPalette: 'teal_oscillator',
           roughHatch: 'hachure',
           domainType: 'math',
           column: 'left',
-          phaseIndex: 1,
+          phaseIndex: 2,
           pauseForInteraction: true,
-          title: `Samakan Penyebut KPK(${b}, ${d}) = ${lcd}`,
-          magnetSlotRoles: [`Ubah ${a}/${b}`, `Ubah ${c}/${d}`, opWord],
-          magnetTargetTokens: [`${n1}/${lcd}`, `${op} ${n2}/${lcd}`, `= ${resNum}/${lcd}`],
-          magnetDistractors: [trapOpDenom],
-          socraticPrompt: `Susun keping pecahan berpenyebut sama (${lcd}) secara berurutan! Jangan terjebak menghitung penyebut secara langsung!`,
-          successVoiceFeedback: `Presisi! ${a}/${b} menjadi ${n1}/${lcd} dan ${c}/${d} menjadi ${n2}/${lcd}, sehingga pembilangnya bisa langsung dihitung jadi ${resNum}/${lcd}.`,
-          spokenNarration: `Pecahan beda penyebut seperti ${a}/${b} ${op} ${c}/${d} tidak boleh langsung dihitung atas dan bawahnya. Kita wajib menyamakan ukuran potongannya dulu ke KPK dari ${b} dan ${d}, yaitu per ${lcd}. Rakit ketiga kepingnya di kiri!`,
+          title: `Lab Potong & Gabung Pecahan: $\\frac{${a}}{${b}} ${op} \\frac{${c}}{${d}}$`,
+          socraticPrompt: `Tekan tombol Potong Silang (Per ${lcd}) untuk membelah kedua kotak menjadi ukuran petak yang sama, lalu tekan Gabungkan Petaknya!`,
+          successVoiceFeedback: `Terlihat nyata! Setelah dipotong silang menjadi ${lcd} petak sama besar, ${n1}/${lcd} ${op} ${n2}/${lcd} menyatu menjadi ${resNum}/${lcd}.`,
+          spokenNarration: `Jangan sekadar menghafal KPK! Di laboratorium pecahan ini, tekan tombol Potong Silang supaya kotak ${a}/${b} dan ${c}/${d} terbelah menjadi ukuran petak yang persis sama yaitu per ${lcd}, lalu gabungkan petaknya!`,
         },
         {
           id: 'wb_dyn_frac_deriv',
@@ -1937,28 +2071,21 @@ function synthesizePolymathStemBeats(
     const I = Number((V / R).toFixed(2));
     return [
       {
-        id: 'wb_dyn_ohm_seesaw',
+        id: 'wb_dyn_ohm_circuit_sandbox',
         kind: 'interactive_mechanic',
-        mechanic: 'balance_seesaw',
+        mechanic: 'experiment_sandbox',
+        sandboxKind: 'circuit_ohm_live',
+        sandboxParams: { targetV: V, targetR: R },
         inkPalette: 'amber_fulcrum',
         roughHatch: 'hachure',
         domainType: 'physics',
         column: 'left',
-        phaseIndex: 1,
+        phaseIndex: 2,
         pauseForInteraction: true,
-        title: `Timbangan Hukum Ohm ($V = I \\times R$)`,
-        seesawLeftFixedLabel: `$V = ${V}\\text{ V}$`,
-        seesawLeftWeight: V,
-        seesawRightBaseWeight: 0,
-        seesawRightFixedLabel: '',
-        seesawTokens: [
-          { id: 'ohm_ok', label: `$${I}\\text{ A} \\times ${R}\\;\\Omega$`, weight: V },
-          { id: 'ohm_lo', label: `$1\\text{ A} \\times ${R}\\;\\Omega$`, weight: R },
-          { id: 'ohm_hi', label: `$${V}\\text{ A} \\times ${R}\\;\\Omega$`, weight: V * R },
-        ],
-        socraticPrompt: `Pasangkan arus $I$ dikali hambatan $${R}\\;\\Omega$ agar setara dengan tegangan $${V}\\text{ Volt}$!`,
-        successVoiceFeedback: `Seimbang! Tegangan ${V} Volt dibagi hambatan ${R} Ohm menghasilkan kuat arus tepat ${I} Ampere!`,
-        spokenNarration: `Bayangkan tegangan V sebagai dorongan pompa listrik dan hambatan R sebagai sempitnya pipa: karena V sama dengan I dikali R, pilih pasangan arus dikali hambatan ${R} Ohm yang menyeimbangkan ${V} Volt!`,
+        title: `Lab Rangkaian Listrik Hidup ($V = I \\times R$)`,
+        socraticPrompt: `Geser tuas Tegangan Baterai ke ${V} Volt dan amati perubahan kecepatan elektron serta nyala lampu pijar!`,
+        successVoiceFeedback: `Menyala terang dan stabil! Pada tegangan ${V} Volt dan hambatan ${R} Ohm, kuat arus terukur tepat ${I} Ampere!`,
+        spokenNarration: `Sekarang uji rangkaian listrik hidup di papan: geser tegangan baterai menuju ${V} Volt dan ubah hambatan resistornya untuk melihat langsung bagaimana aliran elektron dan terang lampu berubah mengikuti Hukum Ohm!`,
       },
       {
         id: 'wb_dyn_ohm_deriv',
@@ -2188,24 +2315,21 @@ function synthesizePolymathStemBeats(
     const triArea = rectArea / 2;
     return [
       {
-        id: 'wb_dyn_tri_wires',
+        id: 'wb_dyn_tri_vertex_sandbox',
         kind: 'interactive_mechanic',
-        mechanic: 'wire_node_connector',
+        mechanic: 'experiment_sandbox',
+        sandboxKind: 'geometry_2d_morph',
+        sandboxParams: { shape: 'triangle', targetBase: a, targetHeight: t },
         inkPalette: 'emerald_botanical',
         roughHatch: 'hachure',
         domainType: 'math',
         column: 'left',
-        phaseIndex: 1,
+        phaseIndex: 2,
         pauseForInteraction: true,
-        title: `Segitiga = Belahan Persegi Panjang (${a} × ${t})`,
-        wirePairs: [
-          { id: 'tg1', leftLabel: `1. Persegi panjang utuh (${a} × ${t})`, rightLabel: `Luas penuh = ${rectArea}` },
-          { id: 'tg2', leftLabel: '2. Potong miring diagonal', rightLabel: 'Terbelah jadi 2 segitiga kembar' },
-          { id: 'tg3', leftLabel: '3. Luas 1 segitiga (½ × alas × tinggi)', rightLabel: `½ × ${rectArea} = ${triArea}` },
-        ],
-        socraticPrompt: 'Hubungkan alasan geometris kenapa rumus luas segitiga selalu memiliki pengali ½!',
-        successVoiceFeedback: `Tepat! Setiap segitiga adalah tepat separuh dari persegi panjang beralas ${a} dan bertinggi ${t}, sehingga luasnya setengah dari ${rectArea} yaitu ${triArea}!`,
-        spokenNarration: `Kenapa luas segitiga ada angka setengahnya? Karena kalau dua segitiga siku-siku digabung menyilang, bentuknya menjadi satu persegi panjang utuh beralas kali tinggi! Sambungkan buktinya di kiri!`,
+        title: `Meja Eksperimen Geser Sudut Segitiga ($a=${a}, t=${t}$)`,
+        socraticPrompt: 'Geser titik puncak merah & titik alas biru di atas petak, lalu tekan tombol Persegi Panjang Utuh untuk melihat bukti visual ½ × alas × tinggi!',
+        successVoiceFeedback: `Terbukti secara visual! Setiap segitiga selalu menempati tepat separuh dari persegi panjang beralas a dan bertinggi t!`,
+        spokenNarration: `Jangan cuma hafal setengah alas kali tinggi! Tarik sendiri titik sudut merah dan biru di meja geometri ini, lalu tekan tombol Persegi Panjang Utuh supaya kamu melihat langsung kenapa luas segitiga selalu separuh dari persegi panjang!`,
       },
       {
         id: 'wb_dyn_tri_deriv',
@@ -4578,6 +4702,7 @@ function buildDynamicTopicRemixPair(params: {
 }
 
 const KNOWN_MECHANIC_KINDS = new Set([
+  'experiment_sandbox',
   'scratch_reveal',
   'balance_seesaw',
   'venn_bucket_sorter',
@@ -4607,6 +4732,9 @@ function isInteractiveStepGenuinelyPopulated(
 ): boolean {
   if (st.kind === 'interactive_mechanic') {
     const m = st.mechanic;
+    if (m === 'experiment_sandbox') {
+      return true;
+    }
     if (m === 'venn_bucket_sorter') {
       return Array.isArray(st.bucketZones) && st.bucketZones.length >= 2 && Array.isArray(st.bucketChips) && st.bucketChips.length >= 2;
     }
@@ -5808,6 +5936,8 @@ export function buildWhiteboardScenePlan(params: {
       !/\b(?:present\s*perfect|past\s*continuous|past\s*perfect|have\s+been|has\s+been)\b/i.test(topicCheckBlob);
     const isPastVsPerfect =
       /\bsimple\s*past\b|\bpast\s*tense\b/i.test(topicCheckBlob) && /\bpresent\s*perfect\b/i.test(topicCheckBlob);
+    const isCubeOr3DNetTopic =
+      /\b(?:kubus|jaring[- ]?jaring|balok|bangun\s*ruang|cube)\b/i.test(topicCheckBlob);
 
     if (headingStepRef && !isCharacterWritingTopic) {
       const curHeadWords = String(headingStepRef.text || '').trim().split(/\s+/).filter(Boolean).length;
@@ -5839,7 +5969,43 @@ export function buildWhiteboardScenePlan(params: {
 
       let synthesizedTeachStep: WhiteboardStepCommand;
 
-      if (isSimplePastOnly) {
+      if (isCubeOr3DNetTopic) {
+        synthesizedTeachStep = {
+          id: 'wb_teach_first_cube_3d',
+          kind: 'mind_map',
+          inkPalette: 'emerald_botanical',
+          column: 'left',
+          phaseIndex: 1,
+          pauseForInteraction: false,
+          title: wbPick('Cube Anatomy, Net Rules & Formulas', 'Penjelasan Unsur, Jaring-Jaring & Rumus Kubus'),
+          metaphorCenterLabel: 'Bangun Ruang Kubus',
+          branches: [
+            {
+              label: '1. Unsur Utama Kubus',
+              sublabel: 'Tersusun dari 6 sisi persegi yang sama besar, 12 rusuk sama panjang, dan 8 titik sudut.',
+              example: 'Pasangan berhadapan: Alas ↔ Tutup, Depan ↔ Belakang, Kiri ↔ Kanan',
+              icon: 'star',
+              color: '#0284C7',
+            },
+            {
+              label: '2. Syarat Jaring-Jaring Sah',
+              sublabel: 'Rangkaian 6 persegi datar yang saat tiap engselnya dilipat 90° menutup rapat tanpa ada sisi yang menumpuk.',
+              example: '✓ Pola Salib (1-4-1), Pola T, Pola Tangga (total ada 11 pola sah)',
+              icon: 'check',
+              color: '#10B981',
+            },
+            {
+              label: '3. Rumus Luas & Volume',
+              sublabel: 'Luas 1 persegi = s², sehingga 6 sisi = 6 × s². Volume ruang dalam = s × s × s = s³.',
+              example: 'Contoh s = 4 cm → Luas = 96 cm² · Volume = 64 cm³',
+              icon: 'bolt',
+              color: '#8B5CF6',
+            },
+          ],
+          spokenNarration:
+            'Sebelum kita melipat kertas tiga dimensi, pahami dulu struktur dasarnya. Kubus memiliki 6 sisi persegi identik, 12 rusuk sama panjang, dan 8 titik sudut. Jaring-jaring kubus hanya sah apabila keenam perseginya saat dilipat 90 derajat saling menutup rapat tanpa ada dua sisi yang bertabrakan di tempat yang sama. Untuk hitungan, luas permukaan adalah 6 dikali rusuk kuadrat, dan volumenya adalah rusuk pangkat tiga.',
+        };
+      } else if (isSimplePastOnly) {
         synthesizedTeachStep = {
           id: 'wb_teach_first_past_tense',
           kind: 'mind_map',
@@ -6076,6 +6242,93 @@ export function buildWhiteboardScenePlan(params: {
       const insertPos = headingPos >= 0 ? headingPos + 1 : 0;
       steps.splice(insertPos, 0, finalizeStep(synthesizedTeachStep, insertPos));
     }
+
+    // BERSIHKAN BOCORAN JAWABAN DI SUBLABEL BUCKET & PROMOSIKAN OTOMATIS KE SANDBOX EKSPERIMEN 60 FPS!
+    steps.forEach((st) => {
+      if (Array.isArray(st.bucketZones) && Array.isArray(st.bucketChips) && st.bucketChips.length > 0) {
+        const chipWords = st.bucketChips
+          .map((c) => String(c.label || '').trim().toLowerCase())
+          .filter((w) => w.length >= 2);
+        st.bucketZones = st.bucketZones.map((z) => {
+          const sub = String(z.sublabel || '').trim();
+          if (!sub) return z;
+          const leaksChip = chipWords.some((cw) => sub.toLowerCase().includes(cw));
+          return leaksChip ? { ...z, sublabel: undefined } : z;
+        });
+      }
+    });
+
+    const hasExperimentSandboxAlready = steps.some(
+      (s) => s.kind === 'interactive_mechanic' && s.mechanic === 'experiment_sandbox'
+    );
+    if (!hasExperimentSandboxAlready && !isCharacterWritingTopic && variantNonce === 0) {
+      let autoSandboxKind: WhiteboardStepCommand['sandboxKind'] | undefined;
+      let autoSandboxParams: Record<string, number | string | boolean> | undefined;
+      let autoSandboxTitle = '';
+      let autoSandboxPrompt = '';
+
+      if (isCubeOr3DNetTopic) {
+        const sM = topicCheckBlob.match(/(\d+)\s*cm/i);
+        autoSandboxKind = 'cube_3d_net';
+        autoSandboxParams = { sideCm: sM ? Math.max(2, Math.min(12, Number(sM[1]))) : 4 };
+        autoSandboxTitle = 'Lab Eksperimen Lipat Kertas Kubus 3D';
+        autoSandboxPrompt = 'Geser tuas lipatan hingga 90° (atau ketuk Lipat Jadi Kubus), putar bentuk 3D dengan jari, dan uji pola jaring valid vs jaring gagal!';
+      } else if (/\b(?:luas\s*segitiga|segitiga|pythagor|luas\s*lingkaran|keliling\s*lingkaran)\b/i.test(topicCheckBlob)) {
+        const isCir = /lingkaran/i.test(topicCheckBlob);
+        const isPy = /pythagor/i.test(topicCheckBlob);
+        autoSandboxKind = 'geometry_2d_morph';
+        autoSandboxParams = { shape: isCir ? 'circle' : isPy ? 'pythagoras' : 'triangle', targetBase: 8, targetHeight: 6 };
+        autoSandboxTitle = isCir ? 'Meja Eksperimen Jari-Jari & Keliling Lingkaran' : 'Meja Eksperimen Geser Titik Sudut Segitiga';
+        autoSandboxPrompt = 'Geser langsung titik sudut berwarna dengan jarimu di atas petak untuk membuktikan perubahan ukurannya secara langsung!';
+      } else if (/\bhukum\s*ohm|tegangan\s*listrik|rangkaian\s*listrik|kuat\s*arus\b/i.test(topicCheckBlob)) {
+        autoSandboxKind = 'circuit_ohm_live';
+        autoSandboxParams = { targetV: 12, targetR: 4 };
+        autoSandboxTitle = 'Lab Eksperimen Rangkaian Listrik Hukum Ohm';
+        autoSandboxPrompt = 'Ubah Tegangan Baterai (V) dan Hambatan (Ω), lalu amati gerak elektron dan terang lampu secara langsung!';
+      } else if (/\bhukum\s*(?:ii\s*)?newton|\bf\s*=\s*m\s*[·*×x]?\s*a\b|gaya\s*dan\s*percepatan/i.test(topicCheckBlob)) {
+        autoSandboxKind = 'newton_motion_track';
+        autoSandboxParams = { forceN: 12, massKg: 3 };
+        autoSandboxTitle = 'Lintasan Eksperimen Gaya & Massa Hukum Newton';
+        autoSandboxPrompt = 'Atur Gaya (N) dan Massa Beban (kg), lalu tekan Dorong & Luncurkan untuk melihat percepatan kereta!';
+      } else if (/\bpecahan\b|\d+\s*\/\s*\d+\s*[+-]\s*\d+\s*\/\s*\d+/i.test(topicCheckBlob)) {
+        autoSandboxKind = 'fraction_grid_mixer';
+        autoSandboxParams = { n1: 2, d1: 3, n2: 1, d2: 4, op: '+' };
+        autoSandboxTitle = 'Lab Eksperimen Potong & Gabung Pecahan Visual';
+        autoSandboxPrompt = 'Tekan Potong Silang untuk menyamakan ukuran petak kedua pecahan, lalu tekan Gabungkan Petaknya!';
+      } else if (isSimplePastOnly || isPastVsPerfect) {
+        autoSandboxKind = 'grammar_time_morph';
+        autoSandboxParams = { tenseMode: isPastVsPerfect ? 'past_vs_perfect' : 'simple_past' };
+        autoSandboxTitle = 'Mesin Eksperimen Mutasi Kalimat: (+), (-), (?)';
+        autoSandboxPrompt = 'Ubah sakelar (+), (-), (?), ganti kata kerja, atau tekan Uji Tabrakan Salah untuk melihat langsung bagaimana kata bantu did menarik Verb 2 kembali ke Verb 1!';
+      }
+
+      if (autoSandboxKind) {
+        const firstInteractiveIdx = steps.findIndex(
+          (s) => s.kind === 'interactive_mechanic' || s.kind === 'socratic_slider'
+        );
+        const sandboxCmd: WhiteboardStepCommand = {
+          id: 'wb_auto_experiment_sandbox',
+          kind: 'interactive_mechanic',
+          mechanic: 'experiment_sandbox',
+          sandboxKind: autoSandboxKind,
+          sandboxParams: autoSandboxParams,
+          inkPalette: 'cobalt_blueprint',
+          column: 'left',
+          phaseIndex: 2,
+          pauseForInteraction: true,
+          title: autoSandboxTitle,
+          socraticPrompt: autoSandboxPrompt,
+        };
+        if (firstInteractiveIdx >= 0) {
+          steps[firstInteractiveIdx] = finalizeStep(
+            { ...sandboxCmd, id: steps[firstInteractiveIdx].id || sandboxCmd.id },
+            firstInteractiveIdx
+          );
+        } else {
+          steps.push(finalizeStep(sandboxCmd, steps.length));
+        }
+      }
+    }
   }
 
   // Tombol eksplisit "Variasi Lab" (`variantNonce > 0`): putar mekanik Kiri & Kanan menjadi lab otentik baru!
@@ -6218,7 +6471,11 @@ export function buildWhiteboardScenePlan(params: {
         ? allTeachingSteps.filter((s) => s.kind === 'table').slice(0, 1)
         : [];
 
-    const interactiveSteps = steps.filter(isInteractivePracticeStep);
+    const interactiveSteps = steps.filter(isInteractivePracticeStep).sort((a, b) => {
+      const aExp = a.kind === 'interactive_mechanic' && a.mechanic === 'experiment_sandbox' ? 0 : 1;
+      const bExp = b.kind === 'interactive_mechanic' && b.mechanic === 'experiment_sandbox' ? 0 : 1;
+      return aExp - bExp;
+    });
     const trapFallbacks =
       interactiveSteps.length < 2
         ? steps.filter((s) => s.kind === 'trap_vs_fix').slice(0, 1)

@@ -24,6 +24,7 @@ import {
   WavePendulumOscillatorLab,
   WireNodeConnectorLab,
 } from './RoughScratchEngine';
+import { ExperimentSandboxRouter } from './WhiteboardExperimentSandbox';
 
 export interface SocraticInteractionEvent {
   stepId: string;
@@ -1236,6 +1237,8 @@ export const PolymorphicInteractiveLab: React.FC<ManipulativeCommonProps> = (pro
         : 'direct_2d_canvas_lab');
 
   switch (m) {
+    case 'experiment_sandbox':
+      return <ExperimentSandboxRouter {...props} />;
     case 'scratch_reveal':
       return <ScratchRevealFoilLab {...props} />;
     case 'balance_seesaw':

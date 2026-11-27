@@ -1676,7 +1676,7 @@ CRITICAL RELEVANCE MANDATE FOR OPTION 1 (easy / Singkat):
 export function isExplanationQuestion(userText) {
   const s = String(userText || '').toLowerCase();
   return (
-    /\b(bedanya|perbedaan|apa beda|arti dari|artinya apa|maksudnya apa|cara (?:menggunakan|memakai|pakai|pake|menghitung|hitung|menulis|tulis|membaca|baca|kerja)|gimana cara (?:pakai|pake|hitung|tulis|kerja)|bagaimana cara|kapan (?:pakai|pake)|kenapa (?:pakai|pake|salah)|mengapa (?:pakai|pake|salah)|jelasin|jelaskan|ajarkan|ajarin|terangin|terangkan|uraikan|gambarkan|tolong bahas|bingung|nggak paham|gak paham|belum paham|kurang paham|tidak paham|nggak ngerti|gak ngerti|apa fungsi|fungsi dari|contoh kalimat|rumus|teorema|proses|alur|tahapan|langkah|strategi|teknik|workflow|note[\s-]?taking|how to (?:use|write|calculate|solve|do)|difference between|what does .* mean|why is .* wrong|confused about|explain|teach me|break down|งง|แปลว่าอะไร|ต่างกันยังไง|ใช้ยังไง|วิธีใช้|อธิบาย)\b/i.test(
+    /\b(bedanya|perbedaan|apa beda|arti dari|artinya apa|maksudnya apa|cara (?:menggunakan|memakai|pakai|pake|membuat|bikin|melipat|lipat|menghitung|hitung|mencari|cari|menyelesaikan|menulis|tulis|membaca|baca|kerja)|gimana cara (?:pakai|pake|membuat|bikin|hitung|cari|tulis|kerja)|bagaimana cara|kapan (?:pakai|pake)|kenapa (?:pakai|pake|salah)|mengapa (?:pakai|pake|salah)|jelasin|jelaskan|ajarkan|ajarin|terangin|terangkan|uraikan|gambarkan|tolong bahas|eksperimen|simulasi|jaring[- ]?jaring|bingung|nggak paham|gak paham|belum paham|kurang paham|tidak paham|nggak ngerti|gak ngerti|apa fungsi|fungsi dari|contoh kalimat|rumus|teorema|proses|alur|tahapan|langkah|strategi|teknik|workflow|note[\s-]?taking|how to (?:use|write|make|fold|calculate|solve|do)|difference between|what does .* mean|why is .* wrong|confused about|explain|teach me|break down|งง|แปลว่าอะไร|ต่างกันยังไง|ใช้ยังไง|วิธีใช้|อธิบาย)\b/i.test(
       s
     ) || /\b(papan tulis|papan belajar|whiteboard|pop[\s-]?up|latihan tulis|secara visual|dengan diagram|pakai diagram|visually|with a (?:\w+\s+)?diagram|step by step)\b/i.test(s)
   );
@@ -2316,7 +2316,7 @@ async function executePartnerTurnCore(ctx, streamHooks = null) {
   if (isCacheableStandaloneBoard) {
     boardCacheKey = await sha256Hex(
       JSON.stringify({
-        v: 'wb-v7-teach-first-live',
+        v: 'wb-v8-experiment-live',
         q: userText.trim().toLowerCase(),
         targetLang,
         locale,
@@ -2437,8 +2437,16 @@ async function executePartnerTurnCore(ctx, streamHooks = null) {
         `     * For Grammar / Particles / Vocabulary contrasts: emit "mind_map", "table", or "contrast_scale" clearly explaining each word/pattern's exact function, rule, natural example sentence, and ${targetLocaleName} meaning!`,
         `     * For Math / Physics / Science: emit "mind_map" or "formula_blocks" clearly explaining (1) makna konsep & variabel rumus, (2) rumus kunci dalam "$...$", dan (3) contoh penerapan / urutan langkah hitung langkah demi langkah!`,
         `     * Beat 1 "spokenNarration": 3-4 clear, detailed yet concise spoken sentences (~40-65 words in ${targetLocaleName}) walking through the rules, formulas, and concrete examples in Beat 1 so a beginner understands 100% BEFORE practicing!`,
-        `   - Beat 2 (kind:"interactive_mechanic" | "socratic_slider" | "kanji_grid", column:"left", phaseIndex:2, "pauseForInteraction":true — GUIDED PRACTICE 1 TESTING WHAT BEAT 1 JUST TAUGHT!): MUST populate ALL required data fields for "${userText}" (NEVER emit an empty step without its array!):`,
-        `     * kind:"interactive_mechanic", mechanic:"venn_bucket_sorter": for categories, prepositions (in/on/at, に/で), positive/negative forms, vs-contrasts -> MUST include 2-3 "bucketZones":[{"id":"z1","label":"...","sublabel":"..."}] & 3-4 "bucketChips":[{"id":"c1","label":"...","targetZoneId":"z1"}].`,
+        `   - Beat 2 (kind:"interactive_mechanic" | "socratic_slider" | "kanji_grid", column:"left", phaseIndex:2, "pauseForInteraction":true — GUIDED HANDS-ON EXPERIMENT OR PRACTICE 1 TESTING WHAT BEAT 1 JUST TAUGHT!):`,
+        `     * PREFER TRUE HANDS-ON EXPERIMENT SANDBOXES (kind:"interactive_mechanic", mechanic:"experiment_sandbox") WHENEVER THE TOPIC FITS:`,
+        `       - sandboxKind:"cube_3d_net" for 3D cubes, paper nets (jaring-jaring kubus/balok), surface area/volume of cubes ("sandboxParams":{"sideCm":4}).`,
+        `       - sandboxKind:"geometry_2d_morph" for triangles, Pythagoras, circles, perimeter/area ("sandboxParams":{"shape":"triangle"|"pythagoras"|"circle","targetBase":8,"targetHeight":6}).`,
+        `       - sandboxKind:"circuit_ohm_live" for Ohm's law, voltage/current/resistance circuits ("sandboxParams":{"targetV":12,"targetR":4}).`,
+        `       - sandboxKind:"newton_motion_track" for Newton's laws, force/mass/acceleration/motion ("sandboxParams":{"forceN":12,"massKg":3}).`,
+        `       - sandboxKind:"fraction_grid_mixer" for adding/subtracting/comparing fractions ("sandboxParams":{"n1":2,"d1":3,"n2":1,"d2":4,"op":"+"}).`,
+        `       - sandboxKind:"algebra_live_scale" for single-variable linear equations ax+b=c ("sandboxParams":{"a":3,"b":-5,"c":16}).`,
+        `       - sandboxKind:"grammar_time_morph" for Simple Past Tense, Past vs Present Perfect, polarity (+)/(-)/(?) verb transformations ("sandboxParams":{"tenseMode":"simple_past"|"past_vs_perfect"}).`,
+        `     * kind:"interactive_mechanic", mechanic:"venn_bucket_sorter": for categories, prepositions (in/on/at, に/で), vs-contrasts -> MUST include 2-3 "bucketZones":[{"id":"z1","label":"...","sublabel":"rule hint ONLY, NEVER list the answer chips here!"}] & 3-4 "bucketChips":[{"id":"c1","label":"...","targetZoneId":"z1"}].`,
         `     * kind:"interactive_mechanic", mechanic:"wire_node_connector": for matching pairs, V1->V2, causes->effects, 4 tones, compounds, sin/cos/tan, formulas -> MUST include 3 "wirePairs":[{"id":"w1","leftLabel":"...","rightLabel":"..."}].`,
         `     * kind:"interactive_mechanic", mechanic:"balance_seesaw": ONLY for equations or two-side balance -> MUST include "seesawLeftFixedLabel", "seesawLeftWeight", "seesawRightBaseWeight", "seesawTokens":[{"id":"t1","label":"...","weight":6}].`,
         `     * kind:"interactive_mechanic", mechanic:"rotary_dial_gauge": ONLY for degree/intensity scales (modals, adverbs of frequency, angles) -> MUST include "dialInitialDeg":25, "dialTargetDeg":155, "dialStops":[{"angleDeg":25,"label":"...","expression":"...","note":"..."}].`,
@@ -2584,7 +2592,7 @@ JSON only: {"aiReply":"...","aiReplyTranslation":"...","diagnosis":{"ok":true,"m
     if (isOffTopicToBeDrift || !Array.isArray(firstSteps) || firstSteps.length < 4) {
       const boardOnlyFallbackKey = await sha256Hex(
         JSON.stringify({
-          v: 'wb-v7-teach-first',
+          v: 'wb-v8-experiment',
           q: userText.trim().toLowerCase(),
           targetLang,
           locale,
@@ -2866,6 +2874,7 @@ JSON only: {"aiReply":"...","aiReplyTranslation":"...","diagnosis":{"ok":true,"m
                       'key_and_lock',
                     ]);
                     const ALLOWED_MECHANICS = new Set([
+                      'experiment_sandbox',
                       'balance_seesaw',
                       'scratch_reveal',
                       'venn_bucket_sorter',
@@ -2877,6 +2886,15 @@ JSON only: {"aiReply":"...","aiReplyTranslation":"...","diagnosis":{"ok":true,"m
                       'wave_pendulum_oscillator',
                       'surgical_ink_strike',
                       'step_derivation',
+                    ]);
+                    const ALLOWED_SANDBOX_KINDS = new Set([
+                      'cube_3d_net',
+                      'geometry_2d_morph',
+                      'circuit_ohm_live',
+                      'newton_motion_track',
+                      'fraction_grid_mixer',
+                      'algebra_live_scale',
+                      'grammar_time_morph',
                     ]);
                     const ALLOWED_PALETTES = new Set([
                       'cobalt_blueprint',
@@ -2931,9 +2949,11 @@ JSON only: {"aiReply":"...","aiReplyTranslation":"...","diagnosis":{"ok":true,"m
                         : isDirectMechanicKind
                           ? rawKindStr
                           : undefined;
-                    const inferredMechanic =
+                      const inferredMechanic =
                       explicitMechanic ||
-                      (resolvedKind === 'interactive_mechanic'
+                      (typeof st.sandboxKind === 'string' && ALLOWED_SANDBOX_KINDS.has(st.sandboxKind.trim())
+                        ? 'experiment_sandbox'
+                        : resolvedKind === 'interactive_mechanic'
                         ? Array.isArray(st.bucketZones) && st.bucketZones.length >= 2
                           ? 'venn_bucket_sorter'
                           : Array.isArray(st.wirePairs) && st.wirePairs.length >= 2
@@ -2978,6 +2998,22 @@ JSON only: {"aiReply":"...","aiReplyTranslation":"...","diagnosis":{"ok":true,"m
                           ? st.domainType.trim()
                           : undefined,
                       mechanic: inferredMechanic,
+                      sandboxKind:
+                        typeof st.sandboxKind === 'string' && ALLOWED_SANDBOX_KINDS.has(st.sandboxKind.trim())
+                          ? st.sandboxKind.trim()
+                          : undefined,
+                      sandboxParams:
+                        st.sandboxParams && typeof st.sandboxParams === 'object' && !Array.isArray(st.sandboxParams)
+                          ? Object.fromEntries(
+                              Object.entries(st.sandboxParams)
+                                .slice(0, 10)
+                                .filter(
+                                  ([k, v]) =>
+                                    /^[a-zA-Z0-9_]{1,24}$/.test(k) &&
+                                    (typeof v === 'number' || typeof v === 'boolean' || (typeof v === 'string' && v.length <= 40))
+                                )
+                            )
+                          : undefined,
                       inkPalette:
                         typeof st.inkPalette === 'string' && ALLOWED_PALETTES.has(st.inkPalette.trim())
                           ? st.inkPalette.trim()

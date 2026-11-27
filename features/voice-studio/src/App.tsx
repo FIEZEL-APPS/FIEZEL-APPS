@@ -3689,7 +3689,7 @@ export default function App() {
         s
       );
     const asksGrammarOrStruggle =
-      /\b(bingung|susah|sulit|belum paham|nggak paham|gak paham|kurang paham|pusing|confused|struggling|don't understand|hard to understand|bedanya|perbedaan|difference between|why is|cara\s+(?:menggunakan|memakai|pakai|tulis|menulis)|how to\s+(?:use|write)|bagaimana\s+(?:cara|membedakan)|gimana cara pakai|kapan pakai|kenapa\s+(?:pakai|salah)|mengapa\s+(?:pakai|salah)|jelasin|jelaskan|ajarkan|ajarin|terangkan|uraikan|gambarkan|tolong bahas|explain|teach me|งง|ไม่เข้าใจ)\b/i.test(
+      /\b(bingung|susah|sulit|belum paham|nggak paham|gak paham|kurang paham|pusing|confused|struggling|don't understand|hard to understand|bedanya|perbedaan|difference between|why is|cara\s+(?:menggunakan|memakai|pakai|pake|tulis|menulis|membuat|bikin|melipat|lipat|menghitung|hitung|mencari|cari|menyelesaikan|kerja)|how to\s+(?:use|write|make|fold|calculate|solve)|bagaimana\s+(?:cara|membedakan)|gimana\s+cara|kapan\s+(?:pakai|pake)|kenapa\s+(?:pakai|salah)|mengapa\s+(?:pakai|salah)|jelasin|jelaskan|ajarkan|ajarin|terangkan|uraikan|gambarkan|tolong bahas|eksperimen|simulasi|jaring[- ]?jaring|explain|teach me|งง|ไม่เข้าใจ)\b/i.test(
         s
       ) &&
       (s.length >= 10 ||

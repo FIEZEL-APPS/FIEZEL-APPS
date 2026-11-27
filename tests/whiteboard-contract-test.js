@@ -382,11 +382,11 @@ const unlockSrc = read('features/voice-studio/src/lib/boardAudioUnlock.ts');
   const distSrc = read('features/voice-studio/dist/voice-studio.js');
 
   assert.ok(
-    workerLiveSrc.includes("v: 'wb-v7-teach-first-live'") &&
+    /v:\s*'wb-v(?:7-teach-first|8-experiment)-live'/.test(workerLiveSrc) &&
       workerLiveSrc.includes('5-STEP TEACH-FIRST CADENCE') &&
       workerLiveSrc.includes('...(ctx?.corsHeaders || {})') &&
       !workerLiveSrc.includes("'access-control-allow-origin': '*'"),
-    'Worker route-voice-live.js must enforce wb-v7-teach-first-live 5-step Teach-First cadence and use credential-safe ctx.corsHeaders on SSE whiteboard-stream'
+    'Worker route-voice-live.js must enforce Teach-First cadence and use credential-safe ctx.corsHeaders on SSE whiteboard-stream'
   );
   assert.ok(
     directorSrcLocal.includes('wb_teach_first_past_tense') &&
@@ -405,4 +405,44 @@ const unlockSrc = read('features/voice-studio/src/lib/boardAudioUnlock.ts');
   console.log('  ✅ PASS 16: Mandatory Teach-First explanation phase before interactive practice & SSE CORS parity verified');
 }
 
-console.log('\n🎉 ALL 16 WHITEBOARD CONTRACT TESTS PASSED 100%!');
+// ============================================================================
+// TEST 17: 60 FPS Tactile Interactive Experiment Sandboxes (3D Cube Net, 2D Geometry, Live Ohm/Newton, Fraction Mixer, Algebra Scale, Grammar Morpher)
+// ============================================================================
+{
+  const sandboxSrc = read('features/voice-studio/src/components/WhiteboardExperimentSandbox.tsx');
+  const manipSrc = read('features/voice-studio/src/components/WhiteboardInteractiveManipulatives.tsx');
+  const directorSrcLocal = read('features/voice-studio/src/lib/whiteboardDirector.ts');
+  const workerLiveSrc = read('workers/api/voice/route-voice-live.js');
+  const distSrc = read('features/voice-studio/dist/voice-studio.js');
+
+  for (const symbol of [
+    'CubeNet3DFoldingLab',
+    'Geometry2DVertexSandbox',
+    'PhysicsLiveSimulatorLab',
+    'FractionGridVisualMixer',
+    'AlgebraLiveScaleLab',
+    'GrammarTimeMorphSandbox',
+    'wb-experiment-cube-3d-lab',
+    'wb-experiment-geometry-2d-lab',
+    'wb-experiment-ohm-circuit-lab',
+    'wb-experiment-newton-lab',
+    'wb-experiment-fraction-mixer-lab',
+    'wb-experiment-algebra-scale-lab',
+    'wb-experiment-grammar-morph-lab',
+  ]) {
+    assert.ok(sandboxSrc.includes(symbol), `WhiteboardExperimentSandbox.tsx must implement ${symbol}`);
+  }
+  assert.ok(
+    manipSrc.includes("case 'experiment_sandbox':") &&
+      directorSrcLocal.includes("sandboxKind: 'cube_3d_net'") &&
+      directorSrcLocal.includes('wb_teach_first_cube_3d') &&
+      workerLiveSrc.includes("v: 'wb-v8-experiment-live'") &&
+      workerLiveSrc.includes('ALLOWED_SANDBOX_KINDS') &&
+      distSrc.includes('wb-experiment-cube-3d-lab') &&
+      distSrc.includes('wb-experiment-grammar-morph-lab'),
+    'Experiment sandboxes must be wired end-to-end across Manipulatives, Director, Worker sanitizer, and compiled dist/voice-studio.js'
+  );
+  console.log('  ✅ PASS 17: 60 FPS tactile 3D cube net folding & multi-domain interactive experiment sandboxes verified');
+}
+
+console.log('\n🎉 ALL 17 WHITEBOARD CONTRACT TESTS PASSED 100%!');
