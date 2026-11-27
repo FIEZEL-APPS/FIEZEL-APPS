@@ -208,9 +208,9 @@ test('B4 perkenalan: tanpa pemilih peran/kode kelas; kursus tepat sesudah nama',
   const O = require(path.join(ROOT, 'features/onboarding/fiezel-onboarding.js'));
   assert.ok(O, 'FiezelOnboarding terpasang');
   assert.strictEqual(O.roleMarkup, undefined, 'pemilih peran tidak diekspor lagi');
-  assert.deepStrictEqual(O.COURSES.map((c) => c.id), ['en', 'ja'], 'dua kursus: Inggris + Jepang');
+  assert.deepStrictEqual(O.COURSES.map((c) => c.id), ['en', 'ja', 'zh'], 'tiga kursus: Inggris + Jepang + Mandarin');
   const html = O.courseMarkup(self, '');
-  assert.ok(/data-ob-course="en"/.test(html) && /data-ob-course="ja"/.test(html), 'kedua kartu kursus');
+  assert.ok(/data-ob-course="en"/.test(html) && /data-ob-course="ja"/.test(html) && /data-ob-course="zh"/.test(html), 'ketiga kartu kursus');
   assert.ok(/data-ob-advance disabled/.test(html), 'tanpa pilihan bawaan: Lanjut nonaktif');
   assert.ok(/aria-checked="true"[^>]*data-ob-course="ja"/.test(O.courseMarkup(self, 'ja')), 'pilihan ja tertandai');
   assert.ok(/LEAN_SEQUENCE = Object\.freeze\(\[NAME_STEP, COURSE_STEP,/.test(src), 'alur ringkas: nama → kursus');

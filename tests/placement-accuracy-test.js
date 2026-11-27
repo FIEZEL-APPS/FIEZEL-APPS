@@ -346,6 +346,83 @@ if (liteSource && liteForgiveMatch && liteBlueprintMatch && liteScoringExpr) {
 }
 
 // ---------------------------------------------------------------------------
+// 4c. Adaptive 5-Skill IRT 3PL CAT Engine (Mudah / Normal / Susah)
+// ---------------------------------------------------------------------------
+{
+  const catFns = ['normalizePlacementTierValue', 'placementDomainOf', 'placementCat3PL', 'placementCatFisher', 'placementCatCreateState', 'placementCatObserve', 'placementCatAllCoreSampled', 'placementCatPromoteNext', 'placementCatFinalize'].map(n => sourceBlock(n)).join('\n');
+  const tiersMatch = app.match(/const\s+PLACEMENT_TIERS_SPEC\s*=\s*Object\.freeze\(\{[\s\S]*?\}\);/);
+  const skillsMatch = app.match(/const\s+PLACEMENT_CORE_SKILLS\s*=\s*Object\.freeze\(\[[^\]]+\]\);/);
+  check('CAT1 Adaptive 5-skill IRT 3PL engine + tier specs are extractable',
+    !!tiersMatch && !!skillsMatch && /function\s+placementCatCreateState/.test(catFns) && /function\s+placementCatFinalize/.test(catFns),
+    `tiers=${!!tiersMatch} skills=${!!skillsMatch}`);
+  if (tiersMatch && skillsMatch && /function\s+placementCatFinalize/.test(catFns)) {
+    const catCtx = vm.runInNewContext(
+      `${tiersMatch[0]}\n${skillsMatch[0]}\n${catFns}\n({create:placementCatCreateState,observe:placementCatObserve,promote:placementCatPromoteNext,finalize:placementCatFinalize,p3:placementCat3PL})`,
+      { LEVELS, Math, Object, Number, String, Boolean, Array, Set },
+      { timeout: 2000 }
+    );
+    const makeSyntheticPool = () => {
+      const out = [];
+      const specs = [
+        ['listening', 'listening', 1.35, 0.25, 3],
+        ['reading', 'reading', 1.4, 0.25, 3],
+        ['cloze', 'writing', 1.65, 0.05, 3],
+        ['speaking', 'speaking', 1.6, 0.08, 2],
+        ['token-order', 'order', 1.65, 0.05, 3],
+        ['grammar', 'anchor', 1.35, 0.25, 2]
+      ];
+      for (const lvl of LEVELS) {
+        const b = LEVELS.indexOf(lvl) + 1;
+        for (const [type, dom, a, c, cnt] of specs) {
+          for (let k = 0; k < cnt; k++) {
+            out.push({ id: `${dom}-${lvl}-${k}`, type, skillDomain: dom, level: lvl, difficulty: b, irtB: b, irtA: a, irtC: c });
+          }
+        }
+      }
+      return out;
+    };
+    const runCatTrial = (tier, rng, answerFn) => {
+      const st = catCtx.create(tier);
+      const cfg = { __catState: st, placement: true, adaptiveCat: true };
+      const rem = makeSyntheticPool();
+      const answers = [];
+      for (let step = 0; step < st.count && rem.length > 0; step++) {
+        catCtx.promote(rem, cfg, rng);
+        const q = rem.shift();
+        const ok = !!answerFn(q, rng);
+        answers.push({ level: q.level, ok, skillDomain: q.skillDomain });
+        catCtx.observe(st, q, ok);
+      }
+      return { verdict: catCtx.finalize(st, answers), state: st, pickedIds: st.items.map((_, idx) => idx) };
+    };
+    for (const tier of ['easy', 'normal', 'hard']) {
+      const r0 = mulberry32(SEED ^ tier.charCodeAt(0));
+      const allWrong = runCatTrial(tier, r0, () => false);
+      const allRight = runCatTrial(tier, r0, () => true);
+      check(`CAT2 [${tier}] all-wrong -> A1 and all-right -> C2`,
+        allWrong.verdict.level === 1 && allRight.verdict.level === 6,
+        `tier=${tier}: wrong=${allWrong.verdict.level} (theta=${allWrong.verdict.theta}), right=${allRight.verdict.level} (theta=${allRight.verdict.theta})`);
+      // Pastikan kelima domain keterampilan inti benar-benar tersampel
+      const sampledAll5 = ['listening', 'reading', 'writing', 'speaking', 'order'].every(d => (allRight.verdict.skills[d]?.n || 0) >= 1);
+      check(`CAT3 [${tier}] samples all 5 core skills (listening, reading, writing, speaking, order)`,
+        sampledAll5, JSON.stringify(allRight.verdict.skills));
+      // Penebak acak tidak boleh diuntungkan walau memilih tier Susah
+      const rg = mulberry32(SEED ^ (0x7700 + tier.charCodeAt(0)));
+      let guessAboveA2 = 0, guessB2Plus = 0;
+      const TRIALS = 400;
+      for (let t = 0; t < TRIALS; t++) {
+        const g = runCatTrial(tier, rg, (q, r) => r() < q.irtC);
+        if (g.verdict.level > 2) guessAboveA2++;
+        if (g.verdict.level >= 4) guessB2Plus++;
+      }
+      check(`CAT4 [${tier}] pure guessing exceeds A2 in <=2% and reaches B2+ in <=0.5%`,
+        guessAboveA2 <= TRIALS * 0.02 && guessB2Plus <= TRIALS * 0.005,
+        `tier=${tier}: >A2=${guessAboveA2}/${TRIALS}, >=B2=${guessB2Plus}/${TRIALS}`);
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
 // 5. Report
 // ---------------------------------------------------------------------------
 const report = {

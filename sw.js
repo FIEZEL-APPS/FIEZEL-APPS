@@ -53,7 +53,7 @@ const CACHE=`fiezel-v${self.FIEZEL_VERSION}`;
 // dilayani dan kedua berkas baru tidak pernah sampai ke pengguna lama - aplikasi mereka
 // akan menjalankan app.js baru tanpa berkas benderanya, dan seluruh bendera jatuh ke
 // salinan bawaan di app.js. Naik SEKALI untuk seluruh gelombang.
-const SW_REV='m025-817-unified-grammar-20261002';
+const SW_REV='m025-818-unified-grammar-20261002';
 const SHELL_CACHE=`fiezel-shell-${SW_REV}`;
 async function ensureShellCoherence(){
   try{
@@ -184,6 +184,8 @@ const ASSETS=['./','./index.html','./style.css','./features/mascot/fiezel-motion
   './features/grammar/grammar-upgrade.css','./features/grammar/fiezel-grammar-upgrade.js','./features/grammar/grammar-vocab-bridge.css','./features/grammar/grammar-vocab-bridge.js','./features/i18n/grammar-sentence-translations.js','./content/grammar-vocab-map-v1.json','./features/ui/fiezel-tactile-clay.css','./call.html','./features/voice-studio/dist/voice-studio.js','./features/voice-studio/dist/voice-studio.css','./assets/brand/mochi-mascot-headset.png','./assets/brand/paw-mochi-speaking.svg',
   './features/brain/fiezel-fsrs-bridge.js',
   './features/japanese/fiezel-ja-conjugator.js',
+  './content/zh/placement-zh.json',
+  './content/ja/placement-ja.json',
   './assets/stories/mizuki-1.webp','./assets/stories/mizuki-2.webp','./assets/stories/mizuki-3.webp','./assets/stories/mizuki-4.webp','./assets/stories/asakusa-1.webp','./assets/stories/asakusa-2.webp','./assets/stories/asakusa-3.webp','./assets/stories/asakusa-4.webp','./assets/stories/shinkansen-1.webp','./assets/stories/shinkansen-2.webp','./assets/stories/shinkansen-3.webp','./assets/stories/shinkansen-4.webp'];
 // Fallback MP3 (OI-1): Safari/iOS tidak bisa mendekode Ogg Vorbis, jadi ke-27 bunyi
 // dikirim kembar .mp3 di assets/audio/sfx/ dan fiezel-ui-sfx.js memilih ekstensinya

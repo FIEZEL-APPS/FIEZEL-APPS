@@ -229,9 +229,18 @@
   var COURSE_STEP = 7;
   var COURSES = Object.freeze([
     Object.freeze({ id: 'en', flag: FLAG_EN, titleKey: 'onboarding.course-en', descKey: 'onboarding.course-en-sub' }),
-    Object.freeze({ id: 'ja', flag: FLAG_JA, titleKey: 'onboarding.course-ja', descKey: 'onboarding.course-ja-sub' })
+    Object.freeze({ id: 'ja', flag: FLAG_JA, titleKey: 'onboarding.course-ja', descKey: 'onboarding.course-ja-sub' }),
+    Object.freeze({ id: 'zh', flag: FLAG_ZH, titleKey: 'onboarding.course-zh', descKey: 'onboarding.course-zh-sub' })
   ]);
-  function normalizeCourse(v) { return v === 'ja' || v === 'en' ? v : ''; }
+  function normalizeCourse(v) { return v === 'ja' || v === 'en' || v === 'zh' ? v : ''; }
+  var HSK_LEVELS = Object.freeze(['HSK 1', 'HSK 2', 'HSK 3', 'HSK 4', 'HSK 5', 'HSK 6']);
+  var PLACEMENT_TIERS = Object.freeze([
+    Object.freeze({ id: 'easy', labelKey: 'onboarding.tier-easy', descKey: 'onboarding.tier-easy-desc', soal: 12 }),
+    Object.freeze({ id: 'normal', labelKey: 'onboarding.tier-normal', descKey: 'onboarding.tier-normal-desc', soal: 15 }),
+    Object.freeze({ id: 'hard', labelKey: 'onboarding.tier-hard', descKey: 'onboarding.tier-hard-desc', soal: 18 })
+  ]);
+  function normalizePlacementTier(v) { return v === 'easy' || v === 'normal' || v === 'hard' ? v : 'normal'; }
+  function storedPlacementTier(env) { var r = readRecord(env); return normalizePlacementTier(r && r.placementTier); }
 
   /* m025-246 — PERKENALAN RINGKAS (<=3 LAYAR).
      ==========================================================================
@@ -428,6 +437,8 @@
       var course = normalizeCourse((detail && detail.course) || previous.course);
       var kanaPref = String((detail && detail.kanaPreference) || previous.kanaPreference || 'learning');
       var furi = detail && typeof detail.furigana === 'boolean' ? detail.furigana : (previous.furigana !== false);
+      var pinyin = detail && typeof detail.pinyin === 'boolean' ? detail.pinyin : (previous.pinyin !== false);
+      var placementTier = normalizePlacementTier((detail && detail.placementTier) || previous.placementTier);
       store.setItem(STORAGE_KEY, JSON.stringify({
         done: true,
         at: Number(detail && detail.at) || 0,
@@ -440,7 +451,9 @@
         classCode: String((detail && detail.classCode) || previous.classCode || ''),
         course: course,
         kanaPreference: kanaPref,
-        furigana: furi
+        furigana: furi,
+        pinyin: pinyin,
+        placementTier: placementTier
       }));
       if (course === 'ja') {
         try {
@@ -451,6 +464,11 @@
           if (env && env.FiezelJaUi && typeof env.FiezelJaUi.applyPrefs === 'function') {
             env.FiezelJaUi.applyPrefs();
           }
+        } catch(_) {}
+      }
+      if (course === 'zh') {
+        try {
+          store.setItem('fz_zh_pinyin', pinyin ? '1' : '0');
         } catch(_) {}
       }
     } catch (_) { /* penyimpanan penuh tidak boleh mengurung murid di onboarding */ }
@@ -986,7 +1004,41 @@
       + '</div>';
   }
 
-  function courseMarkup(env, selected, kanaPref, furiOn, stage) {
+  function zhCourseTryoutMarkup(pinyinOn, isZh) {
+    var pyActive = pinyinOn !== false;
+    return '<div class="fiezel-ja-onboarding-panel fiezel-zh-onboarding-panel" data-ob-zh-panel style="' + (isZh ? 'display:flex;' : 'display:none;') + '">'
+      + '<div class="fz-active-lang-pill" data-ob-change-course role="button" tabindex="0">'
+      + '<div class="fz-active-lang-left"><span class="fiezel-course-flag" aria-hidden="true">' + FLAG_ZH + '</span><b>' + escapeHtml(T('onboarding.course-zh')) + '</b></div>'
+      + '<span class="fz-badge-active">' + escapeHtml(T('onboarding.badge-active')) + '</span>'
+      + '</div>'
+      + '<div class="fz-ja-compact-header fz-toggle-row">'
+      + '<span class="fz-ja-compact-title fz-toggle-label"><span class="fz-toggle-icon">' + ICON_SPEAKER_SVG + '</span> ' + escapeHtml(T('onboarding.pinyin-label')) + '</span>'
+      + '<button type="button" class="fiezel-ob-furigana-pill fz-plain' + (pyActive ? ' is-active' : '') + '" data-ob-toggle-pinyin aria-pressed="' + (pyActive ? 'true' : 'false') + '" aria-label="Pinyin">'
+      + '<span class="fz-switch-track" aria-hidden="true"><span class="fz-switch-thumb"></span></span>'
+      + '<span class="fz-sr-furi"><span class="fz-pill-text">Pinyin:</span> <strong data-ob-pinyin-status>' + (pyActive ? 'ON' : 'OFF') + '</strong></span>'
+      + '</button>'
+      + '</div>'
+      + '<div class="fiezel-ja-kana-options" role="radiogroup" aria-label="Pinyin">'
+      + '<button type="button" role="radio" aria-checked="' + (pyActive ? 'true' : 'false') + '" class="fiezel-kana-btn fz-plain' + (pyActive ? ' is-selected' : '') + '" data-ob-pinyin="learning">'
+      + '<span class="fz-kana-btn-badge">' + escapeHtml(T('onboarding.zh-opt-learn-title')) + '</span>'
+      + '</button>'
+      + '<button type="button" role="radio" aria-checked="' + (!pyActive ? 'true' : 'false') + '" class="fiezel-kana-btn fz-plain' + (!pyActive ? ' is-selected' : '') + '" data-ob-pinyin="fluent">'
+      + '<span class="fz-kana-btn-badge">' + escapeHtml(T('onboarding.zh-opt-fluent-title')) + '</span>'
+      + '</button>'
+      + '</div>'
+      + '<div class="fiezel-ob-sentence-card' + (pyActive ? '' : ' hide-furigana') + '" data-ob-zh-sentence-card>'
+      + '<div class="fz-ob-jp-row">'
+      + '<div class="fz-ob-jp-line" aria-label="Ni hao hen gaoxing renshi ni">'
+      + '<ruby>\u4F60\u597D<rt>n\u01D0 h\u01CEo</rt></ruby>\uFF0C<ruby>\u5F88\u9AD8\u5174<rt>h\u011Bn g\u0101ox\u00ECng</rt></ruby><ruby>\u8BA4\u8BC6<rt>r\u00E8nshi</rt></ruby><ruby>\u4F60<rt>n\u01D0</rt></ruby>\u3002'
+      + '</div>'
+      + '<span class="fz-ob-id-line">"' + escapeHtml(T('onboarding.zh-meaning-hello')) + '"</span>'
+      + '</div>'
+      + '</div>'
+      + '<p class="fz-helper-note"><span class="fz-info-icon">' + ICON_INFO_SVG + '</span> ' + escapeHtml(T('onboarding.helper-toggle-note')) + '</p>'
+      + '</div>';
+  }
+
+  function courseMarkup(env, selected, kanaPref, furiOn, stage, pinyinOn) {
     var pick = normalizeCourse(selected);
     var showSettings = stage ? (stage === 'settings' && !!pick) : !!pick;
     var cards = COURSES.map(function (c) {
@@ -1000,14 +1052,6 @@
         + '</button>';
     }).join('');
 
-    var mandarinCard = '<div class="fiezel-course-card is-mandarin" data-ob-course-preview="zh">'
-      + '<div class="fz-course-card-left">'
-      + '<span class="fiezel-course-flag" aria-hidden="true">' + FLAG_ZH + '</span>'
-      + '<span class="fiezel-course-text"><b>' + escapeHtml(T('onboarding.course-zh')) + '</b><small>' + escapeHtml(T('onboarding.course-zh-sub')) + '</small></span>'
-      + '</div>'
-      + '<span class="fz-card-badge">' + escapeHtml(T('onboarding.course-soon')) + '</span>'
-      + '</div>';
-
     return reveal(env, COURSE_STEP, showSettings ? 3 : 2, {
       showBack: true,
       showSkip: uxOn('leanIntro') ? false : undefined,
@@ -1019,10 +1063,10 @@
       + '<p class="fiezel-body" data-ob-course-sub>' + escapeHtml(T(showSettings ? 'onboarding.lang-settings-desc' : 'onboarding.course-desc-v2')) + '</p>'
       + '<div class="fiezel-course-grid' + (showSettings ? ' is-hidden' : '') + '" data-ob-course-grid role="radiogroup" aria-label="' + escapeHtml(T('onboarding.course-aria')) + '" style="display:' + (showSettings ? 'none' : 'grid') + ';">'
       + cards
-      + mandarinCard
       + '</div>'
       + jaCourseTryoutMarkup(kanaPref, furiOn, showSettings && pick === 'ja')
       + enCourseTryoutMarkup(showSettings && pick === 'en')
+      + zhCourseTryoutMarkup(pinyinOn, showSettings && pick === 'zh')
       + '<p class="fiezel-note" style="display:none;">' + escapeHtml(T('onboarding.course-note')) + '</p>'
       + btn(T('onboarding.next-arrow'), 'data-ob-advance' + (pick ? '' : ' disabled'))
       + dots(5, showSettings ? 2 : 1)
@@ -1112,7 +1156,7 @@
         + (selected ? '<span class="fz-goal-check" aria-hidden="true">\u2713</span>' : '')
         + '</button>';
     }).join('');
-    var levelList = (activeCourse === 'ja') ? JLPT_LEVELS : CEFR_LEVELS;
+    var levelList = (activeCourse === 'ja') ? JLPT_LEVELS : (activeCourse === 'zh') ? HSK_LEVELS : CEFR_LEVELS;
     var levelRow = selectedGoal ? '<div class="fiezel-level-row" role="radiogroup" aria-label="' + escapeHtml(T('onboarding.step-level-aria')) + '">' + levelList.map(function (lv) {
       var selected = lv === selectedLevel;
       return '<button type="button" role="radio" aria-checked="' + (selected ? 'true' : 'false') + '" class="fiezel-level-chip fz-plain' + (selected ? ' is-selected' : '') + '" data-ob-level="' + lv + '">' + lv + '</button>';
@@ -1149,9 +1193,19 @@
     return { lite: lite, soal: soal, menit: lite ? 5 : 10 };
   }
 
-  function placementMarkup(env) {
+  function placementMarkup(env, selectedTier) {
     var facts = placementFacts(env);
+    var hasExplicitTier = selectedTier === 'easy' || selectedTier === 'normal' || selectedTier === 'hard';
+    var tier = hasExplicitTier ? selectedTier : 'normal';
+    var tierObj = PLACEMENT_TIERS.filter(function (t) { return t.id === tier; })[0] || PLACEMENT_TIERS[1];
+    var soalCount = hasExplicitTier ? tierObj.soal : facts.soal;
     var seq = stepSequence(), last = seq[seq.length - 1] === PLACEMENT_STEP;
+    var tierPills = PLACEMENT_TIERS.map(function (t) {
+      var active = t.id === tier;
+      return '<button type="button" role="radio" aria-checked="' + (active ? 'true' : 'false') + '" class="fz-ob-tier-pill fz-plain' + (active ? ' is-selected' : '') + '" data-ob-tier="' + t.id + '" data-tier-soal="' + t.soal + '" data-tier-desc="' + escapeHtml(T(t.descKey)) + '">'
+        + '<b class="fz-tier-title">' + escapeHtml(T(t.labelKey)) + '</b>'
+        + '</button>';
+    }).join('');
     return reveal(env, 4, 5, {
       showBack: true,
       showSkip: last ? false : undefined,
@@ -1181,9 +1235,11 @@
       + '<div class="fz-path-texts">'
       + '<div class="fz-path-header-row">'
       + '<b class="fiezel-path-badge">' + escapeHtml(T('onboarding.path-test-title')) + '</b>'
-      + '<span class="fz-path-soal-pill">' + facts.soal + ' ' + escapeHtml(T('guru.soal-count', 'soal')) + '</span>'
+      + '<span class="fz-path-soal-pill" data-ob-soal-pill>' + soalCount + ' ' + escapeHtml(T('guru.soal-count', 'soal')) + '</span>'
       + '</div>'
-      + '<p class="fiezel-path-desc"><span class="fiezel-path-count" style="display:none;">' + facts.soal + ' ' + escapeHtml(T('guru.soal-count', 'soal')) + '</span> ' + escapeHtml(T('onboarding.path-test-desc-v2')) + '</p>'
+      + '<p class="fiezel-path-desc"><span class="fiezel-path-count" style="display:none;">' + facts.soal + ' ' + escapeHtml(T('guru.soal-count', 'soal')) + '</span> <span data-ob-tier-desc-text>' + escapeHtml(T('onboarding.path-test-desc-v2')) + '</span></p>'
+      + '<div class="fz-ob-skills-strip">' + escapeHtml(T('onboarding.skills-5-pill')) + '</div>'
+      + '<div class="fz-ob-tier-row" role="radiogroup" aria-label="' + escapeHtml(T('onboarding.tier-aria')) + '">' + tierPills + '</div>'
       + '</div>'
       + '</div>'
       + '<div class="fz-path-radio" aria-hidden="true"><span class="fz-radio-dot"></span></div>'
@@ -1303,7 +1359,9 @@
     var returnedToPick = false;
     var selectedKanaPref = 'learning';
     var selectedFurigana = true;
+    var selectedPinyin = true;
     var selectedIpa = true;
+    var selectedPlacementTier = storedPlacementTier(target);
     var selectedGoal = '';
     var selectedLevel = '';
     var closed = false;
@@ -1593,10 +1651,10 @@
       } catch (_) {}
       if (step === LANGUAGE_STEP) html = languageMarkup(target, selectedLocale, localeBusy);
       else if (step === 1) html = nameMarkup(target, typedName);
-      else if (step === COURSE_STEP) html = courseMarkup(target, selectedCourse, selectedKanaPref, selectedFurigana, courseStage);
+      else if (step === COURSE_STEP) html = courseMarkup(target, selectedCourse, selectedKanaPref, selectedFurigana, courseStage, selectedPinyin);
       else if (step === 2) html = carouselMarkup(target, slide);
       else if (step === 3) html = goalMarkup(target, selectedGoal, selectedLevel, selectedCourse);
-      else if (step === 4) html = placementMarkup(target);
+      else if (step === 4) html = placementMarkup(target, selectedPlacementTier);
       else if (step === 5) html = scheduleMarkup(target);
       else html = summaryMarkup(target, typedName, selectedGoal, selectedLevel, reduceMotion);
       var bottomDune = '<div class="fz-ob-bottom-ornament" aria-hidden="true">'
@@ -1710,7 +1768,7 @@
       if (closed) return;
       closed = true;
       clearMascotTimers();
-      markCompleted(target, { at: now, via: via, locale: selectedLocale, name: typedName, goal: selectedGoal, level: selectedLevel, role: selectedRole, classCode: typedClassCode, course: selectedCourse, kanaPreference: selectedKanaPref, furigana: selectedFurigana });
+      markCompleted(target, { at: now, via: via, locale: selectedLocale, name: typedName, goal: selectedGoal, level: selectedLevel, role: selectedRole, classCode: typedClassCode, course: selectedCourse, kanaPreference: selectedKanaPref, furigana: selectedFurigana, pinyin: selectedPinyin, placementTier: selectedPlacementTier });
       // Serah terima hanya pada penyelesaian sungguhan; skip/placement keluar lewat fade
       // lama (§2.3: dilewati pada kurangi-gerak dan pada jalur tes penempatan).
       var handedOff = via === 'finish' ? beginHandoff() : false;
@@ -1724,7 +1782,7 @@
       // semua jalan keluar lain berarti "lanjutkan alur pembukaan seperti biasa".
       var handler = via === 'placement' ? opts.onPlacement : opts.onFinish;
       if (typeof handler === 'function') {
-        try { handler({ name: typedName, goal: selectedGoal, level: selectedLevel, via: via, role: selectedRole, classCode: typedClassCode }); } catch (_) {}
+        try { handler({ name: typedName, goal: selectedGoal, level: selectedLevel, via: via, role: selectedRole, classCode: typedClassCode, course: selectedCourse, tier: selectedPlacementTier }); } catch (_) {}
       }
     }
     function remove() {
@@ -1921,6 +1979,7 @@
         }
         var jaPanel = host.querySelector('[data-ob-ja-panel]');
         var enPanel = host.querySelector('[data-ob-en-panel]');
+        var zhPanel = host.querySelector('[data-ob-zh-panel]');
         var courseGrid = host.querySelector('[data-ob-course-grid]');
         var ipaToggle = host.querySelector('[data-ob-toggle-ipa]');
         if (ipaToggle) {
@@ -1949,6 +2008,7 @@
           }
           if (enPanel && enPanel.style) enPanel.style.display = (showSettings && selectedCourse === 'en') ? 'flex' : 'none';
           if (jaPanel && jaPanel.style) jaPanel.style.display = (showSettings && selectedCourse === 'ja') ? 'flex' : 'none';
+          if (zhPanel && zhPanel.style) zhPanel.style.display = (showSettings && selectedCourse === 'zh') ? 'flex' : 'none';
           var cHead = host.querySelector('[data-ob-course-heading]');
           var cSub = host.querySelector('[data-ob-course-sub]');
           if (cHead) cHead.textContent = T(showSettings ? 'onboarding.lang-settings-title' : 'onboarding.course-title-v2');
@@ -2042,6 +2102,35 @@
             card.classList.toggle('hide-furigana', !selectedFurigana);
           }
           if (status) status.textContent = selectedFurigana ? 'ON' : 'OFF';
+        }
+        function updatePinyinUI() {
+          var pill = host.querySelector('[data-ob-toggle-pinyin]');
+          var card = host.querySelector('[data-ob-zh-sentence-card]');
+          var status = host.querySelector('[data-ob-pinyin-status]');
+          if (pill) {
+            if (pill.classList && typeof pill.classList.toggle === 'function') pill.classList.toggle('is-active', selectedPinyin);
+            pill.setAttribute('aria-pressed', selectedPinyin ? 'true' : 'false');
+          }
+          if (card && card.classList && typeof card.classList.toggle === 'function') card.classList.toggle('hide-furigana', !selectedPinyin);
+          if (status) status.textContent = selectedPinyin ? 'ON' : 'OFF';
+        }
+        host.querySelectorAll('[data-ob-pinyin]').forEach(function (pb) {
+          pb.addEventListener('click', function () {
+            selectedPinyin = (pb.getAttribute('data-ob-pinyin') || 'learning') !== 'fluent';
+            host.querySelectorAll('[data-ob-pinyin]').forEach(function (x) {
+              var on = x === pb;
+              if (x.classList && typeof x.classList.toggle === 'function') x.classList.toggle('is-selected', on);
+              x.setAttribute('aria-checked', on ? 'true' : 'false');
+            });
+            updatePinyinUI();
+          });
+        });
+        var pyToggle = host.querySelector('[data-ob-toggle-pinyin]');
+        if (pyToggle) {
+          pyToggle.addEventListener('click', function () {
+            selectedPinyin = !selectedPinyin;
+            updatePinyinUI();
+          });
         }
         host.querySelectorAll('[data-ob-ruby]').forEach(function (rubyEl) {
           rubyEl.addEventListener('click', function () {
@@ -2171,6 +2260,32 @@
             });
           })(pathCards[pIdx]);
         }
+        var tierBtns = host.querySelectorAll('[data-ob-tier]');
+        for (var tIdx = 0; tIdx < tierBtns.length; tIdx++) {
+          (function (tBtn) {
+            tBtn.addEventListener('click', function (e) {
+              if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+              selectedPlacementTier = normalizePlacementTier(tBtn.getAttribute('data-ob-tier'));
+              selectedPath = 'test';
+              pathCards.forEach(function (c) {
+                if (c.classList && typeof c.classList.toggle === 'function') {
+                  c.classList.toggle('is-selected', c.getAttribute('data-ob-path') === 'test');
+                }
+              });
+              tierBtns.forEach(function (x) {
+                var on = x === tBtn;
+                if (x.classList && typeof x.classList.toggle === 'function') x.classList.toggle('is-selected', on);
+                x.setAttribute('aria-checked', on ? 'true' : 'false');
+              });
+              var soalPill = host.querySelector('[data-ob-soal-pill]');
+              var soalNum = tBtn.getAttribute('data-tier-soal') || '15';
+              if (soalPill) soalPill.textContent = soalNum + ' ' + T('guru.soal-count', 'soal');
+              var descSpan = host.querySelector('[data-ob-tier-desc-text]');
+              var tierDesc = tBtn.getAttribute('data-tier-desc') || '';
+              if (descSpan && tierDesc) descSpan.textContent = tierDesc;
+            });
+          })(tierBtns[tIdx]);
+        }
         var mainStartBtn = host.querySelector('[data-ob-main-start]');
         if (mainStartBtn) {
           mainStartBtn.addEventListener('click', function () {
@@ -2296,6 +2411,11 @@
     markLocaleSelected: markLocaleSelected,
     COURSE_STEP: COURSE_STEP,
     COURSES: COURSES,
+    HSK_LEVELS: HSK_LEVELS,
+    PLACEMENT_TIERS: PLACEMENT_TIERS,
+    normalizeCourse: normalizeCourse,
+    normalizePlacementTier: normalizePlacementTier,
+    storedPlacementTier: storedPlacementTier,
     courseMarkup: courseMarkup,
     needsName: needsName,
     show: show

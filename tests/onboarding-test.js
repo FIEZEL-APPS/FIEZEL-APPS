@@ -248,7 +248,7 @@ test('KUNCI: langkah kursus tepat sesudah nama — Inggris & Jepang, tanpa pilih
   run.element.querySelector('[data-ob-advance]').listeners.click[0]();
   assert.strictEqual(run.stepIndex(), onboarding.COURSE_STEP, 'langkah kursus langsung sesudah nama');
   const cards = run.element.querySelectorAll('[data-ob-course]');
-  assert.deepStrictEqual(cards.map(b => b.getAttribute('data-ob-course')), ['en', 'ja'], 'Bahasa Inggris dan Bahasa Jepang');
+  assert.deepStrictEqual(cards.map(b => b.getAttribute('data-ob-course')), ['en', 'ja', 'zh'], 'Bahasa Inggris, Bahasa Jepang, dan Bahasa Mandarin');
   assert.ok(cards.every(b => b.getAttribute('aria-checked') === 'false'), 'tidak ada pilihan bawaan');
   assert.ok(run.element.querySelector('[data-ob-advance]').hasAttribute('disabled'), 'Lanjut mati sebelum memilih');
   run.element.querySelector('[data-ob-course="ja"]').listeners.click[0]();
@@ -1105,6 +1105,40 @@ test('KUNCI: header onboarding mobile menghormati safe-area-inset-top agar logo 
     'posisi panggung maskot .fiezel-stage wajib memperhitungkan env(safe-area-inset-top)');
   assert.ok(/\.fiezel-ob\s*\.fiezel-ob-reveal:has\(\.fz-ob-header-row\)\s*\.fiezel-stage[\s\S]{0,200}env\(safe-area-inset-top/.test(clay),
     'step tanpa Kembali dengan logo+tagline wajib menurunkan .fiezel-stage agar telinga Mochi tidak menabrak tagline');
+});
+
+test('KUNCI: pilihan kursus Mandarin menyajikan panel Pinyin dan menyimpan fz_zh_pinyin + pilihan Mudah/Normal/Susah pada tes awal', () => {
+  const env = fakeEnv();
+  let placementDetail = null;
+  const run = onboarding.show(env, { now: NOW, force: true, onPlacement(d) { placementDetail = d; }, onFinish() {} });
+  typeName(run, 'Mei');
+  run.element.querySelector('[data-ob-advance]').listeners.click[0]();
+  assert.strictEqual(run.stepIndex(), onboarding.COURSE_STEP, 'di langkah kursus');
+  assert.strictEqual(onboarding.normalizeCourse('zh'), 'zh', 'zh diakui normalizeCourse');
+  const zhPanel = run.element.querySelector('[data-ob-zh-panel]');
+  assert.ok(zhPanel, 'panel pratinjau Mandarin terpasang di DOM');
+  const pyOptions = run.element.querySelectorAll('[data-ob-pinyin]');
+  assert.strictEqual(pyOptions.length, 2, 'dua opsi kesiapan Hanzi/Pinyin');
+  pyOptions[1].listeners.click[0]();
+  run.element.querySelector('[data-ob-course="zh"]').listeners.click[0]();
+  run.element.querySelector('[data-ob-advance]').listeners.click[0]();
+  // Maju sampai langkah tes penempatan (step 4)
+  while (run.stepIndex() !== onboarding.PLACEMENT_STEP) {
+    const goal = run.element.querySelectorAll('[data-ob-goal]')[0];
+    if (goal) {
+      goal.listeners.click[0]();
+      assert.ok(run.element.querySelectorAll('[data-ob-level="HSK 3"]').length === 1, 'kursus Mandarin menyajikan chip level HSK 1-6');
+    }
+    run.element.querySelector('[data-ob-advance]').listeners.click[0]();
+  }
+  const tierBtns = run.element.querySelectorAll('[data-ob-tier]');
+  assert.deepStrictEqual(tierBtns.map(b => b.getAttribute('data-ob-tier')), ['easy', 'normal', 'hard'], 'tiga tingkat tes penempatan: Mudah, Normal, Susah');
+  tierBtns[2].listeners.click[0]();
+  run.element.querySelector('[data-ob-primary]').listeners.click[0]();
+  assert.strictEqual(env.localStorage.getItem('fz_zh_pinyin'), '0', 'fz_zh_pinyin tersinkron saat memilih Sudah Hafal Hanzi');
+  assert.strictEqual(onboarding.storedCourse(env), 'zh', 'kursus zh tersimpan');
+  assert.strictEqual(onboarding.storedPlacementTier(env), 'hard', 'tingkat hard tersimpan');
+  assert.ok(placementDetail && placementDetail.tier === 'hard' && placementDetail.course === 'zh', 'onPlacement menerima tier dan course');
 });
 
 test('gate onboarding sudah terdaftar di CI', () => {

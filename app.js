@@ -7801,7 +7801,8 @@ async function load(opts){const root=document.baseURI;/* W1 P0-1 (16-001): fetch
     ]);
     return{bank,graph,vocab,read,write};
   };
-  let grammarMaster={templates:[]},_misconceptions,grammarVocabMapRaw,zhBundle=null,jaBundle=null;
+  let activeCourseLoadPromise=null;
+let grammarMaster={templates:[]},_misconceptions,grammarVocabMapRaw,zhBundle=null,jaBundle=null;
   if(targetLangAtBoot==='en'){
     const[enBundle,misc,gvMap]=await Promise.all([
       fetchEnglishBundle(),
@@ -10166,6 +10167,7 @@ function afterOnboardingExit(action){
   // Pengguna tanpa kode undangan diarahkan ke modal aktivasi guru.
   if(action==='home'){try{const role=self.FiezelOnboarding?.storedRole?.(self)||'murid';const verified=isVerifiedTeacher();if(role==='guru'&&!verified){showToast('Akses Guru memerlukan kode undangan resmi.');setTimeout(()=>{try{openFiezelAuthModal('teacher')}catch{}},420)}else{if(state.preferences?.role!==role){state.preferences={...state.preferences,role:verified?role:'murid'};save()}if(role==='guru'&&verified)setTimeout(()=>{try{go('tutor')}catch{}},420)}}catch{}}
   if(action==='placement'){
+    if(obRecord&&obRecord.placementTier)state.placementTier=normalizePlacementTierValue(obRecord.placementTier);
     const curBal = Number(state.gems?.balance) || 0;
     state.gems = { schema: 'fiezel-gems-v1', balance: curBal > 0 ? curBal : 100, earnedTotal: Math.max(curBal, 100), spentTotal: 0, ledger: [] };
     save();
@@ -14887,8 +14889,9 @@ function showOnboarding(now=Date.now()){
         // `selfAssessedLevel` adalah perkiraan MURID SENDIRI, bukan hasil pengukuran - karena
         // itu tidak pernah menyentuh state.level, yang hanya diisi tes penempatan asli.
         const jlptMap={N5:'A1',N4:'A2',N3:'B1',N2:'B2',N1:'C1'};
+        const hskMap={'HSK 1':'A1','HSK 2':'A2','HSK 3':'B1','HSK 4':'B2','HSK 5':'C1','HSK 6':'C2'};
         const rawLevel=String(level||'');
-        const cefrEquivalent=jlptMap[rawLevel]||rawLevel;
+        const cefrEquivalent=jlptMap[rawLevel]||hskMap[rawLevel]||rawLevel;
         const selectedLevel=LEVELS.includes(cefrEquivalent)?cefrEquivalent:(LEVELS.includes(rawLevel)?rawLevel:'');
         state.preferences={...state.preferences,goalProfile:id,selfAssessedLevel:selectedLevel,activeLevel:selectedLevel||state.preferences.activeLevel||'',levelMode:selectedLevel?'manual':state.preferences.levelMode||'placement'};
         // m025-166: level yang dipilih di sini belum terbukti. Gerbangnya TIDAK dibuka di atas
@@ -14897,13 +14900,13 @@ function showOnboarding(now=Date.now()){
         try{armLevelEntryGate(selectedLevel)}catch(_){}
         save();render();showToast(FiezelI18n.t('journey.toast-tujuan',{label:label}),'success')
       },
-      /* m025-367: kursus dipilih di perkenalan (Bahasa Inggris / Bahasa Jepang). Jalurnya
+      /* m025-367: kursus dipilih di perkenalan (Bahasa Inggris / Bahasa Jepang / Bahasa Mandarin). Jalurnya
          SAMA dengan chip kursus di Home (setTargetLangPreference), tanpa toast dan tanpa
          menutup lapisan: perkenalan masih terbuka di atasnya, dan bank kursus harus sudah
          termuat sebelum tes penempatan dimulai dua langkah kemudian. */
       onCourse:({course})=>{
         const value=(function(){try{return self.FiezelTargetLanguage?.normalize?.(course)||'en'}catch(_){return course==='ja'?'ja':course==='zh'?'zh':'en'}}());
-        (async()=>{
+        activeCourseLoadPromise=(async()=>{
           try{if(activeTargetLang()===value)return;switchTargetLangStorage(value);await load({kontenSaja:true})}catch(_){}
           try{render()}catch(_){}
         })();
@@ -16595,7 +16598,7 @@ function AudioService(){
    * kolam soal sisanya), persis seperti dicatat reports/voice-v5-prefetch.md §3 baris 4.
    * Tidak ada prepare()/ensureReady() di sini; false yang tenang adalah jawaban sah.
    */
-  prefetch(next,options={}){const loc=options.locale||(typeof activeTargetLang==='function'&&activeTargetLang()==='ja'?'ja-JP':'en-US');let targetNext=next;if(loc==='ja-JP'&&Array.isArray(V)){const found=V.find(x=>x&&(x.word===targetNext||x.kanji===targetNext));if(found&&found.kana)targetNext=found.kana;}return prefetchNextVoice(targetNext,{speed:options.speed??selectedNeuralRate(),contentType:options.contentType,locale:loc})},
+  prefetch(next,options={}){const loc=options.locale||(typeof activeTargetLang==='function'?(activeTargetLang()==='ja'?'ja-JP':activeTargetLang()==='zh'?'zh-CN':'en-US'):'en-US');let targetNext=next;if(loc==='ja-JP'&&Array.isArray(V)){const found=V.find(x=>x&&(x.word===targetNext||x.kanji===targetNext));if(found&&found.kana)targetNext=found.kana;}return prefetchNextVoice(targetNext,{speed:options.speed??selectedNeuralRate(),contentType:options.contentType,locale:loc})},
   /**
    * Satu pintu untuk Reading/Vocabulary/Grammar. Sejak m025-232 ia TIDAK punya cadangan
    * bersuara: hasil selain "berbunyi" berarti teks tanpa suara, dan sekali per sesi murid
@@ -16603,7 +16606,7 @@ function AudioService(){
    */
   play(text,options={}){
    if(!text)return Promise.resolve(null);
-   this.stop();const loc=options.locale||(typeof activeTargetLang==='function'&&activeTargetLang()==='ja'?'ja-JP':'en-US');
+   this.stop();const loc=options.locale||(typeof activeTargetLang==='function'?(activeTargetLang()==='ja'?'ja-JP':activeTargetLang()==='zh'?'zh-CN':'en-US'):'en-US');
    let playText=text;
    if(loc==='ja-JP'&&Array.isArray(V)){
      const found=V.find(x=>x&&(x.word===playText||x.kanji===playText));
@@ -18145,8 +18148,35 @@ function readingSession(r,opts={}){const qs=(r.qs||[]).map((q,i)=>makeReadingQue
    paling mahal, yaitu layar pertama sebelum murid punya alasan mempercayai apa pun.
    Menit dihitung, bukan dipaku: ~25 detik per soal (angka yang sama yang membuat 25
    soal disebut "sekitar sepuluh menit"), dibulatkan ke menit terdekat. */
+const PLACEMENT_TIERS_SPEC=Object.freeze({
+  easy:Object.freeze({id:'easy',theta0:1.3,count:12,minQuestions:10,semStop:0.36}),
+  normal:Object.freeze({id:'normal',theta0:2.6,count:15,minQuestions:12,semStop:0.34}),
+  hard:Object.freeze({id:'hard',theta0:4.0,count:18,minQuestions:14,semStop:0.32})
+});
+function normalizePlacementTierValue(v){return v==='easy'||v==='normal'||v==='hard'?v:'normal'}
+function currentPlacementTier(){
+  if(state?.placementTier==='easy'||state?.placementTier==='normal'||state?.placementTier==='hard')return state.placementTier;
+  try{const ob=self.FiezelOnboarding?.storedPlacementTier?.(self);if(ob)return normalizePlacementTierValue(ob)}catch(_){}
+  return 'normal';
+}
+function placementTierCount(tier=currentPlacementTier()){return (PLACEMENT_TIERS_SPEC[normalizePlacementTierValue(tier)]||PLACEMENT_TIERS_SPEC.normal).count}
+function setPlacementTier(tier){
+  state.placementTier=normalizePlacementTierValue(tier);
+  save();
+  if(state.view==='placement')render();
+}
+window.setPlacementTier=setPlacementTier;
+function placementTierSelectorMarkup(activeTier=currentPlacementTier()){
+  const tiers=['easy','normal','hard'];
+  const keys={easy:'onboarding.tier-easy',normal:'onboarding.tier-normal',hard:'onboarding.tier-hard'};
+  return `<div class="placement-tier-bar" role="radiogroup" aria-label="${esc(FiezelI18n.t('onboarding.tier-aria'))}">${tiers.map(id=>{
+    const spec=PLACEMENT_TIERS_SPEC[id];
+    const on=id===activeTier;
+    return `<button type="button" role="radio" aria-checked="${on?'true':'false'}" class="placement-tier-btn${on?' is-active':''}" data-placement-tier="${id}" onclick="setPlacementTier('${id}')"><b>${esc(FiezelI18n.t(keys[id]))}</b><small>${spec.count} ${esc(FiezelI18n.t('guru.soal-count','soal'))}</small></button>`;
+  }).join('')}</div>`;
+}
 function placementMinutes(count){return Math.max(3,Math.round(Number(count||0)*25/60))}
-function placement(){const jumlah=placementSize(),menit=placementMinutes(jumlah),shownLevels=(typeof jaCourseOn==='function'&&jaCourseOn())?LEVELS.filter(l=>l!=='C2'):LEVELS;shell(FiezelI18n.t('placement.tes-kemampuan-dasar'),FiezelI18n.t('placement.lite-lead',{jumlah}),`<div class="card hero"><div class="eyebrow">${FiezelI18n.t('placement.pemetaan-level')}</div><h2>${FiezelI18n.t('placement.lite-hero',{jumlah,menit})}</h2><p>${FiezelI18n.t(uxOn('placementLite')?'placement.lite-isi':'placement.isinya-listening-grammar-vocabulary-tanpa')}</p><button class="primary" onclick="startPlacement()">${FiezelI18n.t('placement.lite-mulai',{jumlah})} <i data-lucide="arrow-right"></i></button></div><div class="level-grid">${shownLevels.map((l,i)=>card(`<button class="level-card" onclick="startLevelPlacement('${l}')"><span class="level-number">${i+1}</span><div><b>${displayLevel(l)}</b><p>${FiezelI18n.t('placement.masuk-practice-level',{l:displayLevel(l)})}</p></div><i data-lucide="arrow-right"></i></button>`)).join('')}</div>`)}
+function placement(){const tier=currentPlacementTier(),jumlah=placementTierCount(tier),menit=placementMinutes(jumlah),shownLevels=(typeof jaCourseOn==='function'&&jaCourseOn())?LEVELS.filter(l=>l!=='C2'):LEVELS;shell(FiezelI18n.t('placement.tes-kemampuan-dasar'),FiezelI18n.t('placement.lite-lead',{jumlah}),`<div class="card hero"><div class="eyebrow">${FiezelI18n.t('placement.pemetaan-level')}</div><h2>${FiezelI18n.t('placement.lite-hero',{jumlah,menit})}</h2><p>${esc(FiezelI18n.t('onboarding.skills-5-pill'))}</p>${placementTierSelectorMarkup(tier)}<button class="primary" onclick="startPlacement({tier:'${tier}'})">${FiezelI18n.t('placement.lite-mulai',{jumlah})} <i data-lucide="arrow-right"></i></button></div><div class="level-grid">${shownLevels.map((l,i)=>card(`<button class="level-card" onclick="startLevelPlacement('${l}')"><span class="level-number">${i+1}</span><div><b>${displayLevel(l)}</b><p>${FiezelI18n.t('placement.masuk-practice-level',{l:displayLevel(l)})}</p></div><i data-lucide="arrow-right"></i></button>`)).join('')}</div>`)}
 function grammarItemsForLevel(level=getActiveLevel()){
   const target=LEVELS.includes(String(level||''))?String(level):'A1';const bySequence=(a,b)=>Number(a.sequence||Number.MAX_SAFE_INTEGER)-Number(b.sequence||Number.MAX_SAFE_INTEGER)||a.skill.localeCompare(b.skill);return GRAMMAR_ITEMS.filter(entry=>entry.level===target).sort(bySequence);
 }
@@ -18359,7 +18389,75 @@ function placementLiteBandLevel(bands){
   return level;
 }
 let placementListeningBankEn=null,placementListeningBankJa=null,placementListeningInflight=null;
+/* m025-819 (probe empiris): kursus Mandarin dulu jatuh ke cabang "bukan Jepang" sehingga
+   tes penempatannya menyajikan 4 soal listening BERBAHASA INGGRIS dari 12, dan grammar-nya
+   memakai template zh yang 192 stem-nya identik ("我们在学校____X。") dengan pilihan tak
+   bermakna. Mandarin kini punya bank penempatan kurasi sendiri (content/zh/placement-zh.json):
+   listening berbahasa Mandarin (dibacakan zh-CN) dan grammar bertingkat HSK 1-6. */
+let placementBankZh=null,placementBankJa=null,placementSpeakingEn=null;
+function placementCourseIsZh(){try{return typeof activeTargetLang==='function'&&activeTargetLang()==='zh'}catch(_){return false}}
+async function loadPlacementBankZh(){
+  if(placementBankZh)return placementBankZh;
+  try{
+    const response=await fetch('./content/zh/placement-zh.json');
+    if(!response.ok)throw new Error(`zh_placement_${response.status}`);
+    const bank=await response.json();
+    placementBankZh={
+      listening:Array.isArray(bank?.listening)?bank.listening.filter(x=>Array.isArray(x?.options)&&x.options.length>=2&&x.script):[],
+      reading:Array.isArray(bank?.reading)?bank.reading:[],
+      writing:Array.isArray(bank?.writing)?bank.writing:[],
+      speaking:Array.isArray(bank?.speaking)?bank.speaking:[],
+      tokenOrder:Array.isArray(bank?.tokenOrder)?bank.tokenOrder:[],
+      grammar:Array.isArray(bank?.grammar)?bank.grammar.filter(x=>Array.isArray(x?.options)&&x.options.length>=2&&x.stem):[]
+    };
+  }catch{placementBankZh={listening:[],reading:[],writing:[],speaking:[],tokenOrder:[],grammar:[]}}
+  return placementBankZh;
+}
+async function loadPlacementBankJa(){
+  if(placementBankJa)return placementBankJa;
+  try{
+    const response=await fetch('./content/ja/placement-ja.json');
+    if(!response.ok)throw new Error(`ja_placement_${response.status}`);
+    const bank=await response.json();
+    placementBankJa={
+      writing:Array.isArray(bank?.writing)?bank.writing:[],
+      speaking:Array.isArray(bank?.speaking)?bank.speaking:[],
+      tokenOrder:Array.isArray(bank?.tokenOrder)?bank.tokenOrder:[]
+    };
+  }catch{placementBankJa={writing:[],speaking:[],tokenOrder:[]}}
+  return placementBankJa;
+}
+async function loadPlacementSpeakingEn(){
+  if(placementSpeakingEn)return placementSpeakingEn;
+  try{
+    const response=await fetch('./features/speaking-listening/speaking-bank-v1.json');
+    if(!response.ok)throw new Error(`en_speaking_${response.status}`);
+    const bank=await response.json();
+    const list=Array.isArray(bank?.items)?bank.items:(Array.isArray(bank)?bank:[]);
+    placementSpeakingEn=list.filter(x=>x&&(x.targetText||x.sampleAnswer));
+  }catch{placementSpeakingEn=[]}
+  return placementSpeakingEn;
+}
+/** Soal grammar penempatan Mandarin dari bank kurasi; pilihan diacak, penjelasan per pilihan lengkap. */
+function makeZhPlacementGrammarQuestion(item){
+  if(!item||!Array.isArray(item.options))return null;
+  const correct=String(item.options[item.answerIndex]||'');
+  if(!correct)return null;
+  const marked=shuffle(item.options.map(o=>({x:String(o),ok:String(o)===correct})));
+  const distractors=marked.map(m=>({option:m.x,reason:m.ok?String(item.why||''):String(item.distractors?.[m.x]||item.rule||'')}));
+  const level=LEVELS.includes(item.level)?item.level:'A1';
+  return{id:`grammar-${item.id}-${Date.now()}-${Math.random()}`,type:'grammar',level,skill:String(item.skill||item.id),lessonSkill:String(item.skill||item.id),sourceId:String(item.id),conceptId:String(item.id),practiceMode:'placement',question:String(item.stem),options:marked.map(m=>m.x),answerIndex:marked.findIndex(m=>m.ok),difficulty:LEVELS.indexOf(level)+1,explain:{why:String(item.why||''),rule:String(item.rule||''),distractor:FiezelI18n.t('placement.pilihan-lain-memakai-kata-kata'),memory:String(item.rule||''),distractors}};
+}
+/** Kandidat grammar penempatan per level, satu pintu untuk tes penuh dan tes per level. */
+function placementGrammarCandidates(srcLevel){
+  if(placementCourseIsZh()&&placementBankZh?.grammar?.length)return shuffle(placementBankZh.grammar.filter(x=>x.level===srcLevel)).map(item=>({zh:item}));
+  let list=grammarItemsForLevel(srcLevel);
+  if(!list.length&&srcLevel==='C2')list=grammarItemsForLevel('C1');
+  return shuffle(list);
+}
+function buildPlacementGrammar(entry){return entry?.zh?makeZhPlacementGrammarQuestion(entry.zh):makeGrammarQuestion(entry.skill,entry.item)}
 async function loadPlacementListening(){
+  if(placementCourseIsZh()){const bank=await loadPlacementBankZh();return bank.listening}
   const isJa=(typeof jaCourseOn==='function'&&jaCourseOn())||(typeof activeTargetLang==='function'&&activeTargetLang()==='ja');
   if(isJa&&placementListeningBankJa)return placementListeningBankJa;
   if(!isJa&&placementListeningBankEn)return placementListeningBankEn;
@@ -18421,8 +18519,13 @@ function makeListeningQuestion(item){
   if(Array.isArray(item.options)){
     options=item.options.map(opt=>{
       if(typeof opt==='object'&&opt!==null){
-        if(opt.whyFails)distractors.push({option:opt.textId||opt.text,reason:opt.whyFails});
-        return opt.text?(opt.textId?`${opt.text} (${opt.textId})`:opt.text):(opt.textId||String(opt));
+        /* m025-819: label distraktor WAJIB identik dengan label yang tampil di layar.
+           Sebelumnya distraktor memakai textId saja sementara opsi tampil "text (textId)",
+           sehingga gerbang integritas menolak SELURUH bank listening JLPT dan tes
+           penempatan Jepang tidak pernah punya satu pun soal listening (probe m025-819). */
+        const label=opt.text?(opt.textId?`${opt.text} (${opt.textId})`:opt.text):(opt.textId||String(opt));
+        if(opt.whyFails)distractors.push({option:label,reason:opt.whyFails});
+        return label;
       }
       return String(opt);
     });
@@ -18470,18 +18573,33 @@ async function buildPlacement(){
   for(const level of LEVELS){
     const plan=placementBlueprint()[level];
     const srcLevel=(isJaCourse&&level==='C2')?'C1':level;
-    let grammarCandidates=grammarItemsForLevel(srcLevel);
-    if(!grammarCandidates.length&&srcLevel==='C2')grammarCandidates=grammarItemsForLevel('C1');
     const candidates={
       vocab:shuffle(V.filter(v=>v.level===srcLevel&&v.meaning)),
-      grammar:shuffle(grammarCandidates),
+      grammar:placementGrammarCandidates(srcLevel),
       listening:shuffle(listeningItems.filter(x=>x.level===level||x.level===srcLevel||x.cefr===level||x.cefr===srcLevel))
     };
     const build={
       // preferType 'meaning' mengunci bentuk termudah; lihat catatan blueprint di atas.
       vocab:v=>makeVocabQuestion(v,'meaning'),
-      grammar:({skill,item})=>makeGrammarQuestion(skill,item),
+      grammar:buildPlacementGrammar,
       listening:makeListeningQuestion
+    };
+    const used={vocab:new Set(),grammar:new Set(),listening:new Set()};
+    const bandTarget=Object.values(plan).reduce((n,k)=>n+(Number(k)>0?Number(k):0),0);
+    let bandCount=0;
+    const tryAdd=(type,source)=>{
+      if(used[type].has(source))return false;
+      used[type].add(source);
+      const q=build[type](source);
+      if(!q)return false;if(!validateQuestion(q).ok)return false;
+      const sig=sigQ(q);
+      if(seen.has(sig))return false;
+      seen.add(sig);
+      q.difficulty=LEVELS.indexOf(level)+1;
+      q.level=level;
+      all.push(q);
+      bandCount++;
+      return true;
     };
     for(const [type,n] of Object.entries(plan)){
       /* m025-246: kuota NOL berarti "tidak usah sama sekali", dan sebelum baris ini ia
@@ -18494,14 +18612,7 @@ async function buildPlacement(){
       if(!(Number(n)>0))continue;
       let added=0;
       for(const source of candidates[type]){
-        const q=build[type](source);
-        if(!q)continue;if(!validateQuestion(q).ok)continue;
-        const sig=sigQ(q);
-        if(seen.has(sig))continue;
-        seen.add(sig);
-        q.difficulty=LEVELS.indexOf(level)+1;
-        q.level=level;
-        all.push(q);
+        if(!tryAdd(type,source))continue;
         if(++added>=n)break;
       }
       // Listening butuh berkas bank yang diambil lewat jaringan. Kalau berkasnya gagal
@@ -18509,11 +18620,326 @@ async function buildPlacement(){
       // tes karena satu domain tidak termuat hanya memindahkan kegagalan ke murid.
       if(added<n&&type!=='listening')throw new Error(`Placement blueprint shortfall ${level}/${type}: ${added}/${n}`);
     }
+    /* m025-819: setiap band WAJIB mencapai jumlah soal rencananya. Tangga band menolak band
+       dengan bukti < PLACEMENT_BAND_MIN_EVIDENCE, jadi band yang kekurangan soal listening
+       (bank gagal dimuat / soal ditolak gerbang) dulu MENUTUP seluruh band di atasnya:
+       probe m025-819 membuktikan murid Jepang yang menjawab SEMUA benar tetap ditempatkan
+       N5 (5/5 percobaan), murid B1 sejati 200/200 ditaruh N5. Kekurangan ditambal dari
+       vocab/grammar band yang SAMA - levelnya tetap jujur, hanya bentuk soalnya bergeser. */
+    for(const type of ['grammar','vocab']){
+      if(bandCount>=bandTarget)break;
+      for(const source of candidates[type]){
+        if(bandCount>=bandTarget)break;
+        tryAdd(type,source);
+      }
+    }
   }
   return all;
 }
 
-async function startPlacement(){
+const PLACEMENT_CORE_SKILLS=Object.freeze(['listening','reading','writing','speaking','order']);
+function placementDomainOf(q){
+  if(q?.skillDomain)return String(q.skillDomain);
+  const t=String(q?.type||'');
+  if(t==='listening')return 'listening';
+  if(t==='reading')return 'reading';
+  if(t==='cloze'||t==='writing')return 'writing';
+  if(t==='speaking')return 'speaking';
+  if(t==='token-order')return 'order';
+  return 'anchor';
+}
+function makePlacementSpeakingQuestion(item,courseLang){
+  if(!item)return null;
+  const target=String(item.targetText||item.sampleAnswer||'').trim();
+  if(!target)return null;
+  const level=LEVELS.includes(item.level)?item.level:'A1';
+  return{
+    id:`speaking-${item.id||'sp'}-${Date.now()}-${Math.random()}`,
+    type:'speaking',
+    skillDomain:'speaking',
+    level,
+    targetLang:courseLang||'en',
+    skill:`speaking_${level.toLowerCase()}`,
+    target:String(item.id||target.slice(0,24)),
+    difficulty:LEVELS.indexOf(level)+1,
+    irtA:1.6,
+    irtB:LEVELS.indexOf(level)+1,
+    irtC:0.08,
+    instruction:FiezelI18n.t('placement.speaking-instruction'),
+    question:target,
+    speakingTarget:target,
+    options:[],
+    answerIndex:-1,
+    explain:{
+      why:target,
+      rule:FiezelI18n.t('placement.speaking-instruction'),
+      memory:target,
+      avoid:''
+    }
+  };
+}
+function makePlacementCuratedTokenOrder(item,courseLang){
+  if(!item||!Array.isArray(item.tokens)||item.tokens.length<2)return null;
+  const level=LEVELS.includes(item.level)?item.level:'A1';
+  const hasCjk=courseLang==='ja'||courseLang==='zh'||/[\u3040-\u30ff\u4e00-\u9fff]/.test(item.tokens.join(''));
+  const full=hasCjk?item.tokens.join(''):item.tokens.join(' ');
+  const dist=Array.isArray(item.distractors)?item.distractors.map(String).filter(Boolean):[];
+  return{
+    id:`token-curated-${item.id}-${Date.now()}-${Math.random()}`,
+    type:'token-order',
+    skillDomain:'order',
+    sourceId:String(item.id||''),
+    level,
+    targetLang:courseLang||'en',
+    skill:String(item.skill||item.id||'token_order'),
+    lessonSkill:String(item.skill||item.id||'token_order'),
+    instruction:FiezelI18n.t('grammar.susun-kata','Susun Kata'),
+    question:String(item.prompt||''),
+    fullSentence:full,
+    tokens:item.tokens.map(String),
+    gloss:{},
+    distractors:dist,
+    alternates:Array.isArray(item.alternates)?item.alternates:[],
+    correctOrder:item.tokens.map((_,i)=>i),
+    answerIndex:0,
+    options:[full,...dist],
+    difficulty:LEVELS.indexOf(level)+1,
+    irtA:1.65,
+    irtB:LEVELS.indexOf(level)+1,
+    irtC:0.05,
+    explain:{
+      rule:String(item.rule||''),
+      why:String(item.why||full),
+      memory:String(item.rule||full),
+      avoid:'',
+      distractors:dist.map(d=>({option:d,reason:String(item.rule||''),whyFails:String(item.rule||''),whyFailsId:String(item.rule||'')}))
+    }
+  };
+}
+function placementCat3PL(theta,a,b,c){
+  const z=Math.max(-18,Math.min(18,a*(theta-b)));
+  return c+(1-c)/(1+Math.exp(-z));
+}
+function placementCatFisher(theta,a,b,c){
+  const p=placementCat3PL(theta,a,b,c);
+  if(p<=c+1e-6||p>=1-1e-6)return 0;
+  return (a*a*(p-c)*(p-c)*(1-p))/((1-c)*(1-c)*p);
+}
+function placementCatCreateState(tier='normal'){
+  const normTier=normalizePlacementTierValue(tier);
+  const spec=PLACEMENT_TIERS_SPEC[normTier]||PLACEMENT_TIERS_SPEC.normal;
+  const grid=[];
+  for(let i=0;i<=60;i++)grid.push(0.5+i*0.1);
+  const sigma0=2.4;
+  const logPost=grid.map(th=>-((th-spec.theta0)*(th-spec.theta0))/(2*sigma0*sigma0));
+  const skills={listening:{n:0,ok:0},reading:{n:0,ok:0},writing:{n:0,ok:0},speaking:{n:0,ok:0},order:{n:0,ok:0},anchor:{n:0,ok:0}};
+  return{tier:normTier,theta0:spec.theta0,theta:spec.theta0,sem:1.4,count:spec.count,minQuestions:spec.minQuestions,semStop:spec.semStop,grid,logPost,skills,items:[],lastDomain:''};
+}
+function placementCatObserve(catState,q,ok){
+  if(!catState||!q)return catState;
+  const dom=placementDomainOf(q);
+  const b=Number(q.irtB)||Number(q.difficulty)||(LEVELS.indexOf(q.level)+1)||2;
+  const isOpen=q.type==='cloze'||q.type==='token-order'||q.type==='speaking';
+  const c=Number.isFinite(Number(q.irtC))?Number(q.irtC):(isOpen?0.05:0.25);
+  const a=Number.isFinite(Number(q.irtA))?Number(q.irtA):(isOpen?1.65:1.35);
+  let maxLp=-Infinity;
+  for(let i=0;i<catState.grid.length;i++){
+    const p=Math.max(1e-6,Math.min(1-1e-6,placementCat3PL(catState.grid[i],a,b,c)));
+    catState.logPost[i]+=ok?Math.log(p):Math.log(1-p);
+    if(catState.logPost[i]>maxLp)maxLp=catState.logPost[i];
+  }
+  let sumW=0,mean=0;
+  const weights=catState.logPost.map(lp=>{const w=Math.exp(lp-maxLp);sumW+=w;return w});
+  for(let i=0;i<catState.grid.length;i++)mean+=(weights[i]/sumW)*catState.grid[i];
+  let variance=0;
+  for(let i=0;i<catState.grid.length;i++){const d=catState.grid[i]-mean;variance+=(weights[i]/sumW)*d*d}
+  catState.theta=mean;
+  catState.sem=Math.sqrt(Math.max(0.01,variance));
+  if(!catState.skills[dom])catState.skills[dom]={n:0,ok:0};
+  catState.skills[dom].n++;
+  if(ok)catState.skills[dom].ok++;
+  catState.lastDomain=dom;
+  catState.items.push({level:String(q.level||'A1'),b,c,a,ok:!!ok,domain:dom});
+  return catState;
+}
+function placementCatAllCoreSampled(catState,cfg){
+  if(!catState)return true;
+  for(const dom of PLACEMENT_CORE_SKILLS){
+    if(dom==='speaking'&&cfg?.__speakingUnavailable)continue;
+    const minReq=dom==='speaking'?1:2;
+    if((catState.skills[dom]?.n||0)<minReq)return false;
+  }
+  return true;
+}
+function placementCatPromoteNext(remaining,cfg,rngFn=Math.random){
+  if(!Array.isArray(remaining)||remaining.length<=1)return;
+  const catState=cfg?.__catState;
+  if(!catState)return;
+  const poolDomains=new Set(remaining.map(placementDomainOf));
+  // 1. Cari keterampilan inti yang belum mencapai kuota minimum (acak lintas 5 skill + susun kata)
+  const underQuota=PLACEMENT_CORE_SKILLS.filter(dom=>{
+    if(!poolDomains.has(dom))return false;
+    if(dom==='speaking'&&(cfg?.__speakingUnavailable||(catState.skills.speaking?.n||0)>=2))return false;
+    const targetMin=dom==='speaking'?1:2;
+    return (catState.skills[dom]?.n||0)<targetMin;
+  });
+  let eligible=remaining.filter(q=>{
+    const dom=placementDomainOf(q);
+    if(dom==='speaking'&&(cfg?.__speakingUnavailable||(catState.skills.speaking?.n||0)>=2))return false;
+    if(underQuota.length>0&&!underQuota.includes(dom))return false;
+    if(catState.lastDomain&&dom===catState.lastDomain)return false;
+    return true;
+  });
+  if(!eligible.length)eligible=remaining.filter(q=>!(placementDomainOf(q)==='speaking'&&cfg?.__speakingUnavailable));
+  if(!eligible.length)eligible=remaining;
+  // 2. Urutkan kandidat berdasarkan Fisher Information 3PL di sekitar theta saat ini
+  const scored=eligible.map(q=>{
+    const b=Number(q.irtB)||Number(q.difficulty)||(LEVELS.indexOf(q.level)+1)||2;
+    const isOpen=q.type==='cloze'||q.type==='token-order'||q.type==='speaking';
+    const c=Number.isFinite(Number(q.irtC))?Number(q.irtC):(isOpen?0.05:0.25);
+    const a=Number.isFinite(Number(q.irtA))?Number(q.irtA):(isOpen?1.65:1.35);
+    const info=placementCatFisher(catState.theta,a,b,c)-0.08*Math.abs(b-catState.theta);
+    return{q,info};
+  }).sort((x,y)=>y.info-x.info);
+  // 3. Ambil acak dari 3 kandidat teratas (atau dalam 82% Fisher maksimum) agar soal benar-benar diacak
+  const topInfo=scored[0]?.info||0;
+  const topPool=scored.filter((s,idx)=>idx<3||(topInfo>0&&s.info>=topInfo*0.82)).slice(0,4);
+  const chosen=(topPool[Math.floor(rngFn()*topPool.length)]||scored[0]).q;
+  const idx=remaining.indexOf(chosen);
+  if(idx>0){remaining.splice(idx,1);remaining.unshift(chosen)}
+}
+function placementCatFinalize(catState,answers){
+  const list=Array.isArray(catState?.items)&&catState.items.length?catState.items:(Array.isArray(answers)?answers.map(a=>({level:String(a?.level||'A1'),b:Math.max(1,LEVELS.indexOf(String(a?.level||'A1'))+1),c:0.25,a:1.4,ok:!!a?.ok,domain:a?.skillDomain||'anchor'})):[]);
+  if(!list.length)return{level:1,theta:1.0,sem:1.4,skills:{}};
+  const totalOk=list.filter(x=>x.ok).length;
+  if(totalOk===0)return{level:1,theta:0.8,sem:catState?.sem||0.5,skills:catState?.skills||{}};
+  const theta=Number.isFinite(catState?.theta)?catState.theta:1.0;
+  // Pemetaan theta kontinu [0.5..6.5] ke band CEFR 1..6:
+  // <1.65 -> A1(1), <2.55 -> A2(2), <3.55 -> B1(3), <4.55 -> B2(4), <5.45 -> C1(5), >=5.45 -> C2(6)
+  let rawLvl=theta<1.65?1:theta<2.55?2:theta<3.55?3:theta<4.55?4:theta<5.45?5:6;
+  // Penjaga anti-tebakan: untuk naik ke level L>=2, murid wajib punya minimal 2 jawaban benar
+  // secara keseluruhan DAN minimal 1 bukti benar pada band >= L-1 (mencegah tebakan acak di tier Susah)
+  const expectedGuess=list.reduce((s,x)=>s+(Number(x.c)||0.25),0);
+  const netAboveGuess=(totalOk-expectedGuess)/Math.max(1,list.length-expectedGuess);
+  if(netAboveGuess<0.14)rawLvl=1;
+  else if(netAboveGuess<0.28)rawLvl=Math.min(rawLvl,2);
+  while(rawLvl>1){
+    const highSupport=list.filter(x=>x.ok&&x.b>=rawLvl-1).length;
+    if(highSupport>=2||(rawLvl===2&&totalOk>=3&&highSupport>=1))break;
+    rawLvl--;
+  }
+  const skillsOut={};
+  for(const dom of PLACEMENT_CORE_SKILLS){
+    const s=catState?.skills?.[dom]||{n:0,ok:0};
+    skillsOut[dom]={n:s.n||0,ok:s.ok||0,pct:s.n>0?Math.round((s.ok/s.n)*100):null};
+  }
+  return{level:Math.max(1,Math.min(6,rawLvl)),theta:Number(theta.toFixed(2)),sem:Number((catState?.sem||0.4).toFixed(2)),skills:skillsOut};
+}
+function placementSkillProfileMarkup(profile){
+  if(!profile||typeof profile!=='object')return '';
+  const labels={
+    listening:'placement.skill-listen',
+    reading:'placement.skill-read',
+    writing:'placement.skill-write',
+    speaking:'placement.skill-speak',
+    order:'placement.skill-order'
+  };
+  const chips=PLACEMENT_CORE_SKILLS.filter(k=>profile[k]&&profile[k].n>0).map(k=>{
+    const row=profile[k];
+    return `<div class="result-skill-chip"><span>${esc(FiezelI18n.t(labels[k]))}</span><b>${row.ok}/${row.n} (${row.pct}%)</b></div>`;
+  }).join('');
+  if(!chips)return '';
+  return `<div class="result-skill-profile"><b>${esc(FiezelI18n.t('placement.skill-profile-title'))}</b><div class="result-skill-grid">${chips}</div></div>`;
+}
+async function buildPlacementCatPool(){
+  try{if(activeCourseLoadPromise)await activeCourseLoadPromise}catch(_){}
+  const lang=(typeof activeTargetLang==='function')?activeTargetLang():'en';
+  const isJa=lang==='ja'||(typeof jaCourseOn==='function'&&jaCourseOn());
+  const isZh=lang==='zh';
+  const [listeningItems,zhBank,jaBank,enSpk,enCloze]=await Promise.all([
+    loadPlacementListening().catch(()=>[]),
+    isZh?loadPlacementBankZh().catch(()=>null):Promise.resolve(null),
+    isJa?loadPlacementBankJa().catch(()=>null):Promise.resolve(null),
+    (!isJa&&!isZh)?loadPlacementSpeakingEn().catch(()=>[]):Promise.resolve([]),
+    (!isJa&&!isZh&&typeof ensureClozeBank==='function')?ensureClozeBank().catch(()=>[]):Promise.resolve([])
+  ]);
+  const pool=[],seen=new Set();
+  const pushQ=(q,level,dom,a,c)=>{
+    if(!q)return false;
+    const valid=q.type==='cloze'?!!(q.question&&q.clozeAnswer&&(q.lessonSkill||q.skill))
+      :q.type==='token-order'?!!(q.question&&Array.isArray(q.tokens)&&q.tokens.length>=2&&contentIntegrityGate(q).ok)
+      :q.type==='speaking'?!!(q.question&&q.speakingTarget)
+      :validateQuestion(q).ok;
+    if(!valid)return false;
+    const sig=`${q.type}:${sigQ(q)}`;
+    if(seen.has(sig))return false;
+    seen.add(sig);
+    const b=LEVELS.indexOf(level)+1;
+    q.level=level;
+    q.difficulty=b;
+    q.skillDomain=dom;
+    q.irtB=b;
+    q.irtA=a;
+    q.irtC=c;
+    pool.push(q);
+    return true;
+  };
+  const readingAll=[...(Array.isArray(R)?R:[]),...(isZh&&Array.isArray(zhBank?.reading)?zhBank.reading:[])];
+  const writingAll=isZh?(zhBank?.writing||[]):isJa?(jaBank?.writing||[]):(Array.isArray(enCloze)?enCloze:[]);
+  const speakingAll=isZh?(zhBank?.speaking||[]):isJa?(jaBank?.speaking||[]):(Array.isArray(enSpk)?enSpk:[]);
+  const curatedOrder=isZh?(zhBank?.tokenOrder||[]):isJa?(jaBank?.tokenOrder||[]):[];
+  for(const level of LEVELS){
+    const srcLevel=(isJa&&level==='C2')?'C1':level;
+    // 1. Listening (maks 3 per band)
+    let cListen=0;
+    for(const it of shuffle((listeningItems||[]).filter(x=>x.level===level||x.level===srcLevel||x.cefr===level||x.cefr===srcLevel))){
+      if(pushQ(makeListeningQuestion(it),level,'listening',1.35,0.25)&&++cListen>=3)break;
+    }
+    // 2. Reading (maks 3 per band, utamakan bacaan ringkas <=520 karakter)
+    let cRead=0;
+    const rPassages=shuffle(readingAll.filter(r=>(r.level===level||r.level===srcLevel)&&Array.isArray(r.qs)&&r.qs.length)).sort((a,b)=>((a.text||'').length<=520?0:1)-((b.text||'').length<=520?0:1));
+    for(const r of rPassages){
+      const qIdx=Math.floor(Math.random()*r.qs.length);
+      const rq=makeReadingQuestion(r,r.qs[qIdx],qIdx);
+      if(pushQ(rq,level,'reading',1.4,0.25)&&++cRead>=3)break;
+    }
+    // 3. Writing / Cloze (maks 3 per band)
+    let cWrite=0;
+    for(const w of shuffle(writingAll.filter(x=>x.level===level||x.level===srcLevel))){
+      if(pushQ(makeClozeQuestion(w),level,'writing',1.65,0.05)&&++cWrite>=3)break;
+    }
+    // 4. Speaking — penilaian pelafalan AI Gemini di server (maks 2 per band)
+    let cSpeak=0;
+    for(const s of shuffle(speakingAll.filter(x=>x.level===level||x.level===srcLevel))){
+      if(pushQ(makePlacementSpeakingQuestion(s,lang),level,'speaking',1.6,0.08)&&++cSpeak>=2)break;
+    }
+    // 5. Susun Kata / Token-Order (kurasi + generator kalimat sintaksis, maks 3 per band)
+    let cOrder=0;
+    for(const t of shuffle(curatedOrder.filter(x=>x.level===level||x.level===srcLevel))){
+      if(pushQ(makePlacementCuratedTokenOrder(t,lang),level,'order',1.65,0.05)&&++cOrder>=3)break;
+    }
+    if(cOrder<3&&!isZh){
+      const gList=shuffle(grammarItemsForLevel(srcLevel));
+      for(let gi=0;gi<gList.length&&cOrder<3;gi++){
+        const tq=makeGrammarTokenOrderQuestion(gList[gi].skill,gList[gi].item,gi,level);
+        if(pushQ(tq,level,'order',1.65,0.05))cOrder++;
+      }
+    }
+    // 6. Jangkar Vocab & Grammar (cadangan adaptif per band)
+    let cAnc=0;
+    for(const gEntry of placementGrammarCandidates(srcLevel)){
+      if(pushQ(buildPlacementGrammar(gEntry),level,'anchor',1.35,0.25)&&++cAnc>=2)break;
+    }
+    let cVoc=0;
+    for(const v of shuffle(V.filter(x=>x.level===srcLevel&&x.meaning))){
+      if(pushQ(makeVocabQuestion(v,'meaning'),level,'anchor',1.3,0.25)&&++cVoc>=2)break;
+    }
+  }
+  return pool;
+}
+window.buildPlacementCatPool=buildPlacementCatPool;
+
+async function startPlacement(opts={}){
   /* m025-177 (audit skip A13/A14): placement adalah kanal verifikasi (kontrak owner 3),
      tapi tanpa jeda ia menjadi jalan memutar mengitari cooldown Ujian Skip Level (ulang
      terus sampai band atas lolos). Tes pertama tetap bebas; pengulangan diberi jeda 24 jam
@@ -18522,18 +18948,19 @@ async function startPlacement(){
      (tawaran pengingat + tur) - kalau tidak, murid yang tesnya gagal dimulai kehilangan
      keduanya untuk sesi ini. resumeDeferredWelcome() diam kalau tidak ada yang ditahan. */
   if(state.placementDone){const wait=Math.max(0,Number(state.placementLastAt||0)+LEVEL_EXAM_COOLDOWN_MS-Date.now());if(wait>0){resumeDeferredWelcome();if(!appOpened){try{dismissBootSplash();openApp()}catch(_){}}return showToast(FiezelI18n.t('placement.tes-level-bisa-diulang',{level:levelExamCooldownLabel(wait)}))}}
+  const tier=normalizePlacementTierValue(opts?.tier||currentPlacementTier());
+  state.placementTier=tier;
+  const catState=placementCatCreateState(tier);
   let qs=[];
-  try{qs=await buildPlacement()}catch(error){resumeDeferredWelcome();if(!appOpened){try{dismissBootSplash();openApp()}catch(_){}}return showToast(FiezelI18n.t('placement.tes-pending-can-dijalankan',{error:String(error?.message||error)}),'warn')}
-  // Enam dari 25 soal berasal dari bank listening yang diambil lewat jaringan. Kalau bank
-  // itu tidak termuat, sembilan belas soal grammar dan vocabulary masih cukup untuk membaca
-  // level; di bawah itu angkanya tidak lagi berarti dan tes ditahan.
-  const floor=placementSize()-Object.values(placementBlueprint()).reduce((n,plan)=>n+plan.listening,0);
+  try{qs=await buildPlacementCatPool();if(qs.length<12)qs=await buildPlacement()}catch(error){resumeDeferredWelcome();if(!appOpened){try{dismissBootSplash();openApp()}catch(_){}}return showToast(FiezelI18n.t('placement.tes-pending-can-dijalankan',{error:String(error?.message||error)}),'warn')}
+  const floor=Math.min(10,placementSize()-Object.values(placementBlueprint()).reduce((n,plan)=>n+plan.listening,0));
   if(qs.length<floor){resumeDeferredWelcome();if(!appOpened){try{dismissBootSplash();openApp()}catch(_){}}return showToast(FiezelI18n.t('placement.validator-hanya-menemukan-item-unik',{length:qs.length}),'warn')}
-  quizLoop({type:'placement',count:placementSize(),pool:qs,factory:x=>x,placement:true,placementLite:uxOn('placementLite')});
+  quizLoop({type:'placement',count:catState.count,pool:qs,factory:x=>x,placement:true,adaptiveCat:true,placementTier:tier,__catState:catState,dynamicPool:true,noHints:true,placementLite:uxOn('placementLite')});
   /* Jaring pengaman: kalau kuisnya tidak jadi masuk sebagai stage (overlay tak kunjung
      pergi), sambutan yang ditahan tidak boleh ikut hilang. */
   {const t=setTimeout(()=>{if(!stageStack.length)resumeDeferredWelcome()},4000);t?.unref?.()}
 }
+window.startPlacement=startPlacement;
 async function startLevelPlacement(level){
   const targetLevel=LEVELS.includes(String(level||''))?String(level):'A1';
   const isJaCourse=(typeof activeTargetLang==='function'&&activeTargetLang()==='ja')||(typeof jaCourseOn==='function'&&jaCourseOn());
@@ -18543,19 +18970,16 @@ async function startLevelPlacement(level){
   const seen=new Set();
   const qs=[];
 
-  let grammarCandidates=grammarItemsForLevel(srcLevel);
-  if(!grammarCandidates.length&&srcLevel==='C2')grammarCandidates=grammarItemsForLevel('C1');
-
   const candidates={
     vocab:shuffle(V.filter(v=>v.level===srcLevel&&v.meaning)),
-    grammar:shuffle(grammarCandidates),
+    grammar:placementGrammarCandidates(srcLevel),
     listening:shuffle((listeningItems||[]).filter(x=>x.level===targetLevel||x.level===srcLevel||x.cefr===targetLevel||x.cefr===srcLevel))
   };
 
   const plan={vocab:4,grammar:4,listening:2};
   const build={
     vocab:v=>makeVocabQuestion(v,'meaning'),
-    grammar:({skill,item})=>makeGrammarQuestion(skill,item),
+    grammar:buildPlacementGrammar,
     listening:makeListeningQuestion
   };
 
@@ -19164,7 +19588,7 @@ function quizLoop(cfg){
  /* Fase 3 (C5 butir 2): soal cloze memang tanpa opsi (murid mengetik), jadi validator
     pilihan-ganda pasti menolaknya - ia divalidasi dengan syaratnya sendiri: ada kalimat,
     ada jawaban, ada skill. sigQ tetap bekerja (opsi kosong = tanda tangan dari stem saja). */
- for(const q of questions){const valid=q?.type==='cloze'?!!(q.question&&q.clozeAnswer&&(q.lessonSkill||q.skill)):q?.type==='token-order'?!!(q.question&&Array.isArray(q.tokens)&&q.tokens.length):validateQuestion(q).ok;if(!valid)continue;const s=sigQ(q);if(!seen.has(s)){seen.add(s);unique.push(q)}}
+ for(const q of questions){const valid=q?.type==='cloze'?!!(q.question&&q.clozeAnswer&&(q.lessonSkill||q.skill)):q?.type==='token-order'?!!(q.question&&Array.isArray(q.tokens)&&q.tokens.length):q?.type==='speaking'?!!(q.question&&q.speakingTarget):validateQuestion(q).ok;if(!valid)continue;const s=`${q?.type||''}:${sigQ(q)}`;if(!seen.has(s)){seen.add(s);unique.push(q)}}
  questions=cfg.preserveOrder?unique:shuffle(unique);
  // F1 placement: tes penempatan berjenjang A1 -> C2, deterministik-acak. Diacak DI DALAM band
  // (Array.prototype.sort stabil di V8, jadi hasil shuffle di atas tetap terpakai sebagai urutan
@@ -19236,7 +19660,8 @@ function quizLoop(cfg){
      bukan jawaban salah - ia bukan jawaban sama sekali. Math.max(1,...) menjaga
      pembagian tetap sah pada kasus ekstrem "seluruh sesi audionya gagal"; hasilnya 0%
      di sana memang jujur, karena tidak ada satu pun bukti yang terkumpul. */
-  if(asked>=planned||!remaining.length){finishQuiz(cfg,score,Math.max(1,(asked||planned)-(Number(cfg.__noAudioSkips)||0)),tutorSummary(tutor));return}
+  const catConverged=Boolean(cfg.adaptiveCat&&cfg.__catState&&asked>=cfg.__catState.minQuestions&&cfg.__catState.sem<=cfg.__catState.semStop&&placementCatAllCoreSampled(cfg.__catState,cfg));
+  if(asked>=planned||!remaining.length||catConverged){finishQuiz(cfg,score,Math.max(1,(asked||planned)-(Number(cfg.__noAudioSkips)||0)),tutorSummary(tutor));return}
   if(pendingCard){const c=pendingCard;teach(c);return}
   // Placement mengambil soal berikutnya dari urutan berjenjang di atas, bukan dari tutorPick:
   // pemilihan adaptif targetSuccess 0,8 adalah alat MENGAJAR, dan di dalam alat UKUR ia
@@ -19255,6 +19680,7 @@ function quizLoop(cfg){
       if(idx>=0&&!forceConcept)forceConcept=probeSkill;
     }
   }catch{}
+  if(cfg.adaptiveCat)placementCatPromoteNext(remaining,cfg);
   q=(cfg.placement||cfg.preserveOrder)?remaining[0]:(tutorPick(remaining,tutor,{forceConcept,avoidConcept:lastConcept,cfg})||remaining[0]);
   window.__activeQuizQuestion=q;
   const at=remaining.indexOf(q);if(at>=0)remaining.splice(at,1);
@@ -19403,12 +19829,118 @@ function quizLoop(cfg){
      percobaan (produksi dinilai grader, bukan tebak-ulang), Enter atau tombol Periksa. */
   if(q.type==='cloze'){
    const host=$('options');
-   host.innerHTML=`<div class="cloze-entry"><input id="clozeInput" class="cloze-input" type="text" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" lang="en" enterkeyhint="done" aria-label="${FiezelI18n.t('quiz.ketik-jawabanmu-dalam-lang-inggris')}" placeholder="${FiezelI18n.t('quiz.ketik-jawabanmu-sini')}"><button id="clozeSubmit" class="primary">${FiezelI18n.t('quiz.periksa')}</button></div>`;
+   const clozeLang=(typeof activeTargetLang==='function'&&activeTargetLang()==='ja')?'ja':(typeof activeTargetLang==='function'&&activeTargetLang()==='zh')?'zh-CN':'en';
+   host.innerHTML=`<div class="cloze-entry"><input id="clozeInput" class="cloze-input" type="text" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" lang="${clozeLang}" enterkeyhint="done" aria-label="${FiezelI18n.t('quiz.ketik-jawabanmu-dalam-lang-inggris')}" placeholder="${FiezelI18n.t('quiz.ketik-jawabanmu-sini')}"><button id="clozeSubmit" class="primary">${FiezelI18n.t('quiz.periksa')}</button></div>`;
    const input=$('clozeInput'),btn=$('clozeSubmit');
    const submit=()=>{if(answer.locked)return;const typed=String(input.value||'').trim();if(!typed)return;answerCloze(q,typed,input,btn)};
    btn.onclick=submit;
    input.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();submit()}});
    setTimeout(()=>{try{input.focus()}catch{}},60);
+  }
+  if(q.type==='speaking'){
+   const host=$('options');
+   host.innerHTML=`<div class="speaking-quiz-box"><div class="speaking-prompt-target" id="speakingPromptTarget">${esc(q.speakingTarget||q.question||'')}</div><button type="button" id="speakingRecordBtn" class="primary speaking-rec-btn"><i data-lucide="mic"></i> <span id="speakingRecordLabel">${esc(FiezelI18n.t('placement.speaking-record'))}</span></button><span id="speakingStatusNote" class="muted"></span><button type="button" id="speakingSkipBtn" class="ghost speaking-skip-btn">${esc(FiezelI18n.t('placement.speaking-skip'))}</button></div>`;
+   const recBtn=$('speakingRecordBtn'),recLbl=$('speakingRecordLabel'),statusNote=$('speakingStatusNote'),skipBtn=$('speakingSkipBtn');
+   let mediaRec=null,chunks=[],stream=null,autoStopTimer=null;
+   const stopTracks=()=>{try{if(autoStopTimer){clearTimeout(autoStopTimer);autoStopTimer=null}if(stream)stream.getTracks().forEach(t=>t.stop());stream=null}catch(_){}};
+   const finishSpeaking=(ok,spoken,pronScore)=>{
+    if(answer.locked)return;
+    stopTracks();
+    const ms=Date.now()-start;
+    asked++;
+    if(ok)score++;
+    q.__spokenTranscript=String(spoken||'');
+    q.__pronunciationScore=pronScore;
+    if(cfg.placement){
+     (cfg.__placementAnswers??=[]).push({level:String(q.level||''),ok:!!ok,skillDomain:'speaking'});
+     if(cfg.adaptiveCat&&cfg.__catState)placementCatObserve(cfg.__catState,q,!!ok);
+    }
+    if(MEASURE||cfg.placement)(cfg.__measureReview??=[]).push({q,typed:q.__spokenTranscript||'—',ok:!!ok});
+    record(q,ok,ms,-1);
+    const h=state.history[state.history.length-1];
+    if(!state.speaking)state.speaking={};
+    updateMastery('speaking',q.target||q.skill||q.id,ok,h?.ms||ms,h?.confidence||0,h?.at||Date.now());
+    answer.locked=true;
+    if(recBtn)recBtn.disabled=true;
+    if(skipBtn)skipBtn.disabled=true;
+    const f=$('feedback');
+    if(f){
+     f.classList.remove('hidden');
+     f.innerHTML=`<div class="feedback-title"><i data-lucide="check"></i><b>${FiezelI18n.t('quiz.feedback-saved-title')}</b></div><p class="muted">${esc(FiezelI18n.t('placement.speaking-saved'))}</p>`;
+    }
+    $('quizNext').disabled=false;
+    showQuizFloatingNext();
+    enhanceUI();
+   };
+   const assessBlob=async(blob,mime)=>{
+    if(recBtn)recBtn.disabled=true;
+    if(statusNote)statusNote.textContent=FiezelI18n.t('placement.speaking-assessing');
+    try{
+     const buf=await blob.arrayBuffer();
+     const bytes=new Uint8Array(buf);
+     let bin='';
+     for(let i=0;i<bytes.length;i++)bin+=String.fromCharCode(bytes[i]);
+     const audioBase64=btoa(bin);
+     const apiBase=String(self.FIEZEL_CORE_CONFIG?.apiBase||'').replace(/\/+$/,'');
+     const res=await fetch(`${apiBase}/api/voice/verify-speech`,{
+      method:'POST',
+      credentials:'include',
+      headers:{'Content-Type':'application/json','X-Fiezel-Client':'web'},
+      body:JSON.stringify({audioBase64,mimeType:mime||'audio/webm',targetSentence:q.speakingTarget,targetLang:(typeof activeTargetLang==='function')?activeTargetLang():'en'})
+     }).then(r=>r.ok?r.json():null).catch(()=>null);
+     if(res&&res.ok){
+      finishSpeaking(Boolean(res.passed),res.transcript||'',res.pronunciationScore);
+      return;
+     }
+     if(recBtn)recBtn.disabled=false;
+     if(statusNote)statusNote.textContent=FiezelI18n.t('placement.speaking-mic-error');
+    }catch(_){
+     if(recBtn)recBtn.disabled=false;
+     if(statusNote)statusNote.textContent=FiezelI18n.t('placement.speaking-mic-error');
+    }
+   };
+   if(recBtn)recBtn.onclick=async()=>{
+    if(answer.locked)return;
+    if(mediaRec&&mediaRec.state==='recording'){
+     try{mediaRec.stop()}catch(_){stopTracks()}
+     return;
+    }
+    if(!navigator?.mediaDevices?.getUserMedia||typeof MediaRecorder==='undefined'){
+     if(statusNote)statusNote.textContent=FiezelI18n.t('placement.speaking-mic-error');
+     return;
+    }
+    try{
+     chunks=[];
+     stream=await navigator.mediaDevices.getUserMedia({audio:true});
+     const mime=MediaRecorder.isTypeSupported?.('audio/webm;codecs=opus')?'audio/webm;codecs=opus':(MediaRecorder.isTypeSupported?.('audio/mp4')?'audio/mp4':'');
+     mediaRec=mime?new MediaRecorder(stream,{mimeType:mime,audioBitsPerSecond:24000}):new MediaRecorder(stream);
+     mediaRec.ondataavailable=ev=>{if(ev.data&&ev.data.size>0)chunks.push(ev.data)};
+     mediaRec.onstop=()=>{
+      const actualMime=mediaRec?.mimeType||mime||'audio/webm';
+      const blob=new Blob(chunks,{type:actualMime});
+      recBtn.classList.remove('is-recording');
+      if(recLbl)recLbl.textContent=FiezelI18n.t('placement.speaking-record');
+      stopTracks();
+      if(blob.size>200)assessBlob(blob,actualMime);
+     };
+     mediaRec.start();
+     recBtn.classList.add('is-recording');
+     if(recLbl)recLbl.textContent=FiezelI18n.t('placement.speaking-stop');
+     autoStopTimer=setTimeout(()=>{try{if(mediaRec&&mediaRec.state==='recording')mediaRec.stop()}catch(_){}},7500);
+    }catch(_){
+     stopTracks();
+     if(statusNote)statusNote.textContent=FiezelI18n.t('placement.speaking-mic-error');
+    }
+   };
+   if(skipBtn)skipBtn.onclick=()=>{
+    if(answer.locked)return;
+    stopTracks();
+    cfg.__noAudioSkips=(Number(cfg.__noAudioSkips)||0)+1;
+    cfg.__speakingUnavailable=true;
+    asked++;
+    start=Date.now();
+    draw();
+   };
   }
   if(q.type==='token-order'&&self.FiezelGrammarUpgrade&&typeof self.FiezelGrammarUpgrade.renderTokenOrder==='function'){
    const host=$('options');
@@ -20306,7 +20838,7 @@ function quizLoop(cfg){
    if(gemsEligible){if(ok){gemStreak++;const got=awardQuizGems(gemStreak,gemAwards,gemSessionId);if(got){gemAwards++;cfg.__gemsEarned=(Number(cfg.__gemsEarned)||0)+(Number(got)||0)}}else gemStreak=0}
    // F1 placement: bukti per band dikumpulkan di titik yang sama dengan skor, jadi tidak ada
    // jalur jawaban yang bisa lupa melaporkannya. Hanya percobaan pertama - sama seperti skor.
-   if(cfg.placement)(cfg.__placementAnswers??=[]).push({level:String(q.level||''),ok:!!ok});
+   if(cfg.placement){(cfg.__placementAnswers??=[]).push({level:String(q.level||''),ok:!!ok,skillDomain:placementDomainOf(q)});if(cfg.adaptiveCat&&cfg.__catState)placementCatObserve(cfg.__catState,q,!!ok)}
    /* m025-186: tally per seksi Ujian Skip Level — dikumpulkan di titik yang sama dengan skor,
       percobaan pertama saja, supaya lantai per seksi menilai bukti yang sama dengan akurasi. */
    if(cfg.type==='level-exam')(cfg.__examSectionAnswers??=[]).push({type:String(q.type||''),ok:!!ok});
@@ -20600,7 +21132,8 @@ function quizLoop(cfg){
   /* W1 P1-1: jalur cloze di mode ukur juga netral \u2014 bunyi/haptic tanpa vonis. */
   if(MEASURE){haptic('tap');uiSfx('button_tap')}else answerFeedbackSignal(ok);
   if(ok)score++;
-  if(MEASURE)(cfg.__measureReview??=[]).push({q,typed});
+  if(cfg.placement){(cfg.__placementAnswers??=[]).push({level:String(q.level||''),ok:!!ok,skillDomain:'writing'});if(cfg.adaptiveCat&&cfg.__catState)placementCatObserve(cfg.__catState,q,!!ok)}
+  if(MEASURE||cfg.placement)(cfg.__measureReview??=[]).push({q,typed,ok:!!ok});
   q.__typedAnswer=typed;
   record(q,ok,ms,-1);
   // Efek grader: distraktor cocok -> ledger miskonsepsi (guarded di helper).
@@ -20847,12 +21380,13 @@ function finishQuiz(cfg,score,total,tutorReport){
   // angka ambangnya. `state.placementBandLevel` yang belum ada berarti "tidak ada plafon dari
   // bukti band", jadi di dalam test yang berjalan tanpa sesi ia jatuh ke plafon akurasi murni.
   if(cfg.placement)state.placementBandLevel=(cfg.placementLite?placementLiteBandLevel:placementBandLevel)(placementBandTally(cfg.__placementAnswers));
+  if(cfg.placement&&cfg.adaptiveCat&&cfg.__catState){const cv=placementCatFinalize(cfg.__catState,cfg.__placementAnswers);state.placementBandLevel=cv.level;state.placementSkillProfile=cv.skills;state.placementSem=cv.sem;state.placementTier=cfg.placementTier||'normal'}
   const placementBands=cfg.placement?placementBandTally(cfg.__placementAnswers):null;
   // Bukti per band ikut disimpan supaya hasil tes bisa diaudit owner maupun murid, bukan hanya
   // dipercaya. Satu angka level tanpa bandnya adalah kesimpulan tanpa dasar.
   if(cfg.placement)state.placementBands=placementBands;
   const placementWasDone=!!state.placementDone;
-  if(cfg.placement){state.level=cfg.placementLite?Math.max(1,Number(state.placementBandLevel)||1):accuracy<45?1:Math.min(Number(state.placementBandLevel)||6,accuracy<60?2:accuracy<72?3:accuracy<82?4:accuracy<92?5:6);state.placementDone=true;if(cfg.levelScope){const targetIdx=LEVELS.indexOf(cfg.levelScope)+1;state.level=accuracy>=60?targetIdx:Math.max(1,targetIdx-1);}state.placementLastAt=Date.now();/* m028 (kontrak owner 3): placement adalah BUKTI - levelnya langsung terverifikasi. */try{levelTrustAdoptPlacement(placementLevel(state))}catch(_){}}
+  if(cfg.placement){state.level=cfg.placementLite?Math.max(1,Number(state.placementBandLevel)||1):accuracy<45?1:Math.min(Number(state.placementBandLevel)||6,accuracy<60?2:accuracy<72?3:accuracy<82?4:accuracy<92?5:6);state.placementDone=true;if(cfg.adaptiveCat&&state.placementBandLevel)state.level=Math.max(1,Number(state.placementBandLevel)||1);if(cfg.levelScope){const targetIdx=LEVELS.indexOf(cfg.levelScope)+1;state.level=accuracy>=60?targetIdx:Math.max(1,targetIdx-1);}state.placementLastAt=Date.now();/* m028 (kontrak owner 3): placement adalah BUKTI - levelnya langsung terverifikasi. */try{levelTrustAdoptPlacement(placementLevel(state))}catch(_){}}
   // Hasil tes vs level yang dipilih sendiri di onboarding. `getActiveLevel()` mendahulukan
   // `preferences.activeLevel`, jadi tanpa penyelesaian di sini seluruh perbaikan skoring tidak
   // akan pernah terlihat oleh murid yang keburu menebak levelnya sendiri di layar perkenalan.
@@ -20949,13 +21483,13 @@ function finishQuiz(cfg,score,total,tutorReport){
   // hanya menampilkan persentase; nama level baru terlihat sesudah kembali ke Home lewat chip
   // level (temuan empiris §2 nomor 3). Murid berhak tahu hasil tesnya di momen pengumumannya,
   // beserta band mana yang menjadi dasarnya.
-  const placementLevelBlock=cfg.placement&&placementLevelName?`<div class="result-level"><span class="result-level-mark">${FiezelI18n.t('quiz.placement-mark')}</span><b class="result-level-name">${esc(placementLevelName)}</b><span class="result-level-desc">${esc(levelDescriptor(placementLevelName))}</span><span class="result-level-scope">${FiezelI18n.t('quiz.placement-scope')}</span></div>${placementBands?`<div class="result-bands"><small>${FiezelI18n.t('quiz.placement-evidence')}</small><div class="result-band-row">${placementBandChips(placementBands,state.level)}</div><small>${FiezelI18n.t('quiz.placement-rule')}</small></div>`:''}${placementAdopted?`<p class="muted">${FiezelI18n.t('quiz.placement-adopted')}</p>`:''}${placementManualLevel?`<p class="muted">${FiezelI18n.t('quiz.placement-manual-override',{manual:`<b>${esc(placementManualLevel)}</b>`,result:`<b>${esc(placementLevelName)}</b>`})}</p>`:''}`:'';
-  const placementAdoptButton=cfg.placement&&placementManualLevel?`<button class="primary" onclick="usePlacementLevel()&&go('home')">${FiezelI18n.t('quiz.placement-adopt-btn',{level:esc(placementLevelName)})} <i data-lucide="arrow-right"></i></button>`:'';
+  const placementLevelBlock=cfg.placement&&placementLevelName?`<div class="result-level"><span class="result-level-mark">${FiezelI18n.t('quiz.placement-mark')}</span><b class="result-level-name">${esc(displayLevel(placementLevelName))}</b><span class="result-level-desc">${esc(levelDescriptor(placementLevelName))}</span><span class="result-level-scope">${FiezelI18n.t('quiz.placement-scope')}</span></div>${cfg.adaptiveCat&&state.placementSkillProfile?placementSkillProfileMarkup(state.placementSkillProfile):''}${placementBands?`<div class="result-bands"><small>${FiezelI18n.t('quiz.placement-evidence')}</small><div class="result-band-row">${placementBandChips(placementBands,state.level)}</div><small>${FiezelI18n.t('quiz.placement-rule')}</small></div>`:''}${placementAdopted?`<p class="muted">${FiezelI18n.t('quiz.placement-adopted')}</p>`:''}${placementManualLevel?`<p class="muted">${FiezelI18n.t('quiz.placement-manual-override',{manual:`<b>${esc(displayLevel(placementManualLevel))}</b>`,result:`<b>${esc(displayLevel(placementLevelName))}</b>`})}</p>`:''}`:'';
+  const placementAdoptButton=cfg.placement&&placementManualLevel?`<button class="primary" onclick="usePlacementLevel()&&go('home')">${FiezelI18n.t('quiz.placement-adopt-btn',{level:esc(displayLevel(placementLevelName))})} <i data-lucide="arrow-right"></i></button>`:'';
   /* W1 P1-1 (09-001): pembahasan per-soal mode ukur HIDUP DI SINI \u2014 setelah pengukuran
      selesai, bukan di tengahnya. Nilai belajarnya utuh (jawabanmu vs kunci + intinya +
      pembandingnya), integritas ujiannya juga: tidak ada kunci yang tampil sebelum skor final. */
   const measureRows=Array.isArray(cfg.__measureReview)?cfg.__measureReview:[];
-  const measureReviewBlock=measureRows.length?`<details class="acc measure-review"><summary>${FiezelI18n.t('quiz.result-review-summary',{count:measureRows.length})}</summary><div class="measure-review-list">${measureRows.map((r,i)=>{const q=r.q||{};const isCloze=q.type==='cloze';const ok=isCloze?norm(String(r.typed||''))===norm(String(q.clozeAnswer||'')):r.chosen===q.answerIndex;const yours=isCloze?String(r.typed||'\u2014'):String(q.options?.[r.chosen]??'\u2014');const key=isCloze?String(q.clozeAnswer||''):String(q.options?.[q.answerIndex]??'');return `<div class="feedback ${ok?'feedback-success':'feedback-error'}"><div class="feedback-title"><i data-lucide="${ok?'circle-check-big':'circle-x'}"></i><b>${i+1}. ${esc(q.question||'')}</b></div><p>${ok?FiezelI18n.t('quiz.result-your-answer-correct',{yours:`<strong>${esc(yours)}</strong>`}):FiezelI18n.t('quiz.result-your-answer-wrong',{yours:`<strong>${esc(yours)}</strong>`,key:`<strong>${esc(key)}</strong>`})}</p>${q.explain?.why||q.explain?.rule?`<p class="muted"><strong>${FiezelI18n.t('quiz.result-takeaway')}</strong> ${esc(q.explain?.why||'')} ${q.explain?.rule?formatRuleForDisplay(esc(q.explain.rule)):''}</p>`:''}</div>`}).join('')}</div></details>`:'';
+  const measureReviewBlock=measureRows.length?`<details class="acc measure-review"><summary>${FiezelI18n.t('quiz.result-review-summary',{count:measureRows.length})}</summary><div class="measure-review-list">${measureRows.map((r,i)=>{const q=r.q||{};const isCloze=q.type==='cloze';const isSpeak=q.type==='speaking';const isTok=q.type==='token-order';const ok=typeof r.ok==='boolean'?r.ok:(isCloze?norm(String(r.typed||''))===norm(String(q.clozeAnswer||'')):r.chosen===q.answerIndex);const yours=(isCloze||isSpeak)?String(r.typed||'\u2014'):isTok?String(q.__userTokenAnswer||'\u2014'):String(q.options?.[r.chosen]??'\u2014');const key=isCloze?String(q.clozeAnswer||''):isSpeak?String(q.speakingTarget||''):isTok?String((q.tokens||[]).join(' ')):String(q.options?.[q.answerIndex]??'');return `<div class="feedback ${ok?'feedback-success':'feedback-error'}"><div class="feedback-title"><i data-lucide="${ok?'circle-check-big':'circle-x'}"></i><b>${i+1}. ${esc(q.question||'')}</b></div><p>${ok?FiezelI18n.t('quiz.result-your-answer-correct',{yours:`<strong>${esc(yours)}</strong>`}):FiezelI18n.t('quiz.result-your-answer-wrong',{yours:`<strong>${esc(yours)}</strong>`,key:`<strong>${esc(key)}</strong>`})}</p>${q.explain?.why||q.explain?.rule?`<p class="muted"><strong>${FiezelI18n.t('quiz.result-takeaway')}</strong> ${esc(q.explain?.why||'')} ${q.explain?.rule?formatRuleForDisplay(esc(q.explain.rule)):''}</p>`:''}</div>`}).join('')}</div></details>`:'';
   /* i10 2026-08-28 (O5 §7): hasil = laporan dulu, perayaan kalau pantas — trofi + "SESSION
      COMPLETE" di atas skor 17% adalah nada yang berbohong. Ambang ikon/tanda = ambang
      konfeti quizMajorCelebrate di atas (accuracy>=70). Literal vonis & CTA (r2 smoke:
