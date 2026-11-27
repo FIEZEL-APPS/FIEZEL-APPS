@@ -109,6 +109,10 @@ const SENSUS = new Map([
     sejak: '2026-10-24', medan: 48, berTh: 0,
     catatan: 'label + description_id untuk 24 kode miskonsepsi N5-N1+; belum dirujuk kode mana pun, sidecar Thai belum ada',
   }],
+  ['placement-ja.json', {
+    sejak: '2026-11-28', medan: 89, berTh: 89,
+    catatan: 'suplemen tes penempatan 5 keterampilan N5-N1+ (writing cloze, speaking, susun kata); sidecar Thai lengkap di placement-ja-th.json',
+  }],
 ]);
 
 /* Bank yang memang TIDAK punya teks murid — bukan utang, jadi tidak masuk sensus. */
@@ -149,6 +153,14 @@ function medanMurid(nama, doc) {
      * tidak dipungut. `catatan` adalah nota penulis di tingkat berkas, juga bukan naskah
      * murid. Yang dipungut sama dengan yang dipungut sidecar Thai versi Inggrisnya. */
     for (const c of Object.values(doc.codes || {})) { pungut(c.label); pungut(c.description_id); }
+  } else if (nama === 'placement-ja.json') {
+    for (const w of doc.writing || []) {
+      pungut(w.sentence);
+      if (w.explain) { pungut(w.explain.why); pungut(w.explain.rule); }
+      for (const d of w.distractors || []) { pungut(d.whyFailsId); pungut(d.misconceptionId); }
+    }
+    for (const s of doc.speaking || []) pungut(s.meaningId);
+    for (const t of doc.tokenOrder || []) { pungut(t.prompt); pungut(t.rule); pungut(t.why); }
   }
   return keluar;
 }

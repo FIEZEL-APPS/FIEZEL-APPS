@@ -60,9 +60,9 @@ Melalui eksekusi probe peramban Chromium Playwright sungguhan atas `buildPlaceme
 - `features/onboarding/fiezel-onboarding.js` — Kartu kursus Bahasa Mandarin + panel Pinyin `<ruby>` + pemilih tingkat Mudah/Normal/Susah pada langkah Tes Penempatan.
 - `features/ui/fiezel-tactile-clay.css` — Gaya komponen `.fz-ob-tier-row`, `.placement-tier-bar`, `.speaking-quiz-box`, dan `.result-skill-profile`.
 - `workers/api/voice/route-voice-live.js` — Mode penilaian pelafalan & ketepatan kalimat target multimodal Gemini pada `POST /api/voice/verify-speech`.
-- `content/zh/placement-zh.json` & `content/ja/placement-ja.json` — Bank soal kurasi 5 keterampilan + Susun Kata bebas bocoran kunci.
+- `content/zh/placement-zh.json`, `content/ja/placement-ja.json`, & `content/ja/placement-ja-th.json` — Bank soal kurasi 5 keterampilan + Susun Kata bebas bocoran kunci beserta sidecar paritas Thai lengkap (89/89 medan).
 - `features/i18n/copy-id-feat-b.js`, `features/i18n/copy-th-feat-b.js`, `features/i18n/locales/*/ui.json` — Paritas penuh i18n 9 bahasa (0 kebocoran Thai).
-- `tests/placement-accuracy-test.js`, `tests/onboarding-test.js`, `tests/auth-screen-test.js`, `id-golden-baseline.json` — Asersi regresi Monte Carlo CAT 3-tier & onboarding 3 kursus.
+- `tests/placement-accuracy-test.js`, `tests/onboarding-test.js`, `tests/auth-screen-test.js`, `tests/japanese-th-parity-test.js`, `id-golden-baseline.json` — Asersi regresi Monte Carlo CAT 3-tier, paritas sensus Thai bank Jepang, & onboarding 3 kursus.
 - `coordination/BUILD-VERSION.json`, `sw.js`, `core-config.js`, `features/neural-voice/fiezel-diag-panel.js`, `kurikulum.html`, `misi.html` — Sinkronisasi 6 titik `m025-818`.
 
 ## 5. Langkah Berikutnya (Roadmap)

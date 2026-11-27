@@ -18394,7 +18394,7 @@ let placementListeningBankEn=null,placementListeningBankJa=null,placementListeni
    memakai template zh yang 192 stem-nya identik ("我们在学校____X。") dengan pilihan tak
    bermakna. Mandarin kini punya bank penempatan kurasi sendiri (content/zh/placement-zh.json):
    listening berbahasa Mandarin (dibacakan zh-CN) dan grammar bertingkat HSK 1-6. */
-let placementBankZh=null,placementBankJa=null,placementSpeakingEn=null;
+let placementBankZh=null,placementBankJa=null,placementBankJaTh=null,placementSpeakingEn=null;
 function placementCourseIsZh(){try{return typeof activeTargetLang==='function'&&activeTargetLang()==='zh'}catch(_){return false}}
 async function loadPlacementBankZh(){
   if(placementBankZh)return placementBankZh;
@@ -18414,18 +18414,33 @@ async function loadPlacementBankZh(){
   return placementBankZh;
 }
 async function loadPlacementBankJa(){
-  if(placementBankJa)return placementBankJa;
-  try{
-    const response=await fetch('./content/ja/placement-ja.json');
-    if(!response.ok)throw new Error(`ja_placement_${response.status}`);
-    const bank=await response.json();
-    placementBankJa={
-      writing:Array.isArray(bank?.writing)?bank.writing:[],
-      speaking:Array.isArray(bank?.speaking)?bank.speaking:[],
-      tokenOrder:Array.isArray(bank?.tokenOrder)?bank.tokenOrder:[]
-    };
-  }catch{placementBankJa={writing:[],speaking:[],tokenOrder:[]}}
-  return placementBankJa;
+  if(!placementBankJa){
+    try{
+      const response=await fetch('./content/ja/placement-ja.json');
+      if(!response.ok)throw new Error(`ja_placement_${response.status}`);
+      const bank=await response.json();
+      placementBankJa={
+        writing:Array.isArray(bank?.writing)?bank.writing:[],
+        speaking:Array.isArray(bank?.speaking)?bank.speaking:[],
+        tokenOrder:Array.isArray(bank?.tokenOrder)?bank.tokenOrder:[]
+      };
+    }catch{placementBankJa={writing:[],speaking:[],tokenOrder:[]}}
+  }
+  let isTh=false;try{isTh=self.FiezelI18n?.getLocale?.()==='th'}catch{}
+  if(!isTh)return placementBankJa;
+  if(!placementBankJaTh){
+    try{
+      const trRes=await fetch('./content/ja/placement-ja-th.json');
+      if(trRes.ok)placementBankJaTh=await trRes.json();
+    }catch{}
+  }
+  if(!placementBankJaTh)return placementBankJa;
+  const wMap=placementBankJaTh.writing||{},sMap=placementBankJaTh.speaking||{},tMap=placementBankJaTh.tokenOrder||{};
+  return{
+    writing:placementBankJa.writing.map(w=>{const tr=wMap[w.id];if(!tr)return w;return{...w,sentence:tr.sentence||w.sentence,explain:w.explain?{...w.explain,why:tr.why||w.explain.why,rule:tr.rule||w.explain.rule}:w.explain,distractors:Array.isArray(w.distractors)?w.distractors.map(d=>({...d,whyFailsId:tr.whyFailsId||d.whyFailsId,misconceptionId:tr.misconceptionId||d.misconceptionId})):w.distractors}}),
+    speaking:placementBankJa.speaking.map(s=>sMap[s.id]?{...s,meaningId:sMap[s.id]}:s),
+    tokenOrder:placementBankJa.tokenOrder.map(t=>{const tr=tMap[t.id];return tr?{...t,prompt:tr.prompt||t.prompt,rule:tr.rule||t.rule,why:tr.why||t.why}:t})
+  };
 }
 async function loadPlacementSpeakingEn(){
   if(placementSpeakingEn)return placementSpeakingEn;
